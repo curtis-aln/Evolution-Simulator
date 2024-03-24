@@ -135,23 +135,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\builder\builder.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Protozoa\init.cpp" />
     <ClCompile Include="src\Protozoa\physics.cpp" />
     <ClCompile Include="src\Protozoa\rendering.cpp" />
     <ClCompile Include="src\simulation\simulation.cpp" />
     <ClCompile Include="src\world\world.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\builder\builder.h" />
+    <ClInclude Include="src\food\food.h" />
+    <ClInclude Include="src\food\food_manager.h" />
+    <ClInclude Include="src\Protozoa\cell.h" />
     <ClInclude Include="src\Protozoa\genetics.h" />
     <ClInclude Include="src\Protozoa\Protozoa.h" />
+    <ClInclude Include="src\Protozoa\spring.h" />
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\simulation\simulation.h" />
+    <ClInclude Include="src\Utils\button.h" />
+    <ClInclude Include="src\Utils\Circle.h" />
     <ClInclude Include="src\Utils\font_renderer.hpp" />
     <ClInclude Include="src\Utils\fps_manager.h" />
+    <ClInclude Include="src\Utils\line_graph.h" />
     <ClInclude Include="src\Utils\o_vector.hpp" />
     <ClInclude Include="src\Utils\Random.h" />
+    <ClInclude Include="src\Utils\slider.h" />
     <ClInclude Include="src\Utils\time.h" />
     <ClInclude Include="src\Utils\utility.h" />
+    <ClInclude Include="src\Utils\utility_SFML.h" />
+    <ClInclude Include="src\Utils\Camera.hpp" />
     <ClInclude Include="src\world\world.h" />
   </ItemGroup>
   <ItemGroup>

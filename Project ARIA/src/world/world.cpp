@@ -1,6 +1,7 @@
 #include "world.h"
+#include "../Utils/utility_SFML.h"
 
-World::World(sf::RenderWindow* window) : m_window(window), Sample1(world_boundaries, window, &cell_renderer)
+World::World(sf::RenderWindow* window) : m_window_(window), border_render_(make_circle(m_bounds_.radius, m_bounds_.center))
 {
 	init_organisms();
 	init_food();
@@ -11,13 +12,22 @@ World::World(sf::RenderWindow* window) : m_window(window), Sample1(world_boundar
 
 void World::update_world()
 {
-	Sample1.update();
+	for (Protozoa& protozoa : m_all_protozoa_)
+	{
+		protozoa.update();
+	}
 }
 
 
 void World::render_world()
 {
-	Sample1.render();
+	for (Protozoa& protozoa : m_all_protozoa_)
+	{
+		protozoa.render();
+	}
+
+	// drawing the world bounds
+	m_window_->draw(border_render_);
 }
 
 
@@ -29,7 +39,9 @@ void World::render_debug()
 
 void World::init_organisms()
 {
-
+	m_all_protozoa_.reserve(max_protozoa);
+	for (int i = 0; i < max_protozoa; ++i)
+		m_all_protozoa_.emplace_back(&m_bounds_, m_window_, &cell_renderer_);
 }
 
 
@@ -46,18 +58,24 @@ void World::init_environment()
 
 
 
-void World::check_hovering(bool debug_mode)
+void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_position)
 {
 	// resetting all states
-	Sample1.set_debug_mode(false);
+	for (Protozoa& protozoa : m_all_protozoa_)
+	{
+		protozoa.set_debug_mode(false);
+	}
 
 	if (!debug_mode)
 		return;
 
-	const auto mouse_position = static_cast<sf::Vector2f>(sf::Mouse::getPosition(*m_window));
 
-	if (Sample1.is_hovered_on(mouse_position))
+	for (Protozoa& protozoa : m_all_protozoa_)
 	{
-		Sample1.set_debug_mode(true);
+		if (protozoa.is_hovered_on(mouse_position))
+		{
+			protozoa.set_debug_mode(true);
+			break;
+		}
 	}
 }

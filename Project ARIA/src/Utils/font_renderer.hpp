@@ -2,43 +2,51 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-class FontManager
+class Font
 {
-	sf::Font m_font{};
-	sf::Text text{};
-	sf::RenderWindow* m_window;
+    sf::Font m_font_;
+    sf::Text m_text_;
+    sf::RenderWindow* m_window_;
 
 public:
-	FontManager(sf::RenderWindow* window, const unsigned font_size, const std::string& font_loc) : m_window(window)
-	{
-		if (!m_font.loadFromFile(font_loc))
-		{
-			std::cout << "[ERROR]: failed to load font \n";
-			return;
-		}
+    // Constructor taking font size and file location
+    Font(sf::RenderWindow* window, const unsigned font_size, const std::string& font_location) : m_window_(window)
+    {
+        if (!m_font_.loadFromFile(font_location))
+        {
+            std::cerr << "[ERROR]: Failed to load font from: " << font_location << '\n';
+            return;
+        }
 
-		text.setCharacterSize(font_size);
-		text.setFont(m_font);
-		text.setFillColor(sf::Color::White);
-	}
+        m_text_.setFont(m_font_);
+        m_text_.setFillColor(sf::Color::White);
+        set_font_size(font_size);
+    }
 
-	void draw(const sf::Vector2f& position, const std::string& string_text, const bool centered = false)
-	{
-		text.setString(string_text);
+    // Function to set font size
+    void set_font_size(const unsigned font_size)
+    {
+        m_text_.setCharacterSize(font_size);
+    }
 
+    // Function to draw text on the window
+    void draw(const sf::Vector2f& position, const std::string& string_text, const bool centered = false, 
+        const sf::RenderStates& render_states = sf::RenderStates())
+    {
+        m_text_.setString(string_text);
 
-		// Calculate the position for centering the text
-		const sf::FloatRect textBounds = text.getLocalBounds();
+        // Calculate text bounds
+        const sf::FloatRect text_bounds = m_text_.getLocalBounds();
+        sf::Vector2f text_position = position;
 
-		sf::Vector2f textPosition = position;
-		if (centered)
-			textPosition = { position.x - textBounds.width / 2, position.y - textBounds.height / 2 };
+        // Adjust position for centering if needed
+        if (centered)
+        {
+            text_position.x -= text_bounds.width / 2.0f;
+            text_position.y -= text_bounds.height / 2.0f;
+        }
 
-
-		text.setPosition(textPosition);
-
-
-		m_window->draw(text);
-	}
-
+        m_text_.setPosition(text_position);
+        m_window_->draw(m_text_, render_states);
+    }
 };

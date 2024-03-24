@@ -2,22 +2,21 @@
 
 #include <chrono>
 
-// a simple class used for managing time frames, the GetDelta function updates the time so call it at set frequent intervals
-struct DeltaTime
+// A utility class for managing time frames, the GetDelta function updates the time so call it at set frequent intervals
+class StopWatch
 {
-	DeltaTime()
-	{
-		m_start = std::chrono::high_resolution_clock::now();
-	}
+    std::chrono::high_resolution_clock::time_point start_time_;
 
-	double GetDelta()
-	{
-		const auto currentTime = std::chrono::high_resolution_clock::now();
-		const auto delta = currentTime - m_start;
-		m_start = currentTime;
-		return std::chrono::duration_cast<std::chrono::duration<double>>(delta).count();
-	}
+public:
+    // Constructor
+    StopWatch() : start_time_(std::chrono::high_resolution_clock::now()) {}
 
-private:
-	std::chrono::high_resolution_clock::time_point m_start;
+    // Get the time elapsed since the last call to GetDelta
+    double get_delta()
+    {
+        const auto current_time = std::chrono::high_resolution_clock::now();
+        const auto delta = current_time - start_time_;
+        start_time_ = current_time;
+        return std::chrono::duration_cast<std::chrono::duration<double>>(delta).count();
+    }
 };

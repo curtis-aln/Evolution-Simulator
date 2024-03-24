@@ -1,106 +1,51 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "../settings.h"
-
-
-class Cell : CellSettings
-{
-	Cell* m_parent = nullptr;
-	std::vector<int> children_ids{};
-
-	sf::Vector2f m_position{};
-	sf::Vector2f m_velocity{};
-
-	float m_radius = 10.f;
-	float m_direction{};
-
-	sf::Color m_cell_color_inner = { 200, 215, 161 };
-	sf::Color m_cell_color_outer = { 140, 154, 110 };
-
-
-public:
-	int _relID;
-
-	Cell(Cell* parent = nullptr, int relId = 0) : m_parent(parent), _relID(relId)
-	{
-		
-	}
-
-	void update()
-	{
-		
-	}
-
-	void render(sf::RenderWindow* window, sf::CircleShape* renderer)
-	{
-		// configuring the renderer to have the cell paramas
-		renderer->setPosition(m_position - sf::Vector2f{ m_radius, m_radius });
-		renderer->setRadius(m_radius);
-		renderer->setFillColor(m_cell_color_inner);
-		renderer->setOutlineColor(m_cell_color_outer);
-		renderer->setOutlineThickness(m_radius / 6);
-
-		window->draw(*renderer);
-	}
-
-	void render_debug(sf::RenderWindow* window)
-	{
-		
-	}
-
-	void set_position(const sf::Vector2f new_position)
-	{
-		m_position = new_position;
-	}
-
-	sf::Vector2f get_position() const { return m_position; }
-	float get_radius() const { return m_radius; }
-
-	// relationship management
-	void set_parent(Cell* parent) { m_parent = parent; }
-	bool is_parent(const Cell* query_cell) const { return query_cell == m_parent; }
-	bool is_child(const int query_cell_id) const
-	{
-		for (int id : children_ids)
-		{
-			if (id == query_cell_id)
-				return true;
-		}
-		return false;
-	}
-	void add_child(const int child_id)
-	{
-		children_ids.push_back(child_id);
-	}
-};
-
-
+#include "../Utils/font_renderer.hpp"
+#include "../Utils/utility.h"
+#include "../Utils/utility_SFML.h"
+#include "../Utils/Circle.h"
+#include "cell.h"
+#include "spring.h"
 
 class Protozoa : ProtozoaSettings
 {
-	sf::RenderWindow* m_window = nullptr;
-	sf::CircleShape* m_cell_renderer = nullptr;
+	sf::RenderWindow* m_window_ptr_ = nullptr;
+	sf::CircleShape* m_cell_renderer_ptr_ = nullptr;
 
-	std::vector<Cell> m_cells;
+	std::vector<Cell> m_cells_{};
+	std::vector<Spring> m_springs_{};
 
-	sf::Rect<float> m_world_bounds{};
-	sf::Rect<float> m_personal_bounds{};
+	Circle* m_world_bounds_ = nullptr;
+	sf::Rect<float> m_personal_bounds_{};
 
-	bool debug_mode = false;
+	bool debug_mode_ = false;
+	Font m_info_font_;
+
+	float energy = 100.f;
+	unsigned frames_alive = 0u;
+	unsigned generation = 0u;
 
 
 public:
-	Protozoa(const sf::Rect<float>& bounds = sf::Rect<float>(), sf::RenderWindow* window = nullptr, sf::CircleShape* cell_renderer = nullptr);
+	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, sf::CircleShape* cell_renderer = nullptr);
 
 	void update();
+	void update_springs();
+	void update_cells();
 	bool is_hovered_on(sf::Vector2f mousePosition) const;
 	void set_debug_mode(bool mode);
 	void render();
+	void render_cells();
 
 private:
 	void render_debug();
+	void render_cell_connections(Cell& cell, const bool thick_lines = false) const;
 	void update_bounds();
 	void initialise_cells();
-	void set_parent_cell(Cell* cell);
-	static bool create_cellular_connection(Cell* parent_cell, Cell* child_cell);
+	void create_children_for_cell(Cell& cell, float probability, int depth, bool is_parent);
+	void create_cell(Cell* parent, float probability, int depth);
+	void initialise_springs();
+	bool does_spring_exist_between(int cellA_id, int cellB_id) const;
+	static void create_cellular_connection(Cell* parent_cell, Cell* child_cell);
 };

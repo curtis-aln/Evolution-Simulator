@@ -4,6 +4,16 @@
 #include <array>
 #include <vector>
 
+
+/*
+- Optimize iterator implementation for better performance, possibly by caching the last active index.
+- Implement boundary checks in the at method for safer object retrieval.
+- Enhance the efficiency of adding and removing objects, possibly by avoiding linear searches.
+- Consider alternative data structures such as linked lists or hash maps for better performance with large datasets.
+- Improve error handling to provide more informative feedback in cases of container overflow or other errors.
+ */
+
+
 // add this as a public parent struct to the Obj class/structure
 struct o_vec_object
 {
@@ -22,7 +32,7 @@ public:
     int active_objs = 0;
 
 private:
-    // this array contains all of the items and is never directly modified
+    // this array contains all the items and is never directly modified
     std::array<Obj*, N> array{};
 
     // this tracks the actual initilised and implemented Objects being used

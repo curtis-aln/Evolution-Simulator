@@ -1,38 +1,14 @@
 #include "simulation.h"
+#include "../Utils/utility.h"
 
 
-inline std::string trimDoubleToString(const float number, const int precision)
-{
-	// Convert the double to a string with the specified precision
-	std::string result = std::to_string(number);
-	const size_t dotPosition = result.find('.');
-
-	if (dotPosition != std::string::npos)
-	{
-		// Check if there are enough characters after the dot
-		if (result.length() - dotPosition > precision + 1)
-		{
-			result = result.substr(0, dotPosition + precision + 1);
-		}
-	}
-
-	return result;
-}
-
-inline std::string boolToString(const bool val)
-{
-	if (val)
-		return "True";
-	return "False";
-}
-
-
-
-Simulation::Simulation() : m_World(&m_window_)
+Simulation::Simulation() : m_world_(&m_window_)
 {
 	m_window_.setFramerateLimit(frame_rate);
 	std::cout << "window dimensions: " << m_window_.getSize().x << " " << m_window_.getSize().y << "\n";
 	m_window_.setVerticalSyncEnabled(false); // more efficient to have vsync set to false
+
+	protozoa_population_graph.init_graphics("Protozoa", "Time", "Population", { 20, 200, 20 }, { 20, 100, 20 });
 }
 
 
@@ -49,10 +25,11 @@ void Simulation::run()
 
 void Simulation::update()
 {
-	++m_ticks;
-	m_total_time_elapsed += static_cast<float>(deltaTime.GetDelta());
+	++m_ticks_;
+	m_total_time_elapsed_ += static_cast<float>(m_delta_time_.get_delta());
 
-	m_World.update_world();
+	m_world_.update_world();
+	m_builder_.update(camera.get_world_mouse_pos());
 }
 
 
@@ -61,10 +38,11 @@ void Simulation::render()
 {
 	m_window_.clear(window_color);
 
-	display_frame_rate();
-	display_statistics();
-	m_World.render_world();
-	m_World.render_debug();
+	display_screen_info();
+	m_world_.render_world();
+	m_world_.render_debug();
+	m_builder_.render();
+	protozoa_population_graph.render();
 
 	m_window_.display();
 }
@@ -72,10 +50,10 @@ void Simulation::render()
 
 void Simulation::handle_events()
 {
-	//const sf::Vector2f delta = updateMousePos(getMousePositionFloat(m_window));
+	camera.update();
 
-	//if (m_mousePressed)
-	//	translate(delta);
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+		camera.translate();
 
 	sf::Event event{};
 	while (m_window_.pollEvent(event))
@@ -86,42 +64,18 @@ void Simulation::handle_events()
 		else if (event.type == sf::Event::KeyPressed)
 			keyboard_input(event.key.code);
 
-		//else if (event.type == sf::Event::MouseWheelScrolled)
-		//	zoom(event.mouseWheelScroll.delta);
-		//
-		//else if (event.type == sf::Event::MouseButtonPressed)
-		//{
-		//	if (event.mouseButton.button == sf::Mouse::Left)
-		//		m_mousePressed = true;
-		//
-		//	else
-		//	{
-		//		const sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
-		//		std::cout << mousePos.x << " " << mousePos.y << "\n";
-		//
-		//		const auto scaled_pos = static_cast<sf::Vector2f>(mousePos) * m_currentScroll;
-		//
-		//		std::cout << scaled_pos.x << " " << scaled_pos.y << "\n";
-		//	}
-		//}
-		//
-		//else if (event.type == sf::Event::MouseButtonReleased)
-		//{
-		//	if (event.mouseButton.button == sf::Mouse::Left)
-		//		m_mousePressed = false;
-		//}
+		else if (event.type == sf::Event::MouseWheelScrolled)
+			camera.zoom(event.mouseWheelScroll.delta);
 	}
 
 	// mouse hovering over an organism
-	m_World.check_hovering(m_debug_);
+	m_world_.check_hovering(m_debug_, camera.get_world_mouse_pos());
 	
 }
 
 
 void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 {
-	const bool shifting = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
-
 	switch (event_key_code)
 	{
 	case sf::Keyboard::Escape: m_window_.close(); break;
@@ -152,30 +106,26 @@ void Simulation::mouse_input()
 
 }
 
-void Simulation::display_frame_rate()
+
+void Simulation::display_screen_info()
 {
+	camera.toggle_view(false);
+	manage_frame_rate();
 
-}
+	m_title_font_.draw({ 20, 20 }, simulation_name);
 
-void Simulation::display_statistics()
-{
-	manage_framerate();
-	const std::string better_fps = std::to_string(m_frameRateManager.getFrameRate());
-	const std::string time = trimDoubleToString(m_total_time_elapsed, 2);
+	const std::string combined_string = "fps: " + trim_decimal_to_string(m_clock_.get_average_frame_rate(), 2) + "\n" +
+								        "time elapsed:" + trim_decimal_to_string(m_total_time_elapsed_, 2) + "s\n" +
+								        "pause [SPACE]: " + bool_to_string(m_paused_) + "\n" +
+								        "debug [D]: "     + bool_to_string(m_debug_) + "\n" +
+								        "quit [ESC]";
 
-	title_font.draw({ 20, 20 }, simulation_name);
-	text_font.draw({ 20, 65 }, "fps: " + better_fps);
-	//text_font.draw({ 20, 90 }, "frame ticks:" + m_ticks);
-	text_font.draw({ 20, 115 }, "time elapsed:" + time + "s");
-
-	text_font.draw({ 20, 245 }, "pause [SPACE]: " + boolToString(m_paused_));
-	text_font.draw({ 20, 270 }, "quit [ESC]");
-	text_font.draw({ 20, 295 }, "debug [D]: " + boolToString(m_debug_));
+	m_text_font_.draw({ 20, 55 }, combined_string);
+	camera.toggle_view(true);
 }
 
 
-void Simulation::manage_framerate()
+void Simulation::manage_frame_rate()
 {
-	const auto raw_fps = static_cast<unsigned>(1.f / m_clock_.restart().asSeconds());
-	m_frameRateManager.updateFrameRates(raw_fps);
+	m_clock_.update_frame_rate();
 }

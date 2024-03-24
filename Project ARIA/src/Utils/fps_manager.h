@@ -1,29 +1,50 @@
 #pragma once
 
+#include <array> // Include for std::array
+#include <chrono> // Include for std::chrono
 
-// a class used to get average framerates
-template<const unsigned resolution>
-struct BetterFrameRates
+// A utility class for smoothing out frame rates by calculating the average frame rate across multiple frames
+template<size_t Resolution>
+class FrameRateSmoothing
 {
-	unsigned framerates[resolution] = {};
-	unsigned size = 0;
-	unsigned counter = 0;
+    std::array<unsigned, Resolution> frame_rates_array_;
+    size_t current_index_ = 0;
+    size_t current_size_ = 0;
+    std::chrono::steady_clock::time_point last_frame_time_;
 
-	int getFrameRate()
-	{
-		if (size == 0) return 0;
+public:
+    // Constructor
+    FrameRateSmoothing() : frame_rates_array_{}, last_frame_time_(std::chrono::steady_clock::now()) {}
 
-		float sum = 0;
-		for (const unsigned val : framerates) { sum += val; }
-		return static_cast<int>(sum / size);
-	}
+    // Get the average frame rate
+    [[nodiscard]] float get_average_frame_rate() const
+    {
+        if (current_size_ == 0) return 0.0f;
 
-	void updateFrameRates(const unsigned frameRate)
-	{
-		if (counter >= resolution)
-			counter = 0;
+        unsigned sum = 0;
+        for (size_t i = 0; i < current_size_; ++i)
+            sum += frame_rates_array_[i];
 
-		if (size < resolution) ++size;
-		framerates[counter++] = frameRate;
-	}
+        return static_cast<float>(sum) / static_cast<float>(current_size_);
+    }
+
+    // Update frame rate array
+    void update_frame_rate()
+    {
+	    const auto current_time = std::chrono::steady_clock::now();
+	    const auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - last_frame_time_);
+
+        if (elapsed_time.count() > 0)
+        {
+            unsigned frame_rate = 1000 / static_cast<unsigned>(elapsed_time.count());
+
+            if (current_size_ < Resolution)
+                ++current_size_;
+
+            frame_rates_array_[current_index_] = frame_rate;
+            current_index_ = (current_index_ + 1) % Resolution;
+
+            last_frame_time_ = current_time;
+        }
+    }
 };
