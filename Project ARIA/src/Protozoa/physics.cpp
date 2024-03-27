@@ -6,12 +6,15 @@
 
 void Protozoa::update()
 {
+	if (m_cells_.size() == 0)
+		return;
+
 	update_bounds();
-	
-	++frames_alive;
 
 	update_springs();
 	update_cells();
+
+	++frames_alive;
 
 }
 
@@ -43,7 +46,7 @@ void Protozoa::update_bounds()
 
 	for (const Cell& cell : m_cells_) 
 	{
-		sf::Vector2f pos = cell.get_position();
+		const sf::Vector2f pos = cell.get_position();
 		if (pos.x < minX) minX = pos.x - cell.get_radius();
 		if (pos.x > maxX) maxX = pos.x + cell.get_radius();
 		if (pos.y < minY) minY = pos.y - cell.get_radius();

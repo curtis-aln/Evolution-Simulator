@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="src\builder\builder.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Protozoa\debug.cpp" />
     <ClCompile Include="src\Protozoa\init.cpp" />
     <ClCompile Include="src\Protozoa\physics.cpp" />
     <ClCompile Include="src\Protozoa\rendering.cpp" />

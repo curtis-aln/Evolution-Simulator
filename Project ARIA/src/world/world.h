@@ -28,7 +28,7 @@ public:
 	void update_world();
 	void render_world();
 	void render_debug();
-	void check_hovering(bool debug_mode, const sf::Vector2f mouse_position);
+	void check_hovering(bool debug_mode, sf::Vector2f mouse_position);
 
 private:
 	void init_organisms();

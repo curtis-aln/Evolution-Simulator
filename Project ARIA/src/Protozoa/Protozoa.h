@@ -28,24 +28,32 @@ class Protozoa : ProtozoaSettings
 
 
 public:
-	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, sf::CircleShape* cell_renderer = nullptr);
+	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, sf::CircleShape* cell_renderer = nullptr, bool init_cells = true);
 
 	void update();
-	void update_springs();
-	void update_cells();
+
 	bool is_hovered_on(sf::Vector2f mousePosition) const;
 	void set_debug_mode(bool mode);
 	void render();
-	void render_cells();
+
+	void builder_add_cell(const sf::Vector2f center);
+	
 
 private:
 	void render_debug();
-	void render_cell_connections(Cell& cell, const bool thick_lines = false) const;
+	void render_cells();
+	void render_cell_connections(Cell& cell, bool thick_lines = false) const;
+
 	void update_bounds();
+	void update_springs();
+	void update_cells();
+
 	void initialise_cells();
+	sf::Vector2f create_cell_position(sf::Vector2f relative_center, float spawn_range);
+	void initialise_springs();
+
 	void create_children_for_cell(Cell& cell, float probability, int depth, bool is_parent);
 	void create_cell(Cell* parent, float probability, int depth);
-	void initialise_springs();
 	bool does_spring_exist_between(int cellA_id, int cellB_id) const;
 	static void create_cellular_connection(Cell* parent_cell, Cell* child_cell);
 };

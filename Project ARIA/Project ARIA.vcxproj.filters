@@ -36,6 +36,9 @@
     <ClCompile Include="src\Protozoa\init.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Protozoa\debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\simulation\simulation.h">

@@ -25,8 +25,8 @@ class Simulation : SimulationSettings
 	float m_total_time_elapsed_ = 0.f;
 	unsigned m_ticks_ = 0;
 
-	Font m_title_font_{ &m_window_, 33, "src/Utils/fonts/Roboto-Bold.ttf" }; // larger text
-	Font m_text_font_{ &m_window_, 17, "src/Utils/fonts/Roboto-Regular.ttf" };  // smaller text
+	Font m_title_font_{ &m_window_, 33, "src/Utils/fonts/Roboto-Bold.ttf" }; // larger m_text
+	Font m_text_font_{ &m_window_, 17, "src/Utils/fonts/Roboto-Regular.ttf" };  // smaller m_text
 
 	World m_world_{};
 

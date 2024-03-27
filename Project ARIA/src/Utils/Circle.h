@@ -8,7 +8,7 @@ struct Circle
 	float radius{};
 	
 
-	Circle(const sf::Vector2f circle_center, const float circle_radius)
+	Circle(const sf::Vector2f circle_center = {}, const float circle_radius = 0.f)
 		: center(circle_center), radius(circle_radius)
 	{
 		

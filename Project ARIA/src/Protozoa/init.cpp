@@ -1,10 +1,19 @@
 #include "Protozoa.h"
 
-Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, sf::CircleShape* cell_renderer)
+Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, sf::CircleShape* cell_renderer, const bool init_cells)
 	: m_window_ptr_(window), m_cell_renderer_ptr_(cell_renderer), m_world_bounds_(world_bounds),
 	m_info_font_(window, 10, "src/Utils/fonts/Roboto-Regular.ttf")
 {
-	initialise_cells();
+	if (world_bounds == nullptr || cell_renderer == nullptr)
+	{
+		return;
+	}
+
+	if (init_cells)
+	{
+		initialise_cells();
+	}
+
 	initialise_springs();
 }
 
@@ -12,10 +21,8 @@ Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, sf::CircleSha
 void Protozoa::initialise_cells()
 {
 	// preparing the cell container
-	constexpr float spawn_rad = 75.f;
 
 	const sf::Vector2f rel_center = m_world_bounds_->rand_pos_in_circle();
-	const Circle spawn_range = { rel_center, spawn_rad };
 	m_cells_.reserve(max_cells);
 
 	// creating the first cell. it will have 2 children. those children will have a 50% chance of having another child
@@ -24,10 +31,16 @@ void Protozoa::initialise_cells()
 
 	for (Cell& cell : m_cells_)
 	{
-		cell.set_position(spawn_range.rand_pos_in_circle());
+		constexpr float spawn_rad = 75.f;
+		cell.set_position(create_cell_position(rel_center, spawn_rad));
 	}
 }
 
+
+sf::Vector2f Protozoa::create_cell_position(const sf::Vector2f relative_center, const float spawn_range)
+{
+	return Circle(relative_center, spawn_range).rand_pos_in_circle();
+}
 
 
 void Protozoa::create_children_for_cell(Cell& cell, const float probability, int depth, const bool is_parent = false)

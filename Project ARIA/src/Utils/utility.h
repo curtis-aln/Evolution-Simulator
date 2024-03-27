@@ -91,9 +91,8 @@ inline void normalize_angle(float& angle_radians)
 
 inline sf::Vector2f normalize(const sf::Vector2f& vector)
 {
-	const float length = std::sqrt(vector.x * vector.x + vector.y * vector.y);
-	if (length != 0)
-		return sf::Vector2f(vector.x / length, vector.y / length);
-	else
-		return sf::Vector2f(0, 0);
+	if (const float length = std::sqrt(vector.x * vector.x + vector.y * vector.y); length != 0)
+		return {vector.x / length, vector.y / length};
+	
+	return {0, 0};
 }

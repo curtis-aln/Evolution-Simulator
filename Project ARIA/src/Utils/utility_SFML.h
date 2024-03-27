@@ -64,6 +64,13 @@ inline sf::Rect<float> resize_rect(const sf::Rect<float>& rect, const sf::Vector
 	};
 }
 
+template<typename T>
+sf::Vector2<T> get_rect_center(sf::Rect<T> rect)
+{
+	return { rect.left + rect.width / 2, rect.top + rect.height / 2 };
+	
+}
+
 
 inline sf::Rect<float> convert_coordinates(const sf::Vector2f& v1, const sf::Vector2f& v2) {
 	const float x = std::min(v1.x, v2.x);

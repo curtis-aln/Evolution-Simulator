@@ -20,8 +20,8 @@ class Cell : CellSettings
 
 
 public:
-	sf::Color cell_color_inner = cell_fill_colors[Random::rand_range(0, int(cell_fill_colors.size()) - 1)];
-	sf::Color cell_color_outer = cell_outline_colors[Random::rand_range(0, int(cell_outline_colors.size()) - 1)];
+	sf::Color cell_color_inner = cell_fill_colors[Random::rand_range(0, static_cast<int>(cell_fill_colors.size()) - 1)];
+	sf::Color cell_color_outer = cell_outline_colors[Random::rand_range(0, static_cast<int>(cell_outline_colors.size()) - 1)];
 
 	int rel_id;
 
@@ -37,7 +37,7 @@ public:
 			if (cell.rel_id != rel_id)
 			{
 				const sf::Vector2f rel = m_position_ - cell.m_position_;
-				m_velocity_ += (rel / length(rel)) * Random::rand_range(-0.05f, 0.03f);
+				m_velocity_ += (rel / length(rel)) * Random::rand_range(-0.02f, 0.05f);
 			}
 		}
 
