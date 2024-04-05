@@ -18,12 +18,18 @@ class Cell : CellSettings
 	float m_direction_{};
 	float m_friction = 0.99f;
 
+	
+
 
 public:
 	sf::Color cell_color_inner = cell_fill_colors[Random::rand_range(0, static_cast<int>(cell_fill_colors.size()) - 1)];
 	sf::Color cell_color_outer = cell_outline_colors[Random::rand_range(0, static_cast<int>(cell_outline_colors.size()) - 1)];
 
 	int rel_id;
+
+	// the player can press and hold on a cell, and will have the ability to drag it around
+	bool selected = false;
+
 
 	Cell(Cell* parent = nullptr, const int rel_id = 0) : m_parent_(parent), rel_id(rel_id)
 	{

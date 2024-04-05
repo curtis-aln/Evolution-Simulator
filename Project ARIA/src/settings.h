@@ -11,6 +11,9 @@ struct SimulationSettings
 	static constexpr unsigned window_height = 800;
 
 	inline static const sf::Color window_color = sf::Color::Black;
+
+	static constexpr unsigned line_maximum_data = 70;
+	static constexpr unsigned line_x_axis_increments = 3;
 };
 
 

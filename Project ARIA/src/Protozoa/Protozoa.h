@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "../settings.h"
-#include "../Utils/font_renderer.hpp"
+#include "../Utils/fonts/font_renderer.hpp"
 #include "../Utils/utility.h"
 #include "../Utils/utility_SFML.h"
 #include "../Utils/Circle.h"
@@ -26,6 +26,9 @@ class Protozoa : ProtozoaSettings
 	unsigned frames_alive = 0u;
 	unsigned generation = 0u;
 
+	// debug
+	int selected_cell_id = -1;
+
 
 public:
 	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, sf::CircleShape* cell_renderer = nullptr, bool init_cells = true);
@@ -33,11 +36,14 @@ public:
 	void update();
 
 	bool is_hovered_on(sf::Vector2f mousePosition) const;
+	bool check_press(sf::Vector2f mousePosition);
+
 	void set_debug_mode(bool mode);
 	void render();
 
 	void builder_add_cell(const sf::Vector2f center);
-	
+	void move_selected_cell(sf::Vector2f mouse_position);
+	void deselect_cell();
 
 private:
 	void render_debug();
@@ -49,7 +55,7 @@ private:
 	void update_cells();
 
 	void initialise_cells();
-	sf::Vector2f create_cell_position(sf::Vector2f relative_center, float spawn_range);
+	static sf::Vector2f create_cell_position(sf::Vector2f relative_center, float spawn_range);
 	void initialise_springs();
 
 	void create_children_for_cell(Cell& cell, float probability, int depth, bool is_parent);

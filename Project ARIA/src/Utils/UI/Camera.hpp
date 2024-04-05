@@ -94,7 +94,7 @@ public:
 
 
 	// changes the view from original to current, useful if you want objects to be drawn absolutely on the screen instead of relatively
-	void toggle_view(const bool mode)
+	static void toggle_view(const bool mode)
 	{
 		//todo
 		//if (mode)
@@ -110,7 +110,7 @@ public:
 
 
 private:
-	void update_window_view()
+	void update_window_view() const
 	{
 		m_window_ptr_->setView(m_view_);
 	}
@@ -122,8 +122,4 @@ private:
 		return
 		1.0f - m_zoom_strength_;
 	}
-
-
-
-
 };

@@ -134,8 +134,9 @@ inline sf::VertexArray make_circle(const float radius, const sf::Vector2f center
 	sf::VertexArray circle(sf::LinesStrip);
 
 	// Calculate the points around the circumference of the circle and add them to the vertex array
-	for (unsigned i = 0; i <= resolution; ++i) {
-		const auto angle = static_cast<float>(2u * pi * i / resolution);
+	for (unsigned i = 0; i <= resolution; ++i) 
+	{
+		const auto angle = 2 * pi * static_cast<float>(i) / static_cast<float>(resolution);
 		const float x = center.x + radius * std::cos(angle);
 		const float y = center.y + radius * std::sin(angle);
 		circle.append(sf::Vertex(sf::Vector2f(x, y)));
@@ -149,7 +150,7 @@ inline void draw_thick_line(sf::RenderWindow& window, const sf::Vector2f& point1
 	const float thickness, const float outline_thickness, const sf::Color& fill_color, const sf::Color& outline_color)
 {
 	// Calculate the length and angle of the line
-	const float length = std::sqrt(std::pow(point2.x - point1.x, 2) + std::pow(point2.y - point1.y, 2));
+	const float length = std::sqrt(dist_squared(point1, point2));
 	const float angle = std::atan2(point2.y - point1.y, point2.x - point1.x) * 180 / pi;
 
 	// Create the rectangle shape
@@ -202,4 +203,18 @@ inline void draw_direction(sf::RenderWindow& window, const sf::Vector2f& positio
 
 	// Draw the arrow
 	draw_arrow(window, position, end_pos, thickness, arrow_size, fill_color, outline_color);
+}
+
+
+inline sf::Vector2f get_center(const sf::RectangleShape& rect)
+{
+	// Get the position and size of the rectangle
+	const sf::Vector2f position = rect.getPosition();
+	const sf::Vector2f size = rect.getSize();
+
+	// Calculate the center point
+	const float center_x = position.x + size.x / 2;
+	const float center_y = position.y + size.y / 2;
+
+	return {center_x, center_y};
 }

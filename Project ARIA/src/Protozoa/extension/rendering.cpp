@@ -1,6 +1,6 @@
-#include "Protozoa.h"
-#include "../Utils/utility.h"
-#include "../Utils/utility_SFML.h"
+#include "../Protozoa.h"
+#include "../../Utils/utility.h"
+#include "../../Utils/utility_SFML.h"
 
 
 

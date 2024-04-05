@@ -137,10 +137,10 @@
   <ItemGroup>
     <ClCompile Include="src\builder\builder.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Protozoa\debug.cpp" />
-    <ClCompile Include="src\Protozoa\init.cpp" />
-    <ClCompile Include="src\Protozoa\physics.cpp" />
-    <ClCompile Include="src\Protozoa\rendering.cpp" />
+    <ClCompile Include="src\Protozoa\extension\debug.cpp" />
+    <ClCompile Include="src\Protozoa\extension\init.cpp" />
+    <ClCompile Include="src\Protozoa\extension\physics.cpp" />
+    <ClCompile Include="src\Protozoa\extension\rendering.cpp" />
     <ClCompile Include="src\simulation\simulation.cpp" />
     <ClCompile Include="src\world\world.cpp" />
   </ItemGroup>
@@ -154,18 +154,23 @@
     <ClInclude Include="src\Protozoa\spring.h" />
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\simulation\simulation.h" />
-    <ClInclude Include="src\Utils\button.h" />
+    <ClInclude Include="src\Utils\round_rect.h" />
+    <ClInclude Include="src\Utils\UI\text_box.h" />
+    <ClInclude Include="src\Utils\UI\button.h" />
     <ClInclude Include="src\Utils\Circle.h" />
-    <ClInclude Include="src\Utils\font_renderer.hpp" />
+    <ClInclude Include="src\Utils\fonts\font_renderer.hpp" />
     <ClInclude Include="src\Utils\fps_manager.h" />
-    <ClInclude Include="src\Utils\line_graph.h" />
+    <ClInclude Include="src\Utils\NeuralNetworks\GeneticNeuralNetwork.h" />
+    <ClInclude Include="src\Utils\UI\line_graph.h" />
+    <ClInclude Include="src\Utils\NeuralNetworks\NaturalSelection.h" />
+    <ClInclude Include="src\Utils\NeuralNetworks\NeuralNetworkUI.h" />
     <ClInclude Include="src\Utils\o_vector.hpp" />
     <ClInclude Include="src\Utils\Random.h" />
-    <ClInclude Include="src\Utils\slider.h" />
+    <ClInclude Include="src\Utils\UI\slider.h" />
     <ClInclude Include="src\Utils\time.h" />
     <ClInclude Include="src\Utils\utility.h" />
     <ClInclude Include="src\Utils\utility_SFML.h" />
-    <ClInclude Include="src\Utils\Camera.hpp" />
+    <ClInclude Include="src\Utils\UI\Camera.hpp" />
     <ClInclude Include="src\world\world.h" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +179,7 @@
     <Font Include="src\Utils\fonts\Roboto-Medium.ttf" />
     <Font Include="src\Utils\fonts\Roboto-MediumItalic.ttf" />
     <Font Include="src\Utils\fonts\Roboto-Regular.ttf" />
+    <Font Include="src\Utils\fonts\Teko.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

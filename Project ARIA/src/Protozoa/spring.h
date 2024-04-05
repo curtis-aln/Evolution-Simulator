@@ -6,8 +6,8 @@
 
 class Spring
 {
-	float rest_length_ = 40.f;
-	float spring_constant_ = 0.05f;
+	float rest_length_ = 33.f;
+	float spring_constant_ = 0.08f;
 	float damping_factor_ = 0.95f;
 
 public:

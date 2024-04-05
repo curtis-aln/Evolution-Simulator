@@ -18,6 +18,14 @@ void World::update_world()
 	}
 }
 
+void World::update_debug(const sf::Vector2f mouse_position)
+{
+	if (selected_protozoa != nullptr)
+	{
+		selected_protozoa->move_selected_cell(mouse_position);
+	}
+}
+
 
 void World::render_world()
 {
@@ -30,11 +38,6 @@ void World::render_world()
 	m_window_->draw(border_render_);
 }
 
-
-void World::render_debug()
-{
-
-}
 
 
 void World::init_organisms()
@@ -77,5 +80,26 @@ void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_posit
 			protozoa.set_debug_mode(true);
 			break;
 		}
+	}
+}
+
+void World::check_pressed(const sf::Vector2f mouse_position)
+{
+	for (Protozoa& protozoa : m_all_protozoa_)
+	{
+		if (protozoa.check_press(mouse_position))
+		{
+			selected_protozoa = &protozoa;
+		}
+	}
+}
+
+
+void World::de_select_protazoa()
+{
+	if (selected_protozoa != nullptr)
+	{
+		selected_protozoa->deselect_cell();
+		selected_protozoa = nullptr;
 	}
 }

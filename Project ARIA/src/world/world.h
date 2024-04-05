@@ -23,12 +23,16 @@ class World : WorldSettings
 
 
 public:
+	Protozoa* selected_protozoa = nullptr;
+
 	World(sf::RenderWindow* window = nullptr);
 
 	void update_world();
+	void update_debug(sf::Vector2f mouse_position);
 	void render_world();
-	void render_debug();
 	void check_hovering(bool debug_mode, sf::Vector2f mouse_position);
+	void check_pressed(sf::Vector2f mouse_position);
+	void de_select_protazoa();
 
 private:
 	void init_organisms();

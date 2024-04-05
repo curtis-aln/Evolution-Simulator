@@ -88,7 +88,7 @@ void Builder::add_cell()
 }
 
 
-void Builder::render_box()
+void Builder::render_box() const
 {
 	m_window_->draw(m_bounds_render_);
 	draw_rect_outline(protozoa_space, *m_window_);

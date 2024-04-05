@@ -1,4 +1,4 @@
-#include "Protozoa.h"
+#include "../Protozoa.h"
 
 Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, sf::CircleShape* cell_renderer, const bool init_cells)
 	: m_window_ptr_(window), m_cell_renderer_ptr_(cell_renderer), m_world_bounds_(world_bounds),
@@ -43,7 +43,7 @@ sf::Vector2f Protozoa::create_cell_position(const sf::Vector2f relative_center, 
 }
 
 
-void Protozoa::create_children_for_cell(Cell& cell, const float probability, int depth, const bool is_parent = false)
+void Protozoa::create_children_for_cell(Cell& cell, const float probability, const int depth, const bool is_parent = false)
 {
 	if (depth >= 3)
 		return;

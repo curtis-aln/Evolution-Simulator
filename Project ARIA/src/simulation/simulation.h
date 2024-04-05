@@ -6,9 +6,9 @@
 
 #include "../Utils/time.h"
 #include "../Utils/fps_manager.h"
-#include "../Utils/font_renderer.hpp"
-#include "../Utils/Camera.hpp"
-#include "../Utils/line_graph.h"
+#include "../Utils/fonts/font_renderer.hpp"
+#include "../Utils/UI/Camera.hpp"
+#include "../Utils/UI/line_graph.h"
 
 
 class Simulation : SimulationSettings
@@ -17,7 +17,7 @@ class Simulation : SimulationSettings
 		simulation_name, sf::Style::None);
 
 	FrameRateSmoothing<30> m_clock_{};
-	Camera camera{&m_window_, 1.0f};
+	Camera camera_{&m_window_, 1.0f};
 	Builder m_builder_{&m_window_};
 
 	// managing time
@@ -34,8 +34,10 @@ class Simulation : SimulationSettings
 	bool m_paused_ = false;
 	bool m_debug_ = false;
 
-	LineGraph protozoa_population_graph{ &m_window_, {1100, 200, 700, 200} };
-	
+	LineGraph<line_maximum_data, line_x_axis_increments> protozoa_population_graph_{ &m_window_, {1100, 200, 700, 200} };
+	LineGraph<line_maximum_data, line_x_axis_increments> food_population_graph_{ &m_window_, {1100, 500, 700, 200} };
+
+	float test_data = 50.f;
 
 
 public:
@@ -44,12 +46,13 @@ public:
 
 private:
 	void update();
+	void update_statistics();
 	void render();
 
 	// User Input
 	void handle_events();
 	void keyboard_input(const sf::Keyboard::Key& event_key_code);
-	void mouse_input();
+	static void mouse_input();
 
 	// more rendering
 	void display_screen_info();
