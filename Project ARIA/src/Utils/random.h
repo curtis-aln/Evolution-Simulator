@@ -38,7 +38,8 @@ struct Random
 		}
 	}
 
-	// random SFML::Vector<Type>
+
+	// random SFML::Color<Type>
 	static sf::Color rand_color(const sf::Vector3<int> rgb_min = { 0, 0, 0 },
 		const sf::Vector3<int> rgb_max = { 255 ,255, 255 })
 	{
@@ -49,16 +50,45 @@ struct Random
 		};
 	}
 
-	template<typename Type> // random SFML::Vector<Type>
+
+	// random SFML::Vector2<Type>
+	template<typename Type>
 	static sf::Vector2<Type> rand_vector(const Type min, const Type max)
 	{
 		return { rand_range(min, max), rand_range(min, max) };
 	}
 
-	template<typename Type> // random position within a rect
+
+	// random position within a rect
+	template<typename Type>
 	static sf::Vector2<Type> rand_pos_in_rect(const sf::Rect<Type>& rect)
 	{
 		return { rand_range(rect.left, rect.left + rect.width),
 				 rand_range(rect.top, rect.top + rect.height) };
+	}
+
+
+	// std::vector of random points
+	template<typename Type>
+	static std::vector<Type> random_vector(const Type min_value, const Type max_value, const size_t size)
+	{
+		std::vector<Type> values;
+		values.resize(size);
+
+		for (size_t i = 0; i < size; ++i)
+		{
+			values[i] = rand_range(min_value, max_value);
+		}
+
+		return values;
+	}
+
+	template<typename Type>
+	static void randomize_vector(std::vector<Type>& vector, const Type min_value, const Type max_value)
+	{
+		for (size_t i = 0; i < vector.size(); ++i)
+		{
+			vector[i] = rand_range(min_value, max_value);
+		}
 	}
 };

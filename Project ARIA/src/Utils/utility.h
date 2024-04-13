@@ -61,13 +61,29 @@ std::string trim_decimal_to_string(T number, const size_t precision, const bool 
 }
 
 
-inline float dot(const sf::Vector2f& v1, const sf::Vector2f& v2)
+template<typename T>
+T dot(const sf::Vector2<T>& v1, const sf::Vector2<T>& v2)
 {
 	return v1.x * v2.x + v1.y * v2.y;
 }
 
+template<typename T>
+T dot(const std::vector<T>& vector1, const std::vector<T>& vector2)
+{
+	if (vector1.size() != vector2.size())
+		throw std::runtime_error("vectors need to be the same size");
 
-inline float length(const sf::Vector2f& v)
+	T result = 0.f;
+	for (size_t i = 0; i < vector1.size(); ++i)
+	{
+		result += vector1[i] * vector2[i];
+	}
+	return result;
+}
+
+
+template<typename T>
+T length(const sf::Vector2<T>& v)
 {
 	return std::sqrt(dot(v, v));
 }
@@ -95,4 +111,19 @@ inline sf::Vector2f normalize(const sf::Vector2f& vector)
 		return {vector.x / length, vector.y / length};
 	
 	return {0, 0};
+}
+
+
+template<typename T>
+std::vector<int> get_shape_of_2d_vector(std::vector<std::vector<T>>& container)
+{
+	std::vector<int> shape;
+	shape.resize(container.size());
+
+	for (int i = 0; i < container.size(); ++i)
+	{
+		shape[i] = container[i].size();
+	}
+
+	return shape;
 }

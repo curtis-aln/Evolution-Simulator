@@ -83,19 +83,21 @@ void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_posit
 	}
 }
 
-void World::check_pressed(const sf::Vector2f mouse_position)
+bool World::check_pressed(const sf::Vector2f mouse_position)
 {
 	for (Protozoa& protozoa : m_all_protozoa_)
 	{
 		if (protozoa.check_press(mouse_position))
 		{
 			selected_protozoa = &protozoa;
+			return true;
 		}
 	}
+	return false;
 }
 
 
-void World::de_select_protazoa()
+void World::de_select_protozoa()
 {
 	if (selected_protozoa != nullptr)
 	{

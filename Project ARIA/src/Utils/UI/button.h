@@ -13,59 +13,79 @@ class Button
     Font m_font_;
     std::string m_text_;
 
-    sf::Color m_button_color_idle_{};
-    sf::Color m_button_color_active_{};
+    sf::Color m_color_idle_{};
+    sf::Color m_color_active_{};
 
-    bool m_is_mouse_over_;
-    StopWatch stop_watch_{};
+    bool m_mouse_hovering_ = false;
+    StopWatch m_stop_watch_{};
 
-	float press_cooldown_ = 0.25f;
-    float wait_time_ = 0.f;
+	float m_press_cooldown_ = 0.25f;
+    float m_wait_time_ = 0.f;
+
+    bool m_is_font_initialised_ = false;
+    bool m_is_graphics_initialised_ = false;
     
 
 public:
-    explicit Button(sf::RenderWindow* window, const std::string& font_location,
-        const sf::Rect<float> rect = {0, 0, 0, 0},
-        const sf::Color button_color_idle   = sf::Color(20, 20, 20),
-        const sf::Color button_color_active = sf::Color(50, 50, 50))
-        : m_window_(window), m_font_(window, 10, font_location), m_button_color_idle_(button_color_idle),
-          m_button_color_active_(button_color_active),
-          m_is_mouse_over_(false)
+    explicit Button(
+        sf::RenderWindow* window = nullptr, const sf::Rect<float> rect = {})
+	: m_window_(window), m_font_(window)
     {
         m_shape_.setPosition(rect.getPosition());
         m_shape_.setSize(rect.getSize());
-        m_shape_.setFillColor(button_color_idle);
     }
 
 
-    void init_font(const std::string& button_text, 
-        const unsigned text_size = 10, const sf::Color text_fill_color = sf::Color::White)
+    void init_font(
+        const std::string& button_text = "Button", 
+        const std::string& font_location = "src/Utils/fonts/Roboto-Bold.ttf",
+        const sf::Color text_fill_color = sf::Color::White,
+        const unsigned text_size = 15)
     {
         m_text_ = button_text;
+        m_font_.set_font(font_location);
         m_font_.set_font_size(text_size);
+        m_font_.set_render_window(m_window_);
         m_font_.set_fill_color(text_fill_color);
+
+        m_is_font_initialised_ = true;
+    }
+
+
+    void init_graphics(
+        const sf::Color color_idle = sf::Color(20, 20, 20),
+        const sf::Color color_active = sf::Color(50, 50, 50),
+        const sf::Color outline_color = sf::Color(50, 50, 50),
+        const float outline_thickness = 0)
+    {
+        m_color_idle_ = color_idle;
+        m_color_active_ = color_active;
+        m_shape_.setFillColor(color_idle);
+        m_shape_.setOutlineColor(outline_color);
+        m_shape_.setOutlineThickness(outline_thickness);
+
+        m_is_graphics_initialised_ = true;
     }
 
 
     bool check_click(const sf::Vector2f& mouse_position)
     {
-        const float delta_time = static_cast<float>(stop_watch_.get_delta());
-        if (wait_time_ > 0)
+        const float delta_time = static_cast<float>(m_stop_watch_.get_delta());
+        if (m_wait_time_ > 0)
         {
-            wait_time_ -= delta_time;
+            m_wait_time_ -= delta_time;
             return false;
         }
 
-        m_is_mouse_over_ = m_shape_.getGlobalBounds().contains(mouse_position);
-        const bool pressed = m_is_mouse_over_ && sf::Mouse::isButtonPressed(sf::Mouse::Left);
+        m_mouse_hovering_ = m_shape_.getGlobalBounds().contains(mouse_position);
+        const bool pressed = m_mouse_hovering_ && sf::Mouse::isButtonPressed(sf::Mouse::Left);
 
-        m_shape_.setFillColor(m_button_color_idle_);
+        m_shape_.setFillColor(m_color_idle_);
         if (pressed)
         {
-            wait_time_ = press_cooldown_;
-            m_shape_.setFillColor(m_button_color_active_);
+            m_wait_time_ = m_press_cooldown_;
+            m_shape_.setFillColor(m_color_active_);
         }
-
 
         return pressed;
     }
@@ -73,6 +93,7 @@ public:
 
     void draw()
     {
+        check_init_error();
         m_window_->draw(m_shape_);
 
     	const sf::Vector2f pos = m_shape_.getPosition();
@@ -104,10 +125,32 @@ public:
     }
 	void set_rest_color(const sf::Color new_color)
     {
-        m_button_color_idle_ = new_color;
+        m_color_idle_ = new_color;
     }
 	void set_action_color(const sf::Color new_color)
     {
-        m_button_color_active_ = new_color;
+        m_color_active_ = new_color;
+    }
+
+    sf::Rect<float> get_rect() const
+    {
+        const sf::Vector2f pos = m_shape_.getPosition();
+        const sf::Vector2f size = m_shape_.getSize();
+        return { pos.x, pos.y, size.x, size.y };
+    }
+
+
+private:
+    void check_init_error() const
+    {
+        if (!m_is_font_initialised_)
+        {
+            throw std::runtime_error("Font is not initialised");
+        }
+
+        if (!m_is_graphics_initialised_)
+        {
+            throw std::runtime_error("Graphics are not initialised");
+        }
     }
 };

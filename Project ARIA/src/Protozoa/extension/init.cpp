@@ -4,6 +4,8 @@ Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, sf::CircleSha
 	: m_window_ptr_(window), m_cell_renderer_ptr_(cell_renderer), m_world_bounds_(world_bounds),
 	m_info_font_(window, 10, "src/Utils/fonts/Roboto-Regular.ttf")
 {
+	m_info_font_.set_fill_color();
+
 	if (world_bounds == nullptr || cell_renderer == nullptr)
 	{
 		return;

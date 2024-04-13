@@ -21,8 +21,6 @@ void Protozoa::render_debug()
 		m_info_font_.draw(pos, std::to_string(cell.rel_id), true);
 	}
 
-
-
 	// protozoa information under the bounding box
 	const sf::Vector2f start_pos = { m_personal_bounds_.left, m_personal_bounds_.top + m_personal_bounds_.height };
 
@@ -32,6 +30,20 @@ void Protozoa::render_debug()
 		"energy: " + std::to_string(energy);
 
 	m_info_font_.draw(start_pos, combined_string, false);
+
+	// spring information
+	for (const Spring& spring : m_springs_)
+	{
+		const sf::Vector2f cell_A_pos = m_cells_[spring.m_cellA_id].get_position();
+		const sf::Vector2f cell_B_pos = m_cells_[spring.m_cellB_id].get_position();
+
+		const sf::Vector2f mid_point = get_midpoint(cell_A_pos, cell_B_pos);
+		const sf::Vector2f upper_quartile = get_midpoint(mid_point, cell_B_pos);
+		const sf::Vector2f lower_quartile = get_midpoint(cell_A_pos, mid_point);
+
+		m_info_font_.draw(lower_quartile, vector_to_string(spring.direction_A_force, 2), true);
+		m_info_font_.draw(upper_quartile, vector_to_string(spring.direction_B_force, 2), true);
+	}
 }
 
 
@@ -61,4 +73,57 @@ void Protozoa::deselect_cell()
 		m_cells_[selected_cell_id].selected = false;
 		selected_cell_id = -1;
 	}
+}
+
+
+void Protozoa::make_connection(const int cell1_id, const int cell2_id)
+{
+	m_springs_.emplace_back(cell1_id, cell2_id);
+}
+
+
+bool Protozoa::is_hovered_on(const sf::Vector2f mousePosition) const
+{
+	return m_personal_bounds_.contains(mousePosition);
+}
+
+bool Protozoa::check_press(const sf::Vector2f mouse_position)
+{
+	Cell* selected_cell = get_selected_cell(mouse_position);
+
+	if (selected_cell != nullptr)
+	{
+		selected_cell_id = selected_cell->rel_id;
+		selected_cell->selected = true;
+	}
+
+	return selected_cell != nullptr;
+}
+
+
+Cell* Protozoa::get_selected_cell(const sf::Vector2f mouse_pos)
+{
+	if (is_hovered_on(mouse_pos))
+	{
+		for (Cell& cell : m_cells_)
+		{
+			const float dist_sq = dist_squared(cell.get_position(), mouse_pos);
+			const float rad = cell.get_radius();
+			if (dist_sq < rad * rad)
+			{
+				return &cell;
+			}
+		}
+	}
+	return nullptr;
+}
+
+void Protozoa::set_debug_mode(const bool mode)
+{
+	debug_mode_ = mode;
+}
+
+std::vector<Cell>& Protozoa::get_cells()
+{
+	return m_cells_;
 }

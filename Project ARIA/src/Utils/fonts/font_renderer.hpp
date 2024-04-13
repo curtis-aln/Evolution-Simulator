@@ -20,14 +20,14 @@ class Font
 
 public:
     // Constructor taking m_font_ size and file location
-    Font(sf::RenderWindow* window = nullptr, const unsigned font_size = 0, const std::string& font_location = "") : m_window_(window)
+    Font(sf::RenderWindow* window = nullptr, const unsigned font_size = 0, 
+        const std::string& font_location = "src/Utils/fonts/Roboto-Bold.ttf") : m_window_(window)
     {
         if (!font_location.empty())
         {
             set_font(font_location);
+            set_font_size(font_size);
         }
-        set_fill_color();
-        set_font_size(font_size);
     }
 
     void set_font_size(const unsigned font_size)
@@ -57,24 +57,26 @@ public:
 
     void draw(const sf::Vector2f& position, const std::string& string_text, const bool centered = false, const float rotation = 0.0f)
     {
+        if (string_text.empty())
+            return;
+
         m_text_.setString(string_text);
 
-        // Calculate text bounds
-        const sf::FloatRect text_bounds = m_text_.getLocalBounds();
-        const sf::Vector2f text_position = position;
 
         // Adjust position for centering if needed
         if (centered)
         {
+            const sf::FloatRect text_bounds = m_text_.getLocalBounds();
             m_text_.setOrigin(text_bounds.left + text_bounds.width / 2.0f, text_bounds.top + text_bounds.height / 2.0f);
         }
 
         // Set text rotation around its center
         m_text_.setRotation(rotation);
 
-        m_text_.setPosition(text_position);
+        m_text_.setPosition(position);
         m_window_->draw(m_text_);
     }
+
 
     void draw(const TextPacket& text_packet)
     {

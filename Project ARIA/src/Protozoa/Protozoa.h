@@ -34,32 +34,38 @@ public:
 	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, sf::CircleShape* cell_renderer = nullptr, bool init_cells = true);
 
 	void update();
-
-	bool is_hovered_on(sf::Vector2f mousePosition) const;
-	bool check_press(sf::Vector2f mousePosition);
-
-	void set_debug_mode(bool mode);
 	void render();
 
+	// debugging settings
+	bool is_hovered_on(sf::Vector2f mousePosition) const;
+	bool check_press(sf::Vector2f mouse_position);
+	Cell* get_selected_cell(sf::Vector2f mouse_pos);
+	void set_debug_mode(bool mode);
+	std::vector<Cell>& get_cells();
+	void deselect_cell();
+	void make_connection(int cell1_id, int cell2_id);
 	void builder_add_cell(const sf::Vector2f center);
 	void move_selected_cell(sf::Vector2f mouse_position);
-	void deselect_cell();
 
 private:
+	// debugging settings
 	void render_debug();
+
+	// rendering
 	void render_cells();
 	void render_cell_connections(Cell& cell, bool thick_lines = false) const;
 
+	// updating
 	void update_bounds();
 	void update_springs();
 	void update_cells();
 
+	// initialisation
 	void initialise_cells();
-	static sf::Vector2f create_cell_position(sf::Vector2f relative_center, float spawn_range);
 	void initialise_springs();
-
 	void create_children_for_cell(Cell& cell, float probability, int depth, bool is_parent);
 	void create_cell(Cell* parent, float probability, int depth);
 	bool does_spring_exist_between(int cellA_id, int cellB_id) const;
+	static sf::Vector2f create_cell_position(sf::Vector2f relative_center, float spawn_range);
 	static void create_cellular_connection(Cell* parent_cell, Cell* child_cell);
 };

@@ -119,7 +119,7 @@
     <ClInclude Include="src\Utils\UI\text_box.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\round_rect.h">
+    <ClInclude Include="src\Utils\optimised_vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

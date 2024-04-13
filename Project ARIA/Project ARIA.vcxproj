@@ -154,7 +154,7 @@
     <ClInclude Include="src\Protozoa\spring.h" />
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\simulation\simulation.h" />
-    <ClInclude Include="src\Utils\round_rect.h" />
+    <ClInclude Include="src\Utils\optimised_vector.h" />
     <ClInclude Include="src\Utils\UI\text_box.h" />
     <ClInclude Include="src\Utils\UI\button.h" />
     <ClInclude Include="src\Utils\Circle.h" />

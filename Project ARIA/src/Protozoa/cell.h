@@ -12,10 +12,8 @@ class Cell : CellSettings
 
 	sf::Vector2f m_position_{};
 	sf::Vector2f m_velocity_{};
-	sf::Vector2f m_force_{};
 
 	float m_radius_ = cell_radius;
-	float m_direction_{};
 	float m_friction = 0.99f;
 
 	
@@ -30,7 +28,7 @@ public:
 	// the player can press and hold on a cell, and will have the ability to drag it around
 	bool selected = false;
 
-
+	// constructor
 	Cell(Cell* parent = nullptr, const int rel_id = 0) : m_parent_(parent), rel_id(rel_id)
 	{
 
@@ -63,6 +61,11 @@ public:
 	void set_position(const sf::Vector2f new_position)
 	{
 		m_position_ = new_position;
+	}
+
+	void set_velocity(const sf::Vector2f new_velocity)
+	{
+		m_position_ = new_velocity;
 	}
 
 

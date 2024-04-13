@@ -147,7 +147,7 @@ inline sf::VertexArray make_circle(const float radius, const sf::Vector2f center
 
 
 inline void draw_thick_line(sf::RenderWindow& window, const sf::Vector2f& point1, const sf::Vector2f& point2, 
-	const float thickness, const float outline_thickness, const sf::Color& fill_color, const sf::Color& outline_color)
+	const float thickness = {}, const float outline_thickness = {}, const sf::Color& fill_color = {}, const sf::Color& outline_color = {})
 {
 	// Calculate the length and angle of the line
 	const float length = std::sqrt(dist_squared(point1, point2));
@@ -217,4 +217,36 @@ inline sf::Vector2f get_center(const sf::RectangleShape& rect)
 	const float center_y = position.y + size.y / 2;
 
 	return {center_x, center_y};
+}
+
+
+// Function to perform linear interpolation between two colors A and B based on parameter X
+inline sf::Color interpolate_colors(const sf::Color& color_a, const sf::Color& color_b, float x) {
+	// Clamp x within the range [-1, 1]
+	x = std::max(-1.0f, std::min(1.0f, x));
+
+	// Calculate interpolation factor transparency based on the normalized X value
+	float t = (x + 1.0f) / 2.0f;
+
+	// Interpolate each color component separately
+	const sf::Uint8 r = static_cast<sf::Uint8>(color_a.r + t * (color_b.r - color_a.r));
+	const sf::Uint8 g = static_cast<sf::Uint8>(color_a.g + t * (color_b.g - color_a.g));
+	const sf::Uint8 b = static_cast<sf::Uint8>(color_a.b + t * (color_b.b - color_a.b));
+	 
+	// Return the interpolated color
+	return {r, g, b};
+}
+
+
+template<typename T>
+sf::Vector2<T> get_midpoint(const sf::Vector2<T> vec1, const sf::Vector2<T> vec2)
+{
+	return { (vec1.x + vec2.x) / 2, (vec1.y + vec2.y) / 2 };
+}
+
+
+template<typename T>
+std::string vector_to_string(const sf::Vector2<T> vec, const int dp)
+{
+	return "x: " + trim_decimal_to_string(vec.x, dp) + "\ny:" + trim_decimal_to_string(vec.y, dp);
 }

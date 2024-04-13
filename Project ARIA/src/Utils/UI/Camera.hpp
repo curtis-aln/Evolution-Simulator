@@ -34,7 +34,9 @@ public:
 		original_view = { 0, 0, dims.x, dims.y };
 		new_view = original_view;
 		m_view_ = sf::View(original_view);
+
 		m_currentScroll *= scale;
+		zoom(0);
 	}
 
 

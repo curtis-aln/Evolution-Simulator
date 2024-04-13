@@ -5,14 +5,51 @@
 Simulation::Simulation() : m_world_(&m_window_)
 {
 	m_window_.setFramerateLimit(frame_rate);
-	std::cout << "window dimensions: " << m_window_.getSize().x << " " << m_window_.getSize().y << "\n";
-	m_window_.setVerticalSyncEnabled(false); // more efficient to have vsync set to false
+	m_window_.setVerticalSyncEnabled(vsync);
 
-	protozoa_population_graph_.init_graphics("Protozoa Population", "Time", "Population", 
-		{ 20, 200, 20 }, { 20, 100, 20 });
+	protozoa_population_graph_.init_graphics("Protozoa Population", "Time", "Population",
+		protozoa_graph_line_color, protozoa_under_graph_color);
+
+	protozoa_population_graph_.init_further_graphics(
+		UI_Settings::border_outline_thickness,
+		UI_Settings::transparency,
+		UI_Settings::border_fill_color,
+		UI_Settings::border_outline_color,
+		{ 50, 50, 50, UI_Settings::transparency },
+		TextSettings::t_title_size,
+		TextSettings::t_regular_size,
+		TextSettings::bold_font_loc,
+		TextSettings::regular_font_loc
+	);
 
 	food_population_graph_.init_graphics("Food Population", "Time", "Population",
-		{ 20, 200, 20 }, { 20, 100, 20 });
+		food_graph_line_color, food_under_graph_color);
+
+	food_population_graph_.init_further_graphics(
+		UI_Settings::border_outline_thickness,
+		UI_Settings::transparency,
+		UI_Settings::border_fill_color,
+		UI_Settings::border_outline_color,
+		{ 50, 50, 50, UI_Settings::transparency },
+		TextSettings::t_title_size,
+		TextSettings::t_regular_size,
+		TextSettings::bold_font_loc,
+		TextSettings::regular_font_loc
+
+	);
+
+
+	net_renderer.set_title("Test Network");
+	net_renderer.set_input_node_names({ "input A", "Input B" });
+	net_renderer.set_output_node_names({ "output A", "output B" });
+
+	text_box.set_title("Protozoa Simulation");
+	text_box.init_graphics(UI_Settings::border_fill_color, UI_Settings::border_outline_color, UI_Settings::border_outline_thickness);
+
+	text_box.add_statistic("int", "frames", &m_ticks_);
+	text_box.add_statistic("bool", "paused", &m_paused_);
+	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
+		
 }
 
 
@@ -29,16 +66,29 @@ void Simulation::run()
 
 void Simulation::update()
 {
+	const sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();
 	m_world_.update_world();
 
 	if (m_debug_)
 	{
-		m_world_.update_debug(camera_.get_world_mouse_pos());
+		m_world_.update_debug(mouse_pos);
 	}
 
-	m_builder_.update(camera_.get_world_mouse_pos());
+	m_builder_.update(mouse_pos);
 
 	update_statistics();
+
+	test_data3 += Random::rand11_float() * 0.05f;
+	test_data4 += Random::rand11_float() * 0.05f;
+
+	test_data3 = std::clamp(test_data3, -1.f, 1.f);
+	test_data4 = std::clamp(test_data4, -1.f, 1.f);
+
+	network.inputs[0] = std::tanh(test_data3);
+	network.inputs[1] = std::tanh(test_data4);
+	network.forward_propagate();
+	net_renderer.update(mouse_pos);
+	
 }
 
 
@@ -50,7 +100,9 @@ void Simulation::update_statistics()
 	if (m_ticks_ % line_x_axis_increments == 0)
 	{
 		test_data += Random::rand_range(-2.f, 2.f);
+		test_data2 += Random::rand_range(-2.f, 2.f);
 		protozoa_population_graph_.add_data(test_data);
+		food_population_graph_.add_data(test_data2);
 	}
 }
 
@@ -68,6 +120,9 @@ void Simulation::render()
 	protozoa_population_graph_.render(true);
 	food_population_graph_.render(true);
 
+	net_renderer.render();
+	text_box.render();
+
 	m_window_.display();
 }
 
@@ -75,6 +130,7 @@ void Simulation::render()
 void Simulation::handle_events()
 {
 	camera_.update();
+	const sf::Vector2f cam_pos = camera_.get_world_mouse_pos();
 
 	sf::Event event{};
 	while (m_window_.pollEvent(event))
@@ -89,18 +145,24 @@ void Simulation::handle_events()
 			camera_.zoom(event.mouseWheelScroll.delta);
 
 		else if (event.type == sf::Event::MouseButtonPressed)
-			m_world_.check_pressed(camera_.get_world_mouse_pos());
+		{
+			if (m_world_.check_pressed(cam_pos) || m_builder_.check_mouse_input())
+				mouse_pressed_event = true;
+		}
 
 		else if (event.type == sf::Event::MouseButtonReleased)
-			m_world_.de_select_protazoa();
+		{
+			m_world_.de_select_protozoa();
+			m_builder_.de_select_protozoa();
+			mouse_pressed_event = false;
+		}
 	}
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && m_world_.selected_protozoa == nullptr)
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && mouse_pressed_event == false)
 		camera_.translate();
 
 	// mouse hovering over an organism
-	m_world_.check_hovering(m_debug_, camera_.get_world_mouse_pos());
-	
+	m_world_.check_hovering(m_debug_, cam_pos);
 }
 
 

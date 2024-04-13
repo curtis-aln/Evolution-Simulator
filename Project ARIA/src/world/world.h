@@ -31,8 +31,8 @@ public:
 	void update_debug(sf::Vector2f mouse_position);
 	void render_world();
 	void check_hovering(bool debug_mode, sf::Vector2f mouse_position);
-	void check_pressed(sf::Vector2f mouse_position);
-	void de_select_protazoa();
+	bool check_pressed(sf::Vector2f mouse_position);
+	void de_select_protozoa();
 
 private:
 	void init_organisms();
