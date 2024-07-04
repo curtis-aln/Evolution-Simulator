@@ -7,36 +7,17 @@ Simulation::Simulation() : m_world_(&m_window_)
 	m_window_.setFramerateLimit(frame_rate);
 	m_window_.setVerticalSyncEnabled(vsync);
 
-	protozoa_population_graph_.init_graphics("Protozoa Population", "Time", "Population",
-		protozoa_graph_line_color, protozoa_under_graph_color);
+	LineGraphSettings settings = {
+		"Protozoa Population", "Time", "Population",
+		transparency, protozoa_graph_line_color, protozoa_under_graph_color, border_fill_color, border_outline_color,
+		{ 50, 50, 50, transparency }, border_outline_thickness, t_title_size,
+		t_regular_size, t_small_size, bold_font_loc, regular_font_loc};
 
-	protozoa_population_graph_.init_further_graphics(
-		UI_Settings::border_outline_thickness,
-		UI_Settings::transparency,
-		UI_Settings::border_fill_color,
-		UI_Settings::border_outline_color,
-		{ 50, 50, 50, UI_Settings::transparency },
-		TextSettings::t_title_size,
-		TextSettings::t_regular_size,
-		TextSettings::bold_font_loc,
-		TextSettings::regular_font_loc
-	);
-
-	food_population_graph_.init_graphics("Food Population", "Time", "Population",
-		food_graph_line_color, food_under_graph_color);
-
-	food_population_graph_.init_further_graphics(
-		UI_Settings::border_outline_thickness,
-		UI_Settings::transparency,
-		UI_Settings::border_fill_color,
-		UI_Settings::border_outline_color,
-		{ 50, 50, 50, UI_Settings::transparency },
-		TextSettings::t_title_size,
-		TextSettings::t_regular_size,
-		TextSettings::bold_font_loc,
-		TextSettings::regular_font_loc
-
-	);
+	protozoa_population_graph_.set_settings(settings);
+	settings.title = "Food Population";
+	settings.graph_line_color = food_graph_line_color;
+	settings.under_graph_color = food_under_graph_color;
+	food_population_graph_.set_settings(settings);
 
 
 	net_renderer.set_title("Test Network");
@@ -75,6 +56,8 @@ void Simulation::update()
 	}
 
 	m_builder_.update(mouse_pos);
+	protozoa_population_graph_.update(mouse_pos);
+	food_population_graph_.update(mouse_pos);
 
 	update_statistics();
 
@@ -117,8 +100,8 @@ void Simulation::render()
 	m_world_.render_world();
 	m_builder_.render();
 
-	protozoa_population_graph_.render(true);
-	food_population_graph_.render(true);
+	protozoa_population_graph_.render();
+	food_population_graph_.render();
 
 	net_renderer.render();
 	text_box.render();

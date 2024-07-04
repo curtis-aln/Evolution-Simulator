@@ -250,3 +250,46 @@ std::string vector_to_string(const sf::Vector2<T> vec, const int dp)
 {
 	return "x: " + trim_decimal_to_string(vec.x, dp) + "\ny:" + trim_decimal_to_string(vec.y, dp);
 }
+
+
+inline sf::Vector2f interpolate_point(const sf::Vector2f& start_pos, const sf::Vector2f& end_pos, float X) {
+	// Clamp X between 0 and 1 to ensure interpolation stays within the line segment
+	X = std::max(0.0f, std::min(1.0f, X));
+	return start_pos + X * (end_pos - start_pos);
+}
+
+inline float get_line_angle(const sf::Vector2f& start_pos, const sf::Vector2f& end_pos) {
+	// Calculate the direction vector from start_pos to end_pos
+	const sf::Vector2f direction = end_pos - start_pos;
+
+	// Calculate the angle (in radians) of the direction vector relative to the positive x-axis
+	const float angle_radians = std::atan2(direction.y, direction.x);
+
+	// Convert the angle from radians to degrees
+	float angle_degrees = angle_radians * (180.f / pi);
+
+	// Normalize the angle to be in the range [0, 360)
+	if (angle_degrees < 0)
+		angle_degrees += 360.f;
+
+	return angle_degrees;
+}
+
+
+// Function to find a point on the line segment pos1 to pos2
+// such that the distance from this point to pos2 is distance_from_pos2
+inline sf::Vector2f find_point_at_distance_from_pos2(const sf::Vector2f& pos1, const sf::Vector2f& pos2, float distance_from_pos2) {
+	// Calculate the direction vector from pos1 to pos2
+	const sf::Vector2f dir = pos2 - pos1;
+
+	// Calculate the length (magnitude) of the direction vector
+	const float length = std::sqrt(dir.x * dir.x + dir.y * dir.y);
+
+	// Normalize the direction vector (convert it to a unit vector)
+	const sf::Vector2f unit_dir = dir / length;
+
+	// Calculate the point at the specified distance from pos2 along the line
+	const sf::Vector2f point_on_line = pos2 - unit_dir * distance_from_pos2;
+
+	return point_on_line;
+}

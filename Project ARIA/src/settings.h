@@ -67,12 +67,38 @@ struct WorldSettings
 };
 
 
-
+                                                                                                                  
 struct SpringSettings
 {
 	inline static constexpr float rest_length = 120.f;
-	inline static constexpr float spring_constant = 0.08f;
-	inline static constexpr float damping_factor = 0.95f;
+	inline static constexpr float spring_constant = 0.75f;//0.08f;
+	inline static constexpr float damping_factor = 0.50f;
+};
+
+
+struct GeneticInformationSettings
+{
+	inline static const sf::Vector2i init_cell_count_range = { 2, 6 };
+	inline static const sf::Vector2f init_cell_radius_range = { 30.f, 50.f };
+
+	inline static const sf::Vector2f init_rest_length_range = { init_cell_radius_range.y, init_cell_radius_range.y * 4.f };
+	inline static const sf::Vector2f damping_const_range = { 0.95f, 0.99f };
+	inline static const sf::Vector2f spring_const_range = { 0.01f, 0.05f };
+
+	inline static constexpr sf::Uint8 transparancy = 230;
+
+	inline static const std::vector<sf::Color> fill_colors = {
+		{255, 204, 204, transparancy},
+		{208, 255, 194, transparancy},
+		{218, 194, 255, transparancy}
+	};
+
+	inline static const std::vector<sf::Color> outline_colors = {
+		{255, 235, 235, transparancy},
+		{234, 247, 255, transparancy},
+		{226, 255, 216, transparancy},
+		{229, 219, 255, transparancy}
+	};
 };
 
 
@@ -87,25 +113,7 @@ struct ProtozoaSettings
 
 struct CellSettings
 {
-	inline static constexpr sf::Uint8 transparancy = 230;
-
-	inline static const std::vector<sf::Color> cell_fill_colors = {
-		{255, 204, 204, transparancy},
-		{208, 255, 194, transparancy},
-		{218, 194, 255, transparancy}
-	};
-
-	inline static const std::vector<sf::Color> cell_outline_colors = {
-		{255, 235, 235, transparancy},
-		{234, 247, 255, transparancy},
-		{226, 255, 216, transparancy},
-		{229, 219, 255, transparancy}
-	};
-	inline static const std::vector<sf::Color> spring_fill_colors = cell_fill_colors;
-	inline static const std::vector<sf::Color> spring_outline_colors = cell_outline_colors;
-
-	inline static constexpr float cell_radius = 30.f;
-	inline static constexpr float cell_outline_thickness = 6.f;
+	inline static constexpr float cell_outline_thickness = 12.f;
 };
 
 

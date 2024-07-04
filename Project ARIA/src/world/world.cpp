@@ -9,7 +9,6 @@ World::World(sf::RenderWindow* window) : m_window_(window), border_render_(make_
 
 }
 
-
 void World::update_world()
 {
 	for (Protozoa& protozoa : m_all_protozoa_)
@@ -43,8 +42,11 @@ void World::render_world()
 void World::init_organisms()
 {
 	m_all_protozoa_.reserve(max_protozoa);
+
 	for (int i = 0; i < max_protozoa; ++i)
-		m_all_protozoa_.emplace_back(&m_bounds_, m_window_, &cell_renderer_);
+	{
+		m_all_protozoa_.emplace_back(&m_bounds_, m_window_, &cell_renderer_, true);
+	}
 }
 
 

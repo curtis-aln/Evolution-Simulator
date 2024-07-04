@@ -91,4 +91,10 @@ struct Random
 			vector[i] = rand_range(min_value, max_value);
 		}
 	}
+
+	//template<typename Type>
+	//static Type& choice(const std::vector<Type>& vector)
+	//{
+	//	return vector[Random::rand_range(0, vector.size() - 1)];
+	//}
 };

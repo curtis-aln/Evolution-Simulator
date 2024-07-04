@@ -4,35 +4,37 @@
 #include "../Utils/random.h"
 #include "cell.h"
 
-class Spring : SpringSettings
+class Spring
 {
-	float m_rest_length_ = rest_length;
-	float m_spring_constant_ = spring_constant;
-	float m_damping_factor_ = damping_factor;
-
-public:
-	int m_cellA_id{};
-	int m_cellB_id{};
-
-	sf::Color fill_color;
-	sf::Color outline_color;
+	float m_rest_length_{};
+	float m_spring_constant_{};
+	float m_damping_factor_{};
 
 	// for debugging
 	sf::Vector2f direction_A_force{};
 	sf::Vector2f direction_B_force{};
 
 public:
-	Spring(const int cell_a_id, const int cell_b_id) : m_cellA_id(cell_a_id), m_cellB_id(cell_b_id)
+	std::pair<int, int> connection{};
+	std::pair<sf::Color, sf::Color> coloring{};
+
+	
+
+public:
+	Spring(const std::pair<int, int>& connection_ids = {}, const std::pair<sf::Color, sf::Color>& line_coloring = {},
+		const float rest_length = 0, const float spring_constant = 0, const float damping_factor = 0)
+	: m_rest_length_(rest_length), m_spring_constant_(spring_constant),
+	m_damping_factor_(damping_factor), connection(connection_ids), coloring(line_coloring)
 	{
-		init_colors();
+
 	}
 
 	void update(Cell& cell_a, Cell& cell_b)
 	{
-		const sf::Vector2f pos_a = cell_a.get_position();
-		const sf::Vector2f pos_b = cell_b.get_position();
-		const sf::Vector2f vel_a = cell_a.get_velocity();
-		const sf::Vector2f vel_b = cell_b.get_velocity();
+		const sf::Vector2f pos_a = cell_a.position;
+		const sf::Vector2f pos_b = cell_b.position;
+		const sf::Vector2f vel_a = cell_a.velocity;
+		const sf::Vector2f vel_b = cell_b.velocity;
 
 		const float dist = length(pos_b - pos_a);
 
@@ -53,18 +55,5 @@ public:
 
 		direction_B_force = total_force * ((pos_a - pos_b) / dist);
 		cell_b.accelerate(direction_B_force);
-	}
-
-
-private:
-	void init_colors()
-	{
-		const size_t max_fill = CellSettings::spring_fill_colors.size() - 1;
-		const size_t rand_idx_fill = Random::rand_range(static_cast<size_t>(0), max_fill);
-		fill_color = CellSettings::spring_fill_colors[rand_idx_fill];
-
-		const size_t max_outline = CellSettings::spring_outline_colors.size() - 1;
-		const size_t rand_idx_outline = Random::rand_range(static_cast<size_t>(0), max_outline);
-		outline_color = CellSettings::spring_outline_colors[rand_idx_outline];
 	}
 };

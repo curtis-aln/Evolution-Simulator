@@ -23,6 +23,7 @@ class NetworkRenderer : TextSettings, ButtonSettings, UI_Settings
 
 	Font m_title_font_;
 	Font m_text_font_;
+	Font m_stats_font_;
 
 	TextPacket m_title_{};
 	sf::RectangleShape m_render_border_{};
@@ -47,8 +48,10 @@ class NetworkRenderer : TextSettings, ButtonSettings, UI_Settings
 public:
 	explicit NetworkRenderer(const sf::Rect<float>& border = {}, sf::RenderWindow* render_window = nullptr, 
 		GeneticNeuralNetwork* network_pointer = nullptr)
-	: m_border_(border), m_title_font_(render_window, t_title_size, bold_font_loc),
-	m_text_font_(render_window, t_regular_size, regular_font_loc)
+	: m_border_(border),
+	m_title_font_(render_window, t_title_size, bold_font_loc),
+	m_text_font_(render_window, t_regular_size, regular_font_loc),
+	m_stats_font_(render_window, t_small_size, regular_font_loc)
 	{
 		set_pointer(network_pointer);
 		set_render_window(render_window);
@@ -154,19 +157,18 @@ private:
 	void initialize_button()
 	{
 		const sf::Vector2f buffer = { 40, 40 };
-		const sf::Vector2f size = { 240, 75 };
+		const sf::Vector2f size = { 260, 75 };
 		const sf::Rect rect = {
 			m_border_.left + m_border_.width - buffer.x - size.x,
 			m_border_.top + m_border_.height - buffer.y - size.y,
 			size.x, size.y };
 
-		constexpr sf::Uint8 t = CellSettings::transparancy;
-		const sf::Color default_color = { 30, 30, 30, t };
-		const sf::Color active_color = { 50, 50, 50, t };
-		const sf::Color outline_color = { 200, 200, 200, t };
+		const sf::Color default_color = { 30, 30, 30 };
+		const sf::Color active_color = { 50, 50, 50 };
+		const sf::Color outline_color = { 200, 200, 200 };
 
 		debug_toggle = Button(m_render_window_, rect);
-		debug_toggle.init_font("Debug Mode", regular_font_loc, sf::Color::White, b_font_size);
+		debug_toggle.init_font("Debug Toggle", regular_font_loc, sf::Color::White, b_font_size);
 		debug_toggle.init_graphics(default_color, active_color, outline_color, b_thickness);
 	}
 
@@ -290,32 +292,31 @@ private:
 				link_thickness, link_thickness/1.5, color, outline_col);
 		}
 
-		//if (!debug_mode_)
-		//	return;
-		//
-		//std::vector<std::vector<Node>>& network = m_network_pointer_->get_neural_network();
-		//for (const auto& [node1_info, node2_info] : m_connections)
-		//{
-		//	// if debug mode we will draw the weight value of the node below the line
-		//	const sf::Vector2f midpoint = get_midpoint(node1_info->pos, node2_info->pos);
-		//	const sf::Vector2f quartile = get_midpoint(midpoint, node2_info->pos);
-		//
-		//	// nodes
-		//	Node& node1 = node_at_pair(node1_info->node_index);
-		//	Node& node2 = node_at_pair(node2_info->node_index);
-		//
-		//	float state2 = 0.f;
-		//	for (int i = 0; i < node2.connections.size(); ++i)
-		//	{
-		//		if (node2.connections[i] == node1_info->node_index)
-		//		{
-		//			state2 = std::tanh(node2.weights[i]);
-		//		}
-		//	}
-		//
-		//	const std::string val = trim_decimal_to_string(state2, 1);
-		//	m_text_font_.draw(quartile, val, true);
-		//}
+		if (!debug_mode_)
+			return;
+		
+		for (const auto& [node1_info, node2_info] : m_connections)
+		{
+			// if debug mode we will draw the weight value of the node below the line
+			const sf::Vector2f text_pos = find_point_at_distance_from_pos2(node1_info->pos, node2_info->pos, 140.f);
+			const float rotation = get_line_angle(node1_info->pos, node2_info->pos);
+
+			// nodes
+			Node& node2 = node_at_pair(node2_info->node_index);
+
+			// todo
+			float state2 = 0.f;
+			for (int i = 0; i < node2.connections.size(); ++i)
+			{
+				if (node2.connections[i] == node1_info->node_index)
+				{
+					state2 = std::tanh(node2.weights[i]);
+				}
+			}
+		
+			const std::string val = trim_decimal_to_string(state2, 1);
+			m_stats_font_.draw(text_pos, val, true, rotation);
+		}
 	}	
 		
 	Node& node_at_pair(const std::pair<int,int> location) const
@@ -341,10 +342,10 @@ private:
 		{
 			for (int node_idx = 0; node_idx < network[layer_idx].size(); ++node_idx)
 			{
-				const std::string val = trim_decimal_to_string(network[layer_idx][node_idx].output, 1);
+				const std::string val = trim_decimal_to_string(network[layer_idx][node_idx].output, 2);
 				const sf::Vector2f pos = m_node_render_info_[layer_idx][node_idx].pos;
-				const float text_size_y = m_text_font_.get_text_size(val).y;
-				m_text_font_.draw(pos + sf::Vector2f{0, node_radius + text_size_y/2}, val, true);
+				const float text_size_y = m_stats_font_.get_text_size(val).y;
+				m_stats_font_.draw(pos + sf::Vector2f{0, node_radius + text_size_y/2 + 8.f}, val, true);
 			}
 		}
 	}

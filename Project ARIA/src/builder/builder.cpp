@@ -3,7 +3,8 @@
 
 Builder::Builder(sf::RenderWindow* window) : m_window_(window),
 m_title_text_(window, t_title_size, bold_font_loc),
-m_normal_text_(window, t_regular_size, regular_font_loc)
+m_normal_text_(window, t_regular_size, regular_font_loc),
+m_protozoa_(nullptr, window)
 {
 	init_bounds();
 	init_protozoa();
@@ -101,34 +102,31 @@ void Builder::update_protozoa()
 
 void Builder::border_cell(Cell& cell) const
 {
-	sf::Vector2f position = cell.get_position();
-	sf::Vector2f velocity = cell.get_velocity();
 	const float rad = cell.get_radius();
-	if (position.x - rad < protozoa_space.left)
+	if (cell.position.x - rad < protozoa_space.left)
 	{
-		position.x = protozoa_space.left + rad;
-		velocity.x *= -1.f;
+		cell.position.x = protozoa_space.left + rad;
+		//velocity.x *= -1.f;
 	}
 
-	else if (position.x + rad > protozoa_space.left + protozoa_space.width)
+	else if (cell.position.x + rad > protozoa_space.left + protozoa_space.width)
 	{
-		position.x = protozoa_space.left + protozoa_space.width - rad;
-		velocity.x *= -1.f;
+		cell.position.x = protozoa_space.left + protozoa_space.width - rad;
+		//velocity.x *= -1.f;
 	}
 
-	if (position.y - rad < protozoa_space.top)
+	if (cell.position.y - rad < protozoa_space.top)
 	{
-		position.y = protozoa_space.top + rad;
-		velocity.y *= -1.f;
+		cell.position.y = protozoa_space.top + rad;
+		//velocity.y *= -1.f;
 	}
 
-	else if (position.y + rad > protozoa_space.top + protozoa_space.height)
+	else if (cell.position.y + rad > protozoa_space.top + protozoa_space.height)
 	{
-		position.y = protozoa_space.top + protozoa_space.height - rad;
-		velocity.y *= -1.f;
+		cell.position.y = protozoa_space.top + protozoa_space.height - rad;
+		//velocity.y *= -1.f;
 	}
 
-	cell.set_position(position);
 	//cell.set_velocity(velocity);
 }
 
@@ -170,7 +168,7 @@ void Builder::render_protozoa()
 
 	if (start_cell != nullptr)
 	{
-		draw_thick_line(*m_window_, start_cell->get_position(), m_mouse_pos, 4, 0, sf::Color::White);
+		draw_thick_line(*m_window_, start_cell->position, m_mouse_pos, 4, 0, sf::Color::White);
 	}
 }
 
@@ -207,15 +205,14 @@ void Builder::init_add_button()
 	const sf::Rect rect = { bounds.left + button_buffer.x, bounds.top + bounds.height - button_size.y - button_buffer.y,
 		button_size.x, button_size.y };
 
-	constexpr sf::Uint8 t = CellSettings::transparancy;
-	const sf::Color text_color = { 255, 255, 255, t };
-	const sf::Color default_color = { 30, 30, 30, t };
-	const sf::Color active_color = { 50, 50, 50, t };
-	const sf::Color outline_color = { 200, 200, 200, t };
+	const sf::Color text_color = { 255, 255, 255 };
+	const sf::Color default_color = { 30, 30, 30 };
+	const sf::Color active_color = { 50, 50, 50 };
+	const sf::Color outline_color = { 200, 200, 200 };
 
 	m_add_cell_button = Button(m_window_, rect);
 	m_add_cell_button.init_font("add cell", bold_font_loc, text_color, b_font_size);
-	m_add_cell_button.init_graphics(default_color, active_color, outline_color, b_thickness);
+	m_add_cell_button.init_graphics(default_color, active_color, border_outline_color, b_thickness);
 }
 
 
@@ -254,5 +251,6 @@ void Builder::init_protozoa()
 {
 	m_protozoa_bounds_.radius = protozoa_space.width / 1.3f;
 	m_protozoa_bounds_.center = get_rect_center(protozoa_space);
-	m_protozoa_ = Protozoa(&m_protozoa_bounds_, m_window_, &m_protozoa_renderer_, false);
+	m_protozoa_.set_bounds(&m_protozoa_bounds_);
+	m_protozoa_.set_renderer(&m_protozoa_renderer_);
 }

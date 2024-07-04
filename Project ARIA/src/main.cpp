@@ -12,42 +12,66 @@
 //  05/04 - 2748 lines (+263)
 //  09/04 - 3253 lines (+505)
 //  12/04 - 3656 lines (+403)
+//  15/04 - 3958 lines (+302)
 
+
+// NOTE: do not use cell id's as indexes as when cells are added and removed it can mess up
+
+// togo bugs:
+// TODO cells bugging out
+// TODO cells not fully connected
 
 // todo builder:
-// TODO builder menu toggle
 // TODO builder menu add / remove node
 // TODO builder menu add / remove connection
+// TODO ability to release node
+// TODO fix node hiding bug
+
 
 // todo neural network:
-// TODO Network weight adder / remover
-// TODO Network Node modification
 // TODO Working Network for organisms with inputs and outputs working
 // TODO see weights and bias values
+// TODO natural selection alg working
+// TODO mutation and evolution alg
+
 
 // todo utils:
+// TODO create optimized vector
 // TODO create a slider
 // TODO find cleaner and better fonts
 // TODO smooth zooming
 // TODO simple mode [S] which hides all utility accessories
-// TODO button on the line graph to toggle between line mode and fill mode
-// TODO turn springs into a module
 // TODO have some objects static on the screen instead of on the world <- create a surface for the world
  
 // todo line graph:
-// TODO add range for y-axis in graph
-// TODO add x-axis value indicators  
+// [DONE] add range for y-axis in graph
+// [DONE] add x-axis value indicators
+// [DONE] fix bug where values at the end are not showing.
+// [DONE] add line graph toggle to see the line graph
+// TODO add stats on the line graph
 
-// todo protozoa & food:
-// TODO cell connections should change size based on extension
+// todo food:
 // TODO food clusters spawning
 // TODO food population management
-// TODO text for each node on the line mode+
-// TODO protozoa starvation
+// TODO food cluster locomotion
+// TODO food debug settings
+
+
+// todo protozoa:
+// TODO working neural network
+// TODO cell eating system
+// TODO protozoa energy system
 // TODO protozoa reproduction
-// TODO springs showing stress and strain
-// TODO cells can grow in size over time
-// TODO - Mitosis, Each cell duplicates, those new cells begin to cluster into a ball and form connections
+// TODO protozoa death
+
+
+// todo strings:
+// TODO springs showing stress and strain in colour hue
+// TODO springs should change size based on extension
+// TODO turn springs into a module
+// TODO make two debug arrows showing the direction of expansion / contraction
+// TODO give those arrows values
+
 
 // todo advanced:
 // TODO dynamic quad tree for organisms & food
@@ -61,10 +85,11 @@
 // TODO improve o_vector: each object points to the previous and next index. if removed then
 //      TODO self.previous.next_index = self.next_index
 //      TODO self.next.previous_index = self.previous_index
+// TODO ability to create multiple worlds with multi-threading
 
 // todo quality of life:
 // TODO Remove the child and parent id information from cells
-// TODO fix protozoa dragging issue
+// TODO user should have a radius to select and drag multiple cells at a time
 
 int main()
 {

@@ -14,7 +14,7 @@
 #include "../Utils/UI/text_box.h"
 
 
-class Simulation : SimulationSettings
+class Simulation : SimulationSettings, UI_Settings, TextSettings
 {
 	sf::RenderWindow m_window_ = sf::RenderWindow(sf::VideoMode(window_width, window_height), 
 		simulation_name, sf::Style::None);

@@ -22,7 +22,7 @@ void Protozoa::update_springs()
 {
 	for (Spring& spring : m_springs_)
 	{
-		spring.update(m_cells_[spring.m_cellA_id], m_cells_[spring.m_cellB_id]);
+		spring.update(m_cells_[spring.connection.first], m_cells_[spring.connection.second]);
 	}
 }
 
@@ -38,7 +38,7 @@ void Protozoa::update_cells()
 
 void Protozoa::update_bounds()
 {
-	const sf::Vector2f cell0_pos = m_cells_[0].get_position();
+	const sf::Vector2f cell0_pos = m_cells_[0].position;
 	float min_x = cell0_pos.x - m_cells_[0].get_radius();
 	float min_y = cell0_pos.y - m_cells_[0].get_radius();
 	float max_x = cell0_pos.x + m_cells_[0].get_radius();
@@ -46,7 +46,7 @@ void Protozoa::update_bounds()
 
 	for (const Cell& cell : m_cells_) 
 	{
-		const sf::Vector2f pos = cell.get_position();
+		const sf::Vector2f pos = cell.position;
 		if (pos.x < min_x) min_x = pos.x - cell.get_radius();
 		if (pos.x > max_x) max_x = pos.x + cell.get_radius();
 		if (pos.y < min_y) min_y = pos.y - cell.get_radius();
