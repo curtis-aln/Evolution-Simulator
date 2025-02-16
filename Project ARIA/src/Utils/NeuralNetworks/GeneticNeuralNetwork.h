@@ -195,7 +195,10 @@ private:
 		{
 			for (Node& node : Layer)
 			{
-				Random::randomize_vector(node.weights, -weight_init_range, weight_init_range);
+				for (int i = 0; i < node.weights.size(); ++i)
+				{
+					node.weights[i] = Random::rand_range(-weight_init_range, weight_init_range);
+				}
 				node.bias = Random::rand_range(-bias_init_range, bias_init_range);
 				node.inputs.resize(node.weights.size());
 			}

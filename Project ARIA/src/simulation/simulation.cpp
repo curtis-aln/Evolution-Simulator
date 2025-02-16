@@ -25,7 +25,7 @@ Simulation::Simulation() : m_world_(&m_window_)
 	net_renderer.set_output_node_names({ "output A", "output B" });
 
 	text_box.set_title("Protozoa Simulation");
-	text_box.init_graphics(UI_Settings::border_fill_color, UI_Settings::border_outline_color, UI_Settings::border_outline_thickness);
+	text_box.init_graphics(border_fill_color, border_outline_color, border_outline_thickness);
 
 	text_box.add_statistic("int", "frames", &m_ticks_);
 	text_box.add_statistic("bool", "paused", &m_paused_);

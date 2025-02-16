@@ -1,68 +1,35 @@
 #include "simulation/simulation.h"
 
-//  05/03 - 922  lines (+0)
-//  10/03 - 962  lines (+40)
-//  17/03 - 1131 lines (+169)
-//  20/03 - 1255 lines (+124)
-//  21/03 - 1429 lines (+174)
-//  23/03 - 1769 lines (+340)
-//  24/03 - 2011 lines (+242)
-//  27/03 - 2132 lines (+121)
-//  02/04 - 2485 lines (+353)
-//  05/04 - 2748 lines (+263)
-//  09/04 - 3253 lines (+505)
-//  12/04 - 3656 lines (+403)
-//  15/04 - 3958 lines (+302)
+
+/* Project Idea
+ *
+ */
 
 
 // NOTE: do not use cell id's as indexes as when cells are added and removed it can mess up
 
-// togo bugs:
-// TODO cells bugging out
-// TODO cells not fully connected
+// Currently Working On: "camera movement is too jittery"
 
-// todo builder:
-// TODO builder menu add / remove node
-// TODO builder menu add / remove connection
-// TODO ability to release node
-// TODO fix node hiding bug
+// Things ive noticed while Testing
+// - make "project aria" title area larger and move it to the bottom right
+// - fps should be integrated with the protozoa settings
+// - program crashes when you try to link two protozoa in the builder area
+// - make instructions more clear in builder area
+// - program doesn't run from executable
+// - statistics line and data-points are too small
+// - statistics title is too large
+// - camera movement is too jittery
+// - connections between cells should be smoother
+// - protozoa factory title too far down
+// - neural network input colors too strong
+// - cells need better creation colors, should fit a pallet like "lime-pallet" or "ocean-pallet"
 
+// Things i should move onto
+// Cells should be able to bounce off each-over
 
-// todo neural network:
-// TODO Working Network for organisms with inputs and outputs working
-// TODO see weights and bias values
-// TODO natural selection alg working
-// TODO mutation and evolution alg
+// Features to add
+// Food
 
-
-// todo utils:
-// TODO create optimized vector
-// TODO create a slider
-// TODO find cleaner and better fonts
-// TODO smooth zooming
-// TODO simple mode [S] which hides all utility accessories
-// TODO have some objects static on the screen instead of on the world <- create a surface for the world
- 
-// todo line graph:
-// [DONE] add range for y-axis in graph
-// [DONE] add x-axis value indicators
-// [DONE] fix bug where values at the end are not showing.
-// [DONE] add line graph toggle to see the line graph
-// TODO add stats on the line graph
-
-// todo food:
-// TODO food clusters spawning
-// TODO food population management
-// TODO food cluster locomotion
-// TODO food debug settings
-
-
-// todo protozoa:
-// TODO working neural network
-// TODO cell eating system
-// TODO protozoa energy system
-// TODO protozoa reproduction
-// TODO protozoa death
 
 
 // todo strings:

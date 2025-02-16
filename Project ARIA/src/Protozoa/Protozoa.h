@@ -49,7 +49,7 @@ public:
 	void set_renderer(sf::CircleShape* renderer);
 	void deselect_cell();
 	void make_connection(int cell1_id, int cell2_id);
-	void builder_add_cell(const sf::Vector2f center);
+	void builder_add_cell(sf::Vector2f center);
 	void move_selected_cell(sf::Vector2f mouse_position);
 
 private:

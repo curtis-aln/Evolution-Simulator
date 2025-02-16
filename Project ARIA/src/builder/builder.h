@@ -43,7 +43,7 @@ public:
 	void init_text_packets();
 
 	void render();
-	void update(const sf::Vector2f mouse_pos);
+	void update(sf::Vector2f mouse_pos);
 	void add_cell();
 	bool check_mouse_input();
 	void de_select_protozoa();
