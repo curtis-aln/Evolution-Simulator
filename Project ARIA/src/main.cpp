@@ -25,6 +25,7 @@
 // - cells need better creation colors, should fit a pallet like "lime-pallet" or "ocean-pallet"
 
 // Things i should move onto
+// Project rendered and updated on separate threads
 // Cells should be able to bounce off each-over
 
 // Features to add

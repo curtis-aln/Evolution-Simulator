@@ -7,30 +7,43 @@ Simulation::Simulation() : m_world_(&m_window_)
 	m_window_.setFramerateLimit(frame_rate);
 	m_window_.setVerticalSyncEnabled(vsync);
 
+
+	init_line_graphs();
+	init_network_renderer();
+	init_text_box();
+		
+}
+
+void Simulation::init_line_graphs()
+{
 	LineGraphSettings settings = {
 		"Protozoa Population", "Time", "Population",
 		transparency, protozoa_graph_line_color, protozoa_under_graph_color, border_fill_color, border_outline_color,
 		{ 50, 50, 50, transparency }, border_outline_thickness, t_title_size,
-		t_regular_size, t_small_size, bold_font_loc, regular_font_loc};
+		t_regular_size, t_small_size, bold_font_loc, regular_font_loc };
 
 	protozoa_population_graph_.set_settings(settings);
 	settings.title = "Food Population";
 	settings.graph_line_color = food_graph_line_color;
 	settings.under_graph_color = food_under_graph_color;
 	food_population_graph_.set_settings(settings);
+}
 
-
-	net_renderer.set_title("Test Network");
-	net_renderer.set_input_node_names({ "input A", "Input B" });
-	net_renderer.set_output_node_names({ "output A", "output B" });
-
+void Simulation::init_text_box()
+{
 	text_box.set_title("Protozoa Simulation");
 	text_box.init_graphics(border_fill_color, border_outline_color, border_outline_thickness);
 
 	text_box.add_statistic("int", "frames", &m_ticks_);
 	text_box.add_statistic("bool", "paused", &m_paused_);
 	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
-		
+}
+
+void Simulation::init_network_renderer()
+{
+	net_renderer.set_title("Test Network");
+	net_renderer.set_input_node_names({ "input A", "Input B" });
+	net_renderer.set_output_node_names({ "output A", "output B" });
 }
 
 
@@ -58,9 +71,15 @@ void Simulation::update()
 	m_builder_.update(mouse_pos);
 	protozoa_population_graph_.update(mouse_pos);
 	food_population_graph_.update(mouse_pos);
+	net_renderer.update(mouse_pos);
 
-	update_statistics();
+	update_line_graphs();
+	update_test_data();
+}
 
+
+void Simulation::update_test_data()
+{
 	test_data3 += Random::rand11_float() * 0.05f;
 	test_data4 += Random::rand11_float() * 0.05f;
 
@@ -70,12 +89,10 @@ void Simulation::update()
 	network.inputs[0] = std::tanh(test_data3);
 	network.inputs[1] = std::tanh(test_data4);
 	network.forward_propagate();
-	net_renderer.update(mouse_pos);
-	
 }
 
 
-void Simulation::update_statistics()
+void Simulation::update_line_graphs()
 {
 	++m_ticks_;
 	m_total_time_elapsed_ += static_cast<float>(m_delta_time_.get_delta());
@@ -88,7 +105,6 @@ void Simulation::update_statistics()
 		food_population_graph_.add_data(test_data2);
 	}
 }
-
 
 
 void Simulation::render()
@@ -112,7 +128,6 @@ void Simulation::render()
 
 void Simulation::handle_events()
 {
-	camera_.update();
 	const sf::Vector2f cam_pos = camera_.get_world_mouse_pos();
 
 	sf::Event event{};
@@ -146,6 +161,9 @@ void Simulation::handle_events()
 
 	// mouse hovering over an organism
 	m_world_.check_hovering(m_debug_, cam_pos);
+
+	// updating camera translations
+	camera_.update(m_clock_.get_delta_time());
 }
 
 
@@ -184,7 +202,6 @@ void Simulation::mouse_input()
 
 void Simulation::display_screen_info()
 {
-	Camera::toggle_view(false);
 	manage_frame_rate();
 
 	m_title_font_.draw({ 20, 20 }, simulation_name);
@@ -196,7 +213,6 @@ void Simulation::display_screen_info()
 								        "quit [ESC]";
 
 	m_text_font_.draw({ 20, 55 }, combined_string);
-	Camera::toggle_view(true);
 }
 
 

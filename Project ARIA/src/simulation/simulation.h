@@ -55,11 +55,15 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 
 public:
 	Simulation();
+	void init_line_graphs();
+	void init_text_box();
+	void init_network_renderer();
 	void run();
 
 private:
 	void update();
-	void update_statistics();
+	void update_test_data();
+	void update_line_graphs();
 	void render();
 
 	// User Input
