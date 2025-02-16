@@ -36,7 +36,7 @@ struct SimulationSettings
 	inline static const std::string simulation_name = "Project A.R.I.A";
 	static constexpr bool vsync = false;
 
-	static constexpr unsigned frame_rate = 30;
+	static constexpr unsigned frame_rate = 144;
 
 	static constexpr unsigned window_width = 4500;
 	static constexpr unsigned window_height = 2800;
