@@ -7,8 +7,9 @@
 
 
 // NOTE: do not use cell id's as indexes as when cells are added and removed it can mess up
+// NOTE: if there are multithreading issues check how rendering works with the update thread because i commented out the lock mutex
 
-// Currently Working On: "camera movement is too jittery"
+// Currently Working On: "Project rendered and updated on separate threads"
 
 // Things ive noticed while Testing
 // - make "project aria" title area larger and move it to the bottom right
@@ -18,14 +19,13 @@
 // - program doesn't run from executable
 // - statistics line and data-points are too small
 // - statistics title is too large
-// - camera movement is too jittery
 // - connections between cells should be smoother
 // - protozoa factory title too far down
 // - neural network input colors too strong
 // - cells need better creation colors, should fit a pallet like "lime-pallet" or "ocean-pallet"
 
 // Things i should move onto
-// Project rendered and updated on separate threads
+// 
 // Cells should be able to bounce off each-over
 
 // Features to add
@@ -46,7 +46,7 @@
 //      TODO ability to add Nodes
 //      TODO ability to visualise tree
 //      TODO ability to remove nodes
-//      TODO ability to update nodes
+//      TODO ability to update_one_frame nodes
 //      TODO ability to query
 // TODO util and statistics on seperate thread
 // TODO simulation rendering and physics on seperate threads

@@ -49,16 +49,58 @@ void Simulation::init_network_renderer()
 
 void Simulation::run()
 {
-	while (m_window_.isOpen())
+	std::thread updateThread(&Simulation::update_loop, this);
+	render_loop(); // Main thread handles rendering
+
+	// Wait for update thread to finish
+	updateThread.join();
+}
+
+
+void Simulation::render_loop()
+{
+	while (running)
 	{
-		update();
-		render();
 		handle_events();
+
+		// Lock game state for reading
+		{
+			//std::lock_guard<std::mutex> lock(gameStateMutex);
+			render();
+		}
 	}
 }
 
 
-void Simulation::update()
+void Simulation::update_loop()
+{
+	using namespace std::chrono;
+	auto previous = high_resolution_clock::now();
+	float accumulator = 0.0f;
+
+	while (running)
+	{
+		auto now = high_resolution_clock::now();
+		float frameTime = duration<float>(now - previous).count();
+		previous = now;
+		accumulator += frameTime;
+
+		while (accumulator >= dt) 
+		{
+			// Lock game state for safe updates
+			std::lock_guard<std::mutex> lock(gameStateMutex);
+
+			update_one_frame();
+
+			accumulator -= dt;
+		}
+
+		std::this_thread::sleep_for(milliseconds(1)); // Reduce CPU usage
+	}
+}
+
+
+void Simulation::update_one_frame()
 {
 	const sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();
 	m_world_.update_world();
@@ -107,10 +149,8 @@ void Simulation::update_line_graphs()
 }
 
 
-void Simulation::render()
+void Simulation::draw_everything()
 {
-	m_window_.clear(window_color);
-
 	display_screen_info();
 
 	m_world_.render_world();
@@ -121,6 +161,13 @@ void Simulation::render()
 
 	net_renderer.render();
 	text_box.render();
+}
+
+void Simulation::render()
+{
+	m_window_.clear(window_color);
+
+	draw_everything();
 
 	m_window_.display();
 }
@@ -134,7 +181,7 @@ void Simulation::handle_events()
 	while (m_window_.pollEvent(event))
 	{
 		if (event.type == sf::Event::Closed)
-			m_window_.close();
+			running = false;
 
 		else if (event.type == sf::Event::KeyPressed)
 			keyboard_input(event.key.code);
@@ -171,7 +218,7 @@ void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 {
 	switch (event_key_code)
 	{
-	case sf::Keyboard::Escape: m_window_.close(); break;
+	case sf::Keyboard::Escape: running = false; break;
 	case sf::Keyboard::Space:  m_paused_ = not m_paused_; break;
 	case sf::Keyboard::D:      m_debug_ = not m_debug_; break;
 

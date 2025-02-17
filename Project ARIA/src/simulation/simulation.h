@@ -13,13 +13,21 @@
 #include "../Utils/NeuralNetworks/NeuralNetworkUI.h"
 #include "../Utils/UI/text_box.h"
 
+// multithreading imports, rendering and updating happens on two separate threads, with rendering on the main thread
+#include <thread>
+#include <mutex>
+#include <atomic>
+#include <chrono>
+
+inline static constexpr int frame_smoothing = 30;
+inline static constexpr float dt = 1.0f / 30.0f; // 30 updates per second
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
 {
 	sf::RenderWindow m_window_ = sf::RenderWindow(sf::VideoMode(window_width, window_height), 
 		simulation_name, sf::Style::None);
 
-	FrameRateSmoothing<30> m_clock_{};
+	FrameRateSmoothing<frame_smoothing> m_clock_{};
 	Camera camera_{&m_window_, 0.25f};
 	Builder m_builder_{&m_window_};
 
@@ -52,6 +60,10 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 
 	bool mouse_pressed_event = false;
 
+	// A shared game state mutex
+	std::mutex gameStateMutex;
+	std::atomic<bool> running{true};
+
 
 public:
 	Simulation();
@@ -59,11 +71,14 @@ public:
 	void init_text_box();
 	void init_network_renderer();
 	void run();
+	void render_loop();
+	void update_loop();
 
 private:
-	void update();
+	void update_one_frame();
 	void update_test_data();
 	void update_line_graphs();
+	void draw_everything();
 	void render();
 
 	// User Input
