@@ -20,7 +20,7 @@ class Font
 
 public:
     // Constructor taking m_font_ size and file location
-    Font(sf::RenderWindow* window = nullptr, const unsigned font_size = 0, 
+    Font(sf::RenderWindow* window = nullptr, const unsigned font_size = 0,  // todo make path relative
         const std::string& font_location = "src/Utils/fonts/Roboto-Bold.ttf") : m_window_(window)
     {
         if (!font_location.empty())
@@ -55,7 +55,7 @@ public:
     }
 
 
-    void draw(const sf::Vector2f& position, const std::string& string_text, const bool centered = false, const float rotation = 0.0f)
+    void draw(const sf::Vector2f& position, const std::string& string_text, const bool centered = false, const float rotation = 0.0f, sf::RenderWindow* render_window = nullptr)
     {
         if (string_text.empty())
             return;
@@ -74,7 +74,16 @@ public:
         m_text_.setRotation(rotation);
 
         m_text_.setPosition(position);
-        m_window_->draw(m_text_);
+
+        // if the caller would like to use another instance of window
+        if (render_window != nullptr)
+        {
+            render_window->draw(m_text_);
+        }
+        else
+        {
+            m_window_->draw(m_text_);
+        }
     }
 
 

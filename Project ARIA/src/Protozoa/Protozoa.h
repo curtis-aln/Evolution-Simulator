@@ -28,8 +28,6 @@ class Protozoa : ProtozoaSettings, GeneticInformation
 	int selected_cell_id = -1;
 
 	bool debug_mode_ = false;
-	Font m_info_font_;
-
 
 public:
 	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, sf::CircleShape* cell_renderer = nullptr, 
@@ -49,6 +47,7 @@ public:
 	void set_renderer(sf::CircleShape* renderer);
 	void deselect_cell();
 	void make_connection(int cell1_id, int cell2_id);
+	
 	void builder_add_cell(sf::Vector2f center);
 	void move_selected_cell(sf::Vector2f mouse_position);
 

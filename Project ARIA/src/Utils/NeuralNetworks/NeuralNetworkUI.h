@@ -49,9 +49,9 @@ public:
 	explicit NetworkRenderer(const sf::Rect<float>& border = {}, sf::RenderWindow* render_window = nullptr, 
 		GeneticNeuralNetwork* network_pointer = nullptr)
 	: m_border_(border),
-	m_title_font_(render_window, t_title_size, bold_font_loc),
-	m_text_font_(render_window, t_regular_size, regular_font_loc),
-	m_stats_font_(render_window, t_small_size, regular_font_loc)
+	m_title_font_(render_window, title_font_size, bold_font_location),
+	m_text_font_(render_window, regular_font_size, regular_font_location),
+	m_stats_font_(render_window, cell_statistic_font_size, regular_font_location)
 	{
 		set_pointer(network_pointer);
 		set_render_window(render_window);
@@ -168,7 +168,7 @@ private:
 		const sf::Color outline_color = { 200, 200, 200 };
 
 		debug_toggle = Button(m_render_window_, rect);
-		debug_toggle.init_font("Debug Toggle", regular_font_loc, sf::Color::White, b_font_size);
+		debug_toggle.init_font("Debug Toggle", regular_font_location, sf::Color::White, b_font_size);
 		debug_toggle.init_graphics(default_color, active_color, outline_color, b_thickness);
 	}
 

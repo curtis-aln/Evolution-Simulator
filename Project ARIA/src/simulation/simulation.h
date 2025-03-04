@@ -20,7 +20,7 @@
 #include <chrono>
 
 inline static constexpr int frame_smoothing = 30;
-inline static constexpr float dt = 1.0f / 30.0f; // 30 updates per second
+inline static constexpr float dt = 1.0f / 60.0f; // 30 updates per second
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
 {
@@ -35,9 +35,6 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	StopWatch m_delta_time_{};
 	float m_total_time_elapsed_ = 0.f;
 	unsigned m_ticks_ = 0;
-
-	Font m_title_font_{ &m_window_, 33, "src/Utils/fonts/Roboto-Bold.ttf" }; // larger m_text
-	Font m_text_font_{ &m_window_, 17, "src/Utils/fonts/Roboto-Regular.ttf" };  // smaller m_text
 
 	World m_world_{};
 
@@ -64,6 +61,9 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	std::mutex gameStateMutex;
 	std::atomic<bool> running{true};
 
+	// statistics
+	float fps_;
+
 
 public:
 	Simulation();
@@ -87,6 +87,5 @@ private:
 	static void mouse_input();
 
 	// more rendering
-	void display_screen_info();
 	void manage_frame_rate();
 };

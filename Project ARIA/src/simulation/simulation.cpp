@@ -7,6 +7,13 @@ Simulation::Simulation() : m_world_(&m_window_)
 	m_window_.setFramerateLimit(frame_rate);
 	m_window_.setVerticalSyncEnabled(vsync);
 
+	title_font.set_render_window(&m_window_); 
+	regular_font.set_render_window(&m_window_);
+	cell_statistic_font.set_render_window(&m_window_);
+
+	title_font.set_font_size(title_font_size);
+	regular_font.set_font_size(regular_font_size);
+	cell_statistic_font.set_font_size(cell_statistic_font_size);
 
 	init_line_graphs();
 	init_network_renderer();
@@ -19,8 +26,8 @@ void Simulation::init_line_graphs()
 	LineGraphSettings settings = {
 		"Protozoa Population", "Time", "Population",
 		transparency, protozoa_graph_line_color, protozoa_under_graph_color, border_fill_color, border_outline_color,
-		{ 50, 50, 50, transparency }, border_outline_thickness, t_title_size,
-		t_regular_size, t_small_size, bold_font_loc, regular_font_loc };
+		{ 50, 50, 50, transparency }, border_outline_thickness, title_font_size,
+		regular_font_size, cell_statistic_font_size, bold_font_location, regular_font_location };
 
 	protozoa_population_graph_.set_settings(settings);
 	settings.title = "Food Population";
@@ -35,6 +42,7 @@ void Simulation::init_text_box()
 	text_box.init_graphics(border_fill_color, border_outline_color, border_outline_thickness);
 
 	text_box.add_statistic("int", "frames", &m_ticks_);
+	text_box.add_statistic("float", "fps", &fps_);
 	text_box.add_statistic("bool", "paused", &m_paused_);
 	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
 }
@@ -49,11 +57,11 @@ void Simulation::init_network_renderer()
 
 void Simulation::run()
 {
-	std::thread updateThread(&Simulation::update_loop, this);
+	//std::thread updateThread(&Simulation::update_loop, this);
 	render_loop(); // Main thread handles rendering
 
 	// Wait for update thread to finish
-	updateThread.join();
+	//updateThread.join();
 }
 
 
@@ -63,11 +71,8 @@ void Simulation::render_loop()
 	{
 		handle_events();
 
-		// Lock game state for reading
-		{
-			//std::lock_guard<std::mutex> lock(gameStateMutex);
-			render();
-		}
+		update_one_frame();
+		render();
 	}
 }
 
@@ -89,12 +94,12 @@ void Simulation::update_loop()
 		{
 			// Lock game state for safe updates
 			std::lock_guard<std::mutex> lock(gameStateMutex);
-
+		
 			update_one_frame();
-
+		
 			accumulator -= dt;
 		}
-
+		
 		std::this_thread::sleep_for(milliseconds(1)); // Reduce CPU usage
 	}
 }
@@ -102,6 +107,7 @@ void Simulation::update_loop()
 
 void Simulation::update_one_frame()
 {
+	manage_frame_rate();
 	const sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();
 	m_world_.update_world();
 
@@ -151,8 +157,6 @@ void Simulation::update_line_graphs()
 
 void Simulation::draw_everything()
 {
-	display_screen_info();
-
 	m_world_.render_world();
 	m_builder_.render();
 
@@ -247,23 +251,9 @@ void Simulation::mouse_input()
 }
 
 
-void Simulation::display_screen_info()
-{
-	manage_frame_rate();
-
-	m_title_font_.draw({ 20, 20 }, simulation_name);
-
-	const std::string combined_string = "fps: " + trim_decimal_to_string(m_clock_.get_average_frame_rate(), 2) + "\n" +
-								        "time elapsed:" + trim_decimal_to_string(m_total_time_elapsed_, 2) + "s\n" +
-								        "pause [SPACE]: " + bool_to_string(m_paused_) + "\n" +
-								        "debug [D]: "     + bool_to_string(m_debug_) + "\n" +
-								        "quit [ESC]";
-
-	m_text_font_.draw({ 20, 55 }, combined_string);
-}
-
 
 void Simulation::manage_frame_rate()
 {
+	fps_ = m_clock_.get_average_frame_rate();
 	m_clock_.update_frame_rate();
 }

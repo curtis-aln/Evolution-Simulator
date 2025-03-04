@@ -31,10 +31,10 @@ public:
 
 	void update(Cell& cell_a, Cell& cell_b)
 	{
-		const sf::Vector2f pos_a = cell_a.position;
-		const sf::Vector2f pos_b = cell_b.position;
-		const sf::Vector2f vel_a = cell_a.velocity;
-		const sf::Vector2f vel_b = cell_b.velocity;
+		const sf::Vector2f pos_a = cell_a.position_;
+		const sf::Vector2f pos_b = cell_b.position_;
+		const sf::Vector2f vel_a = cell_a.velocity_;
+		const sf::Vector2f vel_b = cell_b.velocity_;
 
 		const float dist = length(pos_b - pos_a);
 

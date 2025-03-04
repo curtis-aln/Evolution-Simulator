@@ -37,8 +37,8 @@ public:
     TextBox(const sf::Rect<float>& border = {}, sf::RenderWindow* render_window = nullptr) :
         m_render_window_(render_window),
         m_border_(border),
-        m_title_font_(render_window, TextSettings::t_title_size, TextSettings::bold_font_loc),
-        m_text_font_(render_window, TextSettings::t_regular_size, TextSettings::regular_font_loc)
+        m_title_font_(render_window, TextSettings::title_font_size, TextSettings::bold_font_location),
+        m_text_font_(render_window, TextSettings::regular_font_size, TextSettings::regular_font_location)
     {
         // Reserve capacity for statistics
         int_stats_.reserve(20);

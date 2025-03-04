@@ -1,14 +1,28 @@
 #pragma once
 #include "Utils/utility_SFML.h"
+#include "Utils/fonts/font_renderer.hpp"
 
 struct TextSettings
 {
-	inline static const std::string bold_font_loc = "src/Utils/fonts/Roboto-Bold.ttf";
-	inline static const std::string regular_font_loc = "src/Utils/fonts/Roboto-Regular.ttf";
-	static constexpr unsigned t_title_size = 70;
-	static constexpr unsigned t_regular_size = 40;
-	static constexpr unsigned t_small_size = 20;
+	// locations for the fonts
+	inline static const std::string bold_font_location = "src/Utils/fonts/Roboto-Bold.ttf";
+	inline static const std::string regular_font_location = "src/Utils/fonts/Roboto-Regular.ttf";
+
+	// Universal font sizes - only these many fonts should be created
+	static constexpr unsigned title_font_size = 70;
+	static constexpr unsigned regular_font_size = 40;
+	static constexpr unsigned cell_statistic_font_size = 20;
+
+	static Font title_font;
+	static Font regular_font;
+	static Font cell_statistic_font;
 };
+
+// Initialize static Font members with appropriate parameters - Which needs to happen outside the class
+inline Font TextSettings::title_font{ nullptr, TextSettings::title_font_size, TextSettings::bold_font_location };
+inline Font TextSettings::regular_font{ nullptr, TextSettings::regular_font_size, TextSettings::regular_font_location };
+inline Font TextSettings::cell_statistic_font{ nullptr, TextSettings::cell_statistic_font_size, TextSettings::regular_font_location };
+
 
 
 struct ButtonSettings
@@ -18,7 +32,7 @@ struct ButtonSettings
 	inline static const sf::Color b_active_color = { 50, 50, 50, transparency };
 	inline static const sf::Color b_outline_color = { 200, 200, 200, transparency };
 
-	static constexpr unsigned b_font_size = TextSettings::t_regular_size;
+	static constexpr unsigned b_font_size = TextSettings::regular_font_size;
 	static constexpr float b_thickness = 4;
 };
 
@@ -60,9 +74,9 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 13000.f;
+	static constexpr float bounds_radius = 23000; //13000.f;
 
-	static constexpr unsigned max_protozoa = 40;
+	static constexpr unsigned max_protozoa = 500;
 	static constexpr unsigned initial_protozoa = max_protozoa / 2;
 };
 

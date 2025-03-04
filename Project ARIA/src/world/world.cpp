@@ -1,7 +1,9 @@
 #include "world.h"
 #include "../Utils/utility_SFML.h"
 
-World::World(sf::RenderWindow* window) : m_window_(window), border_render_(make_circle(m_bounds_.radius, m_bounds_.center))
+World::World(sf::RenderWindow* window)
+	: m_window_(window),
+	border_render_(make_circle(m_bounds_.radius, m_bounds_.center))
 {
 	init_organisms();
 	init_food();

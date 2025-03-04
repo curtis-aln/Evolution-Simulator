@@ -21,7 +21,6 @@ class World : WorldSettings
 	sf::CircleShape cell_renderer_{};
 	sf::VertexArray border_render_{};
 
-
 public:
 	Protozoa* selected_protozoa = nullptr;
 

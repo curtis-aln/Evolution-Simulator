@@ -9,7 +9,9 @@
 // NOTE: do not use cell id's as indexes as when cells are added and removed it can mess up
 // NOTE: if there are multithreading issues check how rendering works with the update thread because i commented out the lock mutex
 
-// Currently Working On: "Project rendered and updated on separate threads"
+// Currently Working On: 
+// seperate the fonts from the font.h file
+// static font class
 
 // Things ive noticed while Testing
 // - make "project aria" title area larger and move it to the bottom right

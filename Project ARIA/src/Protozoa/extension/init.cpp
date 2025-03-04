@@ -3,11 +3,8 @@
 Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, sf::CircleShape* cell_renderer, const bool init_cells, 
 	const GeneticInformation info)
 	: GeneticInformation(info), m_window_ptr_(window), m_cell_renderer_ptr_(cell_renderer),
-	m_world_bounds_(world_bounds),
-	m_info_font_(window, 13, "src/Utils/fonts/Roboto-Regular.ttf")
+	m_world_bounds_(world_bounds)
 {
-	m_info_font_.set_fill_color();
-
 	if (world_bounds == nullptr || cell_renderer == nullptr)
 	{
 		return;
@@ -34,7 +31,7 @@ void Protozoa::initialise_cells()
 	for (const CellGenetics& genetics : cell_info)
 	{
 		m_cells_[genetics.id] = Cell(genetics);
-		m_cells_[genetics.id].position = Circle(rel_center, spawn_radius).rand_pos_in_circle();
+		m_cells_[genetics.id].position_ = Circle(rel_center, spawn_radius).rand_pos_in_circle();
 	}
 }
 

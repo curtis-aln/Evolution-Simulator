@@ -18,9 +18,6 @@ class Builder : BuilderSettings, ButtonSettings, TextSettings, UI_Settings
 
 	sf::Rect<float> protozoa_space;
 
-	Font m_title_text_;
-	Font m_normal_text_;
-
 	TextPacket title{};
 	TextPacket instructions{};
 

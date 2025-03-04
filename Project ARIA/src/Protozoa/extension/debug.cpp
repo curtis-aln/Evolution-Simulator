@@ -1,15 +1,17 @@
 #include "../Protozoa.h"
+#include "../../settings.h"
 
 void Protozoa::render_debug()
 {
 	// This is the bounding box of the protozoa, used for external collision events
 	draw_rect_outline(m_personal_bounds_, *m_window_ptr_);
 
+	Font& font = TextSettings::cell_statistic_font;
 
 	// for each cell we draw its bounding box
 	for (Cell& cell : m_cells_)
 	{
-		const sf::Vector2f pos = cell.position;
+		const sf::Vector2f pos = cell.position_;
 		const float rad = cell.get_radius();
 
 		// rendering the bounding boxes
@@ -18,12 +20,12 @@ void Protozoa::render_debug()
 		render_cell_connections(cell);
 
 		// drawing the direction of the cell
-		const float arrow_length = std::min(rad*4, length(cell.velocity) * rad);
-		draw_direction(*m_window_ptr_, pos, cell.velocity, arrow_length, 6, 10,
+		const float arrow_length = std::min(rad*4, length(cell.velocity_) * rad);
+		draw_direction(*m_window_ptr_, pos, cell.velocity_, arrow_length, 6, 10,
 			{ 200, 220, 200 }, { 190, 200, 190 });
 
 		// drawing cell stats
-		m_info_font_.draw({ rect.left, rect.top + rect.height + 5 }, "id: " + std::to_string(cell.rel_id), false);
+		font.draw({ rect.left, rect.top + rect.height + 5 }, "id: " + std::to_string(cell.rel_id), false);
 	}
 
 	// protozoa information under the bounding box
@@ -34,7 +36,7 @@ void Protozoa::render_debug()
 		"gen: " + std::to_string(generation) + "\n" +
 		"energy: " + std::to_string(energy);
 
-	m_info_font_.draw(start_pos, combined_string, false);
+	font.draw(start_pos, combined_string, false);
 
 	// spring information
 	//for (const Spring& spring : m_springs_)
@@ -60,7 +62,7 @@ void Protozoa::builder_add_cell(const sf::Vector2f center)
 	Cell cell(genetics);
 
 	const Circle circle(center, 200.f);
-	cell.position = circle.rand_pos_in_circle();
+	cell.position_ = circle.rand_pos_in_circle();
 	m_cells_.emplace_back(cell);
 }
 
@@ -69,7 +71,7 @@ void Protozoa::move_selected_cell(const sf::Vector2f mouse_position)
 {
 	if (selected_cell_id >= 0)
 	{
-		m_cells_[selected_cell_id].position = mouse_position;
+		m_cells_[selected_cell_id].position_ = mouse_position;
 	}
 }
 
@@ -117,7 +119,7 @@ Cell* Protozoa::get_selected_cell(const sf::Vector2f mouse_pos)
 	{
 		for (Cell& cell : m_cells_)
 		{
-			const float dist_sq = dist_squared(cell.position, mouse_pos);
+			const float dist_sq = dist_squared(cell.position_, mouse_pos);
 			const float rad = cell.get_radius();
 			if (dist_sq < rad * rad)
 			{

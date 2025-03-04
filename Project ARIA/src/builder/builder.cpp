@@ -1,10 +1,7 @@
 #include "builder.h"
 
 
-Builder::Builder(sf::RenderWindow* window) : m_window_(window),
-m_title_text_(window, t_title_size, bold_font_loc),
-m_normal_text_(window, t_regular_size, regular_font_loc),
-m_protozoa_(nullptr, window)
+Builder::Builder(sf::RenderWindow* window) : m_window_(window), m_protozoa_(nullptr, window)
 {
 	init_bounds();
 	init_protozoa();
@@ -103,27 +100,27 @@ void Builder::update_protozoa()
 void Builder::border_cell(Cell& cell) const
 {
 	const float rad = cell.get_radius();
-	if (cell.position.x - rad < protozoa_space.left)
+	if (cell.position_.x - rad < protozoa_space.left)
 	{
-		cell.position.x = protozoa_space.left + rad;
+		cell.position_.x = protozoa_space.left + rad;
 		//velocity.x *= -1.f;
 	}
 
-	else if (cell.position.x + rad > protozoa_space.left + protozoa_space.width)
+	else if (cell.position_.x + rad > protozoa_space.left + protozoa_space.width)
 	{
-		cell.position.x = protozoa_space.left + protozoa_space.width - rad;
+		cell.position_.x = protozoa_space.left + protozoa_space.width - rad;
 		//velocity.x *= -1.f;
 	}
 
-	if (cell.position.y - rad < protozoa_space.top)
+	if (cell.position_.y - rad < protozoa_space.top)
 	{
-		cell.position.y = protozoa_space.top + rad;
+		cell.position_.y = protozoa_space.top + rad;
 		//velocity.y *= -1.f;
 	}
 
-	else if (cell.position.y + rad > protozoa_space.top + protozoa_space.height)
+	else if (cell.position_.y + rad > protozoa_space.top + protozoa_space.height)
 	{
-		cell.position.y = protozoa_space.top + protozoa_space.height - rad;
+		cell.position_.y = protozoa_space.top + protozoa_space.height - rad;
 		//velocity.y *= -1.f;
 	}
 
@@ -157,8 +154,8 @@ void Builder::render_ui()
 
 void Builder::render_text()
 {
-	m_title_text_.draw(title);
-	m_normal_text_.draw(instructions);
+	title_font.draw(title);
+	regular_font.draw(instructions);
 }
 
 
@@ -168,7 +165,7 @@ void Builder::render_protozoa()
 
 	if (start_cell != nullptr)
 	{
-		draw_thick_line(*m_window_, start_cell->position, m_mouse_pos, 4, 0, sf::Color::White);
+		draw_thick_line(*m_window_, start_cell->position_, m_mouse_pos, 4, 0, sf::Color::White);
 	}
 }
 
@@ -187,7 +184,7 @@ void Builder::init_text_packets()
 	};
 
 
-	const sf::Vector2f text_size = m_normal_text_.get_text_size(box_instructions);
+	const sf::Vector2f text_size = regular_font.get_text_size(box_instructions);
 	const sf::Vector2f instructions_pos = {
 		bounds_pos.x + bounds_size.x - instructions_buffer.x - text_size.x,
 		bounds_pos.y + bounds_size.y - instructions_buffer.y - text_size.y};
@@ -211,7 +208,7 @@ void Builder::init_add_button()
 	const sf::Color outline_color = { 200, 200, 200 };
 
 	m_add_cell_button = Button(m_window_, rect);
-	m_add_cell_button.init_font("add cell", bold_font_loc, text_color, b_font_size);
+	m_add_cell_button.init_font("add cell", bold_font_location, text_color, b_font_size);
 	m_add_cell_button.init_graphics(default_color, active_color, border_outline_color, b_thickness);
 }
 
@@ -222,7 +219,7 @@ void Builder::init_debug_button()
 	rect.left += rect.width + button_spacing;
 
 	debug_toggle = Button(m_window_, rect);
-	debug_toggle.init_font("Debug Mode", bold_font_loc, sf::Color::White, b_font_size);
+	debug_toggle.init_font("Debug Mode", bold_font_location, sf::Color::White, b_font_size);
 	debug_toggle.init_graphics(b_default_color, b_active_color, border_outline_color, b_thickness);
 }
 
