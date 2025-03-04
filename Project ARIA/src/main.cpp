@@ -11,7 +11,8 @@
 
 // Currently Working On: 
 // seperate the fonts from the font.h file
-// static font class
+// automatically detect screen size and set it to be just a bit smaller if full_screen_mode is off
+
 
 // Things ive noticed while Testing
 // - make "project aria" title area larger and move it to the bottom right

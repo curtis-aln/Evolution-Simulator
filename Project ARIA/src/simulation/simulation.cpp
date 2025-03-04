@@ -256,4 +256,9 @@ void Simulation::manage_frame_rate()
 {
 	fps_ = m_clock_.get_average_frame_rate();
 	m_clock_.update_frame_rate();
+
+	// Display FPS in the title bar
+	std::ostringstream title;
+	title << simulation_name << " | FPS: " << std::fixed << std::setprecision(1) << fps_;
+	m_window_.setTitle(title.str());
 }

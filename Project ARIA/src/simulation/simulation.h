@@ -21,11 +21,24 @@
 
 inline static constexpr int frame_smoothing = 30;
 inline static constexpr float dt = 1.0f / 60.0f; // 30 updates per second
+inline const static bool full_screen = true;  // Change this value to toggle fullscreen mode
+inline const static double resize_shrinkage = 0.95;
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
 {
-	sf::RenderWindow m_window_ = sf::RenderWindow(sf::VideoMode(window_width, window_height), 
-		simulation_name, sf::Style::None);
+	// Get the desktop resolution
+	static sf::VideoMode getAdjustedVideoMode()
+	{
+		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
+		unsigned new_width = static_cast<unsigned>(desktop.width * resize_shrinkage);  // 80% of screen width
+		unsigned new_height = static_cast<unsigned>(desktop.height * resize_shrinkage); // 80% of screen height
+
+		return sf::VideoMode(new_width, new_height);
+	}
+
+	sf::VideoMode videoMode = full_screen ? sf::VideoMode::getDesktopMode() : getAdjustedVideoMode();
+	sf::Uint32 windowStyle = full_screen ? sf::Style::Fullscreen : (sf::Style::Titlebar | sf::Style::Close);
+	sf::RenderWindow m_window_{videoMode, "Project ARIA", windowStyle};
 
 	FrameRateSmoothing<frame_smoothing> m_clock_{};
 	Camera camera_{&m_window_, 0.25f};
