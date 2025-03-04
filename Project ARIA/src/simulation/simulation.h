@@ -21,7 +21,7 @@
 
 inline static constexpr int frame_smoothing = 30;
 inline static constexpr float dt = 1.0f / 60.0f; // 30 updates per second
-inline const static bool full_screen = true;  // Change this value to toggle fullscreen mode
+inline const static bool full_screen = false;  // Change this value to toggle fullscreen mode
 inline const static double resize_shrinkage = 0.95;
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
@@ -53,6 +53,7 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 
 	// user controlled variables
 	bool m_paused_ = false;
+	bool m_rendering_ = true;
 	bool m_debug_ = false;
 
 	LineGraph<line_maximum_data, line_x_axis_increments> protozoa_population_graph_{ &m_window_, protozoa_graph_bounds };

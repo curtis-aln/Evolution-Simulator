@@ -72,7 +72,11 @@ void Simulation::render_loop()
 		handle_events();
 
 		update_one_frame();
-		render();
+
+		if (m_rendering_)
+		{
+			render();
+		}
 	}
 }
 
@@ -224,6 +228,7 @@ void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 	{
 	case sf::Keyboard::Escape: running = false; break;
 	case sf::Keyboard::Space:  m_paused_ = not m_paused_; break;
+	case sf::Keyboard::R:      m_rendering_ = not m_rendering_; break;
 	case sf::Keyboard::D:      m_debug_ = not m_debug_; break;
 
 	// todo
