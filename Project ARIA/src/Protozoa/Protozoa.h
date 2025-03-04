@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "../settings.h"
-#include "../Utils/fonts/font_renderer.hpp"
+#include "../Utils/font_renderer.hpp"
 #include "../Utils/utility.h"
 #include "../Utils/utility_SFML.h"
 #include "../Utils/Circle.h"

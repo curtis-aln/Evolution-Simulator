@@ -1,12 +1,12 @@
 #pragma once
 #include "Utils/utility_SFML.h"
-#include "Utils/fonts/font_renderer.hpp"
+#include "Utils/font_renderer.hpp"
 
 struct TextSettings
 {
 	// locations for the fonts
-	inline static const std::string bold_font_location = "src/Utils/fonts/Roboto-Bold.ttf";
-	inline static const std::string regular_font_location = "src/Utils/fonts/Roboto-Regular.ttf";
+	inline static const std::string bold_font_location = "media/fonts/Roboto-Bold.ttf";
+	inline static const std::string regular_font_location = "media/fonts/Roboto-Regular.ttf";
 
 	// Universal font sizes - only these many fonts should be created
 	static constexpr unsigned title_font_size = 70;
@@ -76,7 +76,7 @@ struct WorldSettings
 {
 	static constexpr float bounds_radius = 23000; //13000.f;
 
-	static constexpr unsigned max_protozoa = 500;
+	static constexpr unsigned max_protozoa = 5000;
 	static constexpr unsigned initial_protozoa = max_protozoa / 2;
 };
 

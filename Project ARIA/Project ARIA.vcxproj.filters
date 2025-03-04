@@ -125,13 +125,16 @@
     <ClInclude Include="src\Utils\optimised_vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils\font_renderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="src\Utils\fonts\Calibri.ttf" />
-    <Font Include="src\Utils\fonts\Roboto-Bold.ttf" />
-    <Font Include="src\Utils\fonts\Roboto-Medium.ttf" />
-    <Font Include="src\Utils\fonts\Roboto-MediumItalic.ttf" />
-    <Font Include="src\Utils\fonts\Roboto-Regular.ttf" />
-    <Font Include="src\Utils\fonts\Teko.ttf" />
+    <Font Include="media\fonts\Calibri.ttf" />
+    <Font Include="media\fonts\Roboto-Bold.ttf" />
+    <Font Include="media\fonts\Roboto-Medium.ttf" />
+    <Font Include="media\fonts\Roboto-MediumItalic.ttf" />
+    <Font Include="media\fonts\Roboto-Regular.ttf" />
+    <Font Include="media\fonts\Teko.ttf" />
   </ItemGroup>
 </Project>

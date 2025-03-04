@@ -11,7 +11,7 @@
 
 // Currently Working On: 
 // seperate the fonts from the font.h file
-// automatically detect screen size and set it to be just a bit smaller if full_screen_mode is off
+// Cell rendering is a massive Issue, Implement CircleBuffer
 
 
 // Things ive noticed while Testing

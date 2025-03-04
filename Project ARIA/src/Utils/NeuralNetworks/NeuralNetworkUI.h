@@ -1,6 +1,6 @@
 #pragma once
 #include "GeneticNeuralNetwork.h"
-#include "../fonts/font_renderer.hpp"
+#include "../font_renderer.hpp"
 #include "../UI/button.h"
 #include "../utility_SFML.h"
 #include "../../settings.h"

@@ -155,6 +155,7 @@
     <ClInclude Include="src\Protozoa\spring.h" />
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\simulation\simulation.h" />
+    <ClInclude Include="src\Utils\font_renderer.hpp" />
     <ClInclude Include="src\Utils\optimised_vector.h" />
     <ClInclude Include="src\Utils\UI\text_box.h" />
     <ClInclude Include="src\Utils\UI\button.h" />
@@ -175,12 +176,12 @@
     <ClInclude Include="src\world\world.h" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="src\Utils\fonts\Calibri.ttf" />
-    <Font Include="src\Utils\fonts\Roboto-Bold.ttf" />
-    <Font Include="src\Utils\fonts\Roboto-Medium.ttf" />
-    <Font Include="src\Utils\fonts\Roboto-MediumItalic.ttf" />
-    <Font Include="src\Utils\fonts\Roboto-Regular.ttf" />
-    <Font Include="src\Utils\fonts\Teko.ttf" />
+    <Font Include="media\fonts\Calibri.ttf" />
+    <Font Include="media\fonts\Roboto-Bold.ttf" />
+    <Font Include="media\fonts\Roboto-Medium.ttf" />
+    <Font Include="media\fonts\Roboto-MediumItalic.ttf" />
+    <Font Include="media\fonts\Roboto-Regular.ttf" />
+    <Font Include="media\fonts\Teko.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

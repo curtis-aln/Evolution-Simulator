@@ -21,7 +21,7 @@ class Font
 public:
     // Constructor taking m_font_ size and file location
     Font(sf::RenderWindow* window = nullptr, const unsigned font_size = 0,  // todo make path relative
-        const std::string& font_location = "src/Utils/fonts/Roboto-Bold.ttf") : m_window_(window)
+        const std::string& font_location = "media/fonts/Roboto-Bold.ttf") : m_window_(window)
     {
         if (!font_location.empty())
         {

@@ -6,7 +6,7 @@
 
 #include "../Utils/time.h"
 #include "../Utils/fps_manager.h"
-#include "../Utils/fonts/font_renderer.hpp"
+#include "../Utils/font_renderer.hpp"
 #include "../Utils/UI/Camera.hpp"
 #include "../Utils/UI/line_graph.h"
 #include "../Utils/NeuralNetworks/GeneticNeuralNetwork.h"
