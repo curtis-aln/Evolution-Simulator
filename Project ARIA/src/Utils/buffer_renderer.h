@@ -29,7 +29,12 @@ class CircleBuffer
     sf::VertexArray vertex_array{ sf::Quads };
 
 public:
-    CircleBuffer(sf::RenderWindow* window, std::vector<sf::Color>& colors, const float circle_radius, const int num_circles) : window_(window)
+    CircleBuffer(sf::RenderWindow* window) : window_(window)
+    {
+    
+    }
+
+    void init_texture(std::vector<sf::Color>& colors, const float circle_radius, const int num_circles)
     {
         // Init the texture
         texture = generateCircleTexture(circle_radius);

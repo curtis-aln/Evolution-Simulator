@@ -11,7 +11,6 @@
 // NOTE: if there are multithreading issues check how rendering works with the update thread because i commented out the lock mutex
 
 // Currently Working On: 
-// seperate the fonts from the font.h file
 // Cell rendering is a massive Issue, Implement CircleBuffer
 
 

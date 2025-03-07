@@ -9,6 +9,8 @@
 #include "../Utils/o_vector.hpp"
 #include "../Utils/random.h"
 #include "../Utils/Circle.h"
+#include "../Utils/buffer_renderer.h"
+
 
 class World : WorldSettings
 {
@@ -20,6 +22,14 @@ class World : WorldSettings
 
 	sf::CircleShape cell_renderer_{};
 	sf::VertexArray border_render_{};
+
+	// rendering
+	std::vector<sf::Color> outer_color_data{};
+	std::vector<sf::Color> inner_color_data{};
+	std::vector<sf::Vector2f> position_data{};
+
+	CircleBuffer outer_circle_buffer{ m_window_ };
+	CircleBuffer inner_circle_buffer{ m_window_ };
 
 public:
 	Protozoa* selected_protozoa = nullptr;

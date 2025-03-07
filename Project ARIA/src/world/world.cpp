@@ -10,6 +10,14 @@ World::World(sf::RenderWindow* window)
 	init_food();
 	init_environment();
 
+	const size_t protozoa_count = m_all_protozoa_.size();
+	const size_t predicted_cells = protozoa_count * ProtozoaSettings::max_cells;
+
+	// reserving nessesary data
+	outer_color_data.reserve(predicted_cells);
+	inner_color_data.reserve(predicted_cells);
+	position_data.reserve(predicted_cells);
+
 }
 
 void World::update_world()
@@ -32,20 +40,10 @@ void World::update_debug(const sf::Vector2f mouse_position)
 void World::render_world()
 {
 	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.
-	
-	// creating the data containers
-	std::vector<sf::Color> outer_color_data;
-	std::vector<sf::Color> inner_color_data;
-	std::vector<sf::Vector2f> position_data;
-
-	// getting the size we should reserve
-	const size_t protozoa_count = m_all_protozoa_.size();
-	const size_t predicted_cells = protozoa_count * ProtozoaSettings::max_cells;
-	
-	// reserving nessesary data
-	outer_color_data.reserve(predicted_cells);
-	inner_color_data.reserve(predicted_cells);
-	position_data.reserve(predicted_cells);
+		
+	outer_color_data.clear();
+	inner_color_data.clear();
+	position_data.clear();
 
 	for (Protozoa& protozoa : m_all_protozoa_)
 	{
@@ -58,13 +56,15 @@ void World::render_world()
 	}
 
 	// Now we have all our data we can create the renderers and finaly render all circles
-	//const float radius = Prot
-	//CircleBuffer outer_circle_buffer{m_window_, outer_color_data, }
+	const float radius_inner = CellSettings::cell_radius;
+	const float radius_outer = radius_inner + CellSettings::cell_outline_thickness;
+	const int size = position_data.size();
 
-	for (Protozoa& protozoa : m_all_protozoa_)
-	{
-		protozoa.render();
-	}
+	outer_circle_buffer.init_texture(outer_color_data, radius_outer, size);
+	inner_circle_buffer.init_texture(inner_color_data, radius_inner, size);
+
+	outer_circle_buffer.render(position_data);
+	inner_circle_buffer.render(position_data);
 
 	// drawing the world bounds
 	m_window_->draw(border_render_);
