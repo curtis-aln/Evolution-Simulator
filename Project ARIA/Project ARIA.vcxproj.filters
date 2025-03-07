@@ -128,6 +128,9 @@
     <ClInclude Include="src\Utils\font_renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils\buffer_renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="media\fonts\Calibri.ttf" />

@@ -162,7 +162,8 @@ private:
 		constexpr float add_connection_chance = 0.75f;
 
 		// each layer in the network in decreasing order, starting from the layer before the output layer
-		for (int layer_index = m_network_.size() - 2; layer_index >= 0; layer_index--)
+		const auto net_size = static_cast<int>(m_network_.size());
+		for (int layer_index = net_size - 2; layer_index >= 0; layer_index--)
 		{
 			// for each node in that layer, increasing order
 			for (int node_index = 0; node_index < m_network_[layer_index].size(); ++node_index)

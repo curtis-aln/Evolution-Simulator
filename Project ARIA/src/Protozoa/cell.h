@@ -34,8 +34,8 @@ public:
 	: m_radius_(radius), color_(color_inner), outline_color_(color_outer), rel_id(rel_id)
 	{}
 
-	Cell(const CellGenetics& info = CellGenetics())
-		: m_radius_(info.radius), color_(info.colors.first), outline_color_(info.colors.second), rel_id(info.id)
+	Cell(const CellGene& info = CellGene())
+		: m_radius_(info.radius), color_(info.inner_color), outline_color_(info.outer_color), rel_id(info.id)
 	{}
 
 

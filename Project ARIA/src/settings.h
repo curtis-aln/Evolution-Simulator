@@ -74,9 +74,9 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 23000; //13000.f;
+	static constexpr float bounds_radius = 23'000;
 
-	static constexpr unsigned max_protozoa = 5000;
+	static constexpr unsigned max_protozoa = 3'00;
 	static constexpr unsigned initial_protozoa = max_protozoa / 2;
 };
 
@@ -89,25 +89,31 @@ struct SpringSettings
 	static constexpr float damping_factor = 0.50f;
 };
 
-
-struct GeneticInformationSettings
+struct CellSettings
 {
-	inline static const sf::Vector2i init_cell_count_range = { 2, 6 };
-	inline static const sf::Vector2f init_cell_radius_range = { 30.f, 50.f };
+	static constexpr float cell_radius = 45.f;
+	static constexpr float cell_outline_thickness = 12.f;
+};
 
-	inline static const sf::Vector2f init_rest_length_range = { init_cell_radius_range.y, init_cell_radius_range.y * 4.f };
+
+struct GeneSettings
+{
+	inline static const sf::Vector2i cell_amount_range = { 2, 6 };
+	//inline static const sf::Vector2f init_cell_radius_range = { 30.f, 50.f };
+
+	inline static const sf::Vector2f init_rest_length_range = { CellSettings::cell_radius, CellSettings::cell_radius * 4.f };
 	inline static const sf::Vector2f damping_const_range = { 0.95f, 0.99f };
 	inline static const sf::Vector2f spring_const_range = { 0.01f, 0.05f };
 
 	static constexpr sf::Uint8 transparancy = 230;
 
-	inline static const std::vector<sf::Color> fill_colors = {
+	inline static const std::vector<sf::Color> inner_colors = {
 		{255, 204, 204, transparancy},
 		{208, 255, 194, transparancy},
 		{218, 194, 255, transparancy}
 	};
 
-	inline static const std::vector<sf::Color> outline_colors = {
+	inline static const std::vector<sf::Color> outer_colors = {
 		{255, 235, 235, transparancy},
 		{234, 247, 255, transparancy},
 		{226, 255, 216, transparancy},
@@ -125,10 +131,6 @@ struct ProtozoaSettings
 };
 
 
-struct CellSettings
-{
-	static constexpr float cell_outline_thickness = 12.f;
-};
 
 
 struct BuilderSettings

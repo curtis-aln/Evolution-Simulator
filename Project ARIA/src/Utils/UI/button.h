@@ -114,7 +114,7 @@ public:
     {
         m_shape_.setSize(size);
     }
-	void set_font_size(const float new_font_size)
+	void set_font_size(const unsigned int new_font_size)
     {
         m_font_.set_font_size(new_font_size);
     }

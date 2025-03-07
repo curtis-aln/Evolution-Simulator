@@ -24,7 +24,7 @@ struct Circle
 		return dist_sq < rad_sq;
 	}
 
-	sf::Vector2f rand_pos_in_circle() const
+	sf::Vector2f rand_pos() const
 	{
 		const sf::Rect bounds = { center.x - radius, center.y - radius, radius * 2, radius * 2 };
 		for (int i = 0; i < 20; ++i)

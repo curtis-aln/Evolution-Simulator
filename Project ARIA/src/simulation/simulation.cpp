@@ -259,7 +259,7 @@ void Simulation::mouse_input()
 
 void Simulation::manage_frame_rate()
 {
-	fps_ = m_clock_.get_average_frame_rate();
+	fps_ = static_cast<float>(m_clock_.get_average_frame_rate());
 	m_clock_.update_frame_rate();
 
 	// Display FPS in the title bar

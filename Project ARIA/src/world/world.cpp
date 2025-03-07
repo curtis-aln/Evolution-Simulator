@@ -1,5 +1,6 @@
 #include "world.h"
 #include "../Utils/utility_SFML.h"
+#include "../Utils/buffer_renderer.h"
 
 World::World(sf::RenderWindow* window)
 	: m_window_(window),
@@ -30,6 +31,36 @@ void World::update_debug(const sf::Vector2f mouse_position)
 
 void World::render_world()
 {
+	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.
+	
+	// creating the data containers
+	std::vector<sf::Color> outer_color_data;
+	std::vector<sf::Color> inner_color_data;
+	std::vector<sf::Vector2f> position_data;
+
+	// getting the size we should reserve
+	const size_t protozoa_count = m_all_protozoa_.size();
+	const size_t predicted_cells = protozoa_count * ProtozoaSettings::max_cells;
+	
+	// reserving nessesary data
+	outer_color_data.reserve(predicted_cells);
+	inner_color_data.reserve(predicted_cells);
+	position_data.reserve(predicted_cells);
+
+	for (Protozoa& protozoa : m_all_protozoa_)
+	{
+		for (Cell& cell : protozoa.get_cells())
+		{
+			outer_color_data.push_back(cell.outline_color_);
+			inner_color_data.push_back(cell.color_);
+			position_data.push_back(cell.position_);
+		}
+	}
+
+	// Now we have all our data we can create the renderers and finaly render all circles
+	//const float radius = Prot
+	//CircleBuffer outer_circle_buffer{m_window_, outer_color_data, }
+
 	for (Protozoa& protozoa : m_all_protozoa_)
 	{
 		protozoa.render();
@@ -38,7 +69,6 @@ void World::render_world()
 	// drawing the world bounds
 	m_window_->draw(border_render_);
 }
-
 
 
 void World::init_organisms()

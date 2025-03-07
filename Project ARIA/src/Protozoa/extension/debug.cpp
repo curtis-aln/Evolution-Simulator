@@ -57,13 +57,14 @@ void Protozoa::render_debug()
 
 void Protozoa::builder_add_cell(const sf::Vector2f center)
 {
-	const CellGenetics genetics = create_cell();
+	// todo
+	//const CellGene genetics = create_cell();
 
-	Cell cell(genetics);
+	//Cell cell(genetics);
 
-	const Circle circle(center, 200.f);
-	cell.position_ = circle.rand_pos_in_circle();
-	m_cells_.emplace_back(cell);
+	//const Circle circle(center, 200.f);
+	//cell.position_ = circle.rand_pos();
+	//m_cells_.emplace_back(cell);
 }
 
 
@@ -88,9 +89,10 @@ void Protozoa::deselect_cell()
 
 void Protozoa::make_connection(const int cell1_id, const int cell2_id)
 {
-	const SpringGenetics& genetics = create_cell_connection(cell1_id, cell2_id);
-	m_springs_.emplace_back(genetics.connecting_cell_ids, genetics.colors, genetics.starting_rest_length,
-		genetics.spring_constant, genetics.damping_constant);
+	// todo
+	//const SpringGene& genetics = create_cell_connection(cell1_id, cell2_id);
+	//m_springs_.emplace_back(genetics.connecting_cell_ids, genetics.colors, genetics.rest_length,
+	//	genetics.spring_constant, genetics.damping);
 }
 
 

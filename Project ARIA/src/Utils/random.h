@@ -35,6 +35,32 @@ namespace Random
         }
     }
 
+    template <typename Type>
+    Type rand_range(const sf::Vector2<Type>& range)
+    {
+        if constexpr (std::is_integral_v<Type>)
+        {
+            std::uniform_int_distribution<Type> int_dist{ range.x, range.y };
+            return int_dist(rng);
+        }
+        else
+        {
+            std::uniform_real_distribution<Type> float_dist{ range.x, range.y };
+            return float_dist(rng);
+        }
+    }
+
+    template <typename Type>
+    Type rand_val_in_vector(const std::vector<Type>& vector)
+    {
+        if (vector.empty()) {
+            throw std::runtime_error("rand_val_in_vector called with an empty vector.");
+        }
+
+        const size_t index = Random::rand_range(size_t(0), vector.size() - size_t(1));
+        return vector.at(index);
+    }
+
     // random SFML::Vector<Type>
     inline sf::Color rand_color(const sf::Vector3<int> rgb_min = { 0, 0, 0 },
         const sf::Vector3<int> rgb_max = { 255, 255, 255 })

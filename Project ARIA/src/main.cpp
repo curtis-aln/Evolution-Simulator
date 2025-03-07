@@ -1,10 +1,11 @@
 #include "simulation/simulation.h"
 
 
-/* Project Idea
- *
- */
+// Before rending optimization (2k particles):
+// 6fps
 
+// After Rendering optimization
+// 
 
 // NOTE: do not use cell id's as indexes as when cells are added and removed it can mess up
 // NOTE: if there are multithreading issues check how rendering works with the update thread because i commented out the lock mutex

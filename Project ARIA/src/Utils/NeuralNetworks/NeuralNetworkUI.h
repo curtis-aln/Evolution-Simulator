@@ -21,10 +21,6 @@ class NetworkRenderer : TextSettings, ButtonSettings, UI_Settings
 
 	sf::Rect<float> m_border_{};
 
-	Font m_title_font_;
-	Font m_text_font_;
-	Font m_stats_font_;
-
 	TextPacket m_title_{};
 	sf::RectangleShape m_render_border_{};
 
@@ -48,10 +44,7 @@ class NetworkRenderer : TextSettings, ButtonSettings, UI_Settings
 public:
 	explicit NetworkRenderer(const sf::Rect<float>& border = {}, sf::RenderWindow* render_window = nullptr, 
 		GeneticNeuralNetwork* network_pointer = nullptr)
-	: m_border_(border),
-	m_title_font_(render_window, title_font_size, bold_font_location),
-	m_text_font_(render_window, regular_font_size, regular_font_location),
-	m_stats_font_(render_window, cell_statistic_font_size, regular_font_location)
+	: m_border_(border)
 	{
 		set_pointer(network_pointer);
 		set_render_window(render_window);
@@ -86,7 +79,7 @@ public:
 	{
 		const sf::Vector2f border_pos = m_border_.getPosition();
 		const sf::Vector2f border_size = m_border_.getSize();
-		const sf::Vector2f text_size = m_title_font_.get_text_size(text);
+		const sf::Vector2f text_size = title_font.get_text_size(text);
 		const sf::Vector2f position = { border_pos.x + border_size.x / 2.f, border_pos.y + text_size.y };
 		
 		m_title_ = { position, text, 0, true };
@@ -102,7 +95,7 @@ public:
 
 		for (int i = 0; i < names.size(); ++i)
 		{
-			const sf::Vector2f size = m_text_font_.get_text_size(names[i]);
+			const sf::Vector2f size = regular_font.get_text_size(names[i]);
 			const sf::Vector2f pos = m_node_render_info_[0][i].pos - sf::Vector2f{ size.x + 10, 0 };
 			input_names[i] = { pos, names[i], 0, true };
 		}
@@ -119,7 +112,7 @@ public:
 
 		for (int i = 0; i < names.size(); ++i)
 		{
-			const sf::Vector2f size = m_text_font_.get_text_size(names[i]);
+			const sf::Vector2f size = regular_font.get_text_size(names[i]);
 			const sf::Vector2f pos = m_node_render_info_[m_node_render_info_.size()-1][i].pos + sf::Vector2f{ size.x + 10, 0};
 			output_names[i] = { pos, names[i], 0, true };
 		}
@@ -192,7 +185,7 @@ private:
 
 		for (int layer_idx = 0; layer_idx < neural_network.size(); ++layer_idx)
 		{
-			const int num_nodes = neural_network[layer_idx].size();
+			const auto num_nodes = static_cast<int>(neural_network[layer_idx].size());
 			const float layer_sep_y = static_cast<float>(m_border_.height) / (num_nodes + 1);
 
 			for (int node_idx = 0; node_idx < num_nodes; ++node_idx)
@@ -246,7 +239,7 @@ private:
 	void render_border()
 	{
 		m_render_window_->draw(m_render_border_);
-		m_title_font_.draw(m_title_);
+		title_font.draw(m_title_);
 	}
 
 	void render_UI()
@@ -289,7 +282,7 @@ private:
 			outline_col.a -= 50;
 
 			draw_thick_line(*m_render_window_, node1_info->pos, node2_info->pos, 
-				link_thickness, link_thickness/1.5, color, outline_col);
+				link_thickness, link_thickness/1.5f, color, outline_col);
 		}
 
 		if (!debug_mode_)
@@ -315,7 +308,7 @@ private:
 			}
 		
 			const std::string val = trim_decimal_to_string(state2, 1);
-			m_stats_font_.draw(text_pos, val, true, rotation);
+			cell_statistic_font.draw(text_pos, val, true, rotation);
 		}
 	}	
 		
@@ -328,9 +321,9 @@ private:
 	{
 		// drawing inputs and outputs
 		for (const TextPacket& packet : input_names)
-			m_text_font_.draw(packet);
+			regular_font.draw(packet);
 		for (const TextPacket& packet : output_names)
-			m_text_font_.draw(packet);
+			regular_font.draw(packet);
 
 		// if it is debug mode then we can draw values on each of the weights
 		if (!debug_mode_)
@@ -344,8 +337,8 @@ private:
 			{
 				const std::string val = trim_decimal_to_string(network[layer_idx][node_idx].output, 2);
 				const sf::Vector2f pos = m_node_render_info_[layer_idx][node_idx].pos;
-				const float text_size_y = m_stats_font_.get_text_size(val).y;
-				m_stats_font_.draw(pos + sf::Vector2f{0, node_radius + text_size_y/2 + 8.f}, val, true);
+				const float text_size_y = cell_statistic_font.get_text_size(val).y;
+				cell_statistic_font.draw(pos + sf::Vector2f{0, node_radius + text_size_y/2 + 8.f}, val, true);
 			}
 		}
 	}

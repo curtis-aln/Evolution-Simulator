@@ -9,7 +9,7 @@
 #include "spring.h"
 #include "genetics.h"
 
-class Protozoa : ProtozoaSettings, GeneticInformation
+class Protozoa : ProtozoaSettings
 {
 	sf::RenderWindow* m_window_ptr_ = nullptr;
 	sf::CircleShape* m_cell_renderer_ptr_ = nullptr;
@@ -20,6 +20,8 @@ class Protozoa : ProtozoaSettings, GeneticInformation
 	Circle* m_world_bounds_ = nullptr;
 	sf::Rect<float> m_personal_bounds_{};
 
+	ProtozoaGenes m_genes_{};
+	
 	float energy = 100.f;
 	unsigned frames_alive = 0u;
 	unsigned generation = 0u;
@@ -31,7 +33,7 @@ class Protozoa : ProtozoaSettings, GeneticInformation
 
 public:
 	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, sf::CircleShape* cell_renderer = nullptr, 
-		bool init_cells = false, GeneticInformation info = GeneticInformation());
+		bool init_cells = false);
 
 	void update();
 	void render();

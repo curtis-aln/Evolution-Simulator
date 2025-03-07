@@ -34,7 +34,7 @@ inline void caption_frame_rate(sf::RenderWindow& window, const std::string& titl
 
 template<typename T>
 T round_to_nearest_n(const T value, const unsigned decimal_places) {
-	const T multiplier = pow(10, decimal_places);
+	const T multiplier = static_cast<T>(pow(10, decimal_places));
 	return round(value * multiplier) / multiplier;
 }
 
@@ -43,7 +43,7 @@ template<typename T>
 std::string trim_decimal_to_string(T number, const size_t precision, const bool round=true)
 {
 	if (round)
-		number = round_to_nearest_n(number, precision);
+		number = round_to_nearest_n(number, static_cast<unsigned>(precision));
 
 	// Convert the double to a string with the specified precision
 	std::string result = std::to_string(number);
@@ -122,7 +122,7 @@ std::vector<int> get_shape_of_2d_vector(std::vector<std::vector<T>>& container)
 
 	for (int i = 0; i < container.size(); ++i)
 	{
-		shape[i] = container[i].size();
+		shape[i] = static_cast<int>(container[i].size());
 	}
 
 	return shape;
