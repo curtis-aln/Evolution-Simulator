@@ -32,6 +32,7 @@ class World : WorldSettings
 	CircleBuffer inner_circle_buffer{ m_window_ };
 
 public:
+	bool simple_mode = false;
 	Protozoa* selected_protozoa = nullptr;
 
 	World(sf::RenderWindow* window = nullptr);

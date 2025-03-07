@@ -1,17 +1,17 @@
 #include "simulation/simulation.h"
 
 
-// Before rending optimization (2k particles):
-// 6fps
-
-// After Rendering optimization
-// 
-
 // NOTE: do not use cell id's as indexes as when cells are added and removed it can mess up
 // NOTE: if there are multithreading issues check how rendering works with the update thread because i commented out the lock mutex
 
-// Currently Working On: 
-// Cell rendering is a massive Issue, Implement CircleBuffer
+// ********** Currently Working On ********** //
+// Create a RectBuffer and re-introduce the connections
+// fix the flickering issue and include it as a setting
+// fix the transparency issue
+// re-introduce debug mode
+// fix "(failed to create the font face)" bug
+// fix movement bug
+// [BIG PROJECT] Add the ability to create and destroy protozoa
 
 
 // Things ive noticed while Testing

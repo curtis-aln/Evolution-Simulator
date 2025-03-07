@@ -61,10 +61,18 @@ void World::render_world()
 	const int size = position_data.size();
 
 	outer_circle_buffer.init_texture(outer_color_data, radius_outer, size);
-	inner_circle_buffer.init_texture(inner_color_data, radius_inner, size);
+
+	if (!simple_mode)
+	{
+		inner_circle_buffer.init_texture(inner_color_data, radius_inner, size);
+	}
 
 	outer_circle_buffer.render(position_data);
-	inner_circle_buffer.render(position_data);
+
+	if (!simple_mode)
+	{
+		inner_circle_buffer.render(position_data);
+	}
 
 	// drawing the world bounds
 	m_window_->draw(border_render_);
