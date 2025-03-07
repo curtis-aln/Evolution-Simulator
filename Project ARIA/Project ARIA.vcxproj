@@ -157,7 +157,6 @@
     <ClInclude Include="src\simulation\simulation.h" />
     <ClInclude Include="src\Utils\buffer_renderer.h" />
     <ClInclude Include="src\Utils\font_renderer.hpp" />
-    <ClInclude Include="src\Utils\optimised_vector.h" />
     <ClInclude Include="src\Utils\UI\text_box.h" />
     <ClInclude Include="src\Utils\UI\button.h" />
     <ClInclude Include="src\Utils\Circle.h" />

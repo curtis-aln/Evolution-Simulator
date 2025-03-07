@@ -27,12 +27,15 @@ class Protozoa : ProtozoaSettings
 	unsigned frames_alive = 0u;
 	unsigned generation = 0u;
 
-	// When in debugging mode, you can pull at cells inside this protozoa | storing the location of it in memory | -1 means none selected
+	// When in debugging mode, you can pull at cells inside this protozoa | storing the location of it in memory 
+	// -1 means none selected
 	int selected_cell_id = -1;
 
 	bool debug_mode_ = false;
 
 public:
+	bool active = true;
+
 	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
 	void update();

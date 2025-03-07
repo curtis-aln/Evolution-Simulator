@@ -71,9 +71,9 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 600'000;
+	static constexpr float bounds_radius = 80'000;
 
-	static constexpr unsigned max_protozoa = 40'000;
+	static constexpr unsigned max_protozoa = 4'000;
 	static constexpr unsigned initial_protozoa = max_protozoa / 2;
 };
 

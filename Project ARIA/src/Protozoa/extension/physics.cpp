@@ -47,14 +47,14 @@ void Protozoa::update_bounds()
 	float max_x = cell0_pos.x + radius;
 	float max_y = cell0_pos.y + radius;
 
+	// we check over every cell to see if it beats the current bounds
 	for (const Cell& cell : m_cells_) 
 	{
 		const sf::Vector2f pos = cell.position_;
-		const float cell_rad = cell.get_radius();
-		if (pos.x < min_x) min_x = pos.x - cell_rad;
-		if (pos.x > max_x) max_x = pos.x + cell_rad;
-		if (pos.y < min_y) min_y = pos.y - cell_rad;
-		if (pos.y > max_y) max_y = pos.y + cell_rad;
+		if (pos.x < min_x) min_x = pos.x - radius;
+		if (pos.x > max_x) max_x = pos.x + radius;
+		if (pos.y < min_y) min_y = pos.y - radius;
+		if (pos.y > max_y) max_y = pos.y + radius;
 	}
 
 	const float width = max_x - min_x;

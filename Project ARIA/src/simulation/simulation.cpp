@@ -212,6 +212,10 @@ void Simulation::handle_events()
 			{
 				mouse_pressed_event = true;
 			}
+			else
+			{
+				m_world_.selected_protozoa = nullptr;
+			}
 		}
 
 		else if (event.type == sf::Event::MouseButtonReleased)

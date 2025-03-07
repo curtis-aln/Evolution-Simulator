@@ -10,21 +10,20 @@ World::World(sf::RenderWindow* window)
 	init_food();
 	init_environment();
 
-	const size_t protozoa_count = m_all_protozoa_.size();
+	const size_t protozoa_count = all_protozoa.size();
 	const size_t predicted_cells = protozoa_count * ProtozoaSettings::max_cells;
 
 	// reserving nessesary data
 	outer_color_data.reserve(predicted_cells);
 	inner_color_data.reserve(predicted_cells);
 	position_data.reserve(predicted_cells);
-
 }
 
 void World::update_world()
 {
-	for (Protozoa& protozoa : m_all_protozoa_)
+	for (Protozoa* protozoa : all_protozoa)
 	{
-		protozoa.update();
+		protozoa->update();
 	}
 }
 
@@ -45,9 +44,9 @@ void World::render_world()
 	inner_color_data.clear();
 	position_data.clear();
 
-	for (Protozoa& protozoa : m_all_protozoa_)
+	for (Protozoa* protozoa : all_protozoa)
 	{
-		for (Cell& cell : protozoa.get_cells())
+		for (Cell& cell : protozoa->get_cells())
 		{
 			outer_color_data.push_back(cell.outline_color_);
 			inner_color_data.push_back(cell.color_);
@@ -88,11 +87,13 @@ void World::render_world()
 
 void World::init_organisms()
 {
-	m_all_protozoa_.reserve(max_protozoa);
-
 	for (int i = 0; i < max_protozoa; ++i)
 	{
-		m_all_protozoa_.emplace_back(&m_bounds_, m_window_, true);
+		all_protozoa.emplace({ &m_bounds_, m_window_, true });
+	}
+	for (int i = 0; i < max_protozoa - initial_protozoa; ++i)
+	{
+		all_protozoa.remove(i);
 	}
 }
 
@@ -113,20 +114,20 @@ void World::init_environment()
 void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_position, bool mouse_pressed)
 {
 	// resetting all states
-	for (Protozoa& protozoa : m_all_protozoa_)
+	for (Protozoa* protozoa : all_protozoa)
 	{
-		protozoa.set_debug_mode(false);
+		protozoa->set_debug_mode(false);
 	}
 
 	if (!debug_mode)
 		return;
 
 
-	for (Protozoa& protozoa : m_all_protozoa_)
+	for (Protozoa* protozoa : all_protozoa)
 	{
-		if (protozoa.is_hovered_on(mouse_position))
+		if (protozoa->is_hovered_on(mouse_position))
 		{
-			protozoa.set_debug_mode(true);
+			protozoa->set_debug_mode(true);
 			break;
 		}
 	}
@@ -134,11 +135,11 @@ void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_posit
 
 bool World::check_pressed(const sf::Vector2f mouse_position)
 {
-	for (Protozoa& protozoa : m_all_protozoa_)
+	for (Protozoa* protozoa : all_protozoa)
 	{
-		if (protozoa.is_hovered_on(mouse_position, true))
+		if (protozoa->is_hovered_on(mouse_position, true))
 		{
-			selected_protozoa = &protozoa;
+			selected_protozoa = protozoa;
 			return true;
 		}
 	}

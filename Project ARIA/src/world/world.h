@@ -10,13 +10,15 @@
 #include "../Utils/random.h"
 #include "../Utils/Circle.h"
 #include "../Utils/buffer_renderer.h"
+#include "../Utils/o_vector.hpp"
 
 
 class World : WorldSettings
 {
 	sf::RenderWindow* m_window_ = nullptr;
 
-	std::vector<Protozoa> m_all_protozoa_{};
+	//std::vector<Protozoa> m_all_protozoa_{};
+	o_vector<Protozoa, max_protozoa> all_protozoa{};
 
 	Circle m_bounds_{ {0, 0}, bounds_radius };
 

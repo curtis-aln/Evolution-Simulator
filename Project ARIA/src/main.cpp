@@ -8,7 +8,6 @@
 // Create a RectBuffer and re-introduce the connections
 // fix the flickering issue and include it as a setting
 // fix the transparency issue
-// re-introduce debug mode
 // fix "(failed to create the font face)" bug
 // fix movement bug
 // connections are drawn ontop of the cells
@@ -16,7 +15,6 @@
 
 // ********** Debug mode ********** //
 // upon clicking on a protozoa
-// - the camera begins tracking the center of the organism
 // - the camera is zoomed onto it
 
 

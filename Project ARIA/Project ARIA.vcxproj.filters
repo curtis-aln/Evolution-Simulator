@@ -122,9 +122,6 @@
     <ClInclude Include="src\Utils\UI\text_box.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\optimised_vector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Utils\font_renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
