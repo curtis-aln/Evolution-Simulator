@@ -41,7 +41,7 @@ public:
 	void update_world();
 	void update_debug(sf::Vector2f mouse_position);
 	void render_world();
-	void check_hovering(bool debug_mode, sf::Vector2f mouse_position);
+	void check_hovering(bool debug_mode, sf::Vector2f mouse_position, bool mouse_pressed);
 	bool check_pressed(sf::Vector2f mouse_position);
 	void de_select_protozoa();
 

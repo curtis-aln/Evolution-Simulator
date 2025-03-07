@@ -9,6 +9,8 @@
 #include "spring.h"
 #include "genetics.h"
 
+inline static constexpr float initial_energy = 100.f;
+
 class Protozoa : ProtozoaSettings
 {
 	sf::RenderWindow* m_window_ptr_ = nullptr;
@@ -21,11 +23,11 @@ class Protozoa : ProtozoaSettings
 
 	ProtozoaGenes m_genes_{};
 	
-	float energy = 100.f;
+	float energy = initial_energy;
 	unsigned frames_alive = 0u;
 	unsigned generation = 0u;
 
-	// debug
+	// When in debugging mode, you can pull at cells inside this protozoa | storing the location of it in memory | -1 means none selected
 	int selected_cell_id = -1;
 
 	bool debug_mode_ = false;
@@ -37,7 +39,7 @@ public:
 	void render();
 
 	// debugging settings
-	bool is_hovered_on(sf::Vector2f mousePosition) const;
+	bool is_hovered_on(sf::Vector2f mousePosition, bool tollarance_check = false) const;
 	bool check_press(sf::Vector2f mouse_position);
 	Cell* get_selected_cell(sf::Vector2f mouse_pos);
 	void set_debug_mode(bool mode);
@@ -49,6 +51,8 @@ public:
 	
 	void builder_add_cell(sf::Vector2f center);
 	void move_selected_cell(sf::Vector2f mouse_position);
+
+	sf::Rect<float> get_bounds() { return m_personal_bounds_; }
 
 private:
 	// debugging settings

@@ -11,6 +11,7 @@
 // re-introduce debug mode
 // fix "(failed to create the font face)" bug
 // fix movement bug
+// connections are drawn ontop of the cells
 // [BIG PROJECT] Add the ability to create and destroy protozoa
 
 // ********** Debug mode ********** //

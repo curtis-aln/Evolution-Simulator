@@ -9,6 +9,8 @@
 // Each organism consists of cells which work together via springs
 // Each cell has their own radius and friction coefficient, as well as cosmetic factors such as color
 
+inline static constexpr float border_repulsion_magnitude = 0.01f;
+inline static const float max_speed = 70;
 
 class Cell : CellSettings
 {
@@ -64,11 +66,10 @@ public:
 	void bound(const Circle& bounds)
 	{
 		// if the cell is not within the world bounds we accelerate it towards the center
-		constexpr float mag = 0.01f;
 		if (!bounds.contains(position_))
 		{
 			const sf::Vector2f delta = bounds.center - position_;
-			velocity_ += delta * mag;
+			velocity_ += delta * border_repulsion_magnitude;
 		}
 	}
 
@@ -87,7 +88,6 @@ public:
 private:
 	void clamp_velocity()
 	{
-		static const float max_speed = m_radius_ / 2.f; // todo is having it tied to radius a good idea? what if radius changes
 		const float speed_squared = velocity_.x * velocity_.x + velocity_.y * velocity_.y;
 
 		if (speed_squared > max_speed * max_speed)

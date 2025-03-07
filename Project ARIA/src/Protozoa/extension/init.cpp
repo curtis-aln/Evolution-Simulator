@@ -1,5 +1,7 @@
 #include "../Protozoa.h"
 
+inline static constexpr float spawn_radius = 200.f; // todo move to settings
+
 Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
 	: m_window_ptr_(window), m_world_bounds_(world_bounds)
 {
@@ -18,7 +20,6 @@ Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, const bool in
 void Protozoa::initialise_cells()
 {
 	// cells are spawned in clusters around an origin
-	const float spawn_radius = 200.f; // todo move to settings
 	const Circle protozoa_area = { m_world_bounds_->rand_pos(), spawn_radius };
 
 	m_cells_.reserve(m_genes_.cell_count);

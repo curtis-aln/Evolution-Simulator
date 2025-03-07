@@ -56,6 +56,8 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	bool m_rendering_ = true;
 	bool m_debug_ = false;
 
+	bool camera_following_ = false;
+
 	LineGraph<line_maximum_data, line_x_axis_increments> protozoa_population_graph_{ &m_window_, protozoa_graph_bounds };
 	LineGraph<line_maximum_data, line_x_axis_increments> food_population_graph_{ &m_window_, food_graph_bounds };
 
@@ -86,7 +88,6 @@ public:
 	void init_network_renderer();
 	void run();
 	void render_loop();
-	void update_loop();
 
 private:
 	void update_one_frame();

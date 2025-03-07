@@ -1,6 +1,8 @@
 #include "../Protozoa.h"
 #include "../../settings.h"
 
+inline static constexpr float bounds_tollarance = CellSettings::cell_radius * 3.f;
+
 void Protozoa::render_debug()
 {
 	// This is the bounding box of the protozoa, used for external collision events
@@ -96,8 +98,13 @@ void Protozoa::make_connection(const int cell1_id, const int cell2_id)
 }
 
 
-bool Protozoa::is_hovered_on(const sf::Vector2f mousePosition) const
+bool Protozoa::is_hovered_on(const sf::Vector2f mousePosition, bool tollarance_check) const
 {
+	if (tollarance_check)
+	{
+		sf::FloatRect resized_rect = resize_rect(m_personal_bounds_, { -bounds_tollarance , -bounds_tollarance });
+		return resized_rect.contains(mousePosition);
+	}
 	return m_personal_bounds_.contains(mousePosition);
 }
 
@@ -109,6 +116,11 @@ bool Protozoa::check_press(const sf::Vector2f mouse_position)
 	{
 		selected_cell_id = selected_cell->rel_id;
 		selected_cell->selected = true;
+	}
+
+	if (m_personal_bounds_.contains(mouse_position))
+	{
+		return true;
 	}
 
 	return selected_cell != nullptr;

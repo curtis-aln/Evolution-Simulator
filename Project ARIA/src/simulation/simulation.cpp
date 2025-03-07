@@ -1,6 +1,20 @@
 #include "simulation.h"
 #include "../Utils/utility.h"
 
+inline static constexpr float lerp_factor = 0.025f; // Adjust for smoothness (0 = no movement, 1 = instant movement)
+
+
+inline void draw_debug_circle(sf::RenderWindow* window, sf::Vector2f position)
+{
+	if (!window) return; // Ensure the window pointer is valid
+
+	sf::CircleShape circle(60); // Small debug circle
+	circle.setFillColor(sf::Color::Red); // Red for visibility
+	circle.setOrigin(5.f, 5.f); // Center the origin
+	circle.setPosition(position); // Set position
+
+	window->draw(circle); // Draw the circle to the window
+}
 
 Simulation::Simulation() : m_world_(&m_window_)
 {
@@ -57,11 +71,8 @@ void Simulation::init_network_renderer()
 
 void Simulation::run()
 {
-	//std::thread updateThread(&Simulation::update_loop, this);
-	render_loop(); // Main thread handles rendering
+	render_loop();
 
-	// Wait for update thread to finish
-	//updateThread.join();
 }
 
 
@@ -80,44 +91,41 @@ void Simulation::render_loop()
 	}
 }
 
-
-void Simulation::update_loop()
-{
-	using namespace std::chrono;
-	auto previous = high_resolution_clock::now();
-	float accumulator = 0.0f;
-
-	while (running)
-	{
-		auto now = high_resolution_clock::now();
-		float frameTime = duration<float>(now - previous).count();
-		previous = now;
-		accumulator += frameTime;
-
-		while (accumulator >= dt) 
-		{
-			// Lock game state for safe updates
-			std::lock_guard<std::mutex> lock(gameStateMutex);
-		
-			update_one_frame();
-		
-			accumulator -= dt;
-		}
-		
-		std::this_thread::sleep_for(milliseconds(1)); // Reduce CPU usage
-	}
-}
-
-
 void Simulation::update_one_frame()
 {
 	manage_frame_rate();
 	const sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();
-	m_world_.update_world();
+
+	if (!m_paused_)
+	{
+		m_world_.update_world();
+	}
 
 	if (m_debug_)
 	{
 		m_world_.update_debug(mouse_pos);
+		Protozoa* selected = m_world_.selected_protozoa;
+
+		camera_following_ = selected != nullptr;
+		if (selected != nullptr)
+		{
+			// comparing the difference between the camera center and the protozoa center and subtractign them to find out the camera translation
+			sf::Vector2f win_center = sf::Vector2f(m_window_.getSize()) / 2.f;
+			sf::Vector2f cam_center = camera_.map_window_position_to_world_position(win_center);
+
+			sf::Rect<float> bounds = selected->get_bounds();
+			sf::Vector2f center = bounds.getPosition() + bounds.getSize() / 2.f;
+			//sf::Vector2f dir = cam_center - center;
+			//float length = sqrt(dir.x * dir.x + dir.y * dir.y);
+			//sf::Vector2f norm = dir / length;
+
+			
+			sf::Vector2f new_position = cam_center + (cam_center - center) * lerp_factor;
+			sf::Vector2f translation = new_position - cam_center;
+
+			camera_.translate(translation);
+
+		}
 	}
 
 	m_builder_.update(mouse_pos);
@@ -197,10 +205,13 @@ void Simulation::handle_events()
 		else if (event.type == sf::Event::MouseWheelScrolled)
 			camera_.zoom(event.mouseWheelScroll.delta);
 
+		// if the mouse button is pressed, we see if it pressed on a protozoa bounding box. if so then we have it selected
 		else if (event.type == sf::Event::MouseButtonPressed)
 		{
 			if (m_world_.check_pressed(cam_pos) || m_builder_.check_mouse_input())
+			{
 				mouse_pressed_event = true;
+			}
 		}
 
 		else if (event.type == sf::Event::MouseButtonReleased)
@@ -211,11 +222,13 @@ void Simulation::handle_events()
 		}
 	}
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && mouse_pressed_event == false)
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !mouse_pressed_event && !camera_following_)
+	{
 		camera_.translate();
+	}
 
 	// mouse hovering over an organism
-	m_world_.check_hovering(m_debug_, cam_pos);
+	m_world_.check_hovering(m_debug_, cam_pos, mouse_pressed_event);
 
 	// updating camera translations
 	camera_.update(m_clock_.get_delta_time());

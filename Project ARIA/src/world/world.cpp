@@ -74,12 +74,11 @@ void World::render_world()
 		inner_circle_buffer.render(position_data);
 	}
 
-	if (debug_mode)
+	if (debug_mode && selected_protozoa != nullptr)
 	{
-		for (Protozoa& protozoa : m_all_protozoa_)
-		{
-			protozoa.render();
-		}
+		selected_protozoa->set_debug_mode(true);
+		selected_protozoa->render();
+
 	}
 
 	// drawing the world bounds
@@ -111,7 +110,7 @@ void World::init_environment()
 
 
 
-void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_position)
+void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_position, bool mouse_pressed)
 {
 	// resetting all states
 	for (Protozoa& protozoa : m_all_protozoa_)
@@ -137,7 +136,7 @@ bool World::check_pressed(const sf::Vector2f mouse_position)
 {
 	for (Protozoa& protozoa : m_all_protozoa_)
 	{
-		if (protozoa.check_press(mouse_position))
+		if (protozoa.is_hovered_on(mouse_position, true))
 		{
 			selected_protozoa = &protozoa;
 			return true;
@@ -151,7 +150,7 @@ void World::de_select_protozoa()
 {
 	if (selected_protozoa != nullptr)
 	{
-		selected_protozoa->deselect_cell();
-		selected_protozoa = nullptr;
+		//selected_protozoa->deselect_cell();
+		//selected_protozoa = nullptr;
 	}
 }
