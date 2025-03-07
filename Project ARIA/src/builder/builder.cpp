@@ -249,5 +249,4 @@ void Builder::init_protozoa()
 	m_protozoa_bounds_.radius = protozoa_space.width / 1.3f;
 	m_protozoa_bounds_.center = get_rect_center(protozoa_space);
 	m_protozoa_.set_bounds(&m_protozoa_bounds_);
-	m_protozoa_.set_renderer(&m_protozoa_renderer_);
 }

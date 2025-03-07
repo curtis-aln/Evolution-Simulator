@@ -74,6 +74,14 @@ void World::render_world()
 		inner_circle_buffer.render(position_data);
 	}
 
+	if (debug_mode)
+	{
+		for (Protozoa& protozoa : m_all_protozoa_)
+		{
+			protozoa.render();
+		}
+	}
+
 	// drawing the world bounds
 	m_window_->draw(border_render_);
 }
@@ -85,7 +93,7 @@ void World::init_organisms()
 
 	for (int i = 0; i < max_protozoa; ++i)
 	{
-		m_all_protozoa_.emplace_back(&m_bounds_, m_window_, &cell_renderer_, true);
+		m_all_protozoa_.emplace_back(&m_bounds_, m_window_, true);
 	}
 }
 

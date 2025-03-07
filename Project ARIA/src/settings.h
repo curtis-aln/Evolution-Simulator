@@ -50,7 +50,7 @@ struct SimulationSettings
 	inline static const std::string simulation_name = "Project A.R.I.A";
 	static constexpr bool vsync = false;
 
-	static constexpr unsigned frame_rate = 144;
+	static constexpr unsigned frame_rate = 60;
 
 	static constexpr unsigned window_width = 4500;
 	static constexpr unsigned window_height = 2800;
@@ -74,9 +74,9 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 80'000;
+	static constexpr float bounds_radius = 60'000;
 
-	static constexpr unsigned max_protozoa = 20'000;
+	static constexpr unsigned max_protozoa = 1000;
 	static constexpr unsigned initial_protozoa = max_protozoa / 2;
 };
 

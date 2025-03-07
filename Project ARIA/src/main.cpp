@@ -13,6 +13,12 @@
 // fix movement bug
 // [BIG PROJECT] Add the ability to create and destroy protozoa
 
+// ********** Debug mode ********** //
+// upon clicking on a protozoa
+// - the camera begins tracking the center of the organism
+// - the camera is zoomed onto it
+
+
 
 // Things ive noticed while Testing
 // - make "project aria" title area larger and move it to the bottom right

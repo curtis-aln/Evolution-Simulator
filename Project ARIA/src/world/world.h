@@ -20,7 +20,6 @@ class World : WorldSettings
 
 	Circle m_bounds_{ {0, 0}, bounds_radius };
 
-	sf::CircleShape cell_renderer_{};
 	sf::VertexArray border_render_{};
 
 	// rendering
@@ -33,6 +32,8 @@ class World : WorldSettings
 
 public:
 	bool simple_mode = false;
+	bool debug_mode = false;
+
 	Protozoa* selected_protozoa = nullptr;
 
 	World(sf::RenderWindow* window = nullptr);

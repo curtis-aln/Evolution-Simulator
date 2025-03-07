@@ -1,10 +1,9 @@
 #include "../Protozoa.h"
 
-Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, sf::CircleShape* cell_renderer, const bool init_cells)
-	: m_window_ptr_(window), m_cell_renderer_ptr_(cell_renderer),
-	m_world_bounds_(world_bounds)
+Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
+	: m_window_ptr_(window), m_world_bounds_(world_bounds)
 {
-	if (world_bounds == nullptr || cell_renderer == nullptr)
+	if (world_bounds == nullptr)
 	{
 		return;
 	}

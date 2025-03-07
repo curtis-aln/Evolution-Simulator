@@ -12,7 +12,6 @@
 class Protozoa : ProtozoaSettings
 {
 	sf::RenderWindow* m_window_ptr_ = nullptr;
-	sf::CircleShape* m_cell_renderer_ptr_ = nullptr;
 
 	std::vector<Cell> m_cells_{};
 	std::vector<Spring> m_springs_{};
@@ -32,8 +31,7 @@ class Protozoa : ProtozoaSettings
 	bool debug_mode_ = false;
 
 public:
-	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, sf::CircleShape* cell_renderer = nullptr, 
-		bool init_cells = false);
+	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
 	void update();
 	void render();
@@ -46,7 +44,6 @@ public:
 	std::vector<Cell>& get_cells();
 	void set_render_window(sf::RenderWindow* window);
 	void set_bounds(Circle* bounds);
-	void set_renderer(sf::CircleShape* renderer);
 	void deselect_cell();
 	void make_connection(int cell1_id, int cell2_id);
 	
@@ -58,7 +55,6 @@ private:
 	void render_debug();
 
 	// rendering
-	void render_cells();
 	void render_cell_connections(Cell& cell, bool thick_lines = false) const;
 
 	// updating

@@ -152,8 +152,3 @@ void Protozoa::set_bounds(Circle* bounds)
 {
 	m_world_bounds_ = bounds;
 }
-
-void Protozoa::set_renderer(sf::CircleShape* renderer)
-{
-	m_cell_renderer_ptr_ = renderer;
-}
