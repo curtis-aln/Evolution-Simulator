@@ -21,6 +21,8 @@ World::World(sf::RenderWindow* window)
 
 void World::update_world()
 {
+	food_manager.update();
+
 	for (Protozoa* protozoa : all_protozoa)
 	{
 		protozoa->update();
@@ -43,6 +45,8 @@ void World::render_world()
 	outer_color_data.clear();
 	inner_color_data.clear();
 	position_data.clear();
+
+	food_manager.render();
 
 	for (Protozoa* protozoa : all_protozoa)
 	{

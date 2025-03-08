@@ -10,7 +10,7 @@
 #include "../Utils/random.h"
 #include "../Utils/Circle.h"
 #include "../Utils/buffer_renderer.h"
-#include "../Utils/o_vector.hpp"
+#include "../food_manager.h"
 
 
 class World : WorldSettings
@@ -31,6 +31,8 @@ class World : WorldSettings
 
 	CircleBuffer outer_circle_buffer{ m_window_ };
 	CircleBuffer inner_circle_buffer{ m_window_ };
+
+	FoodManager food_manager{ m_window_, &m_bounds_ };
 
 public:
 	bool simple_mode = false;

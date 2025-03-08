@@ -11,11 +11,11 @@
 // fix "(failed to create the font face)" bug
 // fix movement bug
 // connections are drawn ontop of the cells
-// [BIG PROJECT] Add the ability to create and destroy protozoa
 
-// ********** Debug mode ********** //
-// upon clicking on a protozoa
-// - the camera is zoomed onto it
+// food todo
+// - food spawn randomly around world
+// - good food colors
+
 
 
 

@@ -145,8 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\builder\builder.h" />
-    <ClInclude Include="src\food\food.h" />
-    <ClInclude Include="src\food\food_manager.h" />
+    <ClInclude Include="src\food_manager.h" />
     <ClInclude Include="src\Protozoa\cell.h" />
     <ClInclude Include="src\Protozoa\genetics.h" />
     <ClInclude Include="src\Protozoa\Protozoa.h" />

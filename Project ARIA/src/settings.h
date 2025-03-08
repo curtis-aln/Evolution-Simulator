@@ -71,7 +71,7 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 80'000;
+	static constexpr float bounds_radius = 50'000;
 
 	static constexpr unsigned max_protozoa = 4'000;
 	static constexpr unsigned initial_protozoa = max_protozoa / 2;
@@ -148,14 +148,13 @@ struct BuilderSettings
 };
 
 
-struct FoodManagerSettings
-{
-	static constexpr unsigned max_food_clusters = 60;
-};
-
-
 struct FoodSettings
 {
+	static constexpr unsigned max_food = 4'000;
+	static constexpr unsigned initial_food = 2'200;
+	inline static const float food_radius = 30.f;
+	inline static const float friction = 0.99f;
+
 	static constexpr sf::Uint8 transparency = 200;
 	inline static const std::vector<sf::Color> fill_colors = {
 		{200, 30, 30, transparency}
@@ -165,5 +164,4 @@ struct FoodSettings
 		{250, 60, 60, transparency}
 	};
 
-	static constexpr unsigned max_cluster_size = 8;
 };

@@ -75,18 +75,18 @@ void Protozoa::render_debug()
 	font.draw(start_pos, combined_string, false);
 
 	// spring information
-	//for (const Spring& spring : m_springs_)
-	//{
-	//	const sf::Vector2f cell_A_pos = m_cells_[spring.m_cellA_id].get_position();
-	//	const sf::Vector2f cell_B_pos = m_cells_[spring.m_cellB_id].get_position();
-	//
-	//	const sf::Vector2f mid_point = get_midpoint(cell_A_pos, cell_B_pos);
-	//	const sf::Vector2f upper_quartile = get_midpoint(mid_point, cell_B_pos);
-	//	const sf::Vector2f lower_quartile = get_midpoint(cell_A_pos, mid_point);
-	//
-	//	m_info_font_.draw(lower_quartile, vector_to_string(spring.direction_A_force, 2), true);
-	//	m_info_font_.draw(upper_quartile, vector_to_string(spring.direction_B_force, 2), true);
-	//}
+	for (const Spring& spring : m_springs_)
+	{
+		const sf::Vector2f cell_A_pos = m_cells_[spring.cell_A_id].position_;
+		const sf::Vector2f cell_B_pos = m_cells_[spring.cell_B_id].position_;
+	
+		const sf::Vector2f mid_point = get_midpoint(cell_A_pos, cell_B_pos);
+		const sf::Vector2f upper_quartile = get_midpoint(mid_point, cell_B_pos);
+		const sf::Vector2f lower_quartile = get_midpoint(cell_A_pos, mid_point);
+	
+		TextSettings::cell_statistic_font.draw(lower_quartile, vector_to_string(spring.direction_A_force, 2), true);
+		TextSettings::cell_statistic_font.draw(upper_quartile, vector_to_string(spring.direction_B_force, 2), true);
+	}
 }
 
 

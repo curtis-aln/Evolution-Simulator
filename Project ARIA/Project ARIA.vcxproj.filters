@@ -98,10 +98,7 @@
     <ClInclude Include="src\Utils\UI\line_graph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\food\food.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\food\food_manager.h">
+    <ClInclude Include="src\food_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\NeuralNetworks\GeneticNeuralNetwork.h">

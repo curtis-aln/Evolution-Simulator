@@ -49,8 +49,8 @@ public:
             size_t index = i * 4;
 
             // Set color (all white)
-            sf::Color color = Random::rand_color({ 0, 100, 0 }, { 100, 255, 255 });
-            color.a = 90;
+            sf::Color color = colors[i];
+            color.a = 160;
             vertex_array[index + 0].color = color;
             vertex_array[index + 1].color = color;
             vertex_array[index + 2].color = color;

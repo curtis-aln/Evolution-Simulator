@@ -4,13 +4,12 @@
 #include "../Utils/random.h"
 #include "cell.h"
 
-class Spring : public SpringGene
+struct Spring : public SpringGene
 {
 	// for debugging
 	sf::Vector2f direction_A_force{};
 	sf::Vector2f direction_B_force{};
 
-public:
 	Spring(SpringGene& gene) : SpringGene(gene)
 	{ };
 
