@@ -45,7 +45,7 @@ void Protozoa::initialise_springs()
 }
 
 
-void Protozoa::update()
+void Protozoa::update(Container& container)
 {
 	if (m_cells_.empty()) // No computation is needed if there are no cells
 		return;
@@ -55,8 +55,17 @@ void Protozoa::update()
 	update_springs();
 	update_cells();
 
+	collision_resolution(container);
+
 	++frames_alive;
 
+}
+
+void Protozoa::collision_resolution(Container& container)
+{
+	// firstly, for each cell in our own protozoa, check if there are any collisions to resolve
+
+	// then, for each potential neighbour, check if our bounding boxes intersect, if they do there is a possible collision
 }
 
 void Protozoa::update_springs()

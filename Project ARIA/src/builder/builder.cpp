@@ -86,7 +86,7 @@ bool Builder::check_protozoa_interaction()
 
 void Builder::update_protozoa()
 {
-	m_protozoa_.update();
+	//m_protozoa_.update();
 	m_protozoa_.move_selected_cell(m_mouse_pos);
 
 	for (Cell& cell : m_protozoa_.get_cells())

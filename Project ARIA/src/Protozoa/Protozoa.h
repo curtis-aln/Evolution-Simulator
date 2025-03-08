@@ -5,6 +5,7 @@
 #include "../Utils/utility.h"
 #include "../Utils/utility_SFML.h"
 #include "../Utils/Graphics/Circle.h"
+#include "../Utils/Graphics/spatial_hash_grid.h"
 #include "cell.h"
 #include "spring.h"
 #include "genetics.h"
@@ -42,7 +43,8 @@ public:
 
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
-	void update();
+	void update(Container& container);
+	void collision_resolution(Container& container);
 	void render(bool debug_mode = false);
 
 	// debugging and modifying settings
@@ -61,6 +63,11 @@ public:
 	// information setting
 	void set_render_window(sf::RenderWindow* window);
 	void set_bounds(Circle* bounds);
+
+	sf::Vector2f get_center()
+	{
+		return m_personal_bounds_.getPosition() + m_personal_bounds_.getSize() / 2.f;
+	}
 	
 
 private:

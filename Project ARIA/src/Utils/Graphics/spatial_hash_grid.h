@@ -1,188 +1,208 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 #include <cstdint>
-#include <iostream>
 #include <array>
 
+// todo: make it so agents / entities only have to store the first value in their indexes instead of all the indexes
+// todo: remove dll files
+
 /*
-	SpatialGrid
-- have no more than 65,536 (2^16) objects
-- if experiencing error make sure your objects don't go out of bounds
+
+	SpatialHashGrid
+
+	Improvements:
+	- make a check visual range function
+	- make a way to return the cells within visual range
+	- automatic resolution resizer
+
+	Notes:
+	FINAL GOAL: 50k particles at 144fps
+	03/10/2022 - 20k  at 22fps
+	26/10/2022 - 40k  at 32fps
+	03/03/2023 - 50k  at 25fps
+	16/03/2023 - 50k  at 12fps
+	25/03/2023 - 100k at 10fps
+
+	REMEMBER:
+	changing colors of the rects takes up about 20,000 microseconds
+	the reason why cells might not collide instantly might be due to using floats instead of doubles
 */
 
-// make cell grid 2d
-// tell objects what index they are in
-// instead of removing and re-adding every frame. only remove and re-add if a object changes its cell
 
-
-using cell_idx = uint32_t;
-using obj_idx = uint32_t;
-
-// maximum number of objects a cell can hold
-static constexpr uint8_t cell_capacity = 25;
-
-
-
-template<size_t CellsX, size_t CellsY>
-class SpatialGrid
+// https://github.com/johnBuffer/VerletSFML-Multithread/blob/main/src/physics/collision_grid.hpp
+template<uint8_t cell_capacity>
+struct CollisionCell
 {
-public:
-	explicit SpatialGrid(const sf::FloatRect screen_size = {}) : m_screenSize(screen_size)
-	{
-		objects_count.resize(total_cells, 0);
-		grid.resize(total_cells, std::array<cell_idx, cell_capacity>());
+	// cell_capacity is the absolute MAXIMUM amount of objects that will be in this cell
+	static constexpr uint8_t max_cell_idx = cell_capacity - 1;
 
-		init_graphics();
+	uint8_t size = 0;
+	int32_t objects[cell_capacity] = {};
+
+	void addAtom(const int32_t id)
+	{
+		objects[size] = id;
+		size += size < max_cell_idx;
+	}
+
+	void clear() { size = 0; }
+};
+
+template<uint8_t cell_capacity>
+struct c_Vec
+{
+	static constexpr uint8_t max = cell_capacity;
+	int32_t array[max] = {};
+	uint8_t size = 0;
+
+	void add(const int32_t value)
+	{
+		if (size >= max)
+			return;
+
+		array[size] = value;
+		size++;
+	}
+
+	[[nodiscard]] int32_t at(const unsigned index) const
+	{
+		return array[index];
+	}
+};
+
+inline static constexpr uint8_t cell_capacity = 4;
+inline static constexpr uint8_t max_nearby_capacity = cell_capacity * 9;
+using Container = c_Vec<max_nearby_capacity>;
+
+template <size_t dimsX, size_t dimsY>
+struct SpatialHashGrid
+{
+	CollisionCell<cell_capacity> m_cells[dimsX * dimsY] = {};
+
+	sf::Vector2f conversionFactor{};
+	Container found{};
+
+	// graphics
+	sf::Vector2f dims{ dimsX, dimsY };
+	sf::Vector2f m_cellDimensions{};
+	sf::Rect<float> m_screenSize{};
+	sf::VertexBuffer m_renderGrid{};
+
+	// constructor and destructor
+	explicit SpatialHashGrid(const sf::Rect<float> screenSize = {})
+	{
+		init(screenSize);
+	}
+	~SpatialHashGrid() = default;
+
+
+	void init(const sf::Rect<float> screenSize)
+	{
+		m_screenSize = screenSize;
+
+		m_cellDimensions = { m_screenSize.width / static_cast<float>(dimsX),
+							m_screenSize.height / static_cast<float>(dimsY) };
+
+		conversionFactor = { 1.f / m_cellDimensions.x, 1.f / m_cellDimensions.y };
+
 		initVertexBuffer();
-		initFont();
-	}
-	~SpatialGrid() = default;
-
-
-	cell_idx inline hash(const float x, const float y) const
-	{
-		const auto cell_x = static_cast<cell_idx>(x / m_cellSize.x);
-		const auto cell_y = static_cast<cell_idx>(y / m_cellSize.y);
-		return cell_y * CellsX + cell_x;
 	}
 
 
-	cell_idx inline add_object(const float x, const float y, const size_t obj_id, bool is_food = false)
+	// other functions
+	void addAtom(const sf::Vector2f pos, const int32_t atom)
 	{
-		try
+		const sf::Vector2<uint32_t> cIdx = posTo2dIdx(pos);
+
+		if (!checkValidIndex(cIdx))
+			throw std::out_of_range("position argument out of range");
+
+		const uint32_t idx = idx2dTo1d(cIdx);
+		m_cells[idx].addAtom(atom);
+	}
+
+	void clear()
+	{
+		for (CollisionCell<cell_capacity>& cell : m_cells)
 		{
-			// Hash the object's position
-			const cell_idx index = hash(x, y);
+			cell.size = 0;
+		}
+	}
 
-			// Access the object count for the cell
-			uint8_t& count = objects_count.at(index); // use .at() for bounds checking
+	c_Vec<max_nearby_capacity>& find(const sf::Vector2f position)
+	{
+		found.size = 0;
 
-			// Ensure count doesn't exceed cell capacity
-			if (count >= cell_capacity)
+		const sf::Vector2<uint32_t> cIdx = posTo2dIdx(position);
+		if (!checkValidIndex(cIdx))
+			throw std::out_of_range("find() position argument out of range");
+
+		// getting the indexes needed
+		for (unsigned x = cIdx.x - 1; x <= cIdx.x + 1; ++x)
+		{
+			for (unsigned y = cIdx.y - 1; y <= cIdx.y + 1; ++y)
 			{
-				throw std::out_of_range("Object count exceeds cell capacity.");
-			}
+				const uint32_t index = idx2dTo1d({ x, y });
 
-			// Add the object to the grid
-			grid.at(index).at(count) = static_cast<obj_idx>(obj_id); // use .at() for bounds checking
-
-			// Increment the object count
-			count += 1;
-
-			return index;
-		}
-		catch (const std::out_of_range& e)
-		{
-			return static_cast<cell_idx>(-1); // Return an invalid index in case of error
-		}
-		catch (const std::exception& e)
-		{
-			std::cerr << "Error: " << e.what() << std::endl;
-			return static_cast<cell_idx>(-1); // Return an invalid index in case of general errors
-		}
-	}
-
-
-	inline void clear()
-	{
-		for (int idx = 0; idx < total_cells; ++idx)
-		{
-			objects_count[idx] = 0;
-		}
-	}
-
-
-	void render_grid(sf::RenderWindow& window)
-	{
-		window.draw(vertexBuffer);
-
-		// rendering the locations of each cell with their content counts
-		for (int x = 0; x < CellsX; ++x)
-		{
-			for (int y = 0; y < CellsY; ++y)
-			{
-				const cell_idx index = y * CellsX + x;
-				const sf::Vector2f topleft = { x * m_cellSize.x, y * m_cellSize.y };
-				text.setString("(" + std::to_string(x) + ", " + std::to_string(y) + ")  obj count: " + std::to_string(objects_count[index]));
-				text.setPosition(topleft);
-				window.draw(text);
+				// if there is an error here it is probally because the position lyes on one of the boundary cells (which it shouldnt)
+				for (uint8_t i{ 0 }; i < m_cells[index].size; i++)
+					found.add(m_cells[index].objects[i]);
 			}
 		}
+
+		return found;
 	}
 
-private:
+	[[nodiscard]] static uint32_t idx2dTo1d(const sf::Vector2<uint32_t> idx)
+	{
+		return idx.x + idx.y * dimsX;
+	}
+
+	[[nodiscard]] sf::Vector2<uint32_t> posTo2dIdx(const sf::Vector2f position) const
+	{
+		return {
+			static_cast<uint32_t>(position.x * conversionFactor.x),
+			static_cast<uint32_t>(position.y * conversionFactor.y) };
+	}
+
+	[[nodiscard]] static bool checkValidIndex(const sf::Vector2u index)
+	{
+		return !(index.x < 0 || index.y < 0 || index.x >= dimsX || index.y >= dimsY);
+	}
+
+
 	void initVertexBuffer()
 	{
-		std::vector<sf::Vertex> vertices(static_cast<std::vector<sf::Vertex>::size_type>((CellsX + CellsY) * 2));
+		std::vector<sf::Vertex> vertices((dimsX + dimsY) * 2 + 4);
 
-		vertexBuffer = sf::VertexBuffer(sf::Lines, sf::VertexBuffer::Static);
-		vertexBuffer.create(vertices.size());
+		m_renderGrid = sf::VertexBuffer(sf::Lines, sf::VertexBuffer::Static);
+		m_renderGrid.create(vertices.size());
 
 		size_t counter = 0;
-		for (size_t x = 0; x < CellsX; x++)
+		for (unsigned i = 0; i <= dimsX; i++)
 		{
-			const float posX = static_cast<float>(x) * m_cellSize.x;
+			const float posX = static_cast<float>(i) * m_cellDimensions.x;
 			vertices[counter].position = { posX, 0 };
 			vertices[counter + 1].position = { m_screenSize.left + posX, m_screenSize.top + m_screenSize.height };
 			counter += 2;
 		}
 
-		for (size_t y = 0; y < CellsY; y++)
+		for (unsigned i = 0; i <= dimsY; i++)
 		{
-			const float posY = static_cast<float>(y) * m_cellSize.y;
+			const float posY = static_cast<float>(i) * m_cellDimensions.y;
 			vertices[counter].position = { 0, posY };
 			vertices[counter + 1].position = { m_screenSize.left + m_screenSize.width, m_screenSize.top + posY };
 			counter += 2;
 		}
 
-		for (size_t x = 0; x < counter; x++)
+		for (sf::Vertex& vertex : vertices)
 		{
-			vertices[x].color = { 75, 75, 75 };
+			vertex.color = sf::Color(40, 40, 40);
 		}
 
-		vertexBuffer.update(vertices.data(), vertices.size(), 0);
+		m_renderGrid.update(vertices.data(), vertices.size(), 0);
 	}
-
-	void initFont()
-	{
-		constexpr int char_size = 45;
-		const std::string font_location = "fonts/Calibri.ttf";
-		if (!font.loadFromFile(font_location))
-		{
-			std::cerr << "[ERROR]: Failed to load font from: " << font_location << '\n';
-			return;
-		}
-		text = sf::Text("", font, char_size);
-	}
-
-	void init_graphics()
-	{
-		// increasing the size of the boundaries very slightly stops any out-of-range errors 
-		constexpr float resize = 1.f;
-		m_screenSize.left -= resize;
-		m_screenSize.top -= resize;
-		m_screenSize.width += resize;
-		m_screenSize.height += resize;
-
-		m_cellSize = { m_screenSize.width / static_cast<float>(CellsX),
-						  m_screenSize.height / static_cast<float>(CellsY) };
-
-	}
-
-
-public:
-	inline static constexpr size_t total_cells = CellsX * CellsY;
-
-	// graphics
-	sf::Vector2f m_cellSize{};
-	sf::FloatRect m_screenSize{};
-
-	sf::VertexBuffer vertexBuffer{};
-	sf::Font font;
-	sf::Text text;
-
-	alignas(32) std::vector<std::array<obj_idx, cell_capacity>> grid{};
-	alignas(32) std::vector<uint8_t> objects_count{};
 };

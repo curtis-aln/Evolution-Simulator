@@ -30,14 +30,14 @@ void World::update_world()
 	spatial_hash_grid.clear();
 	for (Protozoa* protozoa : all_protozoa)
 	{
-		const sf::FloatRect bounds = protozoa->get_bounds();
-		const sf::Vector2f center = bounds.getPosition() + bounds.getSize() / 2.f;
-		spatial_hash_grid.add_object(center.x, center.y, protozoa->id);
+		const sf::Vector2f center = protozoa->get_center();
+		spatial_hash_grid.addAtom(center, protozoa->id);
 	}
 
 	for (Protozoa* protozoa : all_protozoa)
 	{
-		protozoa->update();
+		Container& nearby = spatial_hash_grid.find(protozoa->get_center());
+		protozoa->update(nearby);
 	}
 }
 

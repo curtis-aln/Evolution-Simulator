@@ -15,8 +15,8 @@
 #include "../Utils/Graphics/spatial_hash_grid.h"
 #include "../Utils/Graphics/SFML_Grid.h"
 
-inline static constexpr size_t cells_x = 300;
-inline static constexpr size_t cells_y = 300;
+inline static constexpr size_t cells_x = 150;
+inline static constexpr size_t cells_y = 150;
 
 
 class World : WorldSettings
@@ -42,7 +42,7 @@ class World : WorldSettings
 
 	// to handle collisions
 	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
-	SpatialGrid<cells_x, cells_y> spatial_hash_grid{ world_bounds };
+	SpatialHashGrid<cells_x, cells_y> spatial_hash_grid{ world_bounds };
 	SFML_Grid grid_renderer;
 
 public:
