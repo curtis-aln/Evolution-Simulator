@@ -5,7 +5,7 @@
 #include "../Utils/utility_SFML.h"
 #include "../Utils/UI/button.h"
 #include "../Utils/UI/slider.h"
-#include "../Utils/font_renderer.hpp"
+#include "../Utils/Graphics/font_renderer.hpp"
 #include "../settings.h"
 
 #include "../Protozoa/Protozoa.h"

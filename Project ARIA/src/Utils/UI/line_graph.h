@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "../font_renderer.hpp"
+#include "../Graphics/font_renderer.hpp"
 #include "../utility_SFML.h"
 
 #include <algorithm> // Include the <algorithm> header for std::max_element

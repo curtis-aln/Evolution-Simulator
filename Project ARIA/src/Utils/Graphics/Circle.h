@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/System/Vector2.hpp>
-#include "Random.h"
+#include "../Random.h"
 
 struct Circle
 {

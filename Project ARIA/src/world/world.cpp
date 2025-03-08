@@ -1,17 +1,20 @@
 #include "world.h"
 #include "../Utils/utility_SFML.h"
-#include "../Utils/buffer_renderer.h"
+#include "../Utils/Graphics/buffer_renderer.h"
+
+#include "../Utils/Graphics/spatial_hash_grid.h"
 
 World::World(sf::RenderWindow* window)
 	: m_window_(window),
-	border_render_(make_circle(m_bounds_.radius, m_bounds_.center))
-{
+	border_render_(make_circle(m_bounds_.radius, m_bounds_.center)),
+	grid_renderer(*window, world_bounds, cells_x, cells_y)
+{ 
 	init_organisms();
 	init_food();
 	init_environment();
 
 	const size_t protozoa_count = all_protozoa.size();
-	const size_t predicted_cells = protozoa_count * ProtozoaSettings::max_cells;
+	const size_t predicted_cells = protozoa_count * GeneSettings::cell_amount_range.y;
 
 	// reserving nessesary data
 	outer_color_data.reserve(predicted_cells);
@@ -22,6 +25,15 @@ World::World(sf::RenderWindow* window)
 void World::update_world()
 {
 	food_manager.update();
+
+	// updating the spatial grid first
+	spatial_hash_grid.clear();
+	for (Protozoa* protozoa : all_protozoa)
+	{
+		const sf::FloatRect bounds = protozoa->get_bounds();
+		const sf::Vector2f center = bounds.getPosition() + bounds.getSize() / 2.f;
+		spatial_hash_grid.add_object(center.x, center.y, protozoa->id);
+	}
 
 	for (Protozoa* protozoa : all_protozoa)
 	{
@@ -41,24 +53,20 @@ void World::update_debug(const sf::Vector2f mouse_position)
 void World::render_world()
 {
 	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.
-		
-	outer_color_data.clear();
-	inner_color_data.clear();
-	position_data.clear();
-
-	food_manager.render();
-
-	for (Protozoa* protozoa : all_protozoa)
+	if (draw_grid)
 	{
-		for (Cell& cell : protozoa->get_cells())
-		{
-			outer_color_data.push_back(cell.outer_color);
-			inner_color_data.push_back(cell.inner_color);
-			position_data.push_back(cell.position_);
-		}
+		grid_renderer.draw();
 	}
 
-	// Now we have all our data we can create the renderers and finaly render all circles
+	update_position_data();
+	render_protozoa();
+
+	// drawing the world bounds
+	m_window_->draw(border_render_);
+}
+
+void World::render_protozoa()
+{
 	const float radius_inner = CellSettings::cell_radius;
 	const float radius_outer = radius_inner + CellSettings::cell_outline_thickness;
 	const int size = position_data.size();
@@ -80,11 +88,26 @@ void World::render_world()
 	if (debug_mode && selected_protozoa != nullptr)
 	{
 		selected_protozoa->render(true);
-
 	}
+}
 
-	// drawing the world bounds
-	m_window_->draw(border_render_);
+void World::update_position_data()
+{
+	outer_color_data.clear();
+	inner_color_data.clear();
+	position_data.clear();
+
+	food_manager.render();
+
+	for (Protozoa* protozoa : all_protozoa)
+	{
+		for (Cell& cell : protozoa->get_cells())
+		{
+			outer_color_data.push_back(cell.outer_color);
+			inner_color_data.push_back(cell.inner_color);
+			position_data.push_back(cell.position_);
+		}
+	}
 }
 
 
@@ -92,7 +115,7 @@ void World::init_organisms()
 {
 	for (int i = 0; i < max_protozoa; ++i)
 	{
-		all_protozoa.emplace({ &m_bounds_, m_window_, true });
+		all_protozoa.emplace({ i, &m_bounds_, m_window_, true });
 	}
 	for (int i = 0; i < max_protozoa - initial_protozoa; ++i)
 	{

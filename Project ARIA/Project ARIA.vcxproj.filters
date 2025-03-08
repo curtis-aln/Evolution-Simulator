@@ -77,7 +77,7 @@
     <ClInclude Include="src\Utils\UI\Camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\Circle.h">
+    <ClInclude Include="src\Utils\Graphics\Circle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\builder\builder.h">
@@ -113,10 +113,16 @@
     <ClInclude Include="src\Utils\UI\text_box.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\font_renderer.hpp">
+    <ClInclude Include="src\Utils\Graphics\font_renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\buffer_renderer.h">
+    <ClInclude Include="src\Utils\Graphics\buffer_renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Graphics\spatial_hash_grid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Graphics\SFML_Grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

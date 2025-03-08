@@ -1,7 +1,7 @@
 #include "builder.h"
 
 
-Builder::Builder(sf::RenderWindow* window) : m_window_(window), m_protozoa_(nullptr, window)
+Builder::Builder(sf::RenderWindow* window) : m_window_(window), m_protozoa_(0, nullptr, window)
 {
 	init_bounds();
 	init_protozoa();

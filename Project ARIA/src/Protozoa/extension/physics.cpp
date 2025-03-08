@@ -4,8 +4,8 @@
 
 inline static constexpr float spawn_radius = 200.f; // todo move to settings
 
-Protozoa::Protozoa(Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
-	: m_window_(window), m_world_bounds_(world_bounds)
+Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
+	: id(id_), m_window_(window), m_world_bounds_(world_bounds)
 {
 	if (world_bounds == nullptr)
 	{

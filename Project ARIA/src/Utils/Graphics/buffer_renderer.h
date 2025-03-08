@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Random.h"
+#include "../Random.h"
 
 inline sf::Texture generateCircleTexture(float radius)
 {

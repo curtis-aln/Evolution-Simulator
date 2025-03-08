@@ -1,10 +1,10 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "../settings.h"
-#include "../Utils/font_renderer.hpp"
+#include "../Utils/Graphics/font_renderer.hpp"
 #include "../Utils/utility.h"
 #include "../Utils/utility_SFML.h"
-#include "../Utils/Circle.h"
+#include "../Utils/Graphics/Circle.h"
 #include "cell.h"
 #include "spring.h"
 #include "genetics.h"
@@ -36,10 +36,11 @@ class Protozoa : ProtozoaSettings
 	int selected_cell_id = -1;
 
 public:
+	int id = 0;
 	bool active = true; // for o_vector.h
 
 
-	Protozoa(Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
+	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
 	void update();
 	void render(bool debug_mode = false);

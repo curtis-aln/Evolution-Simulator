@@ -6,20 +6,16 @@
 
 // ********** Currently Working On ********** //
 // Create a RectBuffer and re-introduce the connections
-// fix the flickering issue and include it as a setting
-// fix the transparency issue
 // fix "(failed to create the font face)" bug
-// fix movement bug
-// connections are drawn ontop of the cells
-
-// food todo
-// - food spawn randomly around world
-// - good food colors
-
-
+// connections are drawn ontop of the cells which is wrong
+// Intercellular collisions
+// Multicellular collisions
+// Advanced cell debug mode
+// Improve border collisions, currently too aggressive
 
 
 // Things ive noticed while Testing
+// the grid renderers dont work with negative x values
 // - make "project aria" title area larger and move it to the bottom right
 // - fps should be integrated with the protozoa settings
 // - program crashes when you try to link two protozoa in the builder area
@@ -31,14 +27,6 @@
 // - protozoa factory title too far down
 // - neural network input colors too strong
 // - cells need better creation colors, should fit a pallet like "lime-pallet" or "ocean-pallet"
-
-// Things i should move onto
-// 
-// Cells should be able to bounce off each-over
-
-// Features to add
-// Food
-
 
 
 // todo strings:

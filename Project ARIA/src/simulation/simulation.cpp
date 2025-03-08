@@ -246,6 +246,7 @@ void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 	case sf::Keyboard::Escape: running = false; break;
 	case sf::Keyboard::Space:  m_paused_ = not m_paused_; break;
 	case sf::Keyboard::R:      m_rendering_ = not m_rendering_; break;
+	case sf::Keyboard::G:      m_world_.draw_grid = not m_world_.draw_grid; break;
 	case sf::Keyboard::D:      
 		m_debug_ = not m_debug_; 
 		m_world_.debug_mode = not m_world_.debug_mode;

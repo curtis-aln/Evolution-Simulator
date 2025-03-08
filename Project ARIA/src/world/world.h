@@ -8,9 +8,15 @@
 
 #include "../Utils/o_vector.hpp"
 #include "../Utils/random.h"
-#include "../Utils/Circle.h"
-#include "../Utils/buffer_renderer.h"
+#include "../Utils/Graphics/Circle.h"
+#include "../Utils/Graphics/buffer_renderer.h"
 #include "../food_manager.h"
+
+#include "../Utils/Graphics/spatial_hash_grid.h"
+#include "../Utils/Graphics/SFML_Grid.h"
+
+inline static constexpr size_t cells_x = 300;
+inline static constexpr size_t cells_y = 300;
 
 
 class World : WorldSettings
@@ -20,7 +26,7 @@ class World : WorldSettings
 	//std::vector<Protozoa> m_all_protozoa_{};
 	o_vector<Protozoa, max_protozoa> all_protozoa{};
 
-	Circle m_bounds_{ {0, 0}, bounds_radius };
+	Circle m_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
 
 	sf::VertexArray border_render_{};
 
@@ -34,9 +40,15 @@ class World : WorldSettings
 
 	FoodManager food_manager{ m_window_, &m_bounds_ };
 
+	// to handle collisions
+	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
+	SpatialGrid<cells_x, cells_y> spatial_hash_grid{ world_bounds };
+	SFML_Grid grid_renderer;
+
 public:
 	bool simple_mode = false;
 	bool debug_mode = false;
+	bool draw_grid = false;
 
 	Protozoa* selected_protozoa = nullptr;
 
@@ -45,6 +57,8 @@ public:
 	void update_world();
 	void update_debug(sf::Vector2f mouse_position);
 	void render_world();
+	void render_protozoa();
+	void update_position_data();
 	void check_hovering(bool debug_mode, sf::Vector2f mouse_position, bool mouse_pressed);
 	bool check_pressed(sf::Vector2f mouse_position);
 	void de_select_protozoa();

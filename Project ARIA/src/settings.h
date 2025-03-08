@@ -1,6 +1,6 @@
 #pragma once
 #include "Utils/utility_SFML.h"
-#include "Utils/font_renderer.hpp"
+#include "Utils/Graphics/font_renderer.hpp"
 
 struct TextSettings
 {
@@ -71,10 +71,10 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 50'000;
+	static constexpr float bounds_radius = 40'000;
 
-	static constexpr unsigned max_protozoa = 4'000;
-	static constexpr unsigned initial_protozoa = max_protozoa / 2;
+	static constexpr unsigned max_protozoa = 3'000;
+	static constexpr unsigned initial_protozoa = 1'000;
 };
 
 
@@ -95,8 +95,7 @@ struct CellSettings
 
 struct GeneSettings
 {
-	inline static const sf::Vector2i cell_amount_range = { 2, 6 };
-	//inline static const sf::Vector2f init_cell_radius_range = { 30.f, 50.f };
+	inline static const sf::Vector2i cell_amount_range = { 3, 9 };
 
 	inline static const sf::Vector2f init_rest_length_range = { CellSettings::cell_radius, CellSettings::cell_radius * 4.f };
 	inline static const sf::Vector2f damping_const_range = { 0.95f, 0.99f };
@@ -121,8 +120,6 @@ struct GeneSettings
 
 struct ProtozoaSettings
 {
-	static constexpr unsigned max_cells = 30;
-
 	static constexpr float spring_thickness = 9.f;
 	static constexpr float spring_outline_thickness = 6.f;
 };

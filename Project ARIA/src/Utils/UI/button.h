@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "../time.h"
-#include "../font_renderer.hpp"
+#include "../Graphics/font_renderer.hpp"
 
 class Button
 {

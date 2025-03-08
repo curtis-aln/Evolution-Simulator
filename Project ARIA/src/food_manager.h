@@ -1,9 +1,9 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Utils/buffer_renderer.h" // to render all the food
+#include "Utils/Graphics/buffer_renderer.h" // to render all the food
 #include "Utils/o_vector.hpp" // to allow food to be created and destroyed
-#include "Utils/Circle.h" // world boundary
+#include "Utils/Graphics/Circle.h" // world boundary
 #include "Utils/random.h"
 #include "settings.h"
 
