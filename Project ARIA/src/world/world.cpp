@@ -48,8 +48,8 @@ void World::render_world()
 	{
 		for (Cell& cell : protozoa->get_cells())
 		{
-			outer_color_data.push_back(cell.outline_color_);
-			inner_color_data.push_back(cell.color_);
+			outer_color_data.push_back(cell.outer_color);
+			inner_color_data.push_back(cell.inner_color);
 			position_data.push_back(cell.position_);
 		}
 	}
@@ -75,8 +75,7 @@ void World::render_world()
 
 	if (debug_mode && selected_protozoa != nullptr)
 	{
-		selected_protozoa->set_debug_mode(true);
-		selected_protozoa->render();
+		selected_protozoa->render(true);
 
 	}
 
@@ -113,12 +112,6 @@ void World::init_environment()
 
 void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_position, bool mouse_pressed)
 {
-	// resetting all states
-	for (Protozoa* protozoa : all_protozoa)
-	{
-		protozoa->set_debug_mode(false);
-	}
-
 	if (!debug_mode)
 		return;
 
@@ -127,8 +120,7 @@ void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_posit
 	{
 		if (protozoa->is_hovered_on(mouse_position))
 		{
-			protozoa->set_debug_mode(true);
-			break;
+			break; // todo
 		}
 	}
 }

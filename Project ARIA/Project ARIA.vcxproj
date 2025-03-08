@@ -137,11 +137,9 @@
   <ItemGroup>
     <ClCompile Include="src\builder\builder.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Protozoa\extension\debug.cpp" />
-    <ClCompile Include="src\Protozoa\extension\init.cpp" />
+    <ClCompile Include="src\Protozoa\extension\debug_graphics.cpp" />
     <ClCompile Include="src\Protozoa\extension\organic.cpp" />
     <ClCompile Include="src\Protozoa\extension\physics.cpp" />
-    <ClCompile Include="src\Protozoa\extension\rendering.cpp" />
     <ClCompile Include="src\simulation\simulation.cpp" />
     <ClCompile Include="src\world\world.cpp" />
   </ItemGroup>

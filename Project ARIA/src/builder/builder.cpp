@@ -44,7 +44,6 @@ void Builder::check_button_presses()
 	if (debug_toggle.check_click(m_mouse_pos))
 	{
 		debug_mode_ = not debug_mode_;
-		m_protozoa_.set_debug_mode(debug_mode_);
 	}
 }
 
@@ -59,7 +58,7 @@ void Builder::de_select_protozoa()
 
 		if (end_cell != nullptr)
 		{
-			m_protozoa_.make_connection(start_cell->rel_id, end_cell->rel_id);
+			m_protozoa_.make_connection(start_cell->id, end_cell->id);
 		}
 
 		start_cell = nullptr;
@@ -99,7 +98,7 @@ void Builder::update_protozoa()
 
 void Builder::border_cell(Cell& cell) const
 {
-	const float rad = cell.get_radius();
+	const float rad = cell.radius;
 	if (cell.position_.x - rad < protozoa_space.left)
 	{
 		cell.position_.x = protozoa_space.left + rad;

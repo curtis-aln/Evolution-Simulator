@@ -21,6 +21,7 @@ struct CellGene : GeneSettings
 	sf::Color inner_color = c_rand_val_in_vector(inner_colors);
 
 	float radius = CellSettings::cell_radius;
+	float friction = 0.99f; // todo
 };
 
 struct SpringGene : GeneSettings

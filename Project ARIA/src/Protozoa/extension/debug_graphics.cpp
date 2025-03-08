@@ -3,10 +3,44 @@
 
 inline static constexpr float bounds_tollarance = CellSettings::cell_radius * 3.f;
 
+void Protozoa::render(bool debug_mode)
+{
+	for (Cell& cell : m_cells_)
+	{
+		render_cell_connections(cell, true);
+	}
+
+	if (debug_mode)
+	{
+		render_debug();
+	}
+}
+
+
+void Protozoa::render_cell_connections(Cell& cell, const bool thick_lines) const
+{
+	for (const Spring& spring : m_springs_)
+	{
+		const sf::Vector2f pos1 = m_cells_[spring.cell_A_id].position_;
+		const sf::Vector2f pos2 = m_cells_[spring.cell_B_id].position_;
+
+		if (thick_lines)
+		{
+			draw_thick_line(*m_window_, pos1, pos2, spring_thickness,
+				spring_outline_thickness, spring.outer_color, spring.inner_color);
+		}
+
+		else
+		{
+			m_window_->draw(make_line(pos1, pos2, sf::Color::Magenta));
+		}
+	}
+}
+
 void Protozoa::render_debug()
 {
 	// This is the bounding box of the protozoa, used for external collision events
-	draw_rect_outline(m_personal_bounds_, *m_window_ptr_);
+	draw_rect_outline(m_personal_bounds_, *m_window_);
 
 	Font& font = TextSettings::cell_statistic_font;
 
@@ -14,20 +48,20 @@ void Protozoa::render_debug()
 	for (Cell& cell : m_cells_)
 	{
 		const sf::Vector2f pos = cell.position_;
-		const float rad = cell.get_radius();
+		const float rad = cell.radius;
 
 		// rendering the bounding boxes
 		const sf::FloatRect rect = { pos.x - rad, pos.y - rad, rad * 2, rad * 2 };
-		draw_rect_outline(rect, *m_window_ptr_);
+		draw_rect_outline(rect, *m_window_);
 		render_cell_connections(cell);
 
 		// drawing the direction of the cell
 		const float arrow_length = std::min(rad*4, length(cell.velocity_) * rad);
-		draw_direction(*m_window_ptr_, pos, cell.velocity_, arrow_length, 6, 10,
+		draw_direction(*m_window_, pos, cell.velocity_, arrow_length, 6, 10,
 			{ 200, 220, 200 }, { 190, 200, 190 });
 
 		// drawing cell stats
-		font.draw({ rect.left, rect.top + rect.height + 5 }, "id: " + std::to_string(cell.rel_id), false);
+		font.draw({ rect.left, rect.top + rect.height + 5 }, "id: " + std::to_string(cell.id), false);
 	}
 
 	// protozoa information under the bounding box
@@ -83,7 +117,6 @@ void Protozoa::deselect_cell()
 {
 	if (selected_cell_id >= 0)
 	{
-		m_cells_[selected_cell_id].selected = false;
 		selected_cell_id = -1;
 	}
 }
@@ -114,8 +147,7 @@ bool Protozoa::check_press(const sf::Vector2f mouse_position)
 
 	if (selected_cell != nullptr)
 	{
-		selected_cell_id = selected_cell->rel_id;
-		selected_cell->selected = true;
+		selected_cell_id = selected_cell->id;
 	}
 
 	if (m_personal_bounds_.contains(mouse_position))
@@ -134,7 +166,7 @@ Cell* Protozoa::get_selected_cell(const sf::Vector2f mouse_pos)
 		for (Cell& cell : m_cells_)
 		{
 			const float dist_sq = dist_squared(cell.position_, mouse_pos);
-			const float rad = cell.get_radius();
+			const float rad = cell.radius;
 			if (dist_sq < rad * rad)
 			{
 				return &cell;
@@ -142,11 +174,6 @@ Cell* Protozoa::get_selected_cell(const sf::Vector2f mouse_pos)
 		}
 	}
 	return nullptr;
-}
-
-void Protozoa::set_debug_mode(const bool mode)
-{
-	debug_mode_ = mode;
 }
 
 std::vector<Cell>& Protozoa::get_cells()
@@ -157,7 +184,7 @@ std::vector<Cell>& Protozoa::get_cells()
 
 void Protozoa::set_render_window(sf::RenderWindow* window)
 {
-	m_window_ptr_ = window;
+	m_window_ = window;
 }
 
 void Protozoa::set_bounds(Circle* bounds)

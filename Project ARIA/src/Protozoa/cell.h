@@ -9,35 +9,16 @@
 // Each organism consists of cells which work together via springs
 // Each cell has their own radius and friction coefficient, as well as cosmetic factors such as color
 
-inline static constexpr float border_repulsion_magnitude = 0.01f;
+inline static constexpr float border_repulsion_magnitude = 0.01f; // how strong it is repelled from the border
 inline static const float max_speed = 70;
 
-class Cell : CellSettings
+class Cell : public CellGene
 {
-	float m_radius_ = 0.f;
-	float m_friction = 0.99f; // friction coefficient
-
-
 public:
-	sf::Color color_;
-	sf::Color outline_color_;
-
 	sf::Vector2f position_{};
 	sf::Vector2f velocity_{};
 
-	int rel_id;
-
-	// the player can press and hold on a cell, and will have the ability to drag it around
-	bool selected = false; // todo move outside of this cell class
-
-
-	// constructors
-	Cell(const int rel_id = 0, const float radius = 0, sf::Color color_inner = {}, sf::Color color_outer = {})
-	: m_radius_(radius), color_(color_inner), outline_color_(color_outer), rel_id(rel_id)
-	{}
-
-	Cell(const CellGene& info = CellGene())
-		: m_radius_(info.radius), color_(info.inner_color), outline_color_(info.outer_color), rel_id(info.id)
+	Cell(const CellGene& info) : CellGene(info)
 	{}
 
 
@@ -48,35 +29,29 @@ public:
 		int i = 0;
 		for (Cell& cell : family_cells)
 		{
-			if (cell.rel_id != rel_id) // cells cant interact with themselves
-			{
-				const sf::Vector2f direction = normalize(position_ - cell.position_);
-				//const float magnitude = Random::rand_range(-R, R);
-				const float magnitude = R * ((i++ % 2 == 0) * 2 - 1);
-				velocity_ += direction * magnitude;
-			}
+			if (cell.id == id) // cells cant interact with themselves
+				continue;
+			
+			// interacting with the other cell
+			const sf::Vector2f direction = normalize(position_ - cell.position_);
+			const float magnitude = R * ((i++ % 2 == 0) * 2 - 1);
+			velocity_ += direction * magnitude;
 		}
 
+		// updating velocity and position vectors
 		clamp_velocity();
 		position_ += velocity_;
-		velocity_ *= m_friction;
+		velocity_ *= friction;
 	}
 
 
 	void bound(const Circle& bounds)
 	{
-		// if the cell is not within the world bounds we accelerate it towards the center
 		if (!bounds.contains(position_))
 		{
-			const sf::Vector2f delta = bounds.center - position_;
-			velocity_ += delta * border_repulsion_magnitude;
+			const sf::Vector2f direction = bounds.center - position_;
+			velocity_ += direction * border_repulsion_magnitude;
 		}
-	}
-
-
-	[[nodiscard]] float get_radius() const
-	{
-		return m_radius_;
 	}
 
 
