@@ -170,13 +170,17 @@ void Simulation::update_line_graphs()
 void Simulation::draw_everything()
 {
 	m_world_.render_world();
-	m_builder_.render();
+	
+	if (!m_world_.simple_mode)
+	{
+		m_builder_.render();
 
-	protozoa_population_graph_.render();
-	food_population_graph_.render();
+		protozoa_population_graph_.render();
+		food_population_graph_.render();
 
-	net_renderer.render();
-	text_box.render();
+		net_renderer.render();
+		text_box.render();
+	}
 }
 
 void Simulation::render()

@@ -15,8 +15,8 @@
 #include "../Utils/Graphics/spatial_hash_grid.h"
 #include "../Utils/Graphics/SFML_Grid.h"
 
-inline static constexpr size_t cells_x = 150;
-inline static constexpr size_t cells_y = 150;
+inline static constexpr size_t cells_x = 80;
+inline static constexpr size_t cells_y = 80;
 
 
 class World : WorldSettings
@@ -24,7 +24,7 @@ class World : WorldSettings
 	sf::RenderWindow* m_window_ = nullptr;
 
 	//std::vector<Protozoa> m_all_protozoa_{};
-	o_vector<Protozoa, max_protozoa> all_protozoa{};
+	Protozoa::Protozoa_Vector all_protozoa{};
 
 	Circle m_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
 
@@ -44,6 +44,8 @@ class World : WorldSettings
 	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
 	SpatialHashGrid<cells_x, cells_y> spatial_hash_grid{ world_bounds };
 	SFML_Grid grid_renderer;
+
+	int ticks = 0;
 
 public:
 	bool simple_mode = false;

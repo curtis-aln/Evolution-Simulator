@@ -2,7 +2,9 @@
 #include "../../Utils/random.h"
 #include <stdexcept> // Required for std::runtime_error
 
-inline static constexpr float spawn_radius = 200.f; // todo move to settings
+#include "../../Utils/Graphics/spatial_hash_grid.h"
+
+inline static constexpr float spawn_radius = 100.f; // todo move to settings
 
 Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
 	: id(id_), m_window_(window), m_world_bounds_(world_bounds)
@@ -17,6 +19,8 @@ Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, cons
 		initialise_cells();
 		initialise_springs();
 	}
+
+	collision_vector.reserve(30); // todo
 }
 
 void Protozoa::initialise_cells()
@@ -45,27 +49,88 @@ void Protozoa::initialise_springs()
 }
 
 
-void Protozoa::update(Container& container)
+void Protozoa::update(Protozoa_Vector& protozoa_vector, Container& container)
 {
 	if (m_cells_.empty()) // No computation is needed if there are no cells
 		return;
 
-	update_bounding_box();
-
 	update_springs();
 	update_cells();
 
-	collision_resolution(container);
+	collision_resolution(protozoa_vector, container);
+
+	bound_cells();
+	update_bounding_box();
 
 	++frames_alive;
 
 }
 
-void Protozoa::collision_resolution(Container& container)
+void Protozoa::collision_resolution(Protozoa_Vector& protozoa_vector, Container& container)
 {
-	// firstly, for each cell in our own protozoa, check if there are any collisions to resolve
+	// for each neighbour cell that overlaps with our bounding box, we add it to our collision vector and then compute
+	// all the collisions between the cells in this vector
+	collision_vector.clear();
 
-	// then, for each potential neighbour, check if our bounding boxes intersect, if they do there is a possible collision
+	for (Cell& cell : m_cells_)
+	{
+		collision_vector.push_back(&cell);
+	}
+
+	for (int i = 0; i < container.size; ++i)
+	{
+		const int idx = container.at(i);
+
+		Protozoa* protozoa = protozoa_vector.at(idx);
+
+		if (protozoa == this)
+			continue;
+
+		sf::FloatRect other_bounds = protozoa->get_bounds();
+		
+		if (!m_personal_bounds_.intersects(other_bounds))
+			continue;
+	
+		for (Cell& cell : protozoa->get_cells())
+		{
+			collision_vector.push_back(&cell);
+		}
+	}
+
+	interal_collision_resolution(collision_vector);
+}
+
+void Protozoa::interal_collision_resolution(std::vector < Cell* >& cells )
+{
+	for (Cell* cellA : cells)
+	{
+		for (Cell* cellB : cells)
+		{
+			if (cellA == cellB)
+				continue;
+
+			const float dist_sq = dist_squared(cellA->position_, cellB->position_);
+			const float local_diam = cellA->radius + cellB->radius;
+
+			if (dist_sq > local_diam * local_diam)
+				continue;
+
+			// Cells are not the same & they are intersecting
+			const float dist = std::sqrt(dist_sq);
+			if (dist == 0.0f) // Prevent division by zero
+				continue;
+
+			// Compute the overlap
+			float overlap = local_diam - dist;
+
+			// Compute the collision normal
+			sf::Vector2f collisionNormal = (cellB->position_ - cellA->position_) / dist;
+
+			// Move the cells apart
+			cellA->position_ -= collisionNormal * (overlap * 0.5f);
+			cellB->position_ += collisionNormal * (overlap * 0.5f);
+		}
+	}
 }
 
 void Protozoa::update_springs()
@@ -85,6 +150,14 @@ void Protozoa::update_cells()
 	for (Cell& cell : m_cells_)
 	{
 		cell.update(m_cells_);
+	}
+}
+
+void Protozoa::bound_cells()
+{
+	// updates each cell in the organism
+	for (Cell& cell : m_cells_)
+	{
 		cell.bound(*m_world_bounds_);
 	}
 }

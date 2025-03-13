@@ -9,8 +9,8 @@
 // Each organism consists of cells which work together via springs
 // Each cell has their own radius and friction coefficient, as well as cosmetic factors such as color
 
-inline static constexpr float border_repulsion_magnitude = 0.01f; // how strong it is repelled from the border
-inline static const float max_speed = 70;
+inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
+inline static const float max_speed = 30;
 
 class Cell : public CellGene
 {
@@ -25,7 +25,7 @@ public:
 	void update(std::vector<Cell>& family_cells)
 	{
 		// TODO: this is a makeshift showcase to test the mechanics, no logic is happening here
-		static constexpr float R = 0.27f;
+		static constexpr float R = 0.08f;
 		int i = 0;
 		for (Cell& cell : family_cells)
 		{
@@ -47,12 +47,24 @@ public:
 
 	void bound(const Circle& bounds)
 	{
-		if (!bounds.contains(position_))
+		const sf::Vector2f direction = position_ - bounds.center;
+		const float dist_sq = dist_squared(position_, bounds.center);
+		const float bounds_radius = bounds.radius - radius - radius * 0.1f; // Ensure the entire circle stays inside
+		const float bounds_radius_sq = bounds_radius * bounds_radius;
+
+		if (dist_sq > bounds_radius_sq) // Outside the boundary
 		{
-			const sf::Vector2f direction = bounds.center - position_;
-			velocity_ += direction * border_repulsion_magnitude;
+			const float dist = std::sqrt(dist_sq);
+			sf::Vector2f normal = direction / dist; // Normalize direction
+
+			// Move the circle back inside
+			position_ = bounds.center + normal * bounds_radius;
+
+			// Apply velocity adjustment to prevent escaping
+			velocity_ -= normal * (border_repulsion_magnitude * (dist - bounds_radius));
 		}
 	}
+
 
 
 	void accelerate(const sf::Vector2f acceleration)

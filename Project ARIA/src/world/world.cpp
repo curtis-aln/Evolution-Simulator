@@ -24,6 +24,7 @@ World::World(sf::RenderWindow* window)
 
 void World::update_world()
 {
+	ticks++;
 	food_manager.update();
 
 	// updating the spatial grid first
@@ -35,9 +36,12 @@ void World::update_world()
 	}
 
 	for (Protozoa* protozoa : all_protozoa)
-	{
-		Container& nearby = spatial_hash_grid.find(protozoa->get_center());
-		protozoa->update(nearby);
+	{	
+		const sf::Vector2f center = protozoa->get_center();
+
+		Container& nearby = spatial_hash_grid.find(center);
+
+		protozoa->update(all_protozoa, nearby);
 	}
 }
 

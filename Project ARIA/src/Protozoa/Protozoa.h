@@ -10,6 +10,8 @@
 #include "spring.h"
 #include "genetics.h"
 
+#include "../Utils/o_vector.hpp"
+
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs
 // the protozoa class is responsible for connecting the springs and cells
 
@@ -36,15 +38,20 @@ class Protozoa : ProtozoaSettings
 	// -1 means none selected
 	int selected_cell_id = -1;
 
+	std::vector<Cell*> collision_vector;
+
 public:
+	using Protozoa_Vector = o_vector<Protozoa, WorldSettings::max_protozoa>;
+
 	int id = 0;
 	bool active = true; // for o_vector.h
 
 
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
-	void update(Container& container);
-	void collision_resolution(Container& container);
+	void update(Protozoa_Vector& protozoa_vector, Container& container);
+	void collision_resolution(Protozoa_Vector& protozoa_vector, Container& container);
+	void interal_collision_resolution(std::vector < Cell* >& cells);
 	void render(bool debug_mode = false);
 
 	// debugging and modifying settings
@@ -69,6 +76,7 @@ public:
 		return m_personal_bounds_.getPosition() + m_personal_bounds_.getSize() / 2.f;
 	}
 	
+	void bound_cells();
 
 private:
 	// rendering

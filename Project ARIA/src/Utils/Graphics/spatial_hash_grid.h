@@ -73,7 +73,7 @@ struct c_Vec
 	}
 };
 
-inline static constexpr uint8_t cell_capacity = 4;
+inline static constexpr uint8_t cell_capacity = 14;
 inline static constexpr uint8_t max_nearby_capacity = cell_capacity * 9;
 using Container = c_Vec<max_nearby_capacity>;
 
@@ -121,6 +121,7 @@ struct SpatialHashGrid
 			throw std::out_of_range("position argument out of range");
 
 		const uint32_t idx = idx2dTo1d(cIdx);
+
 		m_cells[idx].addAtom(atom);
 	}
 
@@ -141,15 +142,24 @@ struct SpatialHashGrid
 			throw std::out_of_range("find() position argument out of range");
 
 		// getting the indexes needed
-		for (unsigned x = cIdx.x - 1; x <= cIdx.x + 1; ++x)
+		for (unsigned x = cIdx.x - 1; x <= cIdx.x; ++x)
 		{
-			for (unsigned y = cIdx.y - 1; y <= cIdx.y + 1; ++y)
+			for (unsigned y = cIdx.y - 1; y <= cIdx.y; ++y)
 			{
 				const uint32_t index = idx2dTo1d({ x, y });
 
 				// if there is an error here it is probally because the position lyes on one of the boundary cells (which it shouldnt)
-				for (uint8_t i{ 0 }; i < m_cells[index].size; i++)
-					found.add(m_cells[index].objects[i]);
+				CollisionCell<cell_capacity>& cell = m_cells[index];// 22580
+				for (uint8_t i{ 0 }; i < cell.size; i++)
+				{
+					const int object = cell.objects[i];
+					found.add(object);
+
+					if (found.size > 100)
+					{
+						std::cout << "hi\n";
+					}
+				}
 			}
 		}
 

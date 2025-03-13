@@ -71,10 +71,10 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 40'000;
+	static constexpr float bounds_radius = 16'000;
 
-	static constexpr unsigned max_protozoa = 3'000;
-	static constexpr unsigned initial_protozoa = 1'000;
+	static constexpr unsigned max_protozoa = 8'000;
+	static constexpr unsigned initial_protozoa = 8'000;
 };
 
 
@@ -148,7 +148,7 @@ struct BuilderSettings
 struct FoodSettings
 {
 	static constexpr unsigned max_food = 4'000;
-	static constexpr unsigned initial_food = 2'200;
+	static constexpr unsigned initial_food = 10;
 	inline static const float food_radius = 30.f;
 	inline static const float friction = 0.99f;
 
@@ -162,3 +162,4 @@ struct FoodSettings
 	};
 
 };
+
