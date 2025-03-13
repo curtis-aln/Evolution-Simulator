@@ -13,6 +13,8 @@ World::World(sf::RenderWindow* window)
 	init_food();
 	init_environment();
 
+	temp_cells_container.reserve(max_protozoa * GeneSettings::cell_amount_range.y);
+
 	const size_t protozoa_count = all_protozoa.size();
 	const size_t predicted_cells = protozoa_count * GeneSettings::cell_amount_range.y;
 
@@ -28,20 +30,72 @@ void World::update_world()
 	food_manager.update();
 
 	// updating the spatial grid first
-	spatial_hash_grid.clear();
-	for (Protozoa* protozoa : all_protozoa)
-	{
-		const sf::Vector2f center = protozoa->get_center();
-		spatial_hash_grid.addAtom(center, protozoa->id);
-	}
+	
+	update_hash_grid();
 
 	for (Protozoa* protozoa : all_protozoa)
 	{	
-		const sf::Vector2f center = protozoa->get_center();
+		protozoa->update();
+	}
+}
 
-		Container& nearby = spatial_hash_grid.find(center);
+void World::update_hash_grid()
+{
+	temp_cells_container.clear();
 
-		protozoa->update(all_protozoa, nearby);
+	for (Protozoa* protozoa : all_protozoa)
+	{
+		for (Cell& cell : protozoa->get_cells())
+		{
+			temp_cells_container.push_back(&cell);
+		}
+	}
+
+	spatial_hash_grid.clear();
+	int idx = 0;
+	for (Cell* cell : temp_cells_container)
+	{
+		cell->bound(m_bounds_);
+		spatial_hash_grid.addAtom(cell->position_, idx++);
+	}
+
+	for (size_t i = 0; i < temp_cells_container.size(); ++i)
+	{
+		Cell* cell = temp_cells_container[i];
+		Container& nearby = spatial_hash_grid.find(cell->position_);
+
+		for (int j = 0; j < nearby.size; ++j)
+		{
+			if (nearby.at(j) <= i)  // Ensure each pair is processed only once
+				continue;
+
+			Cell* other_cell = temp_cells_container.at(nearby.at(j));
+
+
+			if (cell == other_cell)
+				continue;
+
+			const float dist_sq = dist_squared(cell->position_, other_cell->position_);
+			const float local_diam = cell->radius + other_cell->radius;
+
+			if (dist_sq > local_diam * local_diam)
+				continue;
+
+			// Cells are not the same & they are intersecting
+			const float dist = std::sqrt(dist_sq);
+			if (dist == 0.0f) // Prevent division by zero
+				continue;
+
+			// Compute the overlap
+			float overlap = local_diam - dist;
+
+			// Compute the collision normal
+			sf::Vector2f collisionNormal = (cell->position_ - other_cell->position_) / dist;
+
+			// Move the cells apart
+			cell->position_ += collisionNormal * (overlap * 0.5f);
+			other_cell->position_ -= collisionNormal * (overlap * 0.5f);
+		}
 	}
 }
 

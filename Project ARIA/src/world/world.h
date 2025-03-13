@@ -15,8 +15,8 @@
 #include "../Utils/Graphics/spatial_hash_grid.h"
 #include "../Utils/Graphics/SFML_Grid.h"
 
-inline static constexpr size_t cells_x = 80;
-inline static constexpr size_t cells_y = 80;
+inline static constexpr size_t cells_x = 110;
+inline static constexpr size_t cells_y = 110;
 
 
 class World : WorldSettings
@@ -45,6 +45,8 @@ class World : WorldSettings
 	SpatialHashGrid<cells_x, cells_y> spatial_hash_grid{ world_bounds };
 	SFML_Grid grid_renderer;
 
+	std::vector<Cell*> temp_cells_container;
+
 	int ticks = 0;
 
 public:
@@ -57,6 +59,7 @@ public:
 	World(sf::RenderWindow* window = nullptr);
 
 	void update_world();
+	void update_hash_grid();
 	void update_debug(sf::Vector2f mouse_position);
 	void render_world();
 	void render_protozoa();

@@ -55,6 +55,16 @@
 // TODO Remove the child and parent id information from cells
 // TODO user should have a radius to select and drag multiple cells at a time
 
+// New collision resolution algorithm
+// world collects all cells into a vector
+// all collision resolution happens in world class
+// border collision resolution happens there too
+// also each collision is calculated twice
+
+// current fps: 30
+// after improvements: 60fps
+// after collision slash: 82fps 
+
 int main()
 {
 	///Random::set_seed(0);

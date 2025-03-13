@@ -73,7 +73,7 @@ struct c_Vec
 	}
 };
 
-inline static constexpr uint8_t cell_capacity = 14;
+inline static constexpr uint8_t cell_capacity = 15;
 inline static constexpr uint8_t max_nearby_capacity = cell_capacity * 9;
 using Container = c_Vec<max_nearby_capacity>;
 
@@ -154,11 +154,6 @@ struct SpatialHashGrid
 				{
 					const int object = cell.objects[i];
 					found.add(object);
-
-					if (found.size > 100)
-					{
-						std::cout << "hi\n";
-					}
 				}
 			}
 		}

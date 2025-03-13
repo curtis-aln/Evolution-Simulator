@@ -15,7 +15,7 @@
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs
 // the protozoa class is responsible for connecting the springs and cells
 
-inline static constexpr float initial_energy = 100.f; // energy the protozoa spawn with
+inline static constexpr float initial_energy = 300.f; // energy the protozoa spawn with
 
 class Protozoa : ProtozoaSettings
 {
@@ -49,9 +49,7 @@ public:
 
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
-	void update(Protozoa_Vector& protozoa_vector, Container& container);
-	void collision_resolution(Protozoa_Vector& protozoa_vector, Container& container);
-	void interal_collision_resolution(std::vector < Cell* >& cells);
+	void update();
 	void render(bool debug_mode = false);
 
 	// debugging and modifying settings
