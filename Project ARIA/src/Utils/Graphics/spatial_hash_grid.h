@@ -73,14 +73,14 @@ struct c_Vec
 	}
 };
 
-inline static constexpr uint8_t cell_capacity = 15;
-inline static constexpr uint8_t max_nearby_capacity = cell_capacity * 9;
-using Container = c_Vec<max_nearby_capacity>;
 
-template <size_t dimsX, size_t dimsY>
+template <size_t dimsX, size_t dimsY, uint8_t cell_capacity>
 struct SpatialHashGrid
 {
-	CollisionCell<cell_capacity> m_cells[dimsX * dimsY] = {};
+	static constexpr uint8_t max_nearby_capacity = cell_capacity * 9;
+	using Container = c_Vec<max_nearby_capacity>;
+
+	std::vector<CollisionCell<cell_capacity>> m_cells{};
 
 	sf::Vector2f conversionFactor{};
 	Container found{};
@@ -94,6 +94,7 @@ struct SpatialHashGrid
 	// constructor and destructor
 	explicit SpatialHashGrid(const sf::Rect<float> screenSize = {})
 	{
+		m_cells.resize(dimsX * dimsY, CollisionCell<cell_capacity>());
 		init(screenSize);
 	}
 	~SpatialHashGrid() = default;

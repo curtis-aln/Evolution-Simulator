@@ -15,15 +15,11 @@
 #include "../Utils/Graphics/spatial_hash_grid.h"
 #include "../Utils/Graphics/SFML_Grid.h"
 
-inline static constexpr size_t cells_x = 110;
-inline static constexpr size_t cells_y = 110;
-
 
 class World : WorldSettings
 {
 	sf::RenderWindow* m_window_ = nullptr;
 
-	//std::vector<Protozoa> m_all_protozoa_{};
 	Protozoa::Protozoa_Vector all_protozoa{};
 
 	Circle m_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
@@ -42,7 +38,7 @@ class World : WorldSettings
 
 	// to handle collisions
 	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
-	SpatialHashGrid<cells_x, cells_y> spatial_hash_grid{ world_bounds };
+	SpatialHashGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_bounds };
 	SFML_Grid grid_renderer;
 
 	std::vector<Cell*> temp_cells_container;

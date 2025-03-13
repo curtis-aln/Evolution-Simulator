@@ -62,7 +62,7 @@ void World::update_hash_grid()
 	for (size_t i = 0; i < temp_cells_container.size(); ++i)
 	{
 		Cell* cell = temp_cells_container[i];
-		Container& nearby = spatial_hash_grid.find(cell->position_);
+		c_Vec<spatial_hash_grid.max_nearby_capacity>& nearby = spatial_hash_grid.find(cell->position_);
 
 		for (int j = 0; j < nearby.size; ++j)
 		{
