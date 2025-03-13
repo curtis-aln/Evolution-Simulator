@@ -39,7 +39,8 @@ class World : WorldSettings
 	// to handle collisions
 	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
 	SpatialHashGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_bounds };
-	SFML_Grid grid_renderer;
+	SFML_Grid cell_grid_renderer;
+	SFML_Grid food_grid_renderer;
 
 	std::vector<Cell*> temp_cells_container;
 
@@ -48,13 +49,15 @@ class World : WorldSettings
 public:
 	bool simple_mode = false;
 	bool debug_mode = false;
-	bool draw_grid = false;
+	bool draw_cell_grid = false;
+	bool draw_food_grid = false;
 
 	Protozoa* selected_protozoa = nullptr;
 
 	World(sf::RenderWindow* window = nullptr);
 
 	void update_world();
+	void reproduce_protozoa(Protozoa* protozoa);
 	void update_hash_grid();
 	void update_debug(sf::Vector2f mouse_position);
 	void render_world();
@@ -63,6 +66,16 @@ public:
 	void check_hovering(bool debug_mode, sf::Vector2f mouse_position, bool mouse_pressed);
 	bool check_pressed(sf::Vector2f mouse_position);
 	void de_select_protozoa();
+
+	int get_protozoa_count()
+	{
+		return all_protozoa.size();
+	}
+
+	int get_food_count()
+	{
+		return food_manager.get_size();
+	}
 
 private:
 	void init_organisms();

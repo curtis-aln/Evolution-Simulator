@@ -71,13 +71,13 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 80'000;
+	static constexpr float bounds_radius = 10'000;
 
-	static constexpr unsigned max_protozoa = 8'000;
-	static constexpr unsigned initial_protozoa = 8'000;
+	static constexpr unsigned max_protozoa = 3'000;
+	static constexpr unsigned initial_protozoa = 200;
 
-	inline static constexpr size_t cells_x = 200;
-	inline static constexpr size_t cells_y = 200;
+	inline static constexpr size_t cells_x = 30;
+	inline static constexpr size_t cells_y = 30;
 	inline static constexpr size_t cell_capacity = 20;
 };
 
@@ -101,9 +101,10 @@ struct GeneSettings
 {
 	inline static const sf::Vector2i cell_amount_range = { 3, 9 };
 
-	inline static const sf::Vector2f init_rest_length_range = { CellSettings::cell_radius, CellSettings::cell_radius * 4.f };
-	inline static const sf::Vector2f damping_const_range = { 0.95f, 0.99f };
-	inline static const sf::Vector2f spring_const_range = { 0.01f, 0.05f };
+	inline static const sf::Vector2f init_rest_length_range = { 0.2f, 1.f }; // 0 is a dist of cell radius and 1 is a dist of cell radius * 4
+	inline static const float rest_length_val = CellSettings::cell_radius;
+	inline static const sf::Vector2f damping_const_range = { 0.975f, 0.995f };
+	inline static const sf::Vector2f spring_const_range = { 0.01f, 0.03f };
 
 	static constexpr sf::Uint8 transparancy = 230;
 
@@ -151,8 +152,12 @@ struct BuilderSettings
 
 struct FoodSettings
 {
-	static constexpr unsigned max_food = 4'000;
-	static constexpr unsigned initial_food = 10;
+	inline static constexpr size_t cells_x = 14;
+	inline static constexpr size_t cells_y = 14;
+	inline static constexpr size_t cell_capacity = 100;
+
+	static constexpr unsigned max_food = 15'000;
+	static constexpr unsigned initial_food = 1'000;
 	inline static const float food_radius = 30.f;
 	inline static const float friction = 0.99f;
 

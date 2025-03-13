@@ -11,6 +11,7 @@
 // Protozoa can die if they're alive for too long
 // Protozoa can eat food and food replenishes
 // Protozoa can reproduce if their food eaten matches their cell count
+// Protozoa can mutate their offspring
 
 /* Graphics */
 // Create a RectBuffer and re-introduce the connections

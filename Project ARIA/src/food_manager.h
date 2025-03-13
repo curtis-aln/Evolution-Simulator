@@ -6,6 +6,7 @@
 #include "Utils/Graphics/Circle.h" // world boundary
 #include "Utils/random.h"
 #include "settings.h"
+#include "Utils/Graphics/spatial_hash_grid.h"
 
 struct Food
 {
@@ -26,16 +27,41 @@ class FoodManager : FoodSettings
 	o_vector<Food, max_food> food_vector{};
 
 public:
+	const float bounds_radius = world_bounds_->radius;
+	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
+	SpatialHashGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_bounds };
+	const uint8_t max_nearby_capacity = spatial_hash_grid.max_nearby_capacity;
+
+public:
 	FoodManager(sf::RenderWindow* window, Circle* world_bounds) : window_(window), world_bounds_(world_bounds)
 	{
 		init_renderer();
 		init_food();
 	}
 
+	int get_size()
+	{
+		return food_vector.size();
+	}
+
 
 	void update()
 	{
+		int size = food_vector.size();
+		if (size < initial_food)
+		{
+			for (int i = 0; i < initial_food - size; ++i)
+			{
+				Food* food = food_vector.add();
+				food->position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
+			}
+		}
 
+		spatial_hash_grid.clear();
+		for (Food* food : food_vector)
+		{
+			spatial_hash_grid.addAtom(food->position, food->id);
+		}
 	}
 
 	void render()
@@ -57,6 +83,10 @@ public:
 		food_vector.remove(food_id);
 	}
 
+	Food* at(int idx)
+	{
+		return food_vector.at(idx);
+	}
 
 private:
 	void init_renderer()

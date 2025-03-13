@@ -3,6 +3,7 @@
 #include <stdexcept> // Required for std::runtime_error
 
 #include "../../Utils/Graphics/spatial_hash_grid.h"
+#include "../../food_manager.h"
 
 inline static constexpr float spawn_radius = 100.f; // todo move to settings
 
@@ -19,8 +20,6 @@ Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, cons
 		initialise_cells();
 		initialise_springs();
 	}
-
-	collision_vector.reserve(30); // todo
 }
 
 void Protozoa::initialise_cells()
@@ -49,7 +48,7 @@ void Protozoa::initialise_springs()
 }
 
 
-void Protozoa::update()
+void Protozoa::update(FoodManager& food_manager)
 {
 	if (m_cells_.empty()) // No computation is needed if there are no cells
 		return;
@@ -59,7 +58,14 @@ void Protozoa::update()
 
 	update_bounding_box();
 
+	handle_food(food_manager);
+
 	++frames_alive;
+
+	if (frames_alive > 1000)
+	{
+		dead = true;
+	}
 
 }
 
@@ -71,7 +77,7 @@ void Protozoa::update_springs()
 	{
 		Cell& cell_A = m_cells_[spring.cell_A_id];
 		Cell& cell_B = m_cells_[spring.cell_B_id];
-		spring.update(cell_A, cell_B);
+		spring.update(cell_A, cell_B, frames_alive);
 	}
 }
 
@@ -80,7 +86,7 @@ void Protozoa::update_cells()
 	// updates each cell in the organism
 	for (Cell& cell : m_cells_)
 	{
-		cell.update(m_cells_);
+		cell.update();
 	}
 }
 

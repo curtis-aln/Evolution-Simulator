@@ -22,22 +22,8 @@ public:
 	{}
 
 
-	void update(std::vector<Cell>& family_cells)
+	void update()
 	{
-		// TODO: this is a makeshift showcase to test the mechanics, no logic is happening here
-		static constexpr float R = 0.08f;
-		int i = 0;
-		for (Cell& cell : family_cells)
-		{
-			if (cell.id == id) // cells cant interact with themselves
-				continue;
-			
-			// interacting with the other cell
-			const sf::Vector2f direction = normalize(position_ - cell.position_);
-			const float magnitude = R * ((i++ % 2 == 0) * 2 - 1);
-			velocity_ += direction * magnitude;
-		}
-
 		// updating velocity and position vectors
 		clamp_velocity();
 		position_ += velocity_;

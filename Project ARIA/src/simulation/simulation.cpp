@@ -250,7 +250,8 @@ void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 	case sf::Keyboard::Escape: running = false; break;
 	case sf::Keyboard::Space:  m_paused_ = not m_paused_; break;
 	case sf::Keyboard::R:      m_rendering_ = not m_rendering_; break;
-	case sf::Keyboard::G:      m_world_.draw_grid = not m_world_.draw_grid; break;
+	case sf::Keyboard::G:      m_world_.draw_cell_grid = not m_world_.draw_cell_grid; break;
+	case sf::Keyboard::F:      m_world_.draw_food_grid = not m_world_.draw_food_grid; break;
 	case sf::Keyboard::D:      
 		m_debug_ = not m_debug_; 
 		m_world_.debug_mode = not m_world_.debug_mode;
@@ -290,6 +291,6 @@ void Simulation::manage_frame_rate()
 
 	// Display FPS in the title bar
 	std::ostringstream title;
-	title << simulation_name << " | FPS: " << std::fixed << std::setprecision(1) << fps_;
+	title << simulation_name << " | FPS: " << std::fixed << std::setprecision(1) << fps_ << " | protozoa: " << m_world_.get_protozoa_count() << " | food: " << m_world_.get_food_count();
 	m_window_.setTitle(title.str());
 }

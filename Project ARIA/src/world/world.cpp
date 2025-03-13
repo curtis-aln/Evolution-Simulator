@@ -7,7 +7,8 @@
 World::World(sf::RenderWindow* window)
 	: m_window_(window),
 	border_render_(make_circle(m_bounds_.radius, m_bounds_.center)),
-	grid_renderer(*window, world_bounds, cells_x, cells_y)
+	cell_grid_renderer(*window, world_bounds, cells_x, cells_y),
+	food_grid_renderer(*window, world_bounds, FoodSettings::cells_x, FoodSettings::cells_y)
 { 
 	init_organisms();
 	init_food();
@@ -33,10 +34,45 @@ void World::update_world()
 	
 	update_hash_grid();
 
+	std::vector<int> reproduce_indexes{};
+	reproduce_indexes.reserve(max_protozoa);
 	for (Protozoa* protozoa : all_protozoa)
 	{	
-		protozoa->update();
+		protozoa->update(food_manager);
+
+		if (protozoa->reproduce)
+		{
+			reproduce_indexes.push_back(protozoa->id);
+		}
+
+		if (protozoa->dead)
+		{
+			all_protozoa.remove(protozoa);
+		}
 	}
+
+	for (int idx : reproduce_indexes)
+	{
+		reproduce_protozoa(all_protozoa.at(idx));
+	}
+}
+
+void World::reproduce_protozoa(Protozoa* parent)
+{
+	parent->reproduce = false;
+	Protozoa* offspring = all_protozoa.add();
+
+	if (offspring == nullptr)
+	{
+		return;
+	}
+	
+	// first we assign the genetic aspects of the offspring to match that of the parents, then reconstruct it
+	offspring->set_cells_and_springs(parent->get_cells(), parent->get_springs());
+	offspring->take_parents_genetics(parent->get_genes());
+	offspring->frames_alive = 0;
+	offspring->generation += 1;
+	offspring->dead = false;
 }
 
 void World::update_hash_grid()
@@ -111,9 +147,14 @@ void World::update_debug(const sf::Vector2f mouse_position)
 void World::render_world()
 {
 	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.
-	if (draw_grid)
+	if (draw_cell_grid)
 	{
-		grid_renderer.draw();
+		cell_grid_renderer.draw();
+	}
+
+	if (draw_food_grid)
+	{
+		food_grid_renderer.draw();
 	}
 
 	update_position_data();

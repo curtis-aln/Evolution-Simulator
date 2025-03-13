@@ -13,7 +13,7 @@ struct Spring : public SpringGene
 	Spring(SpringGene& gene) : SpringGene(gene)
 	{ };
 
-	void update(Cell& cell_a, Cell& cell_b)
+	void update(Cell& cell_a, Cell& cell_b, int internal_clock)
 	{
 		const sf::Vector2f pos_a = cell_a.position_;
 		const sf::Vector2f pos_b = cell_b.position_;
@@ -23,6 +23,9 @@ struct Spring : public SpringGene
 		const float dist = length(pos_b - pos_a);
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
+		const float new_rest_length = sin(internal_clock * 1.f/720.f);
+		const float real_rest_length = new_rest_length * rest_length_val * 5.f + rest_length_val;
+
 		const float spring_force = spring_constant * (dist - rest_length);
 
 		// Calculating the damping force

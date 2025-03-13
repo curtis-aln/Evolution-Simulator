@@ -11,6 +11,7 @@
 #include "genetics.h"
 
 #include "../Utils/o_vector.hpp"
+#include "../food_manager.h"
 
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs
 // the protozoa class is responsible for connecting the springs and cells
@@ -30,6 +31,7 @@ class Protozoa : ProtozoaSettings
 
 	ProtozoaGenes m_genes_{}; // information which is passed from generation to generation
 	
+public:
 	float energy = initial_energy;
 	unsigned frames_alive = 0u;
 	unsigned generation = 0u;
@@ -38,18 +40,18 @@ class Protozoa : ProtozoaSettings
 	// -1 means none selected
 	int selected_cell_id = -1;
 
-	std::vector<Cell*> collision_vector;
-
-public:
 	using Protozoa_Vector = o_vector<Protozoa, WorldSettings::max_protozoa>;
 
 	int id = 0;
 	bool active = true; // for o_vector.h
 
+	bool reproduce = false;
+	bool dead = false;
 
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
-	void update();
+	void update(FoodManager& food_manager);
+	void handle_food(FoodManager& food_manager);
 	void render(bool debug_mode = false);
 
 	// debugging and modifying settings
@@ -63,7 +65,9 @@ public:
 	// information fetching
 	Cell* get_selected_cell(sf::Vector2f mouse_pos);
 	std::vector<Cell>& get_cells();
+	std::vector<Spring>& get_springs() { return m_springs_; }
 	sf::Rect<float> get_bounds() { return m_personal_bounds_; }
+	ProtozoaGenes& get_genes() { return m_genes_; }
 
 	// information setting
 	void set_render_window(sf::RenderWindow* window);
@@ -75,6 +79,17 @@ public:
 	}
 	
 	void bound_cells();
+
+	void set_cells_and_springs(std::vector<Cell>& cells, std::vector<Spring>& springs)
+	{
+		m_cells_ = cells;
+		m_springs_ = springs;
+	}
+
+	void take_parents_genetics(ProtozoaGenes& parent_genes)
+	{
+		m_genes_ = parent_genes;
+	}
 
 private:
 	// rendering
