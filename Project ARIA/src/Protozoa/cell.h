@@ -19,7 +19,8 @@ struct Cell : public GeneSettings
 	sf::Color inner_color = Random::rand_val_in_vector(inner_colors);
 
 	float radius = CellSettings::cell_radius;
-	float friction = 0.99f; // todo
+	
+	float vibration = Random::rand_range(cell_vibration_range);
 
 	sf::Vector2f position_{};
 	sf::Vector2f velocity_{};
@@ -31,11 +32,15 @@ struct Cell : public GeneSettings
 
 	}
 
-	void update()
+	void update(int internal_clock)
 	{
 		// updating velocity and position vectors
 		clamp_velocity();
 		position_ += velocity_;
+
+		const float fric_range = friction_range.y - friction_range.x;
+		const float friction_ratio = sin(internal_clock * vibration); // todo lich unfinished
+		const float friction = fric_range * friction_ratio + friction_range.x;
 		velocity_ *= friction;
 	}
 

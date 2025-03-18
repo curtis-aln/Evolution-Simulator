@@ -6,9 +6,10 @@
 
 struct Spring : public GeneSettings
 {
-	float rest_length = Random::rand_range(init_rest_length_range);
+	float rest_length_range = Random::rand_range(rest_length_ranges);
 	float damping = Random::rand_range(damping_const_range);
 	float spring_constant = Random::rand_range(spring_const_range);
+	float vibration = Random::rand_range(spring_vibration_range);
 
 	sf::Color outer_color = Random::rand_val_in_vector(outer_colors);
 	sf::Color inner_color = Random::rand_val_in_vector(inner_colors);
@@ -38,8 +39,8 @@ struct Spring : public GeneSettings
 		const float dist = length(pos_b - pos_a);
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
-		const float new_rest_length = sin(internal_clock * 1.f/720.f);
-		const float real_rest_length = new_rest_length * rest_length_val * 5.f + rest_length_val;
+		const float rest_length_ratio = sin(internal_clock * vibration); // value between 0 and 1
+		const float rest_length = rest_length_ratio * rest_length_val * 5.f + rest_length_val;
 
 		const float spring_force = spring_constant * (dist - rest_length);
 

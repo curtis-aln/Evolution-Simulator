@@ -83,7 +83,7 @@ void Protozoa::update_cells()
 	// updates each cell in the organism
 	for (Cell& cell : m_cells_)
 	{
-		cell.update();
+		cell.update(frames_alive);
 	}
 }
 
