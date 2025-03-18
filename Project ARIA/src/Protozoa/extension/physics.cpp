@@ -27,23 +27,20 @@ void Protozoa::initialise_cells()
 	// cells are spawned in clusters around an origin
 	const Circle protozoa_area = { m_world_bounds_->rand_pos(), spawn_radius };
 
-	m_cells_.reserve(m_genes_.cell_count);
-	for (CellGene& gene : m_genes_.cell_genes) // i literally think we can remove the gene class
+	m_cells_.reserve(cell_count);
+	for (int i = 0; i < cell_count; ++i)
 	{
-		Cell cell = { gene };
-		cell.position_ = protozoa_area.rand_pos();
-
-		m_cells_.emplace_back(cell);
+		m_cells_.emplace_back(i, protozoa_area.rand_pos());
 	}
 }
 
 void Protozoa::initialise_springs()
 {
-	m_springs_.reserve(m_genes_.spring_genes.size());
+	m_springs_.reserve(cell_count);
 
-	for (SpringGene& gene : m_genes_.spring_genes)
+	for (int i = 1; i < cell_count; ++i)
 	{
-		m_springs_.emplace_back(gene);
+		m_springs_.emplace_back(i, Random::rand_range(0, i - 1));
 	}
 }
 

@@ -47,9 +47,6 @@
     <ClInclude Include="src\Protozoa\Protozoa.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Protozoa\genetics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Utils\Random.h">
       <Filter>Header Files</Filter>
     </ClInclude>

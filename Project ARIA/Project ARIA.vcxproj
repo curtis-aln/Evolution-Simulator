@@ -147,7 +147,6 @@
     <ClInclude Include="src\builder\builder.h" />
     <ClInclude Include="src\food_manager.h" />
     <ClInclude Include="src\Protozoa\cell.h" />
-    <ClInclude Include="src\Protozoa\genetics.h" />
     <ClInclude Include="src\Protozoa\Protozoa.h" />
     <ClInclude Include="src\Protozoa\spring.h" />
     <ClInclude Include="src\settings.h" />

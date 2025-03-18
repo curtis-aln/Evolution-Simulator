@@ -69,7 +69,6 @@ void World::reproduce_protozoa(Protozoa* parent)
 	
 	// first we assign the genetic aspects of the offspring to match that of the parents, then reconstruct it
 	offspring->set_cells_and_springs(parent->get_cells(), parent->get_springs());
-	offspring->take_parents_genetics(parent->get_genes());
 	offspring->frames_alive = 0;
 	offspring->generation += 1;
 	offspring->dead = false;

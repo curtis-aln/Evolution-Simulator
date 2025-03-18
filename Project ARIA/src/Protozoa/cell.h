@@ -2,7 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "genetics.h"
 #include "../Utils/utility.h"
 #include "../Utils/random.h"
 
@@ -12,15 +11,25 @@
 inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
 inline static const float max_speed = 30;
 
-class Cell : public CellGene
+struct Cell : public GeneSettings
 {
-public:
+	int id{}; // Unique identifier relative to the protozoa
+
+	sf::Color outer_color = Random::rand_val_in_vector(outer_colors);
+	sf::Color inner_color = Random::rand_val_in_vector(inner_colors);
+
+	float radius = CellSettings::cell_radius;
+	float friction = 0.99f; // todo
+
 	sf::Vector2f position_{};
 	sf::Vector2f velocity_{};
 
-	Cell(const CellGene& info) : CellGene(info)
-	{}
 
+	Cell(const int _id, const sf::Vector2f position)
+		: id(_id), position_(position)
+	{
+
+	}
 
 	void update()
 	{

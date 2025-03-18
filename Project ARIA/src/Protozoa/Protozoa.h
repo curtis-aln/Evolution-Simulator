@@ -6,19 +6,22 @@
 #include "../Utils/utility_SFML.h"
 #include "../Utils/Graphics/Circle.h"
 #include "../Utils/Graphics/spatial_hash_grid.h"
+#include "../Utils/NeuralNetworks/GeneticNeuralNetwork.h"
 #include "cell.h"
 #include "spring.h"
-#include "genetics.h"
+
 
 #include "../Utils/o_vector.hpp"
 #include "../food_manager.h"
+#include "../Utils/random.h"
+
 
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs
 // the protozoa class is responsible for connecting the springs and cells
 
 inline static constexpr float initial_energy = 300.f; // energy the protozoa spawn with
 
-class Protozoa : ProtozoaSettings
+class Protozoa : ProtozoaSettings, GeneSettings
 {
 	sf::RenderWindow* m_window_ = nullptr; // for rendering // todo move all rendering outside this class
 	Circle* m_world_bounds_ = nullptr;
@@ -29,7 +32,9 @@ class Protozoa : ProtozoaSettings
 
 	sf::Rect<float> m_personal_bounds_{};
 
-	ProtozoaGenes m_genes_{}; // information which is passed from generation to generation
+	// information which is passed from generation to generation
+	size_t cell_count = Random::rand_range(cell_amount_range);
+	GeneticNeuralNetwork neural_network;
 	
 public:
 	float energy = initial_energy;
@@ -67,7 +72,6 @@ public:
 	std::vector<Cell>& get_cells();
 	std::vector<Spring>& get_springs() { return m_springs_; }
 	sf::Rect<float> get_bounds() { return m_personal_bounds_; }
-	ProtozoaGenes& get_genes() { return m_genes_; }
 
 	// information setting
 	void set_render_window(sf::RenderWindow* window);
@@ -84,11 +88,6 @@ public:
 	{
 		m_cells_ = cells;
 		m_springs_ = springs;
-	}
-
-	void take_parents_genetics(ProtozoaGenes& parent_genes)
-	{
-		m_genes_ = parent_genes;
 	}
 
 private:

@@ -4,14 +4,29 @@
 #include "../Utils/random.h"
 #include "cell.h"
 
-struct Spring : public SpringGene
+struct Spring : public GeneSettings
 {
+	float rest_length = Random::rand_range(init_rest_length_range);
+	float damping = Random::rand_range(damping_const_range);
+	float spring_constant = Random::rand_range(spring_const_range);
+
+	sf::Color outer_color = Random::rand_val_in_vector(outer_colors);
+	sf::Color inner_color = Random::rand_val_in_vector(inner_colors);
+
+	int cell_A_id{};
+	int cell_B_id{};
+
+
 	// for debugging
 	sf::Vector2f direction_A_force{};
 	sf::Vector2f direction_B_force{};
 
-	Spring(SpringGene& gene) : SpringGene(gene)
-	{ };
+
+	Spring(const int _cell_A_id, const int _cell_B_id)
+		: cell_A_id(_cell_A_id), cell_B_id(_cell_B_id)
+	{
+
+	}
 
 	void update(Cell& cell_a, Cell& cell_b, int internal_clock)
 	{
