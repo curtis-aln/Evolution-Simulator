@@ -71,13 +71,13 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 30'000;
+	static constexpr float bounds_radius = 80'000;
 
-	static constexpr unsigned max_protozoa = 3'000;
-	static constexpr unsigned initial_protozoa = 200;
+	static constexpr unsigned max_protozoa = 20'000;
+	static constexpr unsigned initial_protozoa = 10'000;
 
-	inline static constexpr size_t cells_x = 50;
-	inline static constexpr size_t cells_y = 50;
+	inline static constexpr size_t cells_x = 100;
+	inline static constexpr size_t cells_y = 100;
 	inline static constexpr size_t cell_capacity = 20;
 };
 
@@ -99,17 +99,17 @@ struct CellSettings
 
 struct GeneSettings
 {
-	inline static const sf::Vector2i cell_amount_range = { 2, 6 };
+	inline static const sf::Vector2i cell_amount_range = { 2, 2 };
 
-	inline static const sf::Vector2f rest_length_ranges = { 0.2f, 1.f }; // 0 is a dist of cell radius and 1 is a dist of cell radius * 4
+	inline static const sf::Vector2f rest_length_ranges = { 0., 1.f }; // 0 is a dist of cell radius and 1 is a dist of cell radius * 4
 	inline static const float rest_length_val = CellSettings::cell_radius;
-	inline static const sf::Vector2f friction_range = { 0.5f, 0.95f };
+	inline static const sf::Vector2f friction_range = { 0.90f, 0.998f };
 
 	inline static const sf::Vector2f damping_const_range = { 0.975f, 0.995f };
-	inline static const sf::Vector2f spring_const_range = { 0.01f, 0.03f };
-	inline static const sf::Vector2f spring_vibration_range = { 1.f / 180.f, 1.f / 1200.f }; // how often the spring length changes from minimum to maximum
-	inline static const sf::Vector2f cell_vibration_range   = { 1.f / 180.f, 1.f / 1200.f };
-
+	inline static const sf::Vector2f spring_const_range = { 0.01f, 0.06f };
+	inline static const sf::Vector2f spring_vibration_range = { 30, 200 }; // how often the spring length changes from minimum to maximum
+	inline static const sf::Vector2f cell_vibration_range   = { 30, 200 };
+	
 	static constexpr sf::Uint8 transparancy = 230;
 
 	inline static const std::vector<sf::Color> inner_colors = {
@@ -156,12 +156,12 @@ struct BuilderSettings
 
 struct FoodSettings
 {
-	inline static constexpr size_t cells_x = 24;
-	inline static constexpr size_t cells_y = 24;
-	inline static constexpr size_t cell_capacity = 100;
+	inline static constexpr size_t cells_x = 110;
+	inline static constexpr size_t cells_y = 110;
+	inline static constexpr size_t cell_capacity = 20;
 
-	static constexpr unsigned max_food = 15'000;
-	static constexpr unsigned initial_food = 10'000;
+	static constexpr unsigned max_food = 65'000;
+	static constexpr unsigned initial_food = 65'000;
 	inline static const float food_radius = 30.f;
 	inline static const float friction = 0.99f;
 

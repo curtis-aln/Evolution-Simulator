@@ -39,7 +39,7 @@ struct Spring : public GeneSettings
 		const float dist = length(pos_b - pos_a);
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
-		const float rest_length_ratio = sin(internal_clock * vibration); // value between 0 and 1
+		const float rest_length_ratio = 0.5f * (sin(internal_clock * vibration) + 1.0f); // value between 0 and 1
 		const float rest_length = rest_length_ratio * rest_length_val * 5.f + rest_length_val;
 
 		const float spring_force = spring_constant * (dist - rest_length);
