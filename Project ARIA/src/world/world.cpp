@@ -72,6 +72,7 @@ void World::reproduce_protozoa(Protozoa* parent)
 	offspring->frames_alive = 0;
 	offspring->generation += 1;
 	offspring->dead = false;
+	offspring->mutate();
 }
 
 void World::update_hash_grid()

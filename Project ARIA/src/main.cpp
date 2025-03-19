@@ -7,9 +7,6 @@
 // ********** Currently Working On ********** //
 
 /* Features */
-// Variable time period for springs
-// Variable friction for Cells
-// Offspring mutation
 // World size gradually increases
 // A Dynamic Quad Tree with auto local and global resizing
 

@@ -20,3 +20,29 @@ void Protozoa::handle_food(FoodManager& food_manager)
 	}
 
 }
+
+inline static constexpr float cell_mutation_rate = 0.01f;
+inline static constexpr float cell_mutation_range = 0.01f;
+inline static constexpr float spring_mutation_rate = 0.01f;
+inline static constexpr float spring_mutation_range = 0.01f;
+
+void Protozoa::mutate()
+{
+	// mutating the cells in this organism
+	for (Cell& cell : m_cells_)
+	{
+		if (Random::rand01_float() < cell_mutation_rate)
+		{
+			cell.vibration += Random::rand11_float() * cell_mutation_range;
+		}
+	}
+
+	// mutating the springs in this organism
+	for (Spring& spring : m_springs_)
+	{
+		if (Random::rand01_float() < spring_mutation_rate)
+		{
+			spring.vibration += Random::rand11_float() * spring_mutation_range;
+		}
+	}
+}

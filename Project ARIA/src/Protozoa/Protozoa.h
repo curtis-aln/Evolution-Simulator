@@ -57,6 +57,7 @@ public:
 
 	void update(FoodManager& food_manager);
 	void handle_food(FoodManager& food_manager);
+	void mutate();
 	void render(bool debug_mode = false);
 
 	// debugging and modifying settings
