@@ -20,7 +20,6 @@
 #include <chrono>
 
 inline static constexpr int frame_smoothing = 30;
-inline static constexpr float dt = 1.0f / 60.0f; // 30 updates per second
 inline const static bool full_screen = false;  // Change this value to toggle fullscreen mode
 inline const static double resize_shrinkage = 0.95;
 
@@ -41,7 +40,7 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	sf::RenderWindow m_window_{videoMode, "Project ARIA", windowStyle};
 
 	FrameRateSmoothing<frame_smoothing> m_clock_{};
-	Camera camera_{&m_window_, 0.25f};
+	Camera camera_{&m_window_, 1.f};
 	Builder m_builder_{&m_window_};
 
 	// managing time

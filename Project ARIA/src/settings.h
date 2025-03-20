@@ -99,7 +99,7 @@ struct CellSettings
 
 struct GeneSettings
 {
-	inline static const sf::Vector2i cell_amount_range = { 2, 2 };
+	inline static const sf::Vector2i cell_amount_range = { 2, 4 };
 
 	inline static const sf::Vector2f rest_length_ranges = { 0., 1.f }; // 0 is a dist of cell radius and 1 is a dist of cell radius * 4
 	inline static const float rest_length_val = CellSettings::cell_radius;

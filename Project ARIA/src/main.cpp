@@ -15,6 +15,7 @@
 
 
 /* Debug */
+// red lines from the center of mass to food
 // fix "(failed to create the font face)" bug
 // connections are drawn ontop of the cells which is wrong
 // Advanced cell debug mode

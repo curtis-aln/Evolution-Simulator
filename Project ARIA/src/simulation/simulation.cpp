@@ -21,6 +21,11 @@ Simulation::Simulation() : m_world_(&m_window_)
 	m_window_.setFramerateLimit(frame_rate);
 	m_window_.setVerticalSyncEnabled(vsync);
 
+	const float rad = WorldSettings::bounds_radius;
+	camera_.translate({ -rad, -rad });
+	camera_.zoom(-1000);
+	camera_.update_window_view();
+
 	title_font.set_render_window(&m_window_); 
 	regular_font.set_render_window(&m_window_);
 	cell_statistic_font.set_render_window(&m_window_);

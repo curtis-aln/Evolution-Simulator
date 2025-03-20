@@ -103,13 +103,12 @@ public:
         update_window_view();
     }
 
-
-private:
     void update_window_view() const
     {
         m_window_ptr_->setView(m_view_);
     }
 
+private:
     [[nodiscard]] float get_zoom_scale(float delta) const
     {
         return delta > 0 ? 1.0f + m_zoom_strength_ : 1.0f - m_zoom_strength_;

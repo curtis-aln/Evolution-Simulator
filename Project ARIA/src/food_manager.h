@@ -32,6 +32,8 @@ public:
 	SpatialHashGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_bounds };
 	const uint8_t max_nearby_capacity = spatial_hash_grid.max_nearby_capacity;
 
+	int frames = 0;
+
 public:
 	FoodManager(sf::RenderWindow* window, Circle* world_bounds) : window_(window), world_bounds_(world_bounds)
 	{
@@ -48,11 +50,13 @@ public:
 	void update()
 	{
 		int size = food_vector.size();
-		if (size < initial_food)
+		if (size < initial_food && frames++ % 2 == 0)
 		{
-			for (int i = 0; i < initial_food - size; ++i)
+			for (int i = 0; i < 6; ++i)
 			{
 				Food* food = food_vector.add();
+				if (food == nullptr)
+					break;
 				food->position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
 			}
 		}

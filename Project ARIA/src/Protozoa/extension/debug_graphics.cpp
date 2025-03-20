@@ -12,7 +12,12 @@ void Protozoa::render(bool debug_mode)
 
 	if (debug_mode)
 	{
-		render_debug();
+		// This is the bounding box of the protozoa, used for external collision events
+		draw_rect_outline(m_personal_bounds_, *m_window_);
+
+		draw_cell_physics();
+		draw_cell_stats_info();
+		draw_spring_information();
 	}
 }
 
@@ -37,11 +42,9 @@ void Protozoa::render_cell_connections(Cell& cell, const bool thick_lines) const
 	}
 }
 
-void Protozoa::render_debug()
-{
-	// This is the bounding box of the protozoa, used for external collision events
-	draw_rect_outline(m_personal_bounds_, *m_window_);
 
+void Protozoa::draw_cell_physics()
+{
 	Font& font = TextSettings::cell_statistic_font;
 
 	// for each cell we draw its bounding box
@@ -56,13 +59,19 @@ void Protozoa::render_debug()
 		render_cell_connections(cell);
 
 		// drawing the direction of the cell
-		const float arrow_length = std::min(rad*4, length(cell.velocity_) * rad);
+		const float arrow_length = std::min(rad * 4, length(cell.velocity_) * rad);
 		draw_direction(*m_window_, pos, cell.velocity_, arrow_length, 6, 10,
 			{ 200, 220, 200 }, { 190, 200, 190 });
 
 		// drawing cell stats
 		font.draw({ rect.left, rect.top + rect.height + 5 }, "id: " + std::to_string(cell.id), false);
 	}
+}
+
+
+void Protozoa::draw_cell_stats_info()
+{
+	Font& font = TextSettings::cell_statistic_font;
 
 	// protozoa information under the bounding box
 	const sf::Vector2f start_pos = { m_personal_bounds_.left, m_personal_bounds_.top + m_personal_bounds_.height + 10 };
@@ -73,22 +82,25 @@ void Protozoa::render_debug()
 		"energy: " + std::to_string(energy);
 
 	font.draw(start_pos, combined_string, false);
+}
 
+
+void Protozoa::draw_spring_information()
+{
 	// spring information
 	for (const Spring& spring : m_springs_)
 	{
 		const sf::Vector2f cell_A_pos = m_cells_[spring.cell_A_id].position_;
 		const sf::Vector2f cell_B_pos = m_cells_[spring.cell_B_id].position_;
-	
+
 		const sf::Vector2f mid_point = get_midpoint(cell_A_pos, cell_B_pos);
 		const sf::Vector2f upper_quartile = get_midpoint(mid_point, cell_B_pos);
 		const sf::Vector2f lower_quartile = get_midpoint(cell_A_pos, mid_point);
-	
+
 		TextSettings::cell_statistic_font.draw(lower_quartile, vector_to_string(spring.direction_A_force, 2), true);
 		TextSettings::cell_statistic_font.draw(upper_quartile, vector_to_string(spring.direction_B_force, 2), true);
 	}
 }
-
 
 
 void Protozoa::builder_add_cell(const sf::Vector2f center)

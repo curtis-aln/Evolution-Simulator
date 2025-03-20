@@ -35,6 +35,9 @@ class Protozoa : ProtozoaSettings, GeneSettings
 	// information which is passed from generation to generation
 	size_t cell_count = Random::rand_range(cell_amount_range);
 	GeneticNeuralNetwork neural_network;
+
+	// debugging
+	std::vector<sf::Vector2f> food_positions_nearby{};
 	
 public:
 	float energy = initial_energy;
@@ -93,7 +96,9 @@ public:
 
 private:
 	// rendering
-	void render_debug();
+	void draw_cell_physics();
+	void draw_cell_stats_info();
+	void draw_spring_information();
 	void render_cell_connections(Cell& cell, bool thick_lines = false) const;
 
 	// updating
