@@ -156,8 +156,8 @@ struct BuilderSettings
 
 struct FoodSettings
 {
-	inline static constexpr size_t cells_x = 110;
-	inline static constexpr size_t cells_y = 110;
+	inline static constexpr size_t cells_x = 240;
+	inline static constexpr size_t cells_y = 240;
 	inline static constexpr size_t cell_capacity = 20;
 
 	static constexpr unsigned max_food = 65'000;

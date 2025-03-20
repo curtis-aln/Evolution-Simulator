@@ -12,6 +12,7 @@ Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, cons
 {
 
 	food_positions_nearby.reserve(30);
+	cell_positions_nearby.reserve(30);
 
 	if (world_bounds == nullptr)
 	{
@@ -33,7 +34,7 @@ void Protozoa::initialise_cells()
 	m_cells_.reserve(cell_count);
 	for (int i = 0; i < cell_count; ++i)
 	{
-		m_cells_.emplace_back(i, protozoa_area.rand_pos());
+		m_cells_.emplace_back(i, id, protozoa_area.rand_pos());
 	}
 }
 

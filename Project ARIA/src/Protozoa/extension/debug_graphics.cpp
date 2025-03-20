@@ -18,6 +18,23 @@ void Protozoa::render(bool debug_mode)
 		draw_cell_physics();
 		draw_cell_stats_info();
 		draw_spring_information();
+		nearby_food_information();
+	}
+
+}
+
+
+void Protozoa::nearby_food_information()
+{
+	const sf::Vector2f center = get_center();
+	for (sf::Vector2f pos : food_positions_nearby)
+	{
+		m_window_->draw(make_line(center, pos, sf::Color::Magenta));
+	}
+
+	for (sf::Vector2f pos : cell_positions_nearby)
+	{
+		m_window_->draw(make_line(center, pos, sf::Color::Yellow));
 	}
 }
 

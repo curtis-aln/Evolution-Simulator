@@ -28,16 +28,19 @@ World::World(sf::RenderWindow* window)
 void World::update_world()
 {
 	ticks++;
-	food_manager.update();
-
-	// updating the spatial grid first
-	
 	update_hash_grid();
 
+	food_manager.update();
+
+	update_protozoas();
+}
+
+void World::update_protozoas()
+{
 	std::vector<int> reproduce_indexes{};
 	reproduce_indexes.reserve(max_protozoa);
 	for (Protozoa* protozoa : all_protozoa)
-	{	
+	{
 		protozoa->update(food_manager);
 
 		if (protozoa->reproduce)
@@ -73,9 +76,14 @@ void World::reproduce_protozoa(Protozoa* parent)
 	offspring->generation += 1;
 	offspring->dead = false;
 	offspring->mutate();
+
+	for (Cell& cell : offspring->get_cells())
+	{
+		cell.protozoa_id = offspring->id;
+	}
 }
 
-void World::update_hash_grid()
+void World::update_cells_container()
 {
 	temp_cells_container.clear();
 
@@ -86,7 +94,10 @@ void World::update_hash_grid()
 			temp_cells_container.push_back(&cell);
 		}
 	}
+}
 
+void World::add_cells_to_hash_grid()
+{
 	spatial_hash_grid.clear();
 	int idx = 0;
 	for (Cell* cell : temp_cells_container)
@@ -94,6 +105,13 @@ void World::update_hash_grid()
 		cell->bound(m_bounds_);
 		spatial_hash_grid.addAtom(cell->position_, idx++);
 	}
+}
+
+void World::update_hash_grid()
+{
+	update_cells_container();
+	add_cells_to_hash_grid();
+	
 
 	for (size_t i = 0; i < temp_cells_container.size(); ++i)
 	{
@@ -107,9 +125,17 @@ void World::update_hash_grid()
 
 			Cell* other_cell = temp_cells_container.at(nearby.at(j));
 
-
 			if (cell == other_cell)
 				continue;
+
+			if (debug_mode)
+			{
+				Protozoa* protozoa = all_protozoa.at(cell->protozoa_id);
+				protozoa->cell_positions_nearby.push_back(other_cell->position_);
+
+				Protozoa* other_protozoa = all_protozoa.at(other_cell->protozoa_id);
+				other_protozoa->cell_positions_nearby.push_back(cell->position_);
+			}
 
 			const float dist_sq = dist_squared(cell->position_, other_cell->position_);
 			const float local_diam = cell->radius + other_cell->radius;
@@ -188,6 +214,11 @@ void World::render_protozoa()
 	{
 		selected_protozoa->render(true);
 	}
+
+	for (Protozoa* protozoa : all_protozoa)
+	{
+		protozoa->cell_positions_nearby.clear();
+	}
 }
 
 void World::update_position_data()
@@ -263,7 +294,6 @@ bool World::check_pressed(const sf::Vector2f mouse_position)
 	}
 	return false;
 }
-
 
 void World::de_select_protozoa()
 {

@@ -35,11 +35,12 @@ class Protozoa : ProtozoaSettings, GeneSettings
 	// information which is passed from generation to generation
 	size_t cell_count = Random::rand_range(cell_amount_range);
 	GeneticNeuralNetwork neural_network;
-
-	// debugging
-	std::vector<sf::Vector2f> food_positions_nearby{};
 	
 public:
+	// debugging
+	std::vector<sf::Vector2f> food_positions_nearby{};
+	std::vector<sf::Vector2f> cell_positions_nearby{};
+
 	float energy = initial_energy;
 	unsigned frames_alive = 0u;
 	unsigned generation = 0u;
@@ -62,6 +63,8 @@ public:
 	void handle_food(FoodManager& food_manager);
 	void mutate();
 	void render(bool debug_mode = false);
+
+	void nearby_food_information();
 
 	// debugging and modifying settings
 	bool is_hovered_on(sf::Vector2f mousePosition, bool tollarance_check = false) const;

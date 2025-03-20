@@ -21,7 +21,6 @@ void Protozoa::handle_food(FoodManager& food_manager)
 			reproduce = true;
 		}
 	}
-
 }
 
 inline static constexpr float cell_mutation_rate = .3f;

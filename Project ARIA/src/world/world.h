@@ -57,7 +57,10 @@ public:
 	World(sf::RenderWindow* window = nullptr);
 
 	void update_world();
+	void update_protozoas();
 	void reproduce_protozoa(Protozoa* protozoa);
+	void update_cells_container();
+	void add_cells_to_hash_grid();
 	void update_hash_grid();
 	void update_debug(sf::Vector2f mouse_position);
 	void render_world();

@@ -14,6 +14,7 @@ inline static const float max_speed = 30;
 struct Cell : public GeneSettings
 {
 	int id{}; // Unique identifier relative to the protozoa
+	int protozoa_id{}; // Unique identifier pointing to its protozoa
 
 	sf::Color outer_color = Random::rand_val_in_vector(outer_colors);
 	sf::Color inner_color = Random::rand_val_in_vector(inner_colors);
@@ -26,8 +27,8 @@ struct Cell : public GeneSettings
 	sf::Vector2f velocity_{};
 
 
-	Cell(const int _id, const sf::Vector2f position)
-		: id(_id), position_(position)
+	Cell(const int _id, const int _protozoa_id, const sf::Vector2f position)
+		: id(_id), protozoa_id(_protozoa_id), position_(position)
 	{
 
 	}
