@@ -29,7 +29,9 @@ Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, cons
 void Protozoa::initialise_cells()
 {
 	// cells are spawned in clusters around an origin
-	const Circle protozoa_area = { m_world_bounds_->rand_pos(), spawn_radius };
+	const float world_rad = m_world_bounds_->radius;
+	sf::Vector2f center = Random::rand_pos_in_circle(m_world_bounds_->center, world_rad);
+	const Circle protozoa_area = { center, spawn_radius };
 
 	m_cells_.reserve(cell_count);
 	for (int i = 0; i < cell_count; ++i)

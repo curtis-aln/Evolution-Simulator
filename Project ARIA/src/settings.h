@@ -76,9 +76,9 @@ struct WorldSettings
 	static constexpr unsigned max_protozoa = 20'000;
 	static constexpr unsigned initial_protozoa = 10'000;
 
-	inline static constexpr size_t cells_x = 100;
-	inline static constexpr size_t cells_y = 100;
-	inline static constexpr size_t cell_capacity = 20;
+	inline static constexpr size_t cells_x = 240;
+	inline static constexpr size_t cells_y = 240;
+	inline static constexpr size_t cell_capacity = 13;
 };
 
 

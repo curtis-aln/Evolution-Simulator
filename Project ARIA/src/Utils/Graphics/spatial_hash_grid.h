@@ -143,9 +143,9 @@ struct SpatialHashGrid
 			throw std::out_of_range("find() position argument out of range");
 
 		// getting the indexes needed
-		for (unsigned x = cIdx.x - 1; x <= cIdx.x; ++x)
+		for (unsigned x = (cIdx.x > 0 ? cIdx.x - 1 : 0); x <= (cIdx.x + 1 < dimsX ? cIdx.x + 1 : dimsX - 1); ++x)
 		{
-			for (unsigned y = cIdx.y - 1; y <= cIdx.y; ++y)
+			for (unsigned y = (cIdx.y > 0 ? cIdx.y - 1 : 0); y <= (cIdx.y + 1 < dimsY ? cIdx.y + 1 : dimsY - 1); ++y)
 			{
 				const uint32_t index = idx2dTo1d({ x, y });
 
