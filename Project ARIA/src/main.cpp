@@ -23,6 +23,15 @@
 // - program doesn't run from executable
 
 
+// - re-align the stats with the bounding box
+// - energy value should be rounded
+// - protozoa id should be shown
+// - cell id remove "id" and just have the number
+// - replace frames old with age
+// - replace cell count with cells and springs
+// - A better color scheme is needed
+// - bounding box not working appropriately
+
 int main()
 {
 	///Random::set_seed(0);

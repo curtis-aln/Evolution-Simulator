@@ -40,7 +40,7 @@ T round_to_nearest_n(const T value, const unsigned decimal_places) {
 
 
 template<typename T>
-std::string trim_decimal_to_string(T number, const size_t precision, const bool round=true)
+std::string denary_to_str(T number, const size_t precision, const bool round=true)
 {
 	if (round)
 		number = round_to_nearest_n(number, static_cast<unsigned>(precision));

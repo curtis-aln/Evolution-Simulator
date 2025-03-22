@@ -71,14 +71,14 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 80'000;
+	static constexpr float bounds_radius = 90'000;
 
-	static constexpr unsigned max_protozoa = 20'000;
-	static constexpr unsigned initial_protozoa = 10'000;
+	static constexpr unsigned max_protozoa = 15'000;
+	static constexpr unsigned initial_protozoa = 7'500;
 
-	inline static constexpr size_t cells_x = 240;
-	inline static constexpr size_t cells_y = 240;
-	inline static constexpr size_t cell_capacity = 13;
+	inline static constexpr size_t cells_x = 200;
+	inline static constexpr size_t cells_y = 200;
+	inline static constexpr size_t cell_capacity = 16;
 };
 
 
@@ -92,8 +92,8 @@ struct SpringSettings
 
 struct CellSettings
 {
-	static constexpr float cell_radius = 45.f;
-	static constexpr float cell_outline_thickness = 12.f;
+	static constexpr float cell_radius = 90.f;
+	static constexpr float cell_outline_thickness = 30.f;
 };
 
 
@@ -110,7 +110,7 @@ struct GeneSettings
 	inline static const sf::Vector2f spring_vibration_range = { 30, 200 }; // how often the spring length changes from minimum to maximum
 	inline static const sf::Vector2f cell_vibration_range   = { 30, 200 };
 	
-	static constexpr sf::Uint8 transparancy = 230;
+	static constexpr sf::Uint8 transparancy = 200;
 
 	inline static const std::vector<sf::Color> inner_colors = {
 		{255, 204, 204, transparancy},
@@ -156,12 +156,12 @@ struct BuilderSettings
 
 struct FoodSettings
 {
-	inline static constexpr size_t cells_x = 240;
-	inline static constexpr size_t cells_y = 240;
+	inline static constexpr size_t cells_x = 200;
+	inline static constexpr size_t cells_y = 200;
 	inline static constexpr size_t cell_capacity = 20;
 
-	static constexpr unsigned max_food = 65'000;
-	static constexpr unsigned initial_food = 65'000;
+	static constexpr unsigned max_food = 45'000;
+	static constexpr unsigned initial_food = 45'000;
 	inline static const float food_radius = 30.f;
 	inline static const float friction = 0.99f;
 

@@ -49,6 +49,8 @@ class World : WorldSettings
 public:
 	bool simple_mode = false;
 	bool debug_mode = false;
+	bool skeleton_mode = false;
+	bool paused = false;
 	bool draw_cell_grid = false;
 	bool draw_food_grid = false;
 
@@ -61,7 +63,7 @@ public:
 	void reproduce_protozoa(Protozoa* protozoa);
 	void update_cells_container();
 	void add_cells_to_hash_grid();
-	void update_hash_grid();
+	void handle_cell_collisions();
 	void update_debug(sf::Vector2f mouse_position);
 	void render_world();
 	void render_protozoa();

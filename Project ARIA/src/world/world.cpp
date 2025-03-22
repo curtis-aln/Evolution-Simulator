@@ -28,11 +28,15 @@ World::World(sf::RenderWindow* window)
 void World::update_world()
 {
 	ticks++;
-	update_hash_grid();
+	update_cells_container();
+	add_cells_to_hash_grid();
+	handle_cell_collisions();
 
-	food_manager.update();
-
-	update_protozoas();
+	if (!paused)
+	{ 
+		food_manager.update();
+		update_protozoas();
+	}
 }
 
 void World::update_protozoas()
@@ -107,12 +111,8 @@ void World::add_cells_to_hash_grid()
 	}
 }
 
-void World::update_hash_grid()
+void World::handle_cell_collisions()
 {
-	update_cells_container();
-	add_cells_to_hash_grid();
-	
-
 	for (size_t i = 0; i < temp_cells_container.size(); ++i)
 	{
 		Cell* cell = temp_cells_container[i];
@@ -135,6 +135,11 @@ void World::update_hash_grid()
 
 				Protozoa* other_protozoa = all_protozoa.at(other_cell->protozoa_id);
 				other_protozoa->cell_positions_nearby.push_back(cell->position_);
+			}
+
+			if (paused)
+			{
+				continue;
 			}
 
 			const float dist_sq = dist_squared(cell->position_, other_cell->position_);
@@ -198,11 +203,19 @@ void World::render_protozoa()
 
 	outer_circle_buffer.init_texture(outer_color_data, radius_outer, size);
 
+	// if simple mode is off then we init the inner circle texture
 	if (!simple_mode)
 	{
 		inner_circle_buffer.init_texture(inner_color_data, radius_inner, size);
 	}
 
+	// we want the springs to be rendered behind the cells
+	if (selected_protozoa != nullptr && debug_mode && !skeleton_mode)
+	{
+		selected_protozoa->render_protozoa_springs();
+	}
+
+	// rendering the rest of the protozoas
 	outer_circle_buffer.render(position_data);
 
 	if (!simple_mode)
@@ -210,11 +223,13 @@ void World::render_protozoa()
 		inner_circle_buffer.render(position_data);
 	}
 
+	// if our selected cell needs debugging
 	if (debug_mode && selected_protozoa != nullptr)
 	{
-		selected_protozoa->render(true);
+		selected_protozoa->render_debug(skeleton_mode);
 	}
 
+	// clearing all of their nearby data to be re-written to
 	for (Protozoa* protozoa : all_protozoa)
 	{
 		protozoa->cell_positions_nearby.clear();

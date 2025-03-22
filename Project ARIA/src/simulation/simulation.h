@@ -51,7 +51,6 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	World m_world_{};
 
 	// user controlled variables
-	bool m_paused_ = false;
 	bool m_rendering_ = true;
 	bool m_debug_ = false;
 

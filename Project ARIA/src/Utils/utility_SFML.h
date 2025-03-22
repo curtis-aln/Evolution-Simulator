@@ -248,7 +248,7 @@ sf::Vector2<T> get_midpoint(const sf::Vector2<T> vec1, const sf::Vector2<T> vec2
 template<typename T>
 std::string vector_to_string(const sf::Vector2<T> vec, const int dp)
 {
-	return "x: " + trim_decimal_to_string(vec.x, dp) + "\ny:" + trim_decimal_to_string(vec.y, dp);
+	return "x: " + denary_to_str(vec.x, dp) + "\ny:" + denary_to_str(vec.y, dp);
 }
 
 

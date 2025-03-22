@@ -62,7 +62,10 @@ public:
 	void update(FoodManager& food_manager);
 	void handle_food(FoodManager& food_manager);
 	void mutate();
-	void render(bool debug_mode = false);
+	void render_protozoa_springs();
+	void render_debug(bool skeleton_mode);
+
+	void draw_cell_outlines();
 
 	void nearby_food_information();
 

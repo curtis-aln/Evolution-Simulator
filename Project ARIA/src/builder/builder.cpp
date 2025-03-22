@@ -160,7 +160,7 @@ void Builder::render_text()
 
 void Builder::render_protozoa()
 {
-	m_protozoa_.render();
+	m_protozoa_.render_debug(false);
 
 	if (start_cell != nullptr)
 	{

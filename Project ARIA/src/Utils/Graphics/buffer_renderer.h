@@ -50,7 +50,6 @@ public:
 
             // Set color (all white)
             sf::Color color = colors[i];
-            color.a = 160;
             vertex_array[index + 0].color = color;
             vertex_array[index + 1].color = color;
             vertex_array[index + 2].color = color;

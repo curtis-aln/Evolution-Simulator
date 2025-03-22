@@ -62,7 +62,7 @@ void Simulation::init_text_box()
 
 	text_box.add_statistic("int", "frames", &m_ticks_);
 	text_box.add_statistic("float", "fps", &fps_);
-	text_box.add_statistic("bool", "paused", &m_paused_);
+	text_box.add_statistic("bool", "paused", &m_world_.paused);
 	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
 }
 
@@ -101,10 +101,7 @@ void Simulation::update_one_frame()
 	manage_frame_rate();
 	const sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();
 
-	if (!m_paused_)
-	{
-		m_world_.update_world();
-	}
+	m_world_.update_world();
 
 	if (m_debug_)
 	{
@@ -120,10 +117,6 @@ void Simulation::update_one_frame()
 
 			sf::Rect<float> bounds = selected->get_bounds();
 			sf::Vector2f center = bounds.getPosition() + bounds.getSize() / 2.f;
-			//sf::Vector2f dir = cam_center - center;
-			//float length = sqrt(dir.x * dir.x + dir.y * dir.y);
-			//sf::Vector2f norm = dir / length;
-
 			
 			sf::Vector2f new_position = cam_center + (cam_center - center) * lerp_factor;
 			sf::Vector2f translation = new_position - cam_center;
@@ -250,12 +243,13 @@ void Simulation::handle_events()
 
 void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 {
-	switch (event_key_code)
+	switch (event_key_code) // todo move the world parts into the world class and make their respective variables private
 	{
 	case sf::Keyboard::Escape: running = false; break;
-	case sf::Keyboard::Space:  m_paused_ = not m_paused_; break;
+	case sf::Keyboard::Space:  m_world_.paused = not m_world_.paused; break;
 	case sf::Keyboard::R:      m_rendering_ = not m_rendering_; break;
 	case sf::Keyboard::G:      m_world_.draw_cell_grid = not m_world_.draw_cell_grid; break;
+	case sf::Keyboard::K:      m_world_.skeleton_mode = not m_world_.skeleton_mode; break;
 	case sf::Keyboard::F:      m_world_.draw_food_grid = not m_world_.draw_food_grid; break;
 	case sf::Keyboard::D:      
 		m_debug_ = not m_debug_; 

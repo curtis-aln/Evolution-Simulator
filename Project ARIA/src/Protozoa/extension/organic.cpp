@@ -23,10 +23,10 @@ void Protozoa::handle_food(FoodManager& food_manager)
 	}
 }
 
-inline static constexpr float cell_mutation_rate = .3f;
-inline static constexpr float cell_mutation_range = 3.f;
-inline static constexpr float spring_mutation_rate = .3f;
-inline static constexpr float spring_mutation_range = 3.f;
+inline static constexpr float cell_mutation_rate = .5f;
+inline static constexpr float cell_mutation_range = 0.05f;
+inline static constexpr float spring_mutation_rate = .5f;
+inline static constexpr float spring_mutation_range = 0.05f;
 
 void Protozoa::mutate()
 {

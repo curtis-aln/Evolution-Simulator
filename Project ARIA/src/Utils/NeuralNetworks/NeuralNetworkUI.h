@@ -307,7 +307,7 @@ private:
 				}
 			}
 		
-			const std::string val = trim_decimal_to_string(state2, 1);
+			const std::string val = denary_to_str(state2, 1);
 			cell_statistic_font.draw(text_pos, val, true, rotation);
 		}
 	}	
@@ -335,7 +335,7 @@ private:
 		{
 			for (int node_idx = 0; node_idx < network[layer_idx].size(); ++node_idx)
 			{
-				const std::string val = trim_decimal_to_string(network[layer_idx][node_idx].output, 2);
+				const std::string val = denary_to_str(network[layer_idx][node_idx].output, 2);
 				const sf::Vector2f pos = m_node_render_info_[layer_idx][node_idx].pos;
 				const float text_size_y = cell_statistic_font.get_text_size(val).y;
 				cell_statistic_font.draw(pos + sf::Vector2f{0, node_radius + text_size_y/2 + 8.f}, val, true);

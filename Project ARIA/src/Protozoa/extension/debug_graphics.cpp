@@ -3,26 +3,53 @@
 
 inline static constexpr float bounds_tollarance = CellSettings::cell_radius * 3.f;
 
-void Protozoa::render(bool debug_mode)
+void Protozoa::render_protozoa_springs()
 {
 	for (Cell& cell : m_cells_)
 	{
 		render_cell_connections(cell, true);
 	}
-
-	if (debug_mode)
-	{
-		// This is the bounding box of the protozoa, used for external collision events
-		draw_rect_outline(m_personal_bounds_, *m_window_);
-
-		draw_cell_physics();
-		draw_cell_stats_info();
-		draw_spring_information();
-		nearby_food_information();
-	}
-
 }
 
+void Protozoa::render_debug(bool skeleton_mode)
+{
+	if (skeleton_mode)
+	{
+		draw_cell_outlines();
+	}
+
+
+	// This is the bounding box of the protozoa, used for external collision events
+	draw_rect_outline(m_personal_bounds_, *m_window_);
+
+	draw_cell_physics();
+	draw_cell_stats_info();
+	draw_spring_information();
+	nearby_food_information();
+}
+
+void Protozoa::draw_cell_outlines()
+{
+	sf::CircleShape circle_outline;
+	
+	for (Cell& cell : m_cells_)
+	{
+		const sf::Vector2f pos = cell.position_;
+		const float rad = cell.radius + CellSettings::cell_outline_thickness;
+
+		circle_outline.setRadius(rad);
+		circle_outline.setFillColor({ 0, 0, 0 });
+		circle_outline.setPosition(pos - sf::Vector2f{rad, rad});
+		m_window_->draw(circle_outline);
+
+		circle_outline.setFillColor({ 255, 0, 255 });
+		circle_outline.setRadius(rad/3);
+		circle_outline.setPosition(pos - sf::Vector2f{ rad/3, rad/3 });
+		m_window_->draw(circle_outline);
+	}
+
+
+}
 
 void Protozoa::nearby_food_information()
 {
@@ -81,7 +108,7 @@ void Protozoa::draw_cell_physics()
 			{ 200, 220, 200 }, { 190, 200, 190 });
 
 		// drawing cell stats
-		font.draw({ rect.left, rect.top + rect.height + 5 }, "id: " + std::to_string(cell.id), false);
+		font.draw(pos, "id: " + std::to_string(cell.id), false);
 	}
 }
 
@@ -114,8 +141,16 @@ void Protozoa::draw_spring_information()
 		const sf::Vector2f upper_quartile = get_midpoint(mid_point, cell_B_pos);
 		const sf::Vector2f lower_quartile = get_midpoint(cell_A_pos, mid_point);
 
-		TextSettings::cell_statistic_font.draw(lower_quartile, vector_to_string(spring.direction_A_force, 2), true);
-		TextSettings::cell_statistic_font.draw(upper_quartile, vector_to_string(spring.direction_B_force, 2), true);
+		sf::Vector2f f1 = spring.direction_A_force;
+		sf::Vector2f f2 = spring.direction_B_force;
+
+		std::ostringstream vectorF1;
+		vectorF1 << "(" << denary_to_str(f1.x, 1) << ", " << denary_to_str(f1.y, 1) << ")";
+		std::ostringstream vectorF2;
+		vectorF2 << "(" << denary_to_str(f2.x, 1) << ", " << denary_to_str(f2.y, 1) << ")";
+		
+		TextSettings::cell_statistic_font.draw(lower_quartile, vectorF1.str(), true);
+		TextSettings::cell_statistic_font.draw(upper_quartile, vectorF2.str(), true);
 	}
 }
 
