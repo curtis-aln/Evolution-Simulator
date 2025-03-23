@@ -62,12 +62,15 @@ public:
 
         m_text_.setString(string_text);
 
-
         // Adjust position for centering if needed
         if (centered)
         {
             const sf::FloatRect text_bounds = m_text_.getLocalBounds();
             m_text_.setOrigin(text_bounds.left + text_bounds.width / 2.0f, text_bounds.top + text_bounds.height / 2.0f);
+        }
+        else
+        {
+            m_text_.setOrigin(0.0f, 0.0f); // Reset origin when not centered
         }
 
         // Set text rotation around its center
@@ -75,7 +78,7 @@ public:
 
         m_text_.setPosition(position);
 
-        // if the caller would like to use another instance of window
+        // Draw using the specified window or the default one
         if (render_window != nullptr)
         {
             render_window->draw(m_text_);
@@ -85,6 +88,7 @@ public:
             m_window_->draw(m_text_);
         }
     }
+
 
 
     void draw(const TextPacket& text_packet)

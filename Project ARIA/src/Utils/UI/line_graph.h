@@ -26,8 +26,8 @@ struct LineGraphSettings
 	unsigned text_font_size = 15;
 	unsigned stat_font_size = 10;
 
-	std::string title_font_location = "src/Utils/fonts/Roboto-Bold.ttf";
-	std::string text_font_location = "src/Utils/fonts/Roboto-Bold.ttf";
+	std::string title_font_location = "media/fonts/Roboto-Bold.ttf";
+	std::string text_font_location = "media/fonts/Roboto-Bold.ttf";
 };
 
 

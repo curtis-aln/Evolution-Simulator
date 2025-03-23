@@ -1,5 +1,6 @@
 #include "../Protozoa.h"
 #include "../../settings.h"
+#include "../../Utils/utility.h"
 
 inline static constexpr float bounds_tollarance = CellSettings::cell_radius * 3.f;
 
@@ -118,14 +119,24 @@ void Protozoa::draw_cell_stats_info()
 	Font& font = TextSettings::cell_statistic_font;
 
 	// protozoa information under the bounding box
-	const sf::Vector2f start_pos = { m_personal_bounds_.left, m_personal_bounds_.top + m_personal_bounds_.height + 10 };
+	sf::Vector2f start_pos = { m_personal_bounds_.left, m_personal_bounds_.top + m_personal_bounds_.height + 10 };
 
-	const std::string combined_string = "cell count: " + std::to_string(m_cells_.size()) + "\n" +
-		"frames old: " + std::to_string(frames_alive) + "\n" +
-		"gen: " + std::to_string(generation) + "\n" +
-		"energy: " + std::to_string(energy);
+	const std::string combined_string =
+		"id: " + std::to_string(id) +"\n" +
+		"cells: " + std::to_string(m_cells_.size()) + " springs: " + std::to_string(m_springs_.size()) + "\n" +
+		"age: " + std::to_string(frames_alive) + "\n" +
+		"generation: " + std::to_string(generation) + "\n" +
+		"energy: " + denary_to_str(energy, 1);
 
 	font.draw(start_pos, combined_string, false);
+
+	// top statistics
+	const float speed = length(velocity);
+
+	start_pos = { m_personal_bounds_.left, m_personal_bounds_.top - 70 };
+	const std::string text = "position: " + vector_to_string(get_center(), 1)
+		+ "\nvelocity: " + vector_to_string(velocity, 1) + "\nspeed: " + denary_to_str(speed, 1);
+	font.draw(start_pos, text, false);
 }
 
 

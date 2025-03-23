@@ -25,14 +25,20 @@ World::World(sf::RenderWindow* window)
 	position_data.reserve(predicted_cells);
 }
 
-void World::update_world()
+void World::update_world(bool pause)
 {
 	ticks++;
 	update_cells_container();
 	add_cells_to_hash_grid();
 	handle_cell_collisions();
 
-	if (!paused)
+	// if our selected protozoa has died we can no longer track it
+	if (selected_protozoa != nullptr && selected_protozoa->dead)
+	{
+		selected_protozoa = nullptr;
+	}
+
+	if (!pause)
 	{ 
 		food_manager.update();
 		update_protozoas();
@@ -274,13 +280,10 @@ void World::init_food()
 
 }
 
-
 void World::init_environment()
 {
 
 }
-
-
 
 void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_position, bool mouse_pressed)
 {
@@ -317,4 +320,15 @@ void World::de_select_protozoa()
 		//selected_protozoa->deselect_cell();
 		//selected_protozoa = nullptr;
 	}
+}
+
+
+float World::calculate_average_generation()
+{
+	float sum = 0.f;
+	for (Protozoa* protozoa : all_protozoa)
+	{
+		sum += protozoa->generation;
+	}
+	return sum / all_protozoa.size();
 }

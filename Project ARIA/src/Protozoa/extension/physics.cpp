@@ -70,6 +70,9 @@ void Protozoa::update(FoodManager& food_manager)
 		dead = true;
 	}
 
+	const sf::Vector2f center = get_center();
+	velocity = center - previous_position;
+	previous_position = center;
 }
 
 
@@ -117,10 +120,10 @@ void Protozoa::update_bounding_box()
 	for (const Cell& cell : m_cells_) 
 	{
 		const sf::Vector2f pos = cell.position_;
-		if (pos.x < min_x) min_x = pos.x - radius;
-		if (pos.x > max_x) max_x = pos.x + radius;
-		if (pos.y < min_y) min_y = pos.y - radius;
-		if (pos.y > max_y) max_y = pos.y + radius;
+		min_x = std::min(min_x, pos.x - radius);
+		max_x = std::max(max_x, pos.x + radius);
+		min_y = std::min(min_y, pos.y - radius);
+		max_y = std::max(max_y, pos.y + radius);
 	}
 
 	const float width = max_x - min_x;

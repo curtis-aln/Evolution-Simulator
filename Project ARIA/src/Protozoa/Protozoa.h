@@ -35,6 +35,10 @@ class Protozoa : ProtozoaSettings, GeneSettings
 	// information which is passed from generation to generation
 	size_t cell_count = Random::rand_range(cell_amount_range);
 	GeneticNeuralNetwork neural_network;
+
+	// position and velocity tracking
+	sf::Vector2f previous_position = {0, 0};
+	sf::Vector2f velocity = { 0, 0 };
 	
 public:
 	// debugging

@@ -58,7 +58,7 @@ public:
 
 	World(sf::RenderWindow* window = nullptr);
 
-	void update_world();
+	void update_world(bool pause);
 	void update_protozoas();
 	void reproduce_protozoa(Protozoa* protozoa);
 	void update_cells_container();
@@ -71,6 +71,8 @@ public:
 	void check_hovering(bool debug_mode, sf::Vector2f mouse_position, bool mouse_pressed);
 	bool check_pressed(sf::Vector2f mouse_position);
 	void de_select_protozoa();
+
+	float calculate_average_generation();
 
 	int get_protozoa_count()
 	{

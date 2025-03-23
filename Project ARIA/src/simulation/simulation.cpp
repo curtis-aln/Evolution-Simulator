@@ -87,7 +87,9 @@ void Simulation::render_loop()
 	{
 		handle_events();
 
+		
 		update_one_frame();
+
 
 		if (m_rendering_)
 		{
@@ -101,14 +103,22 @@ void Simulation::update_one_frame()
 	manage_frame_rate();
 	const sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();
 
-	m_world_.update_world();
+	if (m_tick_frame_time)
+	{
+		m_world_.update_world(false);
+		m_tick_frame_time = false;
+	}
+	else if (!m_world_.paused)
+	{
+		m_world_.update_world(false);	
+	}
+
 
 	if (m_debug_)
 	{
 		m_world_.update_debug(mouse_pos);
 		Protozoa* selected = m_world_.selected_protozoa;
 
-		camera_following_ = selected != nullptr;
 		if (selected != nullptr)
 		{
 			// comparing the difference between the camera center and the protozoa center and subtractign them to find out the camera translation
@@ -228,13 +238,16 @@ void Simulation::handle_events()
 		}
 	}
 
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !mouse_pressed_event && !camera_following_)
+	if (m_world_.selected_protozoa == nullptr)
 	{
-		camera_.translate();
-	}
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !mouse_pressed_event)
+		{
+			camera_.translate();
+		}
 
-	// mouse hovering over an organism
-	m_world_.check_hovering(m_debug_, cam_pos, mouse_pressed_event);
+		// mouse hovering over an organism
+		m_world_.check_hovering(m_debug_, cam_pos, mouse_pressed_event);
+	}
 
 	// updating camera translations
 	camera_.update(m_clock_.get_delta_time());
@@ -246,7 +259,16 @@ void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 	switch (event_key_code) // todo move the world parts into the world class and make their respective variables private
 	{
 	case sf::Keyboard::Escape: running = false; break;
-	case sf::Keyboard::Space:  m_world_.paused = not m_world_.paused; break;
+	case sf::Keyboard::Space:  
+		m_world_.paused = not m_world_.paused; 
+		
+		if (!m_world_.paused)
+		{
+			m_tick_frame = false;
+			m_tick_frame_time = false;
+		}
+		
+		break;
 	case sf::Keyboard::R:      m_rendering_ = not m_rendering_; break;
 	case sf::Keyboard::G:      m_world_.draw_cell_grid = not m_world_.draw_cell_grid; break;
 	case sf::Keyboard::K:      m_world_.skeleton_mode = not m_world_.skeleton_mode; break;
@@ -257,6 +279,10 @@ void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 		break;
 
 	case sf::Keyboard::S:      m_world_.simple_mode = not m_world_.simple_mode; break;
+	case sf::Keyboard::O:
+		m_tick_frame_time = true;
+		break;
+
 	// todo
 	//case sf::Keyboard::Key::S:
 	//	if (shifting)
@@ -290,6 +316,10 @@ void Simulation::manage_frame_rate()
 
 	// Display FPS in the title bar
 	std::ostringstream title;
-	title << simulation_name << " | FPS: " << std::fixed << std::setprecision(1) << fps_ << " | protozoa: " << m_world_.get_protozoa_count() << " | food: " << m_world_.get_food_count();
+	title << simulation_name 
+		<< " | FPS: " << std::fixed << std::setprecision(1) << fps_ 
+		<< " | protozoa: " << m_world_.get_protozoa_count() 
+		<< " | food: " << m_world_.get_food_count()
+		<< " | average generation: " << m_world_.calculate_average_generation();
 	m_window_.setTitle(title.str());
 }

@@ -38,7 +38,7 @@ public:
 
     void init_font(
         const std::string& button_text = "Button", 
-        const std::string& font_location = "src/Utils/fonts/Roboto-Bold.ttf",
+        const std::string& font_location = "media/fonts/Roboto-Bold.ttf",
         const sf::Color text_fill_color = sf::Color::White,
         const unsigned text_size = 15)
     {
