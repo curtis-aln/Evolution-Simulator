@@ -59,4 +59,13 @@ struct Spring : public SpringGeneSettings
 		direction_B_force = total_force * ((pos_a - pos_b) / dist);
 		cell_b.accelerate(direction_B_force);
 	}
+
+	void call_mutate()
+	{
+		if (Random::rand01_float() < mutation_rate)
+		{
+			offset += Random::rand11_float() * mutation_range;
+			frequency += Random::rand11_float() * mutation_range;
+		}
+	}
 };

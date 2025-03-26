@@ -83,6 +83,15 @@ struct Cell : public CellGeneSettings
 		velocity_ += acceleration;
 	}
 
+	void call_mutate()
+	{
+		if (Random::rand01_float() < mutation_rate)
+		{
+			offset += Random::rand11_float() * mutation_range;
+			frequency += Random::rand11_float() * mutation_range;
+		}
+	}
+
 private:
 	void clamp_velocity()
 	{

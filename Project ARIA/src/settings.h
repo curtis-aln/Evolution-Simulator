@@ -99,20 +99,20 @@ struct CellSettings
 
 struct GeneSettings
 {
+	// the amount of cells each protzoa starts off with
 	inline static const sf::Vector2i cell_amount_range = { 2, 4 };
 
-	inline static const sf::Vector2f rest_length_ranges = { 0., 1.f }; // 0 is a dist of cell radius and 1 is a dist of cell radius * 4
-	inline static const float rest_length_val = CellSettings::cell_radius;
-
-	inline static const sf::Vector2f damping_const_range = { 0.975f, 0.995f };
-	inline static const sf::Vector2f spring_const_range = { 0.01f, 0.06f };
-	inline static const sf::Vector2f spring_vibration_range = { 30, 200 }; // how often the spring length changes from minimum to maximum
-
+	// chances of adding or removing a cell per mutation event
+	inline static constexpr float add_cell_chance = 0.03f;
+	inline static constexpr float remove_cell_chance = 0.03f;
 	
 };
 
 struct SpringGeneSettings
 {
+	inline static constexpr float mutation_rate = .5f;
+	inline static constexpr float mutation_range = 0.02f;
+
 	inline static constexpr float damping = 0.975f;
 	inline static constexpr float spring_const = 0.26f;
 
@@ -126,6 +126,9 @@ struct SpringGeneSettings
 
 struct CellGeneSettings
 {
+	inline static constexpr float mutation_rate = .5f;
+	inline static constexpr float mutation_range = 0.02f;
+
 	// cell friction settings
 	inline static const sf::Vector2f offset_range = { 0.f, pi };
 	inline static const sf::Vector2f frequency_range = { 0.f, pi };

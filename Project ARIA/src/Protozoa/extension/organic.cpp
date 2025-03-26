@@ -73,11 +73,6 @@ void Protozoa::handle_food(FoodManager& food_manager)
 	}
 }
 
-inline static constexpr float cell_mutation_rate = .5f;
-inline static constexpr float cell_mutation_range = 0.02f;
-
-inline static constexpr float spring_mutation_rate = .5f;
-inline static constexpr float spring_mutation_range = 0.02f;
 
 
 void Protozoa::mutate()
@@ -85,11 +80,7 @@ void Protozoa::mutate()
 	// mutating the cells in this organism
 	for (Cell& cell : m_cells_)
 	{
-		if (Random::rand01_float() < cell_mutation_rate)
-		{
-			cell.offset    += Random::rand11_float() * cell_mutation_range;
-            cell.frequency += Random::rand11_float() * cell_mutation_range;
-		}
+        cell.call_mutate();
 
         cell.inner_color = mutate_color(cell.inner_color);
         cell.outer_color = mutate_color(cell.outer_color);
@@ -98,13 +89,11 @@ void Protozoa::mutate()
 	// mutating the springs in this organism
 	for (Spring& spring : m_springs_)
 	{
-		if (Random::rand01_float() < spring_mutation_rate)
-		{
-            spring.offset += Random::rand11_float() * spring_mutation_range;
-            spring.frequency += Random::rand11_float() * spring_mutation_range;
+        spring.call_mutate();
 
-            spring.inner_color = mutate_color(spring.inner_color);
-            spring.outer_color = mutate_color(spring.outer_color);
-		}
+        spring.inner_color = mutate_color(spring.inner_color);
+        spring.outer_color = mutate_color(spring.outer_color);
 	}
+
+    // adding new components to the organism
 }
