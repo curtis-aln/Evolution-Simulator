@@ -22,8 +22,8 @@ struct LineGraphSettings
 	sf::Color axis_color = { 50, 50, 50, transparency };
 
 	float box_thickness = 2;
-	unsigned title_font_size = 20;
-	unsigned text_font_size = 15;
+	unsigned title_font_size = 14;
+	unsigned text_font_size = 12;
 	unsigned stat_font_size = 10;
 
 	std::string title_font_location = "media/fonts/Roboto-Bold.ttf";
@@ -124,8 +124,20 @@ public:
 		update_button(mouse_pos);
 	}
 
+	void set_top_left(sf::Vector2f topleft)
+	{
+		m_bounds_.left = topleft.x;
+		m_bounds_.top = topleft.y;
+	}
+
 	void render()
 	{
+		// Save the current view
+		sf::View currentView = m_window_->getView();
+
+		// Reset to the default view
+		m_window_->setView(m_window_->getDefaultView());
+
 		find_max_data();
 		find_data_points();
 
@@ -145,7 +157,11 @@ public:
 		render_axis_bounds();
 		render_text();
 		render_UI();
+
+		// Restore the original view
+		m_window_->setView(currentView);
 	}
+
 
 
 private:

@@ -45,7 +45,7 @@ void Simulation::init_line_graphs()
 	LineGraphSettings settings = {
 		"Protozoa Population", "Time", "Population",
 		transparency, protozoa_graph_line_color, protozoa_under_graph_color, border_fill_color, border_outline_color,
-		{ 50, 50, 50, transparency }, border_outline_thickness, title_font_size,
+		{ 50, 50, 50, transparency }, border_outline_thickness, regular_font_size,
 		regular_font_size, cell_statistic_font_size, bold_font_location, regular_font_location };
 
 	protozoa_population_graph_.set_settings(settings);
@@ -87,7 +87,6 @@ void Simulation::render_loop()
 	{
 		handle_events();
 
-		
 		update_one_frame();
 
 
@@ -123,7 +122,7 @@ void Simulation::update_one_frame()
 		{
 			// comparing the difference between the camera center and the protozoa center and subtractign them to find out the camera translation
 			sf::Vector2f win_center = sf::Vector2f(m_window_.getSize()) / 2.f;
-			sf::Vector2f cam_center = camera_.map_window_position_to_world_position(win_center);
+			sf::Vector2f cam_center = camera_.window_pos_to_world_pos(win_center);
 
 			sf::Rect<float> bounds = selected->get_bounds();
 			sf::Vector2f center = bounds.getPosition() + bounds.getSize() / 2.f;

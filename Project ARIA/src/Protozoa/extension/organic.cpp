@@ -127,6 +127,8 @@ void Protozoa::add_cell()
     // creating a spring connection to that cell
     Spring new_spring{ parent_index, cell_id };
     m_springs_.push_back(new_spring);
+
+    cell_count++;
 }
 
 void Protozoa::remove_cell()

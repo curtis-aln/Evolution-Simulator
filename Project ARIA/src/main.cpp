@@ -13,24 +13,18 @@
 /* Graphics */
 // Create a RectBuffer and re-introduce the connections
 // Cells should fade in and out of existance
+// Statistics graphs should be constantly at the bottom right corner of the screen
+// Food and cell counts should be on the same graph
 
 
 /* Debug */
-// fix "(failed to create the font face)" bug
-// connections are drawn ontop of the cells which is wrong
-// Advanced cell debug mode
 // - the grid renderers dont work with negative x values
 // - program doesn't run from executable
 
 
 // - protozoa id should be shown
 // - bounding box not working appropriately
-// - all cells of teh same protzoa should have the same color
-// - spring const, damping, and mutaiton constants should be mutatable
 
-// NOTE: vibrations need an offset
-// Experiment with constant time period for springs only
-// Solve overpopulation issues by removing a random protoszoa
 
 int main()
 {

@@ -115,6 +115,20 @@ public:
 		m_springs_ = springs;
 	}
 
+	void set_protozoa_attributes(Protozoa* other)
+	{
+		m_cells_ = other->m_cells_;
+		m_springs_ = other->m_springs_;
+		cell_inner_color = other->cell_inner_color;
+		cell_outer_color = other->cell_outer_color;
+
+		spring_inner_color = other->spring_inner_color;
+		spring_outer_color = other->spring_outer_color;
+
+		mutation_range = other->mutation_range;
+		mutation_rate = other->mutation_rate;
+	}
+
 private:
 	// rendering
 	void draw_cell_physics();

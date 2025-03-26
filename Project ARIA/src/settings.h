@@ -58,9 +58,9 @@ struct SimulationSettings
 	// statistics settings
 	static constexpr unsigned line_maximum_data = 70;
 	static constexpr unsigned line_x_axis_increments = 3;
-	inline static const sf::FloatRect protozoa_graph_bounds = { 2600, 200, 2100, 600 };
-	inline static const sf::FloatRect food_graph_bounds = { 2600, 1000, 2100, 600 };
-	inline static const sf::FloatRect text_renderer_bounds = { 2600, 1700, 900, 1200 };
+	inline static const sf::FloatRect protozoa_graph_bounds = { 700, 1500, 1000, 300 };
+	inline static const sf::FloatRect food_graph_bounds     = { 2000, 1500, 1000, 300 };
+	inline static const sf::FloatRect text_renderer_bounds  = { 2600, 1700, 900, 1200 };
 
 	inline static const sf::Color protozoa_graph_line_color = { 20, 200, 20 };
 	inline static const sf::Color protozoa_under_graph_color = { 20, 100, 20 };

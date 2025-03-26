@@ -30,11 +30,11 @@ public:
 
     sf::Vector2f get_world_mouse_pos() const
     {
-        return map_window_position_to_world_position(sf::Mouse::getPosition(*m_window_ptr_));
+        return window_pos_to_world_pos(sf::Mouse::getPosition(*m_window_ptr_));
     }
 
     template<typename T>
-    sf::Vector2f map_window_position_to_world_position(const sf::Vector2<T> window_position) const
+    sf::Vector2f window_pos_to_world_pos(const sf::Vector2<T> window_position) const
     {
         return m_window_ptr_->mapPixelToCoords(static_cast<sf::Vector2i>(window_position), m_view_);
     }
