@@ -122,6 +122,9 @@
     <ClInclude Include="src\Utils\Graphics\SFML_Grid.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils\thread_pool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="media\fonts\Calibri.ttf" />

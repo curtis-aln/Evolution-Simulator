@@ -5,7 +5,6 @@
 #include "../../Utils/Graphics/spatial_hash_grid.h"
 #include "../../food_manager.h"
 
-inline static constexpr float spawn_radius = 100.f; // todo move to settings
 
 Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
 	: id(id_), m_window_(window), m_world_bounds_(world_bounds)

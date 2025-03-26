@@ -155,6 +155,7 @@
     <ClInclude Include="src\Utils\Graphics\font_renderer.hpp" />
     <ClInclude Include="src\Utils\Graphics\SFML_Grid.h" />
     <ClInclude Include="src\Utils\Graphics\spatial_hash_grid.h" />
+    <ClInclude Include="src\Utils\thread_pool.h" />
     <ClInclude Include="src\Utils\UI\text_box.h" />
     <ClInclude Include="src\Utils\UI\button.h" />
     <ClInclude Include="src\Utils\Graphics\Circle.h" />

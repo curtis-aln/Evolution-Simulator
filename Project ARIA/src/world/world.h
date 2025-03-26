@@ -6,6 +6,8 @@
 
 #include "../settings.h"
 
+
+#include "../Utils/thread_pool.h"
 #include "../Utils/o_vector.hpp"
 #include "../Utils/random.h"
 #include "../Utils/Graphics/Circle.h"
@@ -46,6 +48,8 @@ class World : WorldSettings
 
 	int ticks = 0;
 
+	tp::ThreadPool thread_pool;
+
 public:
 	bool simple_mode = false;
 	bool debug_mode = false;
@@ -53,6 +57,7 @@ public:
 	bool paused = false;
 	bool draw_cell_grid = false;
 	bool draw_food_grid = false;
+	bool toggle_collisions = true;
 
 	Protozoa* selected_protozoa = nullptr;
 

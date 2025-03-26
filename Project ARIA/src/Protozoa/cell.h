@@ -11,17 +11,19 @@
 inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
 inline static const float max_speed = 30;
 
-struct Cell : public GeneSettings
+
+struct Cell : public CellGeneSettings
 {
 	int id{}; // Unique identifier relative to the protozoa
 	int protozoa_id{}; // Unique identifier pointing to its protozoa
 
-	sf::Color outer_color = Random::rand_val_in_vector(outer_colors);
-	sf::Color inner_color = Random::rand_val_in_vector(inner_colors);
+	sf::Color outer_color = Random::rand_color(); // todo
+	sf::Color inner_color = Random::rand_color();
 
 	float radius = CellSettings::cell_radius;
-	
-	float vibration = Random::rand_range(cell_vibration_range);
+		
+	float offset = Random::rand_range(offset_range);
+	float frequency = Random::rand_range(frequency_range);
 
 	sf::Vector2f position_{};
 	sf::Vector2f velocity_{};
@@ -39,9 +41,17 @@ struct Cell : public GeneSettings
 		clamp_velocity();
 		position_ += velocity_;
 
-		const float fric_range = friction_range.y - friction_range.x;
-		const float friction_ratio = sin(internal_clock * vibration); // todo lich unfinished
-		const float friction = fric_range * friction_ratio + friction_range.x;
+		// we first need to scale down the internal clock value, it increments by 1 every frame which is way too large for the sin input
+		// as it is expecting a radian input rather than a degree-like input
+		const float scaled_clock = fmod(internal_clock, 360.f) * pi / 180.f;
+
+		// getting a value between 0 and 1 for maximum and minimum friction
+		const float phase = (sin(frequency * scaled_clock + offset) + 1.f) / 2.f;
+
+		// changing the range of friction to something better
+		const float friction = minFriction + (phase * (maxFriction - minFriction));
+		
+		// updating the velocity with the new friction
 		velocity_ *= friction;
 	}
 

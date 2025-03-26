@@ -71,13 +71,13 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 90'000;
+	static constexpr float bounds_radius = 70'000;
 
-	static constexpr unsigned max_protozoa = 15'000;
-	static constexpr unsigned initial_protozoa = 7'500;
+	static constexpr unsigned max_protozoa = 10'000;
+	static constexpr unsigned initial_protozoa = 4'000;
 
-	inline static constexpr size_t cells_x = 200;
-	inline static constexpr size_t cells_y = 200;
+	inline static constexpr size_t cells_x = 170;
+	inline static constexpr size_t cells_y = 170;
 	inline static constexpr size_t cell_capacity = 16;
 };
 
@@ -103,32 +103,44 @@ struct GeneSettings
 
 	inline static const sf::Vector2f rest_length_ranges = { 0., 1.f }; // 0 is a dist of cell radius and 1 is a dist of cell radius * 4
 	inline static const float rest_length_val = CellSettings::cell_radius;
-	inline static const sf::Vector2f friction_range = { 0.90f, 0.998f };
 
 	inline static const sf::Vector2f damping_const_range = { 0.975f, 0.995f };
 	inline static const sf::Vector2f spring_const_range = { 0.01f, 0.06f };
 	inline static const sf::Vector2f spring_vibration_range = { 30, 200 }; // how often the spring length changes from minimum to maximum
-	inline static const sf::Vector2f cell_vibration_range   = { 30, 200 };
+
 	
+};
+
+struct SpringGeneSettings
+{
+	inline static constexpr float damping = 0.975f;
+	inline static constexpr float spring_const = 0.26f;
+
+	inline static const sf::Vector2f offset_range = { 0.f, pi };
+	inline static const sf::Vector2f frequency_range = { 0.f, pi };
+
+	inline static constexpr float minLength = CellSettings::cell_radius * 2.f;
+	inline static constexpr float maxLength = minLength * 4.f;
+};
+
+
+struct CellGeneSettings
+{
+	// cell friction settings
+	inline static const sf::Vector2f offset_range = { 0.f, pi };
+	inline static const sf::Vector2f frequency_range = { 0.f, pi };
+
+	inline static constexpr float minFriction = 0.95f;
+	inline static constexpr float maxFriction = 1.00f;
+
 	static constexpr sf::Uint8 transparancy = 200;
-
-	inline static const std::vector<sf::Color> inner_colors = {
-		{255, 204, 204, transparancy},
-		{208, 255, 194, transparancy},
-		{218, 194, 255, transparancy}
-	};
-
-	inline static const std::vector<sf::Color> outer_colors = {
-		{255, 235, 235, transparancy},
-		{234, 247, 255, transparancy},
-		{226, 255, 216, transparancy},
-		{229, 219, 255, transparancy}
-	};
 };
 
 
 struct ProtozoaSettings
 {
+	static constexpr float spawn_radius = 100.f;
+
 	static constexpr float spring_thickness = 9.f;
 	static constexpr float spring_outline_thickness = 6.f;
 };
@@ -156,12 +168,12 @@ struct BuilderSettings
 
 struct FoodSettings
 {
-	inline static constexpr size_t cells_x = 200;
-	inline static constexpr size_t cells_y = 200;
-	inline static constexpr size_t cell_capacity = 20;
+	inline static constexpr size_t cells_x = 170;
+	inline static constexpr size_t cells_y = 170;
+	inline static constexpr size_t cell_capacity = 25;
 
-	static constexpr unsigned max_food = 45'000;
-	static constexpr unsigned initial_food = 45'000;
+	static constexpr unsigned max_food = 40'000;
+	static constexpr unsigned initial_food = 40'000;
 	inline static const float food_radius = 30.f;
 	inline static const float friction = 0.99f;
 

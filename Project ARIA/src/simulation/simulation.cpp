@@ -271,6 +271,7 @@ void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 		break;
 	case sf::Keyboard::R:      m_rendering_ = not m_rendering_; break;
 	case sf::Keyboard::G:      m_world_.draw_cell_grid = not m_world_.draw_cell_grid; break;
+	case sf::Keyboard::C:      m_world_.toggle_collisions = not m_world_.toggle_collisions; break;
 	case sf::Keyboard::K:      m_world_.skeleton_mode = not m_world_.skeleton_mode; break;
 	case sf::Keyboard::F:      m_world_.draw_food_grid = not m_world_.draw_food_grid; break;
 	case sf::Keyboard::D:      

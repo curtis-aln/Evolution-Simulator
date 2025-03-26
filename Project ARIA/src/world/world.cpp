@@ -8,7 +8,8 @@ World::World(sf::RenderWindow* window)
 	: m_window_(window),
 	border_render_(make_circle(m_bounds_.radius, m_bounds_.center)),
 	cell_grid_renderer(*window, world_bounds, cells_x, cells_y),
-	food_grid_renderer(*window, world_bounds, FoodSettings::cells_x, FoodSettings::cells_y)
+	food_grid_renderer(*window, world_bounds, FoodSettings::cells_x, FoodSettings::cells_y),
+	thread_pool(8)
 { 
 	init_organisms();
 	init_food();
@@ -30,7 +31,11 @@ void World::update_world(bool pause)
 	ticks++;
 	update_cells_container();
 	add_cells_to_hash_grid();
-	handle_cell_collisions();
+
+	if (toggle_collisions)
+	{
+		handle_cell_collisions();
+	}
 
 	// if our selected protozoa has died we can no longer track it
 	if (selected_protozoa != nullptr && selected_protozoa->dead)
@@ -77,7 +82,8 @@ void World::reproduce_protozoa(Protozoa* parent)
 
 	if (offspring == nullptr)
 	{
-		return;
+		const size_t idx = Random::rand_range(unsigned(0), all_protozoa.size()-1);
+		offspring = all_protozoa.at(idx);
 	}
 	
 	// first we assign the genetic aspects of the offspring to match that of the parents, then reconstruct it
@@ -122,6 +128,8 @@ void World::handle_cell_collisions()
 	for (size_t i = 0; i < temp_cells_container.size(); ++i)
 	{
 		Cell* cell = temp_cells_container[i];
+
+		cell->bound(m_bounds_);
 		c_Vec<spatial_hash_grid.max_nearby_capacity>& nearby = spatial_hash_grid.find(cell->position_);
 
 		for (int j = 0; j < nearby.size; ++j)

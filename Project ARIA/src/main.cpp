@@ -12,6 +12,7 @@
 
 /* Graphics */
 // Create a RectBuffer and re-introduce the connections
+// Cells should fade in and out of existance
 
 
 /* Debug */
@@ -26,6 +27,10 @@
 // - protozoa id should be shown
 // - A better color scheme is needed
 // - bounding box not working appropriately
+
+// NOTE: vibrations need an offset
+// Experiment with constant time period for springs only
+// Solve overpopulation issues by removing a random protoszoa
 
 int main()
 {

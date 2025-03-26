@@ -4,15 +4,13 @@
 #include "../Utils/random.h"
 #include "cell.h"
 
-struct Spring : public GeneSettings
+struct Spring : public SpringGeneSettings
 {
-	float rest_length_range = Random::rand_range(rest_length_ranges);
-	float damping = Random::rand_range(damping_const_range);
-	float spring_constant = Random::rand_range(spring_const_range);
-	float vibration = Random::rand_range(spring_vibration_range);
+	float offset = Random::rand_range(offset_range);
+	float frequency = Random::rand_range(frequency_range);
 
-	sf::Color outer_color = Random::rand_val_in_vector(outer_colors);
-	sf::Color inner_color = Random::rand_val_in_vector(inner_colors);
+	sf::Color outer_color = Random::rand_color();
+	sf::Color inner_color = Random::rand_color();
 
 	int cell_A_id{};
 	int cell_B_id{};
@@ -38,11 +36,13 @@ struct Spring : public GeneSettings
 
 		const float dist = length(pos_b - pos_a);
 
-		// Calculating the spring force: Fs = K * (|B - A| - L)
-		const float rest_length_ratio = 0.5f * (sin(internal_clock * vibration) + 1.0f); // value between 0 and 1
-		const float rest_length = rest_length_ratio * rest_length_val * 5.f + rest_length_val;
+		// finding the rest length of the spring
+		const float scaled_clock = fmod(internal_clock, 360.f) * pi / 180.f;
+		const float phase = (sin(frequency * scaled_clock + offset) + 1.f) / 2.f;
+		const float rest_length = minLength + (phase * (maxLength - minLength));
 
-		const float spring_force = spring_constant * (dist - rest_length);
+		// Calculating the spring force: Fs = K * (|B - A| - L)
+		const float spring_force = spring_const * (dist - rest_length);
 
 		// Calculating the damping force
 		const sf::Vector2f normalised_dir = ((pos_b - pos_a) / dist);
