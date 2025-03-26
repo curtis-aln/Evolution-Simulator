@@ -22,11 +22,11 @@
 // - the grid renderers dont work with negative x values
 // - program doesn't run from executable
 
-// - color mutations
-// - protoza velocity and position should be tracked and displayed
+
 // - protozoa id should be shown
-// - A better color scheme is needed
 // - bounding box not working appropriately
+// - all cells of teh same protzoa should have the same color
+// - spring const, damping, and mutaiton constants should be mutatable
 
 // NOTE: vibrations need an offset
 // Experiment with constant time period for springs only

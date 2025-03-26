@@ -17,9 +17,6 @@ struct Cell : public CellGeneSettings
 	int id{}; // Unique identifier relative to the protozoa
 	int protozoa_id{}; // Unique identifier pointing to its protozoa
 
-	sf::Color outer_color = Random::rand_color(); // todo
-	sf::Color inner_color = Random::rand_color();
-
 	float radius = CellSettings::cell_radius;
 		
 	float offset = Random::rand_range(offset_range);

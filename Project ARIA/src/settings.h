@@ -103,7 +103,7 @@ struct GeneSettings
 	inline static const sf::Vector2i cell_amount_range = { 2, 4 };
 
 	// chances of adding or removing a cell per mutation event
-	inline static constexpr float add_cell_chance = 0.03f;
+	inline static constexpr float add_cell_chance = 0.1f;
 	inline static constexpr float remove_cell_chance = 0.03f;
 	
 };
@@ -120,7 +120,7 @@ struct SpringGeneSettings
 	inline static const sf::Vector2f frequency_range = { 0.f, pi };
 
 	inline static constexpr float minLength = CellSettings::cell_radius * 2.f;
-	inline static constexpr float maxLength = minLength * 4.f;
+	inline static constexpr float maxLength = minLength * 2.5f;
 };
 
 
@@ -136,7 +136,7 @@ struct CellGeneSettings
 	inline static constexpr float minFriction = 0.95f;
 	inline static constexpr float maxFriction = 1.00f;
 
-	static constexpr sf::Uint8 transparancy = 200;
+	static constexpr sf::Uint8 transparancy = 160;
 };
 
 

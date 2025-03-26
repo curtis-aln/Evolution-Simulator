@@ -262,8 +262,8 @@ void World::update_position_data()
 	{
 		for (Cell& cell : protozoa->get_cells())
 		{
-			outer_color_data.push_back(cell.outer_color);
-			inner_color_data.push_back(cell.inner_color);
+			outer_color_data.push_back(protozoa->cell_outer_color);
+			inner_color_data.push_back(protozoa->cell_inner_color);
 			position_data.push_back(cell.position_);
 		}
 	}

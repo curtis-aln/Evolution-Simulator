@@ -74,26 +74,60 @@ void Protozoa::handle_food(FoodManager& food_manager)
 }
 
 
+template <typename T>
+void mutate_elements(std::vector<T>& elements) {
+    for (T& element : elements) {
+        element.call_mutate();
+    }
+}
+
 
 void Protozoa::mutate()
 {
-	// mutating the cells in this organism
-	for (Cell& cell : m_cells_)
-	{
-        cell.call_mutate();
+    mutate_elements(m_cells_);
+    mutate_elements(m_springs_);
 
-        cell.inner_color = mutate_color(cell.inner_color);
-        cell.outer_color = mutate_color(cell.outer_color);
-	}
+    cell_outer_color = mutate_color(cell_outer_color);
+    cell_inner_color = mutate_color(cell_inner_color);
+    
+    spring_outer_color = mutate_color(spring_outer_color);
+    spring_inner_color = mutate_color(spring_inner_color);
 
-	// mutating the springs in this organism
-	for (Spring& spring : m_springs_)
-	{
-        spring.call_mutate();
+    cell_outer_color.a = CellGeneSettings::transparancy;
+    cell_inner_color.a = CellGeneSettings::transparancy;
+    spring_outer_color.a = CellGeneSettings::transparancy;
+    spring_inner_color.a = CellGeneSettings::transparancy;
 
-        spring.inner_color = mutate_color(spring.inner_color);
-        spring.outer_color = mutate_color(spring.outer_color);
-	}
 
     // adding new components to the organism
+    if (Random::rand01_float() < add_cell_chance)
+    {
+        add_cell();
+    }
+
+    if (Random::rand01_float() < remove_cell_chance)
+    {
+        remove_cell();
+    }
+}
+
+void Protozoa::add_cell()
+{
+    // finding the parent which will undergo mitosis
+    const int parent_index = Random::rand_range(size_t(0), m_cells_.size() - 1);
+    sf::Vector2f position = Random::rand_pos_in_circle(m_cells_[parent_index].position_, m_cells_[parent_index].radius);
+
+    // creating the new cell and adding it to our cells
+    const int cell_id = m_cells_.size();
+    Cell new_cell{ cell_id, id, position };
+    m_cells_.push_back(new_cell);
+
+    // creating a spring connection to that cell
+    Spring new_spring{ parent_index, cell_id };
+    m_springs_.push_back(new_spring);
+}
+
+void Protozoa::remove_cell()
+{
+
 }

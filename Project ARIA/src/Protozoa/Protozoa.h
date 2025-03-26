@@ -39,8 +39,15 @@ class Protozoa : ProtozoaSettings, GeneSettings
 	// position and velocity tracking
 	sf::Vector2f previous_position = {0, 0};
 	sf::Vector2f velocity = { 0, 0 };
+
 	
 public:
+	sf::Color cell_outer_color = Random::rand_color();
+	sf::Color cell_inner_color = Random::rand_color();
+
+	sf::Color spring_outer_color = Random::rand_color();
+	sf::Color spring_inner_color = Random::rand_color();
+
 	// debugging
 	std::vector<sf::Vector2f> food_positions_nearby{};
 	std::vector<sf::Vector2f> cell_positions_nearby{};
@@ -66,6 +73,8 @@ public:
 	void update(FoodManager& food_manager);
 	void handle_food(FoodManager& food_manager);
 	void mutate();
+	void add_cell();
+	void remove_cell();
 	void render_protozoa_springs();
 	void render_debug(bool skeleton_mode);
 

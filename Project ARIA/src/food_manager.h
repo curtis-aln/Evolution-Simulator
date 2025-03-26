@@ -70,7 +70,7 @@ public:
 
 	void render()
 	{
-		std::vector<sf::Vector2f> food_positions;
+		std::vector<sf::Vector2f> food_positions; // todo
 		food_positions.reserve(food_vector.size());
 
 		for (Food* food : food_vector)
