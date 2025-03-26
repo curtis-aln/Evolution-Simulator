@@ -40,6 +40,8 @@ class Protozoa : ProtozoaSettings, GeneSettings
 	sf::Vector2f previous_position = {0, 0};
 	sf::Vector2f velocity = { 0, 0 };
 
+	float mutation_rate = .5f;
+	float mutation_range = 0.02f;
 	
 public:
 	sf::Color cell_outer_color = Random::rand_color();

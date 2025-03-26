@@ -6,6 +6,9 @@
 
 struct Spring : public SpringGeneSettings
 {
+	float damping = init_damping;
+	float spring_const = init_spring_const;
+
 	float offset = Random::rand_range(offset_range);
 	float frequency = Random::rand_range(frequency_range);
 
@@ -14,7 +17,6 @@ struct Spring : public SpringGeneSettings
 
 	int cell_A_id{};
 	int cell_B_id{};
-
 
 	// for debugging
 	sf::Vector2f direction_A_force{};
@@ -60,7 +62,7 @@ struct Spring : public SpringGeneSettings
 		cell_b.accelerate(direction_B_force);
 	}
 
-	void call_mutate()
+	void call_mutate(float mutation_rate, float mutation_range)
 	{
 		if (Random::rand01_float() < mutation_rate)
 		{

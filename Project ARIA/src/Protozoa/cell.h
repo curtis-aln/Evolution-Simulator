@@ -80,7 +80,7 @@ struct Cell : public CellGeneSettings
 		velocity_ += acceleration;
 	}
 
-	void call_mutate()
+	void call_mutate(float mutation_rate, float mutation_range)
 	{
 		if (Random::rand01_float() < mutation_rate)
 		{

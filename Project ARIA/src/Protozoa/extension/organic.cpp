@@ -74,18 +74,17 @@ void Protozoa::handle_food(FoodManager& food_manager)
 }
 
 
-template <typename T>
-void mutate_elements(std::vector<T>& elements) {
-    for (T& element : elements) {
-        element.call_mutate();
-    }
-}
-
-
 void Protozoa::mutate()
 {
-    mutate_elements(m_cells_);
-    mutate_elements(m_springs_);
+    for (Cell& cell : m_cells_)
+    {
+        cell.call_mutate(mutation_rate, mutation_range);
+    }
+
+    for (Spring& spring : m_springs_)
+    {
+        spring.call_mutate(mutation_rate, mutation_range);
+    }
 
     cell_outer_color = mutate_color(cell_outer_color);
     cell_inner_color = mutate_color(cell_inner_color);
@@ -109,6 +108,9 @@ void Protozoa::mutate()
     {
         remove_cell();
     }
+
+    mutation_rate += Random::rand11_float() * delta_mutation_rate;
+    mutation_range += Random::rand11_float() * delta_mutation_range;
 }
 
 void Protozoa::add_cell()

@@ -84,6 +84,8 @@ public:
 	// world interacting with the food
 	void remove_food(int food_id)
 	{
+		Food* food = food_vector.at(food_id);
+		food->position = { 0, 0 };
 		food_vector.remove(food_id);
 	}
 

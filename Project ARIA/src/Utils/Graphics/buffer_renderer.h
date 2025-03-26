@@ -28,6 +28,8 @@ class CircleBuffer
     sf::Texture texture;
     sf::VertexArray vertex_array{ sf::Quads };
 
+    int max_circles = 0;
+
 public:
     CircleBuffer(sf::RenderWindow* window) : window_(window)
     {
@@ -36,6 +38,7 @@ public:
 
     void init_texture(std::vector<sf::Color>& colors, const float circle_radius, const int num_circles)
     {
+        max_circles = num_circles;
         // Init the texture
         texture = generateCircleTexture(circle_radius);
         texture.setSmooth(true); // Enabled smoothing for better quality
@@ -72,6 +75,22 @@ public:
         for (size_t i = 0; i < num_circles; ++i)
         {
             sf::Vector2f pos = positions_x[i];
+            float r = tex_size.x / 2.0f; // Assuming a square texture
+
+            size_t index = i * 4;
+
+            // Define quad (textured sprite)
+            vertex_array[index + 0].position = sf::Vector2f(pos.x - r, pos.y - r);
+            vertex_array[index + 1].position = sf::Vector2f(pos.x + r, pos.y - r);
+            vertex_array[index + 2].position = sf::Vector2f(pos.x + r, pos.y + r);
+            vertex_array[index + 3].position = sf::Vector2f(pos.x - r, pos.y + r);
+        }
+
+        // any extra circles will be drawn far away
+
+        for (size_t i = num_circles; i < max_circles; ++i)
+        {
+            sf::Vector2f pos = {0, 0};
             float r = tex_size.x / 2.0f; // Assuming a square texture
 
             size_t index = i * 4;

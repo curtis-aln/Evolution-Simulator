@@ -105,16 +105,16 @@ struct GeneSettings
 	// chances of adding or removing a cell per mutation event
 	inline static constexpr float add_cell_chance = 0.1f;
 	inline static constexpr float remove_cell_chance = 0.03f;
+
+	inline static constexpr float delta_mutation_rate  = 0.0075f;
+	inline static constexpr float delta_mutation_range = 0.0075f;
 	
 };
 
 struct SpringGeneSettings
 {
-	inline static constexpr float mutation_rate = .5f;
-	inline static constexpr float mutation_range = 0.02f;
-
-	inline static constexpr float damping = 0.975f;
-	inline static constexpr float spring_const = 0.26f;
+	inline static constexpr float init_damping = 0.975f;
+	inline static constexpr float init_spring_const = 0.26f;
 
 	inline static const sf::Vector2f offset_range = { 0.f, pi };
 	inline static const sf::Vector2f frequency_range = { 0.f, pi };
@@ -126,9 +126,6 @@ struct SpringGeneSettings
 
 struct CellGeneSettings
 {
-	inline static constexpr float mutation_rate = .5f;
-	inline static constexpr float mutation_range = 0.02f;
-
 	// cell friction settings
 	inline static const sf::Vector2f offset_range = { 0.f, pi };
 	inline static const sf::Vector2f frequency_range = { 0.f, pi };
