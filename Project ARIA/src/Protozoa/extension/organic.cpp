@@ -73,7 +73,15 @@ void Protozoa::handle_food(FoodManager& food_manager)
 		if (m_personal_bounds_.contains(food_particle->position)) // todo better collision handling
 		{
 			food_manager.remove_food(food_particle->id);
-			reproduce = true;
+
+            total_food_eaten++;
+            stomach++;
+
+            if (stomach > 3)
+            {
+                stomach = 0;
+                reproduce = true;
+            }
 		}
 	}
 }

@@ -42,6 +42,10 @@ class Protozoa : ProtozoaSettings, GeneSettings, GeneticPresets
 
 	float mutation_rate = .5f;
 	float mutation_range = 0.02f;
+
+	// reproduction - related
+	unsigned stomach = 0;
+	unsigned total_food_eaten = 0;
 	
 public:
 	sf::Color cell_outer_color = Random::rand_color();
@@ -114,6 +118,9 @@ public:
 	{
 		frames_alive = 0.f;
 		dead = false;
+
+		stomach = 0;
+		total_food_eaten = 0;
 	}
 
 

@@ -172,8 +172,8 @@ struct FoodSettings
 	inline static constexpr size_t cells_y = 170;
 	inline static constexpr size_t cell_capacity = 25;
 
-	static constexpr unsigned max_food = 40'000;
-	static constexpr unsigned initial_food = 40'000;
+	static constexpr unsigned max_food = 60'000;
+	static constexpr unsigned initial_food = 60'000;
 	inline static const float food_radius = 30.f;
 	inline static const float friction = 0.99f;
 

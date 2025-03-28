@@ -28,6 +28,10 @@
 
 // - protozoa id should be shown
 // - bounding box not working appropriately
+// - display mutation rate and mutation range
+// - track average mutation rate / mutation range
+// - display offspring count and track average
+// - display food eaten
 
 // add o_vector compatability for the circleBuffer and spatial_hash_grid
 
