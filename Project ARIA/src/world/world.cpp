@@ -36,7 +36,7 @@ void World::update_world(bool pause)
 
 	if (toggle_collisions)
 	{
-		handle_cell_collisions();
+		optimized_cell_collisions();
 	}
 
 	// if our selected protozoa has died we can no longer track it
@@ -51,6 +51,115 @@ void World::update_world(bool pause)
 		update_protozoas();
 	}
 }
+
+
+void World::optimized_cell_collisions()
+{
+	// iterating over each cell, we update as per the cell instead of as per the particle
+	for (int cell_id = 0; cell_id < cells_x * cells_y; ++cell_id)
+	{
+		update_grid_cell(cell_id);
+	}
+}
+
+void World::update_grid_cell(const int grid_cell_id)
+{
+	/* All of the particles in this cell will be updated based on the information of the sorrounding 9 neighbours, this is a more optimized approach */ 
+	int neighbours_size = 0;
+
+	const int cell_index_x = grid_cell_id % cells_x;
+	const int cell_index_y = grid_cell_id / cells_x;
+	const bool at_border_x = cell_index_x == 0 || cell_index_x == cells_x - 1;
+	const bool at_border_y = cell_index_y == 0 || cell_index_y == cells_y - 1;
+
+	// each possible neighbour in the 3x3 area
+	update_nearby_container(neighbours_size, cell_index_x - 1, cell_index_y - 1, true, true);
+	update_nearby_container(neighbours_size, cell_index_x, cell_index_y - 1, false, true);
+	update_nearby_container(neighbours_size, cell_index_x + 1, cell_index_y - 1, true, true);
+	update_nearby_container(neighbours_size, cell_index_x - 1, cell_index_y, true, false);
+	update_nearby_container(neighbours_size, cell_index_x, cell_index_y, false, false);
+	update_nearby_container(neighbours_size, cell_index_x + 1, cell_index_y, true, false);
+	update_nearby_container(neighbours_size, cell_index_x - 1, cell_index_y + 1, true, true);
+	update_nearby_container(neighbours_size, cell_index_x, cell_index_y + 1, false, true);
+	update_nearby_container(neighbours_size, cell_index_x + 1, cell_index_y + 1, true, true);
+
+	// updating the particles
+	const auto& cell_contents = spatial_hash_grid.grid[grid_cell_id];
+	const uint8_t cell_size = spatial_hash_grid.objects_count[grid_cell_id];
+
+//#pragma omp parallel for
+	for (uint8_t idx = 0; idx < cell_size; ++idx)
+	{
+		update_protozoa_cell(cell_contents[idx], neighbours_size);
+	}
+}
+
+void World::update_protozoa_cell(int protozoa_cell_index, int neighbours_size)
+{
+	Cell* cell = temp_cells_container[protozoa_cell_index];
+
+	for (uint32_t i{ 0 }; i < neighbours_size; ++i)
+	{
+		Cell* other_cell = temp_cells_container[nearby_ids[i]];
+		const sf::Vector2f other_pos = other_cell->position_;
+
+		const float dist_sq = dist_squared(cell->position_, other_pos);
+		const float local_diam = cell->radius * 2.f;
+
+		if (dist_sq > local_diam * local_diam)
+			continue;
+
+		// Cells are not the same & they are intersecting
+		const float dist = std::sqrt(dist_sq);
+		if (dist == 0.0f) // Prevent division by zero
+			continue;
+
+		// Compute the overlap
+		float overlap = local_diam - dist;
+
+		// Compute the collision normal
+		sf::Vector2f collisionNormal = (cell->position_ - other_pos) / dist;
+
+		// Move the cells apart
+		cell->position_ += collisionNormal * (overlap * 0.5f);
+		other_cell->position_ -= collisionNormal * (overlap * 0.5f);
+
+	}
+}
+
+void World::update_nearby_container(int& neighbours_size,
+	int32_t neighbour_index_x, int32_t neighbour_index_y,
+	bool check_x = true,
+	bool check_y = true)
+{
+	// Fast modulo for positive and negative numbers
+	if (check_x)
+	{
+		neighbour_index_x = neighbour_index_x >= 0 ?
+			(neighbour_index_x < cells_x ? neighbour_index_x : neighbour_index_x - cells_x) :
+			(neighbour_index_x + cells_x);
+	}
+
+	if (check_y)
+	{
+		neighbour_index_y = neighbour_index_y >= 0 ?
+			(neighbour_index_y < cells_y ? neighbour_index_y : neighbour_index_y - cells_y) :
+			(neighbour_index_y + cells_y);
+	}
+
+	// fetching data for copying
+	const uint32_t neighbour_index = neighbour_index_y * cells_x + neighbour_index_x;
+	const auto& contents = spatial_hash_grid.grid[neighbour_index];
+	const auto size = spatial_hash_grid.objects_count[neighbour_index];
+
+	// adding the neighbour data to the array
+//#pragma omp parallel for
+	for (uint8_t idx = 0; idx < size; ++idx)
+	{
+		nearby_ids[neighbours_size++] = contents[idx];
+	}
+}
+
 
 void World::update_protozoas()
 {
@@ -134,66 +243,10 @@ void World::add_cells_to_hash_grid()
 	for (Cell* cell : temp_cells_container)
 	{
 		cell->bound(m_bounds_);
-		spatial_hash_grid.addAtom(cell->position_, idx++);
+		spatial_hash_grid.add_object(cell->position_.x, cell->position_.y, idx++);
 	}
 }
 
-void World::handle_cell_collisions()
-{
-	for (size_t i = 0; i < temp_cells_container.size(); ++i)
-	{
-		Cell* cell = temp_cells_container[i];
-
-		cell->bound(m_bounds_);
-		c_Vec<spatial_hash_grid.max_nearby_capacity>& nearby = spatial_hash_grid.find(cell->position_);
-
-		for (int j = 0; j < nearby.size; ++j)
-		{
-			if (nearby.at(j) <= i)  // Ensure each pair is processed only once
-				continue;
-
-			Cell* other_cell = temp_cells_container.at(nearby.at(j));
-
-			if (cell == other_cell)
-				continue;
-
-			if (debug_mode)
-			{
-				Protozoa* protozoa = all_protozoa.at(cell->protozoa_id);
-				protozoa->cell_positions_nearby.push_back(other_cell->position_);
-
-				Protozoa* other_protozoa = all_protozoa.at(other_cell->protozoa_id);
-				other_protozoa->cell_positions_nearby.push_back(cell->position_);
-			}
-
-			if (paused)
-			{
-				continue;
-			}
-
-			const float dist_sq = dist_squared(cell->position_, other_cell->position_);
-			const float local_diam = cell->radius + other_cell->radius;
-
-			if (dist_sq > local_diam * local_diam)
-				continue;
-
-			// Cells are not the same & they are intersecting
-			const float dist = std::sqrt(dist_sq);
-			if (dist == 0.0f) // Prevent division by zero
-				continue;
-
-			// Compute the overlap
-			float overlap = local_diam - dist;
-
-			// Compute the collision normal
-			sf::Vector2f collisionNormal = (cell->position_ - other_cell->position_) / dist;
-
-			// Move the cells apart
-			cell->position_ += collisionNormal * (overlap * 0.5f);
-			other_cell->position_ -= collisionNormal * (overlap * 0.5f);
-		}
-	}
-}
 
 void World::update_debug(const sf::Vector2f mouse_position)
 {

@@ -15,6 +15,8 @@
 #include "../food_manager.h"
 
 #include "../Utils/Graphics/spatial_hash_grid.h"
+#include "../Utils/Graphics/simple_spatial_grid.h"
+
 #include "../Utils/Graphics/SFML_Grid.h"
 
 
@@ -40,7 +42,7 @@ class World : WorldSettings
 
 	// to handle collisions
 	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
-	SpatialHashGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_bounds };
+	SimpleSpatialGrid<cells_x, cells_y> spatial_hash_grid{ world_bounds };
 	SFML_Grid cell_grid_renderer;
 	SFML_Grid food_grid_renderer;
 
@@ -64,13 +66,24 @@ public:
 	World(sf::RenderWindow* window = nullptr);
 
 	void update_world(bool pause);
+
+	// cell collision handling
+	std::array<int, cell_capacity * 9> nearby_ids = {};
+
+	void optimized_cell_collisions();
+	void update_grid_cell(const int grid_cell_id);
+
+	void update_protozoa_cell(int protozoa_cell_index, int neighbours_size);
+
+	void update_nearby_container(int& neighbours_size, int32_t neighbour_index_x, int32_t neighbour_index_y, bool check_x, bool check_y);
+
+
 	void update_protozoas();
 	Protozoa* find_an_offspring();
 	void reproduce_protozoa(Protozoa* protozoa);
 	void update_cells_container();
 	void handle_extinction_event();
 	void add_cells_to_hash_grid();
-	void handle_cell_collisions();
 	void update_debug(sf::Vector2f mouse_position);
 	void render_world();
 	void render_protozoa();
