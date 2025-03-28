@@ -1,6 +1,11 @@
 #include "../Protozoa.h"
 #include "../../food_manager.h"
 
+#include <iostream>
+#include <unordered_map>
+#include <vector>
+
+#include <unordered_set>
 
 inline sf::Color mutate_color(const sf::Color& color, float mutation_rate = 0.012f)
 {
@@ -134,4 +139,36 @@ void Protozoa::add_cell()
 void Protozoa::remove_cell()
 {
 
+}
+
+
+void Protozoa::load_preset(const static GeneticPresets::Preset& preset)
+{
+    // Clear existing genetic data
+    m_cells_.clear();
+    m_springs_.clear();
+
+    // Create unique cells based on the preset
+    std::unordered_set<int> unique_cells;
+    for (const auto& connection : preset) 
+    {
+        unique_cells.insert(connection.first);
+        unique_cells.insert(connection.second);
+    }
+
+    // Initialize cells
+    const float world_rad = m_world_bounds_->radius;
+    sf::Vector2f center = Random::rand_pos_in_circle(m_world_bounds_->center, world_rad);
+    const Circle protozoa_area = { center, spawn_radius };
+
+    for (int cell_id : unique_cells) 
+    {
+        m_cells_.emplace_back(cell_id, id, protozoa_area.rand_pos());
+    }
+
+    // Create springs
+    for (const auto& connection : preset) 
+    {
+        m_springs_.emplace_back(connection.first, connection.second);
+    }
 }

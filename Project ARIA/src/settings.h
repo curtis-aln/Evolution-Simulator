@@ -100,7 +100,7 @@ struct CellSettings
 struct GeneSettings
 {
 	// the amount of cells each protzoa starts off with
-	inline static const sf::Vector2i cell_amount_range = { 2, 4 };
+	inline static const sf::Vector2i cell_amount_range = { 4, 6 };
 
 	// chances of adding or removing a cell per mutation event
 	inline static constexpr float add_cell_chance = 0.1f;
@@ -188,3 +188,41 @@ struct FoodSettings
 
 };
 
+
+#include <iostream>
+#include <unordered_map>
+#include <vector>
+
+#include <unordered_map>
+
+struct GeneticPresets
+{
+	using Preset = std::vector<std::pair<int, int>>;
+
+	static const Preset two_celled_protozoa;
+	static const Preset three_celled_protozoa;
+	static const Preset five_celled_protozoa;
+
+	static const std::vector<Preset> presets;
+};
+
+// Definition outside the class
+inline const GeneticPresets::Preset GeneticPresets::two_celled_protozoa = {
+	{0, 1}
+};
+
+inline const GeneticPresets::Preset GeneticPresets::three_celled_protozoa = {
+	{0, 1},
+	{0, 2},
+	{1, 2}
+};
+
+inline const GeneticPresets::Preset GeneticPresets::five_celled_protozoa = {
+	{0, 1},
+	{0, 2},
+	{0, 3},
+	{0, 4}
+};
+
+inline const std::vector<GeneticPresets::Preset> GeneticPresets::presets = { 
+	two_celled_protozoa, three_celled_protozoa, five_celled_protozoa };

@@ -20,9 +20,20 @@ Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, cons
 
 	if (init_cells)
 	{
-		initialise_cells();
-		initialise_springs();
+		const auto idx = Random::rand_range(size_t(0), presets.size() - 1);
+		load_preset(presets.at(idx));
+		//initialise_cells();
+		//initialise_springs();
 	}
+}
+
+
+void Protozoa::generate_random()
+{
+	m_cells_.clear();
+	m_springs_.clear();
+	initialise_cells();
+	initialise_springs();
 }
 
 void Protozoa::initialise_cells()
@@ -38,6 +49,7 @@ void Protozoa::initialise_cells()
 		m_cells_.emplace_back(i, id, protozoa_area.rand_pos());
 	}
 }
+
 
 void Protozoa::initialise_springs()
 {

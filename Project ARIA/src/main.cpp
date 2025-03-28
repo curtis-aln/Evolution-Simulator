@@ -10,21 +10,26 @@
 // World size gradually increases
 // A Dynamic Quad Tree with auto local and global resizing
 
+
 /* Graphics */
 // Create a RectBuffer and re-introduce the connections
 // Cells should fade in and out of existance
 // Statistics graphs should be constantly at the bottom right corner of the screen
 // Food and cell counts should be on the same graph
+// sort out recaling issues with the line graph
+// add statistics statically on the screen aswell
+// make a "draw_static" function for the camera
 
 
 /* Debug */
 // - the grid renderers dont work with negative x values
 // - program doesn't run from executable
-
+// - when selecting organisms, everything else should fade a bit
 
 // - protozoa id should be shown
 // - bounding box not working appropriately
 
+// add o_vector compatability for the circleBuffer and spatial_hash_grid
 
 int main()
 {

@@ -52,7 +52,7 @@ public:
 		int size = food_vector.size();
 		if (size < initial_food && frames++ % 2 == 0)
 		{
-			for (int i = 0; i < 6; ++i)
+			for (int i = 0; i < 7; ++i)
 			{
 				Food* food = food_vector.add();
 				if (food == nullptr)

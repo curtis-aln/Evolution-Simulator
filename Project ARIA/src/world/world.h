@@ -65,8 +65,10 @@ public:
 
 	void update_world(bool pause);
 	void update_protozoas();
+	Protozoa* find_an_offspring();
 	void reproduce_protozoa(Protozoa* protozoa);
 	void update_cells_container();
+	void handle_extinction_event();
 	void add_cells_to_hash_grid();
 	void handle_cell_collisions();
 	void update_debug(sf::Vector2f mouse_position);

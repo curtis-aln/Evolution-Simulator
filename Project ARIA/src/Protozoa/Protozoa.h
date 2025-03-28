@@ -21,7 +21,7 @@
 
 inline static constexpr float initial_energy = 300.f; // energy the protozoa spawn with
 
-class Protozoa : ProtozoaSettings, GeneSettings
+class Protozoa : ProtozoaSettings, GeneSettings, GeneticPresets
 {
 	sf::RenderWindow* m_window_ = nullptr; // for rendering // todo move all rendering outside this class
 	Circle* m_world_bounds_ = nullptr;
@@ -77,6 +77,7 @@ public:
 	void mutate();
 	void add_cell();
 	void remove_cell();
+	void load_preset(const static GeneticPresets::Preset& preset);
 	void render_protozoa_springs();
 	void render_debug(bool skeleton_mode);
 
@@ -109,11 +110,12 @@ public:
 	
 	void bound_cells();
 
-	void set_cells_and_springs(std::vector<Cell>& cells, std::vector<Spring>& springs)
+	void reset_protozoa()
 	{
-		m_cells_ = cells;
-		m_springs_ = springs;
+		frames_alive = 0.f;
+		dead = false;
 	}
+
 
 	void set_protozoa_attributes(Protozoa* other)
 	{
@@ -127,7 +129,18 @@ public:
 
 		mutation_range = other->mutation_range;
 		mutation_rate = other->mutation_rate;
+
+		for (Cell& cell : m_cells_)
+		{
+			cell.protozoa_id = id;
+		}
 	}
+
+	void generate_random();
+
+	// initialisation
+	void initialise_cells();
+	void initialise_springs();
 
 private:
 	// rendering
@@ -140,8 +153,4 @@ private:
 	void update_bounding_box();
 	void update_springs();
 	void update_cells();
-
-	// initialisation
-	void initialise_cells();
-	void initialise_springs();
 };

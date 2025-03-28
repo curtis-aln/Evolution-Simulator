@@ -28,6 +28,8 @@ World::World(sf::RenderWindow* window)
 
 void World::update_world(bool pause)
 {
+	handle_extinction_event();
+
 	ticks++;
 	update_cells_container();
 	add_cells_to_hash_grid();
@@ -75,28 +77,28 @@ void World::update_protozoas()
 	}
 }
 
-void World::reproduce_protozoa(Protozoa* parent)
+Protozoa* World::find_an_offspring()
 {
-	parent->reproduce = false;
 	Protozoa* offspring = all_protozoa.add();
 
 	if (offspring == nullptr)
 	{
-		const size_t idx = Random::rand_range(unsigned(0), all_protozoa.size()-1);
+		const size_t idx = Random::rand_range(unsigned(0), all_protozoa.size() - 1);
 		offspring = all_protozoa.at(idx);
 	}
+	return offspring;
+}
+
+void World::reproduce_protozoa(Protozoa* parent)
+{
+	Protozoa* offspring = find_an_offspring();
+	parent->reproduce = false;
 	
 	// first we assign the genetic aspects of the offspring to match that of the parents, then reconstruct it
-	offspring->set_cells_and_springs(parent->get_cells(), parent->get_springs());
-	offspring->frames_alive = 0;
+	offspring->reset_protozoa();
+	offspring->set_protozoa_attributes(parent);
 	offspring->generation += 1;
-	offspring->dead = false;
 	offspring->mutate();
-
-	for (Cell& cell : offspring->get_cells())
-	{
-		cell.protozoa_id = offspring->id;
-	}
 }
 
 void World::update_cells_container()
@@ -108,6 +110,19 @@ void World::update_cells_container()
 		for (Cell& cell : protozoa->get_cells())
 		{
 			temp_cells_container.push_back(&cell);
+		}
+	}
+}
+
+
+void World::handle_extinction_event()
+{
+	if (all_protozoa.size() == 0)
+	{
+		for (int i = 0; i < initial_protozoa; ++i)
+		{
+			Protozoa* protozoa = all_protozoa.add();
+			protozoa->generate_random();
 		}
 	}
 }
