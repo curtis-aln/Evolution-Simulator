@@ -32,7 +32,7 @@ inline sf::Color mutate_color(const sf::Color& color, float mutation_rate = 0.01
     if (h < 0) h += 360.f;
 
     // Mutate hue, saturation, and lightness
-    h += Random::rand_range(-30.f, 30.f); // Larger hue mutations
+    h += Random::rand_range(-20.f, 20.f); // Larger hue mutations
     s += Random::rand_range(-mutation_rate, mutation_rate);
     l += Random::rand_range(-mutation_rate, mutation_rate);
 
@@ -57,18 +57,25 @@ inline sf::Color mutate_color(const sf::Color& color, float mutation_rate = 0.01
 }
 
 
-void Protozoa::handle_food(FoodManager& food_manager)
+void Protozoa::handle_food(FoodManager& food_manager, bool debug)
 {
 	const sf::Vector2f center = get_center();
 	c_Vec<food_manager.spatial_hash_grid.max_nearby_capacity>& nearby =
 		food_manager.spatial_hash_grid.find(center);
 
-	food_positions_nearby.clear();
+    if (debug)
+    {
+        food_positions_nearby.clear();
+    }
 
 	for (int i = 0; i < nearby.size; ++i)
 	{
 		Food* food_particle = food_manager.at(nearby.at(i));
-		food_positions_nearby.push_back(food_particle->position);
+
+        if (debug)
+        {
+            food_positions_nearby.push_back(food_particle->position);
+        }
 
 		if (m_personal_bounds_.contains(food_particle->position)) // todo better collision handling
 		{
@@ -140,8 +147,6 @@ void Protozoa::add_cell()
     // creating a spring connection to that cell
     Spring new_spring{ parent_index, cell_id };
     m_springs_.push_back(new_spring);
-
-    cell_count++;
 }
 
 void Protozoa::remove_cell()
@@ -150,7 +155,7 @@ void Protozoa::remove_cell()
 }
 
 
-void Protozoa::load_preset(const static GeneticPresets::Preset& preset)
+void Protozoa::load_preset(Preset& preset)
 {
     // Clear existing genetic data
     m_cells_.clear();

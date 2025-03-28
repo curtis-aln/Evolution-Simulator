@@ -26,6 +26,8 @@ class FoodManager : FoodSettings
 	CircleBuffer food_renderer{ window_ };
 	o_vector<Food, max_food> food_vector{};
 
+	std::vector<sf::Vector2f> food_positions;
+
 public:
 	const float bounds_radius = world_bounds_->radius;
 	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
@@ -39,6 +41,8 @@ public:
 	{
 		init_renderer();
 		init_food();
+
+		food_positions.reserve(max_food);
 	}
 
 	int get_size()
@@ -70,8 +74,7 @@ public:
 
 	void render()
 	{
-		std::vector<sf::Vector2f> food_positions; // todo
-		food_positions.reserve(food_vector.size());
+		food_positions.clear();
 
 		for (Food* food : food_vector)
 		{

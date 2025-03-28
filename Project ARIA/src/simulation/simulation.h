@@ -19,8 +19,8 @@
 #include <atomic>
 #include <chrono>
 
-inline static constexpr int frame_smoothing = 30;
-inline const static bool full_screen = true;  // Change this value to toggle fullscreen mode
+inline static constexpr int frame_smoothing = 10;
+inline const static bool full_screen = false;  // Change this value to toggle fullscreen mode
 inline const static double resize_shrinkage = 0.95;
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
@@ -59,12 +59,6 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 
 	LineGraph<line_maximum_data, line_x_axis_increments> protozoa_population_graph_{ &m_window_, protozoa_graph_bounds };
 	LineGraph<line_maximum_data, line_x_axis_increments> food_population_graph_{ &m_window_, food_graph_bounds };
-
-	float test_data = 50.f;
-	float test_data2 = 100.f;
-
-	float test_data3 = 0;
-	float test_data4 = 0;
 
 	GeneticNeuralNetwork network{ 2, 1, 2 };
 	NetworkRenderer net_renderer{ {200, 1750, 1800, 900}, &m_window_, &network };

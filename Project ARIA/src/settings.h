@@ -57,7 +57,7 @@ struct SimulationSettings
 
 	// statistics settings
 	static constexpr unsigned line_maximum_data = 70;
-	static constexpr unsigned line_x_axis_increments = 3;
+	static constexpr unsigned line_x_axis_increments = 20;
 	inline static const sf::FloatRect protozoa_graph_bounds = { 700, 1500, 1000, 300 };
 	inline static const sf::FloatRect food_graph_bounds     = { 2000, 1500, 1000, 300 };
 	inline static const sf::FloatRect text_renderer_bounds  = { 2600, 1700, 900, 1200 };
@@ -71,13 +71,13 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 70'000;
+	static constexpr float bounds_radius = 140'000;
 
-	static constexpr unsigned max_protozoa = 10'000;
-	static constexpr unsigned initial_protozoa = 4'000;
+	static constexpr unsigned max_protozoa = 30'000;
+	static constexpr unsigned initial_protozoa = 15'000;
 
-	inline static constexpr size_t cells_x = 170;
-	inline static constexpr size_t cells_y = 170;
+	inline static constexpr size_t cells_x = 240;
+	inline static constexpr size_t cells_y = 240;
 	inline static constexpr size_t cell_capacity = 16;
 };
 
@@ -130,7 +130,7 @@ struct CellGeneSettings
 	inline static const sf::Vector2f offset_range = { 0.f, pi };
 	inline static const sf::Vector2f frequency_range = { 0.f, pi };
 
-	inline static constexpr float minFriction = 0.95f;
+	inline static constexpr float minFriction = 0.992f;
 	inline static constexpr float maxFriction = 1.00f;
 
 	static constexpr sf::Uint8 transparancy = 160;
@@ -168,12 +168,12 @@ struct BuilderSettings
 
 struct FoodSettings
 {
-	inline static constexpr size_t cells_x = 170;
-	inline static constexpr size_t cells_y = 170;
+	inline static constexpr size_t cells_x = 240;
+	inline static constexpr size_t cells_y = 240;
 	inline static constexpr size_t cell_capacity = 25;
 
-	static constexpr unsigned max_food = 60'000;
-	static constexpr unsigned initial_food = 60'000;
+	static constexpr unsigned max_food = 80'000;
+	static constexpr unsigned initial_food = 80'000;
 	inline static const float food_radius = 30.f;
 	inline static const float friction = 0.99f;
 
@@ -195,34 +195,33 @@ struct FoodSettings
 
 #include <unordered_map>
 
+#include <vector>
+#include <utility>
+
 struct GeneticPresets
 {
 	using Preset = std::vector<std::pair<int, int>>;
 
-	static const Preset two_celled_protozoa;
-	static const Preset three_celled_protozoa;
-	static const Preset five_celled_protozoa;
+	Preset two_celled_protozoa = {
+		{0, 1}
+	};
 
-	static const std::vector<Preset> presets;
+	Preset three_celled_protozoa = {
+		{0, 1},
+		{0, 2},
+		{1, 2}
+	};
+
+	Preset five_celled_protozoa = {
+		{0, 1},
+		{0, 2},
+		{0, 3},
+		{0, 4}
+	};
+
+	std::vector<Preset> presets = {
+		two_celled_protozoa,
+		three_celled_protozoa,
+		five_celled_protozoa
+	};
 };
-
-// Definition outside the class
-inline const GeneticPresets::Preset GeneticPresets::two_celled_protozoa = {
-	{0, 1}
-};
-
-inline const GeneticPresets::Preset GeneticPresets::three_celled_protozoa = {
-	{0, 1},
-	{0, 2},
-	{1, 2}
-};
-
-inline const GeneticPresets::Preset GeneticPresets::five_celled_protozoa = {
-	{0, 1},
-	{0, 2},
-	{0, 3},
-	{0, 4}
-};
-
-inline const std::vector<GeneticPresets::Preset> GeneticPresets::presets = { 
-	two_celled_protozoa, three_celled_protozoa, five_celled_protozoa };

@@ -58,7 +58,7 @@ void World::update_protozoas()
 	reproduce_indexes.reserve(max_protozoa);
 	for (Protozoa* protozoa : all_protozoa)
 	{
-		protozoa->update(food_manager);
+		protozoa->update(food_manager, debug_mode);
 
 		if (protozoa->reproduce)
 		{

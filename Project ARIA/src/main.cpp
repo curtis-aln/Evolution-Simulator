@@ -41,3 +41,6 @@ int main()
 	Simulation().run();
 }
 
+
+
+// before, fps: 30

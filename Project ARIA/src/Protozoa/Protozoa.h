@@ -15,7 +15,6 @@
 #include "../food_manager.h"
 #include "../Utils/random.h"
 
-
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs
 // the protozoa class is responsible for connecting the springs and cells
 
@@ -23,7 +22,7 @@ inline static constexpr float initial_energy = 300.f; // energy the protozoa spa
 
 class Protozoa : ProtozoaSettings, GeneSettings, GeneticPresets
 {
-	sf::RenderWindow* m_window_ = nullptr; // for rendering // todo move all rendering outside this class
+	sf::RenderWindow* m_window_ = nullptr;
 	Circle* m_world_bounds_ = nullptr;
 
 	// components of the protozoa
@@ -33,8 +32,7 @@ class Protozoa : ProtozoaSettings, GeneSettings, GeneticPresets
 	sf::Rect<float> m_personal_bounds_{};
 
 	// information which is passed from generation to generation
-	size_t cell_count = Random::rand_range(cell_amount_range);
-	GeneticNeuralNetwork neural_network;
+	//GeneticNeuralNetwork neural_network;
 
 	// position and velocity tracking
 	sf::Vector2f previous_position = {0, 0};
@@ -76,12 +74,12 @@ public:
 
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
-	void update(FoodManager& food_manager);
-	void handle_food(FoodManager& food_manager);
+	void update(FoodManager& food_manager, bool debug);
+	void handle_food(FoodManager& food_manager, bool debug);
 	void mutate();
 	void add_cell();
 	void remove_cell();
-	void load_preset(const static GeneticPresets::Preset& preset);
+	void load_preset(Preset& preset);
 	void render_protozoa_springs();
 	void render_debug(bool skeleton_mode);
 

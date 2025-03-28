@@ -147,15 +147,9 @@ void Simulation::update_one_frame()
 
 void Simulation::update_test_data()
 {
-	test_data3 += Random::rand11_float() * 0.05f;
-	test_data4 += Random::rand11_float() * 0.05f;
-
-	test_data3 = std::clamp(test_data3, -1.f, 1.f);
-	test_data4 = std::clamp(test_data4, -1.f, 1.f);
-
-	network.inputs[0] = std::tanh(test_data3);
-	network.inputs[1] = std::tanh(test_data4);
-	network.forward_propagate();
+	//network.inputs[0] = std::tanh(test_data3);
+	//network.inputs[1] = std::tanh(test_data4);
+	//network.forward_propagate();
 }
 
 
@@ -166,10 +160,8 @@ void Simulation::update_line_graphs()
 
 	if (m_ticks_ % line_x_axis_increments == 0)
 	{
-		test_data += Random::rand_range(-2.f, 2.f);
-		test_data2 += Random::rand_range(-2.f, 2.f);
-		protozoa_population_graph_.add_data(test_data);
-		food_population_graph_.add_data(test_data2);
+		protozoa_population_graph_.add_data(m_world_.get_protozoa_count());
+		food_population_graph_.add_data(m_world_.get_food_count());
 	}
 }
 

@@ -7,7 +7,7 @@
 
 
 Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
-	: id(id_), m_window_(window), m_world_bounds_(world_bounds)
+	: id(id_), m_window_(window), m_world_bounds_(world_bounds), GeneticPresets()
 {
 
 	food_positions_nearby.reserve(30);
@@ -43,6 +43,7 @@ void Protozoa::initialise_cells()
 	sf::Vector2f center = Random::rand_pos_in_circle(m_world_bounds_->center, world_rad);
 	const Circle protozoa_area = { center, spawn_radius };
 
+	const int cell_count = Random::rand_range(cell_amount_range);
 	m_cells_.reserve(cell_count);
 	for (int i = 0; i < cell_count; ++i)
 	{
@@ -53,6 +54,8 @@ void Protozoa::initialise_cells()
 
 void Protozoa::initialise_springs()
 {
+	const int cell_count = m_cells_.size();
+
 	m_springs_.reserve(cell_count);
 
 	for (int i = 1; i < cell_count; ++i)
@@ -62,7 +65,7 @@ void Protozoa::initialise_springs()
 }
 
 
-void Protozoa::update(FoodManager& food_manager)
+void Protozoa::update(FoodManager& food_manager, bool debug)
 {
 	if (m_cells_.empty()) // No computation is needed if there are no cells
 		return;
@@ -72,7 +75,7 @@ void Protozoa::update(FoodManager& food_manager)
 
 	update_bounding_box();
 
-	handle_food(food_manager);
+	handle_food(food_manager, debug);
 
 	++frames_alive;
 
