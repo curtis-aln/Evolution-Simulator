@@ -71,13 +71,13 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 140'000;
+	static constexpr float bounds_radius =80'000;
 
-	static constexpr unsigned max_protozoa = 30'000;
+	static constexpr unsigned max_protozoa = 20'000;
 	static constexpr unsigned initial_protozoa = 15'000;
 
-	inline static constexpr size_t cells_x = 240;
-	inline static constexpr size_t cells_y = 240;
+	inline static constexpr size_t cells_x = 130;
+	inline static constexpr size_t cells_y = 130;
 	inline static constexpr size_t cell_capacity = 16;
 };
 
@@ -100,7 +100,7 @@ struct CellSettings
 struct GeneSettings
 {
 	// the amount of cells each protzoa starts off with
-	inline static const sf::Vector2i cell_amount_range = { 4, 6 };
+	inline static const sf::Vector2i cell_amount_range = { 2, 4 };
 
 	// chances of adding or removing a cell per mutation event
 	inline static constexpr float add_cell_chance = 0.1f;
@@ -168,8 +168,8 @@ struct BuilderSettings
 
 struct FoodSettings
 {
-	inline static constexpr size_t cells_x = 240;
-	inline static constexpr size_t cells_y = 240;
+	inline static constexpr size_t cells_x = 130;
+	inline static constexpr size_t cells_y = 130;
 	inline static constexpr size_t cell_capacity = 25;
 
 	static constexpr unsigned max_food = 80'000;

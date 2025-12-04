@@ -36,7 +36,6 @@ struct Cell : public CellGeneSettings
 	{
 		// updating velocity and position vectors
 		clamp_velocity();
-		position_ += velocity_;
 
 		// we first need to scale down the internal clock value, it increments by 1 every frame which is way too large for the sin input
 		// as it is expecting a radian input rather than a degree-like input
@@ -50,7 +49,11 @@ struct Cell : public CellGeneSettings
 		
 		// updating the velocity with the new friction
 		velocity_ *= friction;
+
+
+		position_ += velocity_;
 	}
+
 
 
 	void bound(const Circle& bounds)

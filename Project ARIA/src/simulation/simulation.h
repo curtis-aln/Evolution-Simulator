@@ -20,7 +20,7 @@
 #include <chrono>
 
 inline static constexpr int frame_smoothing = 10;
-inline const static bool full_screen = false;  // Change this value to toggle fullscreen mode
+inline const static bool full_screen = true;  // Change this value to toggle fullscreen mode
 inline const static double resize_shrinkage = 0.95;
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
