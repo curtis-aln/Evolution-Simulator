@@ -22,6 +22,12 @@ struct Cell : public CellGeneSettings
 	float offset = Random::rand_range(offset_range);
 	float frequency = Random::rand_range(frequency_range);
 
+	float phase_;
+	float friction_;
+
+	float minFriction = Random::rand_range(0.7, 0.9);
+	float maxFriction = Random::rand_range(0.9, 1.0);
+
 	sf::Vector2f position_{};
 	sf::Vector2f velocity_{};
 
@@ -42,13 +48,13 @@ struct Cell : public CellGeneSettings
 		const float scaled_clock = fmod(internal_clock, 360.f) * pi / 180.f;
 
 		// getting a value between 0 and 1 for maximum and minimum friction
-		const float phase = (sin(frequency * scaled_clock + offset) + 1.f) / 2.f;
+		phase_ = (sin(frequency * scaled_clock + offset) + 1.f) / 2.f;
 
 		// changing the range of friction to something better
-		const float friction = minFriction + (phase * (maxFriction - minFriction));
+		friction_ = minFriction + (phase_ * (maxFriction - minFriction));
 		
 		// updating the velocity with the new friction
-		velocity_ *= friction;
+		velocity_ *= friction_;
 
 
 		position_ += velocity_;
@@ -88,7 +94,23 @@ struct Cell : public CellGeneSettings
 		if (Random::rand01_float() < mutation_rate)
 		{
 			offset += Random::rand11_float() * mutation_range;
+		}
+
+		if (Random::rand01_float() < mutation_rate)
+		{
 			frequency += Random::rand11_float() * mutation_range;
+		}
+
+		if (Random::rand01_float() < mutation_rate)
+		{
+			minFriction += Random::rand11_float() * mutation_range;
+			minFriction = std::clamp(minFriction, 0.f, 1.f);
+		}
+
+		if (Random::rand01_float() < mutation_rate)
+		{
+			maxFriction += Random::rand11_float() * mutation_range;
+			maxFriction = std::clamp(maxFriction, 0.f, 1.f);
 		}
 	}
 

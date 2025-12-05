@@ -119,6 +119,8 @@ void Protozoa::draw_cell_physics()
 
 		// drawing cell stats
 		font.draw(pos, "id: " + std::to_string(cell.id), false);
+		font.draw(pos + sf::Vector2f{0, 10}, "phase: " + std::to_string(cell.phase_), false);
+		font.draw(pos + sf::Vector2f{0, 20}, "friction: " + std::to_string(cell.friction_), false);
 	}
 }
 

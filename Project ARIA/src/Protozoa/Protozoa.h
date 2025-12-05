@@ -38,8 +38,8 @@ class Protozoa : ProtozoaSettings, GeneSettings, GeneticPresets
 	sf::Vector2f previous_position = {0, 0};
 	sf::Vector2f velocity = { 0, 0 };
 
-	float mutation_rate = .5f;
-	float mutation_range = 0.02f;
+	float mutation_rate = .8f;
+	float mutation_range = 0.08f;
 
 	// reproduction - related
 	unsigned stomach = 0;

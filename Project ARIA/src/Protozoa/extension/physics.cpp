@@ -79,7 +79,8 @@ void Protozoa::update(FoodManager& food_manager, bool debug)
 
 	++frames_alive;
 
-	if (frames_alive > 1000)
+	energy -= 0.15;
+	if (energy <= 0)
 	{
 		dead = true;
 	}

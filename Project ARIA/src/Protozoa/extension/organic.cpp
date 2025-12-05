@@ -7,53 +7,91 @@
 
 #include <unordered_set>
 
-inline sf::Color mutate_color(const sf::Color& color, float mutation_rate = 0.012f)
+inline float soften_clamp(float value, float minv, float maxv, float softness = 0.15f)
 {
-    // Convert RGB to HSL
+    // Pulls values gently back into range without killing exploration
+    if (value < minv)
+        return minv + (value - minv) * softness;
+    if (value > maxv)
+        return maxv + (value - maxv) * softness;
+    return value;
+}
+
+inline sf::Color mutate_color(const sf::Color& color, float mutation_rate = 0.002f)
+{
+    // Convert RGB -> [0,1]
     float r = color.r / 255.f;
     float g = color.g / 255.f;
     float b = color.b / 255.f;
 
-    float max_val = std::max({ r, g, b });
-    float min_val = std::min({ r, g, b });
-    float delta = max_val - min_val;
+    float maxv = std::max({ r, g, b });
+    float minv = std::min({ r, g, b });
+    float delta = maxv - minv;
 
+    // --- RGB -> HSL ---
     float h = 0.f;
-    float s = (max_val == 0) ? 0.f : (delta / max_val);
-    float l = (max_val + min_val) / 2.f;
+    float l = 0.5f * (maxv + minv);
+    float s = 0.f;
 
-    // Calculate hue
-    if (delta != 0)
+    if (delta > 0.f)
     {
-        if (max_val == r)      h = 60.f * (fmod((g - b) / delta, 6));
-        else if (max_val == g) h = 60.f * ((b - r) / delta + 2);
-        else if (max_val == b) h = 60.f * ((r - g) / delta + 4);
-    }
-    if (h < 0) h += 360.f;
+        s = delta / (1.f - std::abs(2.f * l - 1.f));
 
-    // Mutate hue, saturation, and lightness
-    h += Random::rand_range(-20.f, 20.f); // Larger hue mutations
+        if (maxv == r)
+            h = 60.f * fmod(((g - b) / delta), 6.f);
+        else if (maxv == g)
+            h = 60.f * (((b - r) / delta) + 2.f);
+        else
+            h = 60.f * (((r - g) / delta) + 4.f);
+
+        if (h < 0.f) h += 360.f;
+    }
+
+    // --- Mutation ---
+    h += Random::rand_range(-20.f, 20.f);
     s += Random::rand_range(-mutation_rate, mutation_rate);
     l += Random::rand_range(-mutation_rate, mutation_rate);
 
-    h = fmod(h + 360.f, 360.f); // Keep hue in range
-    s = std::clamp(s, 0.2f, 1.0f); // Prevent low saturation (dull colors)
-    l = std::clamp(l, 0.2f, 0.8f); // Prevent black or white
+    // Wrap hue to [0,360)
+    h = fmod(h + 360.f, 360.f);
 
-    // Convert back to RGB
-    float c = (1 - std::abs(2 * l - 1)) * s;
-    float x = c * (1 - std::abs(fmod(h / 60.f, 2) - 1));
-    float m = l - c / 2;
+    // --- Organic biological palette constraints ---
 
-    float r1, g1, b1;
-    if (h < 60) { r1 = c; g1 = x; b1 = 0; }
-    else if (h < 120) { r1 = x; g1 = c; b1 = 0; }
-    else if (h < 180) { r1 = 0; g1 = c; b1 = x; }
-    else if (h < 240) { r1 = 0; g1 = x; b1 = c; }
-    else if (h < 300) { r1 = x; g1 = 0; b1 = c; }
-    else { r1 = c; g1 = 0; b1 = x; }
+    // Hue: avoid harsh red & neon colours, but still allow full range softly
+    // (keeps blue–green–yellow–purple cluster typical in microbiology)
+    h = soften_clamp(h, 20.f, 320.f, 0.25f);
 
-    return sf::Color((r1 + m) * 255, (g1 + m) * 255, (b1 + m) * 255);
+    // Saturation: organic, non-neon
+    s = soften_clamp(s, 0.25f, 0.75f, 0.20f);
+
+    // Lightness: translucent soft look
+    l = soften_clamp(l, 0.35f, 0.70f, 0.20f);
+
+    // Clamp hard to prevent overflow
+    s = std::clamp(s, 0.f, 1.f);
+    l = std::clamp(l, 0.f, 1.f);
+
+    // --- HSL -> RGB ---
+    float c = (1.f - std::abs(2.f * l - 1.f)) * s;
+    float hprime = h / 60.f;
+    float x = c * (1.f - std::abs(fmod(hprime, 2.f) - 1.f));
+
+    float r1 = 0.f, g1 = 0.f, b1 = 0.f;
+
+    if (hprime < 1) { r1 = c; g1 = x; }
+    else if (hprime < 2) { r1 = x; g1 = c; }
+    else if (hprime < 3) { g1 = c; b1 = x; }
+    else if (hprime < 4) { g1 = x; b1 = c; }
+    else if (hprime < 5) { r1 = x; b1 = c; }
+    else { r1 = c; b1 = x; }
+
+    float m = l - c * 0.5f;
+
+    return sf::Color(
+        static_cast<sf::Uint8>((r1 + m) * 255),
+        static_cast<sf::Uint8>((g1 + m) * 255),
+        static_cast<sf::Uint8>((b1 + m) * 255)
+    );
 }
 
 
@@ -83,8 +121,9 @@ void Protozoa::handle_food(FoodManager& food_manager, bool debug)
 
             total_food_eaten++;
             stomach++;
+            energy += 10;
 
-            if (stomach > 3)
+            if (stomach > 1)
             {
                 stomach = 0;
                 reproduce = true;

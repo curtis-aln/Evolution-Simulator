@@ -104,14 +104,14 @@ public:
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 80'000;
+	static constexpr float bounds_radius = 60'000;
 
-	static constexpr unsigned max_protozoa = 20'000;
-	static constexpr unsigned initial_protozoa = 5'000;
+	static constexpr unsigned max_protozoa = 30'000;
+	static constexpr unsigned initial_protozoa = 3'000;
 
-	inline static constexpr size_t cells_x = 130;
-	inline static constexpr size_t cells_y = 130;
-	inline static constexpr size_t cell_capacity = 16;
+	inline static constexpr size_t cells_x = 110;
+	inline static constexpr size_t cells_y = 110;
+	inline static constexpr size_t cell_capacity = 18;
 };
 
 
@@ -136,7 +136,7 @@ struct GeneSettings
 	inline static const sf::Vector2i cell_amount_range = { 2, 4 };
 
 	// chances of adding or removing a cell per mutation event
-	inline static constexpr float add_cell_chance = 0.1f;
+	inline static constexpr float add_cell_chance = 0.2f;
 	inline static constexpr float remove_cell_chance = 0.03f;
 
 	inline static constexpr float delta_mutation_rate  = 0.0075f;
@@ -146,8 +146,8 @@ struct GeneSettings
 
 struct SpringGeneSettings
 {
-	inline static constexpr float init_damping = 0.975f;
-	inline static constexpr float init_spring_const = 0.26f;
+	inline static constexpr float init_damping = 0.0;
+	inline static constexpr float init_spring_const = 0.1f;
 
 	inline static const sf::Vector2f offset_range = { 0.f, pi };
 	inline static const sf::Vector2f frequency_range = { 0.f, pi };
@@ -162,9 +162,6 @@ struct CellGeneSettings
 	// cell friction settings
 	inline static const sf::Vector2f offset_range = { 0.f, pi };
 	inline static const sf::Vector2f frequency_range = { 0.f, pi };
-
-	inline static constexpr float minFriction = 0.992f;
-	inline static constexpr float maxFriction = 1.00f;
 
 	static constexpr sf::Uint8 transparancy = 160;
 };
@@ -206,7 +203,7 @@ struct FoodSettings
 	inline static constexpr size_t cell_capacity = 25;
 
 	static constexpr unsigned max_food = 80'000;
-	static constexpr unsigned initial_food = 30'000;
+	static constexpr unsigned initial_food = 60'000;
 	inline static const float food_radius = 30.f;
 	inline static const float friction = 0.99f;
 
