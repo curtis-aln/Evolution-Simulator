@@ -49,10 +49,24 @@ public:
         string_stats_.reserve(20);
     }
 
-    void render()
+    void set_fonts(Font title_font, Font text_font)
     {
-        render_border();
-        render_stats();
+        m_title_font_ = title_font;
+        m_text_font_ = text_font;
+    }
+
+    void render(Camera& camera, bool render_absolute_position = true)
+    {
+        if (render_absolute_position)
+        {
+            camera.call_draw_at_absolute_position([&]() {
+                this->render_text_box();   // or any member function
+                });
+        }
+        else
+        {
+            render_text_box();
+        }
     }
 
     template<typename T>
@@ -78,6 +92,11 @@ public:
         }
     }
 
+    void add_text(const std::string& text)
+    {
+        string_stats_["string"].add_statistic(text, nullptr);
+    }
+
     void set_title(const std::string& text)
     {
         const sf::Vector2f border_pos = m_border_.getPosition();
@@ -98,6 +117,12 @@ public:
     }
 
 private:
+    void render_text_box()
+    {
+        render_border();
+        render_stats();
+    }
+
     void render_border()
     {
         m_render_window_->draw(m_render_border_);
@@ -133,7 +158,8 @@ private:
                 if constexpr (std::is_same_v<T, bool>) {
                     ss << ((*statistic) ? "true" : "false");
                 }
-                else {
+                else if (statistic != nullptr)
+                {
                     ss << std::fixed << std::setprecision(2) << (*statistic);
                 }
 

@@ -150,7 +150,7 @@ public:
 private:
 	// rendering
 	void draw_cell_physics();
-	void draw_cell_stats_info();
+	void draw_protozoa_information();
 	void draw_spring_information();
 	void render_cell_connections(Cell& cell, bool thick_lines = false) const;
 

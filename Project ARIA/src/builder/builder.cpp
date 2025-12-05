@@ -140,7 +140,7 @@ void Builder::render()
 void Builder::render_box() const
 {
 	m_window_->draw(m_bounds_render_);
-	draw_rect_outline(protozoa_space, *m_window_);
+	draw_protozoa_bounding_box(protozoa_space, *m_window_);
 }
 
 

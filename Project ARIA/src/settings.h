@@ -47,6 +47,31 @@ struct UI_Settings
 
 struct SimulationSettings
 {
+public:
+	inline static sf::Vector2f get_window_dimensions()
+	{
+		auto vid = sf::VideoMode::getDesktopMode();
+		sf::Vector2u size_int = { vid.width, vid.height };
+		auto size = static_cast<sf::Vector2f>(size_int);
+		if (full_screen)
+			return size;
+		return size * static_cast<float>(resize_shrinkage);
+	}
+
+
+private:
+	inline static const sf::Vector2f winDims = SimulationSettings::get_window_dimensions();
+	inline static const float middle_x = winDims.x / 2;
+	inline static const float line_graph_buffer = winDims.x / 10;
+	inline static const float line_graph_width = middle_x - line_graph_buffer;
+	inline static const float line_graph_height = winDims.y / 8;
+	inline static const float line_graph_y = winDims.y - line_graph_height - line_graph_buffer/2;
+
+public:
+	inline static constexpr int frame_smoothing = 10;
+	inline const static bool full_screen = false;  // Change this value to toggle fullscreen mode
+	inline const static double resize_shrinkage = 0.95;
+
 	inline static const std::string simulation_name = "Project A.R.I.A";
 	static constexpr bool vsync = false;
 
@@ -56,11 +81,19 @@ struct SimulationSettings
 
 
 	// statistics settings
-	static constexpr unsigned line_maximum_data = 70;
+	// The two line graphs should exist on the bottom of the screen starting from the middle going out 5/6ths
+	// of the way to the border.
+	
+	static constexpr unsigned line_maximum_data = 120;
 	static constexpr unsigned line_x_axis_increments = 20;
-	inline static const sf::FloatRect protozoa_graph_bounds = { 700, 1500, 1000, 300 };
-	inline static const sf::FloatRect food_graph_bounds     = { 2000, 1500, 1000, 300 };
-	inline static const sf::FloatRect text_renderer_bounds  = { 2600, 1700, 900, 1200 };
+
+	inline static const sf::FloatRect protozoa_graph_bounds = 
+	{ line_graph_buffer/2, line_graph_y, line_graph_width, line_graph_height };
+
+	inline static const sf::FloatRect food_graph_bounds = 
+	{ line_graph_buffer * 1.5f + line_graph_width, line_graph_y, line_graph_width , line_graph_height };
+
+	inline static const sf::FloatRect text_renderer_bounds  = { 100, 100, 500, 300 };
 
 	inline static const sf::Color protozoa_graph_line_color = { 20, 200, 20 };
 	inline static const sf::Color protozoa_under_graph_color = { 20, 100, 20 };
@@ -71,10 +104,10 @@ struct SimulationSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius =80'000;
+	static constexpr float bounds_radius = 80'000;
 
 	static constexpr unsigned max_protozoa = 20'000;
-	static constexpr unsigned initial_protozoa = 15'000;
+	static constexpr unsigned initial_protozoa = 5'000;
 
 	inline static constexpr size_t cells_x = 130;
 	inline static constexpr size_t cells_y = 130;
@@ -173,7 +206,7 @@ struct FoodSettings
 	inline static constexpr size_t cell_capacity = 25;
 
 	static constexpr unsigned max_food = 80'000;
-	static constexpr unsigned initial_food = 80'000;
+	static constexpr unsigned initial_food = 30'000;
 	inline static const float food_radius = 30.f;
 	inline static const float friction = 0.99f;
 

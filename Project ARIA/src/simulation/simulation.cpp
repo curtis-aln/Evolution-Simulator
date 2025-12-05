@@ -57,6 +57,7 @@ void Simulation::init_line_graphs()
 
 void Simulation::init_text_box()
 {
+	text_box.set_fonts(TextSettings::regular_font, TextSettings::cell_statistic_font);
 	text_box.set_title("Protozoa Simulation");
 	text_box.init_graphics(border_fill_color, border_outline_color, border_outline_thickness);
 
@@ -64,6 +65,8 @@ void Simulation::init_text_box()
 	text_box.add_statistic("float", "fps", &fps_);
 	text_box.add_statistic("bool", "paused", &m_world_.paused);
 	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
+	text_box.add_text("This is a test");
+	text_box.add_text("This is also a test");
 }
 
 void Simulation::init_network_renderer()
@@ -174,11 +177,11 @@ void Simulation::draw_everything()
 	{
 		m_builder_.render();
 
-		protozoa_population_graph_.render();
-		food_population_graph_.render();
+		protozoa_population_graph_.render(camera_);
+		food_population_graph_.render(camera_);
 
 		net_renderer.render();
-		text_box.render();
+		text_box.render(camera_);
 	}
 }
 
@@ -236,7 +239,7 @@ void Simulation::handle_events()
 			camera_.translate();
 		}
 
-		// mouse hovering over an organism
+		// mouse hovering over a protozoa
 		m_world_.check_hovering(m_debug_, cam_pos, mouse_pressed_event);
 	}
 

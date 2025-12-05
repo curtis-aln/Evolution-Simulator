@@ -3,7 +3,7 @@
 #include <SFMl/Graphics.hpp>
 #include "utility.h"
 
-inline void draw_rect_outline(sf::Vector2f top_left, sf::Vector2f bottom_right, sf::RenderWindow& window, const sf::RenderStates& render_states = sf::RenderStates())
+inline void draw_protozoa_bounding_box(sf::Vector2f top_left, sf::Vector2f bottom_right, sf::RenderWindow& window, const sf::RenderStates& render_states = sf::RenderStates())
 {
 	sf::VertexArray lines(sf::Lines, 8);
 
@@ -27,9 +27,9 @@ inline void draw_rect_outline(sf::Vector2f top_left, sf::Vector2f bottom_right, 
 }
 
 
-inline void draw_rect_outline(const sf::Rect<float>& rect, sf::RenderWindow& window, const sf::RenderStates& render_states = sf::RenderStates())
+inline void draw_protozoa_bounding_box(const sf::Rect<float>& rect, sf::RenderWindow& window, const sf::RenderStates& render_states = sf::RenderStates())
 {
-	draw_rect_outline({ rect.left, rect.top }, { rect.left + rect.width, rect.top + rect.height }, window, render_states);
+	draw_protozoa_bounding_box({ rect.left, rect.top }, { rect.left + rect.width, rect.top + rect.height }, window, render_states);
 }
 
 

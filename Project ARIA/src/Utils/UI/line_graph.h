@@ -130,14 +130,25 @@ public:
 		m_bounds_.top = topleft.y;
 	}
 
-	void render()
+	void render(Camera& camera, bool render_absolute_position=true)
 	{
-		// Save the current view
-		sf::View currentView = m_window_->getView();
+		if (render_absolute_position)
+		{
+			camera.call_draw_at_absolute_position([&]() {
+				this->render_line_graph();   // or any member function
+				});
+		}
+		else
+		{
+			render_line_graph();
+		}
+	}
 
-		// Reset to the default view
-		m_window_->setView(m_window_->getDefaultView());
 
+
+private:
+	void render_line_graph()
+	{
 		find_max_data();
 		find_data_points();
 
@@ -157,14 +168,8 @@ public:
 		render_axis_bounds();
 		render_text();
 		render_UI();
-
-		// Restore the original view
-		m_window_->setView(currentView);
 	}
 
-
-
-private:
 	void init_further_graphics()
 	{
 		// border

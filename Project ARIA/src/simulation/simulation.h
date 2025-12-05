@@ -19,19 +19,16 @@
 #include <atomic>
 #include <chrono>
 
-inline static constexpr int frame_smoothing = 10;
-inline const static bool full_screen = true;  // Change this value to toggle fullscreen mode
-inline const static double resize_shrinkage = 0.95;
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
 {
-	// Get the desktop resolution
+	// Get the desktop resolution but shrinks it by 80%
 	static sf::VideoMode getAdjustedVideoMode()
 	{
 		sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
 		unsigned new_width = static_cast<unsigned>(desktop.width * resize_shrinkage);  // 80% of screen width
 		unsigned new_height = static_cast<unsigned>(desktop.height * resize_shrinkage); // 80% of screen height
-
+		std::cout << "new width height: " << new_width << ", " << new_height << "\n";
 		return sf::VideoMode(new_width, new_height);
 	}
 

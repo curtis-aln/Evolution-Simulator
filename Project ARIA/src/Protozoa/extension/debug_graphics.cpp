@@ -2,7 +2,6 @@
 #include "../../settings.h"
 #include "../../Utils/utility.h"
 
-inline static constexpr float bounds_tollarance = CellSettings::cell_radius * 3.f;
 
 void Protozoa::render_protozoa_springs()
 {
@@ -14,6 +13,7 @@ void Protozoa::render_protozoa_springs()
 
 void Protozoa::render_debug(bool skeleton_mode)
 {
+	// skeleton mode just hides the cell bodies and leaves only the outlines of the cells
 	if (skeleton_mode)
 	{
 		draw_cell_outlines();
@@ -21,16 +21,17 @@ void Protozoa::render_debug(bool skeleton_mode)
 
 
 	// This is the bounding box of the protozoa, used for external collision events
-	draw_rect_outline(m_personal_bounds_, *m_window_);
+	draw_protozoa_bounding_box(m_personal_bounds_, *m_window_);
 
 	draw_cell_physics();
-	draw_cell_stats_info();
+	draw_protozoa_information();
 	draw_spring_information();
 	nearby_food_information();
 }
 
 void Protozoa::draw_cell_outlines()
 {
+	// draws a small 
 	sf::CircleShape circle_outline;
 	
 	for (Cell& cell : m_cells_)
@@ -100,7 +101,7 @@ void Protozoa::draw_cell_physics()
 
 		// rendering the bounding boxes
 		const sf::FloatRect rect = { pos.x - rad, pos.y - rad, rad * 2, rad * 2 };
-		draw_rect_outline(rect, *m_window_);
+		draw_protozoa_bounding_box(rect, *m_window_);
 		render_cell_connections(cell);
 
 		// drawing the direction of the cell
@@ -114,7 +115,7 @@ void Protozoa::draw_cell_physics()
 }
 
 
-void Protozoa::draw_cell_stats_info()
+void Protozoa::draw_protozoa_information()
 {
 	Font& font = TextSettings::cell_statistic_font;
 
@@ -210,6 +211,9 @@ bool Protozoa::is_hovered_on(const sf::Vector2f mousePosition, bool tollarance_c
 {
 	if (tollarance_check)
 	{
+		// when the mouse hovers over a protozoa we add an extra amount to its boundary to make it easier to click
+		const float bounds_tollarance = CellSettings::cell_radius * 3.f;
+
 		sf::FloatRect resized_rect = resize_rect(m_personal_bounds_, { -bounds_tollarance , -bounds_tollarance });
 		return resized_rect.contains(mousePosition);
 	}
