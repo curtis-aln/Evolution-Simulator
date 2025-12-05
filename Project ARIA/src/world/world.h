@@ -60,6 +60,8 @@ public:
 	bool draw_cell_grid = false;
 	bool draw_food_grid = false;
 	bool toggle_collisions = true;
+	bool show_connections = true;
+	bool show_bounding_boxes = true;
 
 	Protozoa* selected_protozoa = nullptr;
 

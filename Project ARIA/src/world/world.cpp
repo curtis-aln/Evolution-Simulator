@@ -308,7 +308,7 @@ void World::render_protozoa()
 	// if our selected cell needs debugging
 	if (debug_mode && selected_protozoa != nullptr)
 	{
-		selected_protozoa->render_debug(skeleton_mode);
+		selected_protozoa->render_debug(skeleton_mode, show_connections, show_bounding_boxes);
 	}
 
 	// clearing all of their nearby data to be re-written to

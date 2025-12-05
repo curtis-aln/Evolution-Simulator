@@ -81,7 +81,7 @@ public:
 	void remove_cell();
 	void load_preset(Preset& preset);
 	void render_protozoa_springs();
-	void render_debug(bool skeleton_mode);
+	void render_debug(bool skeleton_mode, bool show_connections, bool show_bounding_boxes);
 
 	void draw_cell_outlines();
 

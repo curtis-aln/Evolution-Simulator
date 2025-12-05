@@ -153,10 +153,10 @@ private:
                 const sf::Vector2f size = m_text_font_.get_text_size(name);
                 const sf::Vector2f pos = { m_border_.left + buffer.x, m_border_.top + currentY };
                 std::stringstream ss;
-                ss << name << ": ";
+                ss << name;
 
                 if constexpr (std::is_same_v<T, bool>) {
-                    ss << ((*statistic) ? "true" : "false");
+                    ss << ":" << ((*statistic) ? "true" : "false");
                 }
                 else if (statistic != nullptr)
                 {
@@ -164,12 +164,12 @@ private:
                 }
 
                 m_text_font_.draw(pos, ss.str());
-                currentY += size.y; // Move to the next line
+                currentY += size.y * 1.15f; // Move to the next line
             }
         }
 
         // Add some padding after each type of statistics
-        currentY += 10;
+        currentY += m_text_font_.get_text_size("0").y;
 
         return currentY;
     }

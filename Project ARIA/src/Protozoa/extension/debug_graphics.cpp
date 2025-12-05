@@ -11,7 +11,7 @@ void Protozoa::render_protozoa_springs()
 	}
 }
 
-void Protozoa::render_debug(bool skeleton_mode)
+void Protozoa::render_debug(bool skeleton_mode, bool show_connections, bool show_bounding_boxes)
 {
 	// skeleton mode just hides the cell bodies and leaves only the outlines of the cells
 	if (skeleton_mode)
@@ -21,12 +21,19 @@ void Protozoa::render_debug(bool skeleton_mode)
 
 
 	// This is the bounding box of the protozoa, used for external collision events
-	draw_protozoa_bounding_box(m_personal_bounds_, *m_window_);
+	if (show_bounding_boxes)
+	{
+		draw_protozoa_bounding_box(m_personal_bounds_, *m_window_);
+	}
 
 	draw_cell_physics();
 	draw_protozoa_information();
 	draw_spring_information();
-	nearby_food_information();
+
+	if (show_connections)
+	{
+		nearby_food_information();
+	}
 }
 
 void Protozoa::draw_cell_outlines()
@@ -58,7 +65,8 @@ void Protozoa::nearby_food_information()
 	const sf::Vector2f center = get_center();
 	for (sf::Vector2f pos : food_positions_nearby)
 	{
-		m_window_->draw(make_line(center, pos, sf::Color::Magenta));
+		auto col = sf::Color{ 50, 153, 204, 100 };
+		m_window_->draw(make_line(center, pos, col));
 	}
 
 	for (sf::Vector2f pos : cell_positions_nearby)

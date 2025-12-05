@@ -65,8 +65,17 @@ void Simulation::init_text_box()
 	text_box.add_statistic("float", "fps", &fps_);
 	text_box.add_statistic("bool", "paused", &m_world_.paused);
 	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
-	text_box.add_text("This is a test");
-	text_box.add_text("This is also a test");
+
+	text_box.add_text("R: Toggle Rendering");
+	text_box.add_text("G: toggle cell grid");
+	text_box.add_text("C: toggle collisions");
+	text_box.add_text("F: toggle food grid");
+	text_box.add_text("S: toggle simple mode");
+	text_box.add_text("O: tick frames");
+	text_box.add_text("[Debug] D: debug mode");
+	text_box.add_text("[Debug] K: skelleton mode");
+	text_box.add_text("[Debug] C: toggle connections");
+	text_box.add_text("[Debug] B: toggle bounding boxes");
 }
 
 void Simulation::init_network_renderer()
@@ -265,19 +274,33 @@ void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 		break;
 	case sf::Keyboard::R:      m_rendering_ = not m_rendering_; break;
 	case sf::Keyboard::G:      m_world_.draw_cell_grid = not m_world_.draw_cell_grid; break;
-	case sf::Keyboard::C:      m_world_.toggle_collisions = not m_world_.toggle_collisions; break;
-	case sf::Keyboard::K:      m_world_.skeleton_mode = not m_world_.skeleton_mode; break;
-	case sf::Keyboard::F:      m_world_.draw_food_grid = not m_world_.draw_food_grid; break;
-	case sf::Keyboard::D:      
-		m_debug_ = not m_debug_; 
-		m_world_.debug_mode = not m_world_.debug_mode;
+	
+	case sf::Keyboard::C: 
+		if (m_debug_)
+			m_world_.show_connections = not m_world_.show_connections;
+		else
+			m_world_.toggle_collisions = not m_world_.toggle_collisions; 
 		break;
 
+	case sf::Keyboard::F:      m_world_.draw_food_grid = not m_world_.draw_food_grid; break;
 	case sf::Keyboard::S:      m_world_.simple_mode = not m_world_.simple_mode; break;
 	case sf::Keyboard::O:
 		m_tick_frame_time = true;
 		break;
 
+	case sf::Keyboard::D:
+		m_debug_ = not m_debug_;
+		m_world_.debug_mode = not m_world_.debug_mode;
+		break;
+	case sf::Keyboard::K:
+		if (m_debug_)
+			m_world_.skeleton_mode = not m_world_.skeleton_mode; break;
+		
+
+	case sf::Keyboard::B:
+		if (m_debug_)
+			m_world_.show_bounding_boxes = not m_world_.show_bounding_boxes; break;
+	
 	// todo
 	//case sf::Keyboard::Key::S:
 	//	if (shifting)

@@ -93,7 +93,7 @@ public:
 	inline static const sf::FloatRect food_graph_bounds = 
 	{ line_graph_buffer * 1.5f + line_graph_width, line_graph_y, line_graph_width , line_graph_height };
 
-	inline static const sf::FloatRect text_renderer_bounds  = { 100, 100, 500, 300 };
+	inline static const sf::FloatRect text_renderer_bounds  = { 100, 100, 500, 500 };
 
 	inline static const sf::Color protozoa_graph_line_color = { 20, 200, 20 };
 	inline static const sf::Color protozoa_under_graph_color = { 20, 100, 20 };
