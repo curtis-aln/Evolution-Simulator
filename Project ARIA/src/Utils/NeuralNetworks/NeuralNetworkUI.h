@@ -230,13 +230,13 @@ private:
 		}
 	}
 
-	void initialize_text_values()
+	static void initialize_text_values()
 	{
 		
 	}
 
 	// rendering
-	void render_border()
+	void render_border() const
 	{
 		m_render_window_->draw(m_render_border_);
 		title_font.draw(m_title_);
@@ -317,7 +317,7 @@ private:
 		return m_network_pointer_->at(location.first, location.second);
 	}
 
-	void render_text_values()
+	void render_text_values() const
 	{
 		// drawing inputs and outputs
 		for (const TextPacket& packet : input_names)

@@ -2,8 +2,6 @@
 #include "../Utils/utility_SFML.h"
 #include "../Utils/Graphics/buffer_renderer.h"
 
-#include "../Utils/Graphics/spatial_hash_grid.h"
-
 World::World(sf::RenderWindow* window)
 	: m_window_(window),
 	border_render_(make_circle(m_bounds_.radius, m_bounds_.center)),
@@ -26,7 +24,7 @@ World::World(sf::RenderWindow* window)
 	position_data.reserve(predicted_cells);
 }
 
-void World::update_world(bool pause)
+void World::update_world(const bool pause)
 {
 	handle_extinction_event();
 
@@ -94,7 +92,7 @@ void World::update_grid_cell(const int grid_cell_id)
 	}
 }
 
-void World::update_protozoa_cell(int protozoa_cell_index, int neighbours_size)
+void World::update_protozoa_cell(const int protozoa_cell_index, const int neighbours_size) const
 {
 	Cell* cell = temp_cells_container[protozoa_cell_index];
 
@@ -129,8 +127,8 @@ void World::update_protozoa_cell(int protozoa_cell_index, int neighbours_size)
 
 void World::update_nearby_container(int& neighbours_size,
 	int32_t neighbour_index_x, int32_t neighbour_index_y,
-	bool check_x = true,
-	bool check_y = true)
+	const bool check_x = true,
+	const bool check_y = true)
 {
 	// Fast modulo for positive and negative numbers
 	if (check_x)
@@ -248,7 +246,7 @@ void World::add_cells_to_hash_grid()
 }
 
 
-void World::update_debug(const sf::Vector2f mouse_position)
+void World::update_debug(const sf::Vector2f mouse_position) const
 {
 	if (selected_protozoa != nullptr)
 	{
@@ -279,7 +277,7 @@ void World::render_world()
 
 void World::render_protozoa()
 {
-	const float radius_inner = CellSettings::cell_radius;
+	constexpr float radius_inner = CellSettings::cell_radius;
 	const float radius_outer = radius_inner + CellSettings::cell_outline_thickness;
 	const int size = position_data.size();
 
@@ -361,7 +359,7 @@ void World::init_environment()
 
 }
 
-void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_position, bool mouse_pressed)
+void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_position, bool mouse_pressed) const
 {
 	if (!debug_mode)
 		return;
@@ -389,7 +387,7 @@ bool World::check_pressed(const sf::Vector2f mouse_position)
 	return false;
 }
 
-void World::de_select_protozoa()
+void World::de_select_protozoa() const
 {
 	if (selected_protozoa != nullptr)
 	{
@@ -399,7 +397,7 @@ void World::de_select_protozoa()
 }
 
 
-float World::calculate_average_generation()
+float World::calculate_average_generation() const
 {
 	float sum = 0.f;
 	for (Protozoa* protozoa : all_protozoa)

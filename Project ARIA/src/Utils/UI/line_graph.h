@@ -124,13 +124,13 @@ public:
 		update_button(mouse_pos);
 	}
 
-	void set_top_left(sf::Vector2f topleft)
+	void set_top_left(const sf::Vector2f topleft)
 	{
 		m_bounds_.left = topleft.x;
 		m_bounds_.top = topleft.y;
 	}
 
-	void render(Camera& camera, bool render_absolute_position=true)
+	void render(Camera& camera, const bool render_absolute_position=true)
 	{
 		if (render_absolute_position)
 		{

@@ -121,7 +121,7 @@ namespace tp
 
         Worker() = default;
 
-        Worker(TaskQueue& queue, uint32_t id)
+        Worker(TaskQueue& queue, const uint32_t id)
             : m_id{ id }
             , m_queue{ &queue }
         {
@@ -175,7 +175,7 @@ namespace tp
         std::vector<Worker> m_workers;
 
         // Initializes Self, Task Queue, and worker threads
-        explicit ThreadPool(uint32_t thread_count)
+        explicit ThreadPool(const uint32_t thread_count)
             : m_thread_count{ thread_count }
         {
             m_workers.reserve(thread_count);

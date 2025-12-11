@@ -69,8 +69,8 @@ private:
 
 public:
 	inline static constexpr int frame_smoothing = 10;
-	inline const static bool full_screen = false;  // Change this value to toggle fullscreen mode
-	inline const static double resize_shrinkage = 0.95;
+	inline static constexpr bool full_screen = false;  // Change this value to toggle fullscreen mode
+	inline static constexpr double resize_shrinkage = 0.95;
 
 	inline static const std::string simulation_name = "Project A.R.I.A";
 	static constexpr bool vsync = false;
@@ -81,7 +81,7 @@ public:
 
 
 	// statistics settings
-	// The two line graphs should exist on the bottom of the screen starting from the middle going out 5/6ths
+	// The two line graphs should exist at the bottom of the screen starting from the middle going out 5/6ths
 	// of the way to the border.
 	
 	static constexpr unsigned line_maximum_data = 120;
@@ -149,6 +149,7 @@ struct SpringGeneSettings
 	inline static constexpr float init_damping = 0.0;
 	inline static constexpr float init_spring_const = 0.1f;
 
+	// the offset range 8a
 	inline static const sf::Vector2f offset_range = { 0.f, pi };
 	inline static const sf::Vector2f frequency_range = { 0.f, pi };
 
@@ -204,8 +205,8 @@ struct FoodSettings
 
 	static constexpr unsigned max_food = 80'000;
 	static constexpr unsigned initial_food = 60'000;
-	inline static const float food_radius = 30.f;
-	inline static const float friction = 0.99f;
+	inline static constexpr float food_radius = 30.f;
+	inline static constexpr float friction = 0.99f;
 
 	static constexpr sf::Uint8 transparency = 200;
 	inline static const std::vector<sf::Color> fill_colors = {
@@ -219,13 +220,9 @@ struct FoodSettings
 };
 
 
-#include <iostream>
 #include <unordered_map>
 #include <vector>
 
-#include <unordered_map>
-
-#include <vector>
 #include <utility>
 
 struct GeneticPresets

@@ -1,10 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "../Utils/utility.h"
-#include "../Utils/utility_SFML.h"
 #include "../Utils/UI/button.h"
-#include "../Utils/UI/slider.h"
 #include "../Utils/Graphics/font_renderer.hpp"
 #include "../settings.h"
 
@@ -41,7 +38,7 @@ public:
 
 	void render();
 	void update(sf::Vector2f mouse_pos);
-	void add_cell();
+	void add_cell() const;
 	bool check_mouse_input();
 	void de_select_protozoa();
 
@@ -53,7 +50,7 @@ private:
 
 	void render_box() const;
 	void render_ui();
-	void render_text();
+	void render_text() const;
 	void render_protozoa();
 
 	void init_add_button();

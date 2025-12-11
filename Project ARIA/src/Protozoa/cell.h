@@ -9,13 +9,15 @@
 // Each cell has their own radius and friction coefficient, as well as cosmetic factors such as color
 
 inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
-inline static const float max_speed = 30;
+inline static constexpr float max_speed = 30;
 
 
 struct Cell : public CellGeneSettings
 {
 	int id{}; // Unique identifier relative to the protozoa
 	int protozoa_id{}; // Unique identifier pointing to its protozoa
+
+	int generation = 0;
 
 	float radius = CellSettings::cell_radius;
 		
@@ -38,7 +40,12 @@ struct Cell : public CellGeneSettings
 
 	}
 
-	void update(int internal_clock)
+	void reset()
+	{
+		generation = 0;
+	}
+
+	void update(const int internal_clock)
 	{
 		// updating velocity and position vectors
 		clamp_velocity();
@@ -89,7 +96,7 @@ struct Cell : public CellGeneSettings
 		velocity_ += acceleration;
 	}
 
-	void call_mutate(float mutation_rate, float mutation_range)
+	void call_mutate(const float mutation_rate, const float mutation_range)
 	{
 		if (Random::rand01_float() < mutation_rate)
 		{

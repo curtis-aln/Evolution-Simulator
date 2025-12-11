@@ -55,7 +55,7 @@ public:
         m_text_font_ = text_font;
     }
 
-    void render(Camera& camera, bool render_absolute_position = true)
+    void render(Camera& camera, const bool render_absolute_position = true)
     {
         if (render_absolute_position)
         {
@@ -144,7 +144,7 @@ private:
     }
 
     template<typename T>
-    float render_statistic_type(std::unordered_map<std::string, StatisticVector<T>>& stat_map, const sf::Vector2f& buffer, float startY)
+    float render_statistic_type(std::unordered_map<std::string, StatisticVector<T>>& stat_map, const sf::Vector2f& buffer, const float startY)
     {
         float currentY = startY;
 

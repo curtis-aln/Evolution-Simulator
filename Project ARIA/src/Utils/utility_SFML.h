@@ -278,7 +278,7 @@ inline float get_line_angle(const sf::Vector2f& start_pos, const sf::Vector2f& e
 
 // Function to find a point on the line segment pos1 to pos2
 // such that the distance from this point to pos2 is distance_from_pos2
-inline sf::Vector2f find_point_at_distance_from_pos2(const sf::Vector2f& pos1, const sf::Vector2f& pos2, float distance_from_pos2) {
+inline sf::Vector2f find_point_at_distance_from_pos2(const sf::Vector2f& pos1, const sf::Vector2f& pos2, const float distance_from_pos2) {
 	// Calculate the direction vector from pos1 to pos2
 	const sf::Vector2f dir = pos2 - pos1;
 

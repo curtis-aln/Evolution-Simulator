@@ -65,7 +65,7 @@ public:
         update_window_view();
     }
 
-    void update(float deltaTime)
+    void update(const float deltaTime)
     {
         const auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(*m_window_));
         m_delta_ = mouse_pos - m_mouse_position_before_;
@@ -75,7 +75,7 @@ public:
         smooth_zoom(deltaTime);
     }
 
-    void zoom(float delta_scroll)
+    void zoom(const float delta_scroll)
     {
         const sf::Vector2f before_mouse_pos = m_window_->mapPixelToCoords(sf::Mouse::getPosition(*m_window_), m_view_);
 
@@ -88,7 +88,7 @@ public:
         m_view_.move(offset);
     }
 
-    void smooth_zoom(float deltaTime)
+    void smooth_zoom(const float deltaTime)
     {
         if (std::abs(m_currentScroll - m_targetScroll) < 0.001f)
             return; // Prevent unnecessary updates
@@ -121,7 +121,7 @@ public:
     }
 
 private:
-    [[nodiscard]] float get_zoom_scale(float delta) const
+    [[nodiscard]] float get_zoom_scale(const float delta) const
     {
         return delta > 0 ? 1.0f + m_zoom_strength_ : 1.0f - m_zoom_strength_;
     }

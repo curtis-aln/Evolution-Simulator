@@ -1,13 +1,11 @@
 #include "../Protozoa.h"
 #include "../../food_manager.h"
 
-#include <iostream>
-#include <unordered_map>
 #include <vector>
 
 #include <unordered_set>
 
-inline float soften_clamp(float value, float minv, float maxv, float softness = 0.15f)
+inline float soften_clamp(const float value, const float minv, const float maxv, const float softness = 0.15f)
 {
     // Pulls values gently back into range without killing exploration
     if (value < minv)
@@ -17,7 +15,7 @@ inline float soften_clamp(float value, float minv, float maxv, float softness = 
     return value;
 }
 
-inline sf::Color mutate_color(const sf::Color& color, float mutation_rate = 0.002f)
+inline sf::Color mutate_color(const sf::Color& color, const float mutation_rate = 0.002f)
 {
     // Convert RGB -> [0,1]
     float r = color.r / 255.f;
@@ -95,7 +93,7 @@ inline sf::Color mutate_color(const sf::Color& color, float mutation_rate = 0.00
 }
 
 
-void Protozoa::handle_food(FoodManager& food_manager, bool debug)
+void Protozoa::handle_food(FoodManager& food_manager, const bool debug)
 {
 	const sf::Vector2f center = get_center();
 	c_Vec<food_manager.spatial_hash_grid.max_nearby_capacity>& nearby =
@@ -127,6 +125,7 @@ void Protozoa::handle_food(FoodManager& food_manager, bool debug)
             {
                 stomach = 0;
                 reproduce = true;
+                offspring_count++;
             }
 		}
 	}

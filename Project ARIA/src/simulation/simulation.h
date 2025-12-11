@@ -6,7 +6,6 @@
 
 #include "../Utils/time.h"
 #include "../Utils/fps_manager.h"
-#include "../Utils/Graphics/font_renderer.hpp"
 #include "../Utils/UI/Camera.hpp"
 #include "../Utils/UI/line_graph.h"
 #include "../Utils/NeuralNetworks/GeneticNeuralNetwork.h"
@@ -17,7 +16,6 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
-#include <chrono>
 
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
@@ -81,7 +79,7 @@ public:
 
 private:
 	void update_one_frame();
-	void update_test_data();
+	static void update_test_data();
 	void update_line_graphs();
 	void draw_everything();
 	void render();

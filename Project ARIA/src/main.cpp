@@ -1,16 +1,5 @@
 #include "simulation/simulation.h"
 
-/*
-First Test Log
-
-  
- */
-
-
-
-
-
-
 // NOTE: do not use cell id's as indexes as when cells are added and removed it can mess up
 // NOTE: if there are multithreading issues check how rendering works with the update thread because i commented out the lock mutex
 
@@ -32,16 +21,13 @@ First Test Log
 
 
 /* Debug */
-// - the grid renderers dont work with negative x values
-// - program doesn't run from executable
-// - when selecting organisms, everything else should fade a bit
-
-// - protozoa id should be shown
-// - bounding box not working appropriately
-// - display mutation rate and mutation range
-// - track average mutation rate / mutation range
-// - display offspring count and track average
-// - display food eaten
+// cell phase and friction dp need to be trimmed
+// cell phase and friction spacing too small
+// show cell generation
+// move all cell information to top corner of bounding box
+// - track average mutation rate / mutation range accross all protozoa
+// - display offspring count and track average accross all protozoa
+// - track average cells accross all protozoa
 
 // add o_vector compatability for the circleBuffer and spatial_hash_grid
 
@@ -50,7 +36,6 @@ int main()
 	///Random::set_seed(0);
 	Simulation().run();
 }
-
 
 
 // before, fps: 30

@@ -45,7 +45,7 @@ public:
 		food_positions.reserve(max_food);
 	}
 
-	int get_size()
+	int get_size() const
 	{
 		return food_vector.size();
 	}
@@ -85,14 +85,14 @@ public:
 	}
 
 	// world interacting with the food
-	void remove_food(int food_id)
+	void remove_food(const int food_id)
 	{
 		Food* food = food_vector.at(food_id);
 		food->position = { 0, 0 };
 		food_vector.remove(food_id);
 	}
 
-	Food* at(int idx)
+	Food* at(const int idx)
 	{
 		return food_vector.at(idx);
 	}

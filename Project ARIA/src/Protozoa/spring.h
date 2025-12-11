@@ -29,7 +29,7 @@ struct Spring : public SpringGeneSettings
 
 	}
 
-	void update(Cell& cell_a, Cell& cell_b, int internal_clock)
+	void update(Cell& cell_a, Cell& cell_b, const int internal_clock)
 	{
 		const sf::Vector2f pos_a = cell_a.position_;
 		const sf::Vector2f pos_b = cell_b.position_;
@@ -62,7 +62,7 @@ struct Spring : public SpringGeneSettings
 		cell_b.accelerate(direction_B_force);
 	}
 
-	void call_mutate(float mutation_rate, float mutation_range)
+	void call_mutate(const float mutation_rate, const float mutation_range)
 	{
 		if (Random::rand01_float() < mutation_rate)
 		{

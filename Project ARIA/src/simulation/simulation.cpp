@@ -1,10 +1,9 @@
 #include "simulation.h"
-#include "../Utils/utility.h"
 
 inline static constexpr float lerp_factor = 0.025f; // Adjust for smoothness (0 = no movement, 1 = instant movement)
 
 
-inline void draw_debug_circle(sf::RenderWindow* window, sf::Vector2f position)
+inline void draw_debug_circle(sf::RenderWindow* window, const sf::Vector2f position)
 {
 	if (!window) return; // Ensure the window pointer is valid
 
@@ -21,7 +20,7 @@ Simulation::Simulation() : m_world_(&m_window_)
 	m_window_.setFramerateLimit(frame_rate);
 	m_window_.setVerticalSyncEnabled(vsync);
 
-	const float rad = WorldSettings::bounds_radius;
+	constexpr float rad = WorldSettings::bounds_radius;
 	camera_.translate({ -rad, -rad });
 	camera_.zoom(-1000);
 	camera_.update_window_view();

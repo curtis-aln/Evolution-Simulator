@@ -9,12 +9,10 @@
 
 #include "../Utils/thread_pool.h"
 #include "../Utils/o_vector.hpp"
-#include "../Utils/random.h"
 #include "../Utils/Graphics/Circle.h"
 #include "../Utils/Graphics/buffer_renderer.h"
 #include "../food_manager.h"
 
-#include "../Utils/Graphics/spatial_hash_grid.h"
 #include "../Utils/Graphics/simple_spatial_grid.h"
 
 #include "../Utils/Graphics/SFML_Grid.h"
@@ -52,6 +50,13 @@ class World : WorldSettings
 
 	tp::ThreadPool thread_pool;
 
+	// statistics
+	int average_cells_per_protozoa;
+	int average_offspring_count;
+	int average_mutation_rate;
+	int average_mutation_range;
+
+
 public:
 	bool simple_mode = false;
 	bool debug_mode = false;
@@ -75,7 +80,7 @@ public:
 	void optimized_cell_collisions();
 	void update_grid_cell(const int grid_cell_id);
 
-	void update_protozoa_cell(int protozoa_cell_index, int neighbours_size);
+	void update_protozoa_cell(int protozoa_cell_index, int neighbours_size) const;
 
 	void update_nearby_container(int& neighbours_size, int32_t neighbour_index_x, int32_t neighbour_index_y, bool check_x, bool check_y);
 
@@ -86,28 +91,28 @@ public:
 	void update_cells_container();
 	void handle_extinction_event();
 	void add_cells_to_hash_grid();
-	void update_debug(sf::Vector2f mouse_position);
+	void update_debug(sf::Vector2f mouse_position) const;
 	void render_world();
 	void render_protozoa();
 	void update_position_data();
-	void check_hovering(bool debug_mode, sf::Vector2f mouse_position, bool mouse_pressed);
+	void check_hovering(bool debug_mode, sf::Vector2f mouse_position, bool mouse_pressed) const;
 	bool check_pressed(sf::Vector2f mouse_position);
-	void de_select_protozoa();
+	void de_select_protozoa() const;
 
-	float calculate_average_generation();
+	float calculate_average_generation() const;
 
-	int get_protozoa_count()
+	int get_protozoa_count() const
 	{
 		return all_protozoa.size();
 	}
 
-	int get_food_count()
+	int get_food_count() const
 	{
 		return food_manager.get_size();
 	}
 
 private:
 	void init_organisms();
-	void init_food();
-	void init_environment();
+	static void init_food();
+	static void init_environment();
 };

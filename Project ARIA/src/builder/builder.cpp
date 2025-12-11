@@ -12,7 +12,7 @@ Builder::Builder(sf::RenderWindow* window) : m_window_(window), m_protozoa_(0, n
 }
 
 
-void Builder::add_cell()
+void Builder::add_cell() const
 {
 	m_protozoa_.builder_add_cell(m_protozoa_bounds_.center);
 }
@@ -151,7 +151,7 @@ void Builder::render_ui()
 }
 
 
-void Builder::render_text()
+void Builder::render_text() const
 {
 	title_font.draw(title);
 	regular_font.draw(instructions);

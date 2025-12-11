@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include<iostream>
 
 // Creates a grid of nested level N to give a frame of reference when navigating 2d space
 
@@ -54,7 +53,7 @@ public:
 	}
 
 
-	void draw()
+	void draw() const
 	{
 		window_.draw(vertexBuffer);
 	}

@@ -1,12 +1,11 @@
 #include "../Protozoa.h"
 #include "../../Utils/random.h"
-#include <stdexcept> // Required for std::runtime_error
 
 #include "../../Utils/Graphics/spatial_hash_grid.h"
 #include "../../food_manager.h"
 
 
-Protozoa::Protozoa(int id_, Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
+Protozoa::Protozoa(const int id_, Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
 	: id(id_), m_window_(window), m_world_bounds_(world_bounds), GeneticPresets()
 {
 
@@ -65,7 +64,7 @@ void Protozoa::initialise_springs()
 }
 
 
-void Protozoa::update(FoodManager& food_manager, bool debug)
+void Protozoa::update(FoodManager& food_manager, const bool debug)
 {
 	if (m_cells_.empty()) // No computation is needed if there are no cells
 		return;
