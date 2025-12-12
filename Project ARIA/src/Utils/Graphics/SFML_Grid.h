@@ -22,7 +22,7 @@ public:
 		const size_t cells_y = cells_x * static_cast<size_t>(aspect_ratio);
 		const float cell_size = world_dimensions.width / cells_x;
 
-		std::vector<sf::Vertex> vertices(static_cast<std::vector<sf::Vertex>::size_type>((cells_x + cells_y) * 2));
+		std::vector<sf::Vertex> vertices((cells_x + cells_y) * 2);
 
 		vertexBuffer = sf::VertexBuffer(sf::Lines, sf::VertexBuffer::Static);
 		vertexBuffer.create(vertices.size());

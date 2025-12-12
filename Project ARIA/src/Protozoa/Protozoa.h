@@ -10,13 +10,15 @@
 #include "../Utils/o_vector.hpp"
 #include "../food_manager.h"
 #include "../Utils/random.h"
+#include "genome.h"
 
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs
 // the protozoa class is responsible for connecting the springs and cells
 
 inline static constexpr float initial_energy = 300.f; // energy the protozoa spawn with
 
-class Protozoa : ProtozoaSettings, GeneSettings, GeneticPresets
+// The Genome class handles anything that has to do with mutation and genetics
+class Protozoa : ProtozoaSettings, public Genome
 {
 	sf::RenderWindow* m_window_ = nullptr;
 	Circle* m_world_bounds_ = nullptr;
@@ -27,34 +29,21 @@ class Protozoa : ProtozoaSettings, GeneSettings, GeneticPresets
 
 	sf::Rect<float> m_personal_bounds_{};
 
-	// information which is passed from generation to generation
-	//GeneticNeuralNetwork neural_network;
-
 	// position and velocity tracking
 	sf::Vector2f previous_position = {0, 0};
 	sf::Vector2f velocity = { 0, 0 };
 
-	float mutation_rate = .8f;
-	float mutation_range = 0.08f;
-
-	// reproduction - related
+	// reproduction related parameters
 	unsigned stomach = 0;
 	unsigned total_food_eaten = 0;
 	
 public:
-	sf::Color cell_outer_color = Random::rand_color();
-	sf::Color cell_inner_color = Random::rand_color();
-
-	sf::Color spring_outer_color = Random::rand_color();
-	sf::Color spring_inner_color = Random::rand_color();
-
 	// debugging
 	std::vector<sf::Vector2f> food_positions_nearby{};
 	std::vector<sf::Vector2f> cell_positions_nearby{};
 
 	float energy = initial_energy;
 	unsigned frames_alive = 0u;
-	unsigned generation = 0u;
 
 	// When in debugging mode, you can pull at cells inside this protozoa | storing the location of it in memory 
 	// -1 means none selected
@@ -77,6 +66,10 @@ public:
 	void add_cell();
 	static void remove_cell();
 	void load_preset(Preset& preset);
+	void init_cell_genome_dictionaries();
+	void init_spring_genome_dictionaries();
+	void update_spring_gene_connections();
+	void update_cell_gene_connections();
 	void render_protozoa_springs();
 	void render_debug(bool skeleton_mode, bool show_connections, bool show_bounding_boxes);
 
@@ -129,14 +122,8 @@ public:
 	{
 		m_cells_ = other->m_cells_;
 		m_springs_ = other->m_springs_;
-		cell_inner_color = other->cell_inner_color;
-		cell_outer_color = other->cell_outer_color;
-
-		spring_inner_color = other->spring_inner_color;
-		spring_outer_color = other->spring_outer_color;
-
-		mutation_range = other->mutation_range;
-		mutation_rate = other->mutation_rate;
+		
+		reset(*other); // genome
 
 		int idx = 0;
 		for (Cell& cell : m_cells_)

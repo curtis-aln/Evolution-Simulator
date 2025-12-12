@@ -56,7 +56,7 @@ void Simulation::init_line_graphs()
 
 void Simulation::init_text_box()
 {
-	text_box.set_fonts(TextSettings::regular_font, TextSettings::cell_statistic_font);
+	text_box.set_fonts(regular_font, cell_statistic_font);
 	text_box.set_title("Protozoa Simulation");
 	text_box.init_graphics(border_fill_color, border_outline_color, border_outline_thickness);
 

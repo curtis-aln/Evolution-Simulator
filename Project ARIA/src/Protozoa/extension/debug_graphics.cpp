@@ -83,7 +83,7 @@ void Protozoa::render_cell_connections(Cell& cell, const bool thick_lines) const
         if (thick_lines)
         {
             draw_thick_line(*m_window_, pos1, pos2, spring_thickness,
-                spring_outline_thickness, spring.outer_color, spring.inner_color);
+                spring_outline_thickness, spring_outer_color, spring_inner_color);
         }
         else
         {
@@ -118,8 +118,8 @@ void Protozoa::draw_cell_physics() const
         const auto spacing = font.get_text_size("0").y;
         const sf::Vector2f offset = { 0, spacing };
         font.draw(top_left, "id: " + std::to_string(cell.id), false);
-        font.draw(top_left + offset, "phase: " + std::to_string(cell.phase_), false);
-        font.draw(top_left + offset * 2.f, "friction: " + std::to_string(cell.friction_), false);
+        font.draw(top_left + offset, "phase: " + std::to_string(cell.sinwave_current_phase_), false);
+        font.draw(top_left + offset * 2.f, "friction: " + std::to_string(cell.sinwave_current_friction_), false);
         font.draw(top_left + offset * 3.f, "gen: " + std::to_string(cell.generation), false);
     }
 }

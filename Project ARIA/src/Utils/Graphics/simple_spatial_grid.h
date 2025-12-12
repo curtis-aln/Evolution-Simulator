@@ -93,7 +93,7 @@ public:
 private:
 	void initVertexBuffer()
 	{
-		std::vector<sf::Vertex> vertices(static_cast<std::vector<sf::Vertex>::size_type>((CellsX + CellsY) * 2));
+		std::vector<sf::Vertex> vertices((CellsX + CellsY) * 2);
 
 		vertexBuffer = sf::VertexBuffer(sf::Lines, sf::VertexBuffer::Static);
 		vertexBuffer.create(vertices.size());

@@ -19,9 +19,9 @@ struct TextSettings
 };
 
 // Initialize static Font members with appropriate parameters - Which needs to happen outside the class
-inline Font TextSettings::title_font{ nullptr, TextSettings::title_font_size, TextSettings::bold_font_location };
-inline Font TextSettings::regular_font{ nullptr, TextSettings::regular_font_size, TextSettings::regular_font_location };
-inline Font TextSettings::cell_statistic_font{ nullptr, TextSettings::cell_statistic_font_size, TextSettings::regular_font_location };
+inline Font TextSettings::title_font{ nullptr, title_font_size, bold_font_location };
+inline Font TextSettings::regular_font{ nullptr, regular_font_size, regular_font_location };
+inline Font TextSettings::cell_statistic_font{ nullptr, cell_statistic_font_size, regular_font_location };
 
 
 
@@ -60,7 +60,7 @@ public:
 
 
 private:
-	inline static const sf::Vector2f winDims = SimulationSettings::get_window_dimensions();
+	inline static const sf::Vector2f winDims = get_window_dimensions();
 	inline static const float middle_x = winDims.x / 2;
 	inline static const float line_graph_buffer = winDims.x / 10;
 	inline static const float line_graph_width = middle_x - line_graph_buffer;
@@ -114,8 +114,6 @@ struct WorldSettings
 	inline static constexpr size_t cell_capacity = 18;
 };
 
-
-                                                                                                                  
 struct SpringSettings
 {
 	static constexpr float rest_length = 120.f;
@@ -130,44 +128,6 @@ struct CellSettings
 };
 
 
-struct GeneSettings
-{
-	// the amount of cells each protzoa starts off with
-	inline static const sf::Vector2i cell_amount_range = { 2, 4 };
-
-	// chances of adding or removing a cell per mutation event
-	inline static constexpr float add_cell_chance = 0.2f;
-	inline static constexpr float remove_cell_chance = 0.03f;
-
-	inline static constexpr float delta_mutation_rate  = 0.0075f;
-	inline static constexpr float delta_mutation_range = 0.0075f;
-	
-};
-
-struct SpringGeneSettings
-{
-	inline static constexpr float init_damping = 0.0;
-	inline static constexpr float init_spring_const = 0.1f;
-
-	// the offset range 8a
-	inline static const sf::Vector2f offset_range = { 0.f, pi };
-	inline static const sf::Vector2f frequency_range = { 0.f, pi };
-
-	inline static constexpr float minLength = CellSettings::cell_radius * 2.f;
-	inline static constexpr float maxLength = minLength * 2.5f;
-};
-
-
-struct CellGeneSettings
-{
-	// cell friction settings
-	inline static const sf::Vector2f offset_range = { 0.f, pi };
-	inline static const sf::Vector2f frequency_range = { 0.f, pi };
-
-	static constexpr sf::Uint8 transparancy = 160;
-};
-
-
 struct ProtozoaSettings
 {
 	static constexpr float spawn_radius = 100.f;
@@ -175,8 +135,6 @@ struct ProtozoaSettings
 	static constexpr float spring_thickness = 9.f;
 	static constexpr float spring_outline_thickness = 6.f;
 };
-
-
 
 
 struct BuilderSettings
@@ -224,31 +182,3 @@ struct FoodSettings
 #include <vector>
 
 #include <utility>
-
-struct GeneticPresets
-{
-	using Preset = std::vector<std::pair<int, int>>;
-
-	Preset two_celled_protozoa = {
-		{0, 1}
-	};
-
-	Preset three_celled_protozoa = {
-		{0, 1},
-		{0, 2},
-		{1, 2}
-	};
-
-	Preset five_celled_protozoa = {
-		{0, 1},
-		{0, 2},
-		{0, 3},
-		{0, 4}
-	};
-
-	std::vector<Preset> presets = {
-		two_celled_protozoa,
-		three_celled_protozoa,
-		five_celled_protozoa
-	};
-};

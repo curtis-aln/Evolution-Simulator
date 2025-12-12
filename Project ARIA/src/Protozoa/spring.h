@@ -3,30 +3,31 @@
 #include "../settings.h"
 #include "../Utils/random.h"
 #include "cell.h"
+#include "genome.h"
 
-struct Spring : public SpringGeneSettings
+struct Spring
 {
-	float damping = init_damping;
-	float spring_const = init_spring_const;
-
-	float offset = Random::rand_range(offset_range);
-	float frequency = Random::rand_range(frequency_range);
-
-	sf::Color outer_color = Random::rand_color();
-	sf::Color inner_color = Random::rand_color();
+	SpringGene* gene = nullptr;
 
 	int cell_A_id{};
 	int cell_B_id{};
+
+	int id{};
 
 	// for debugging
 	sf::Vector2f direction_A_force{};
 	sf::Vector2f direction_B_force{};
 
 
-	Spring(const int _cell_A_id, const int _cell_B_id)
-		: cell_A_id(_cell_A_id), cell_B_id(_cell_B_id)
+	Spring(const int _id, const int _cell_A_id, const int _cell_B_id, SpringGene* spring_gene = nullptr)
+		: id(_id), cell_A_id(_cell_A_id), cell_B_id(_cell_B_id), gene(spring_gene)
 	{
 
+	}
+
+	void set_spring_gene(SpringGene* spring_gene)
+	{
+		gene = spring_gene;
 	}
 
 	void update(Cell& cell_a, Cell& cell_b, const int internal_clock)
@@ -39,17 +40,16 @@ struct Spring : public SpringGeneSettings
 		const float dist = length(pos_b - pos_a);
 
 		// finding the rest length of the spring
-		const float scaled_clock = fmod(internal_clock, 360.f) * pi / 180.f;
-		const float phase = (sin(frequency * scaled_clock + offset) + 1.f) / 2.f;
-		const float rest_length = minLength + (phase * (maxLength - minLength));
+		const float phase = gene->amplitude * sinf(gene->frequency * internal_clock + gene->offset) + gene->vertical_shift;
+		const float rest_length = phase * CellSettings::cell_radius * 2;
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
-		const float spring_force = spring_const * (dist - rest_length);
+		const float spring_force = gene->spring_constant * (dist - rest_length);
 
 		// Calculating the damping force
 		const sf::Vector2f normalised_dir = ((pos_b - pos_a) / dist);
 		const sf::Vector2f vel_difference = (vel_b - vel_a);
-		const float damping_force = dot(normalised_dir, vel_difference) * damping;
+		const float damping_force = dot(normalised_dir, vel_difference) * gene->damping;
 
 		// Calculating total force (sum of the two forces)
 		const float total_force = spring_force + damping_force;
@@ -60,14 +60,5 @@ struct Spring : public SpringGeneSettings
 
 		direction_B_force = total_force * ((pos_a - pos_b) / dist);
 		cell_b.accelerate(direction_B_force);
-	}
-
-	void call_mutate(const float mutation_rate, const float mutation_range)
-	{
-		if (Random::rand01_float() < mutation_rate)
-		{
-			offset += Random::rand11_float() * mutation_range;
-			frequency += Random::rand11_float() * mutation_range;
-		}
 	}
 };

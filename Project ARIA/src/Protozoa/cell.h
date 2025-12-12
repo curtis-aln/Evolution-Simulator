@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "genome.h"
 #include "../Utils/utility.h"
 #include "../Utils/random.h"
 
@@ -12,32 +13,35 @@ inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong
 inline static constexpr float max_speed = 30;
 
 
-struct Cell : public CellGeneSettings
+struct Cell 
 {
 	int id{}; // Unique identifier relative to the protozoa
 	int protozoa_id{}; // Unique identifier pointing to its protozoa
 
 	int generation = 0;
 
+	CellGene* gene = nullptr;
+
 	float radius = CellSettings::cell_radius;
-		
-	float offset = Random::rand_range(offset_range);
-	float frequency = Random::rand_range(frequency_range);
 
-	float phase_;
-	float friction_;
 
-	float minFriction = Random::rand_range(0.7, 0.9);
-	float maxFriction = Random::rand_range(0.9, 1.0);
+	float sinwave_current_phase_;
+	float sinwave_current_friction_;
+
 
 	sf::Vector2f position_{};
 	sf::Vector2f velocity_{};
 
 
-	Cell(const int _id, const int _protozoa_id, const sf::Vector2f position)
-		: id(_id), protozoa_id(_protozoa_id), position_(position)
+	Cell(const int _id, const int _protozoa_id, const sf::Vector2f position, CellGene* cell_gene = nullptr)
+		: id(_id), protozoa_id(_protozoa_id), position_(position), gene(cell_gene)
 	{
 
+	}
+
+	void set_cell_gene(CellGene* cell_gene)
+	{
+		gene = cell_gene;
 	}
 
 	void reset()
@@ -54,15 +58,11 @@ struct Cell : public CellGeneSettings
 		// as it is expecting a radian input rather than a degree-like input
 		const float scaled_clock = fmod(internal_clock, 360.f) * pi / 180.f;
 
-		// getting a value between 0 and 1 for maximum and minimum friction
-		phase_ = (sin(frequency * scaled_clock + offset) + 1.f) / 2.f;
-
-		// changing the range of friction to something better
-		friction_ = minFriction + (phase_ * (maxFriction - minFriction));
+		sinwave_current_phase_ = fmod(internal_clock * gene->frequency + gene->offset, 360.f) * pi / 180.f;
+		sinwave_current_friction_ = gene->amplitude * sinf(gene->frequency * internal_clock + gene->offset) + gene->vertical_shift;
 		
 		// updating the velocity with the new friction
-		velocity_ *= friction_;
-
+		velocity_ *= sinwave_current_friction_;
 
 		position_ += velocity_;
 	}
@@ -89,37 +89,11 @@ struct Cell : public CellGeneSettings
 		}
 	}
 
-
-
 	void accelerate(const sf::Vector2f acceleration)
 	{
 		velocity_ += acceleration;
 	}
 
-	void call_mutate(const float mutation_rate, const float mutation_range)
-	{
-		if (Random::rand01_float() < mutation_rate)
-		{
-			offset += Random::rand11_float() * mutation_range;
-		}
-
-		if (Random::rand01_float() < mutation_rate)
-		{
-			frequency += Random::rand11_float() * mutation_range;
-		}
-
-		if (Random::rand01_float() < mutation_rate)
-		{
-			minFriction += Random::rand11_float() * mutation_range;
-			minFriction = std::clamp(minFriction, 0.f, 1.f);
-		}
-
-		if (Random::rand01_float() < mutation_rate)
-		{
-			maxFriction += Random::rand11_float() * mutation_range;
-			maxFriction = std::clamp(maxFriction, 0.f, 1.f);
-		}
-	}
 
 private:
 	void clamp_velocity()

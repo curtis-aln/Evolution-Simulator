@@ -175,7 +175,7 @@ private:
 		const std::vector<int> shape = m_network_pointer_->get_shape();
 		const std::vector<std::vector<Node>>& neural_network = m_network_pointer_->get_neural_network();
 
-		const float layer_sep_x = static_cast<float>(m_border_.width) / (shape.size() + 1);
+		const float layer_sep_x = m_border_.width / (shape.size() + 1);
 		std::vector<float> x_positions(shape.size());
 
 		for (int i = 0; i < shape.size(); ++i)
@@ -186,7 +186,7 @@ private:
 		for (int layer_idx = 0; layer_idx < neural_network.size(); ++layer_idx)
 		{
 			const auto num_nodes = static_cast<int>(neural_network[layer_idx].size());
-			const float layer_sep_y = static_cast<float>(m_border_.height) / (num_nodes + 1);
+			const float layer_sep_y = m_border_.height / (num_nodes + 1);
 
 			for (int node_idx = 0; node_idx < num_nodes; ++node_idx)
 			{
