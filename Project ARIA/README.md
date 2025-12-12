@@ -13,13 +13,11 @@ Project A.R.I.A is a realtime 2D organic simulation and sandbox built with C++ a
 
 
 ## Screenshots
-> Replace the file names below with the exact names you placed under `media/readme_images` if they differ.
+![Overview](media/readme_images/Evolution-Run-timestep-10,000.png)
 
-![Overview](media/readme_images/overview.png)
+![In-Editor](media/readme_images/Evolution-Run-timestep-40,000.png)
 
-![In-Editor](media/readme_images/editor.png)
-
-![Debug View](media/readme_images/debug.png)
+![Debug View](media/readme_images/Evolution-Run-timestep-100,000.png)
 
 
 ## Getting started
