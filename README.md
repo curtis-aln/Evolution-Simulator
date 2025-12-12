@@ -13,7 +13,7 @@ Project A.R.I.A is a realtime 2D organic simulation and sandbox built with C++ a
 
 
 ## Screenshots
-![Overview](Project-Aria/media/readme_images/Evolution-Run-timestep-10,000.png)
+![Overview](Project ARIA/media/readme_images/Evolution-Run-timestep-10,000.png)
 
 ![In-Editor](media/readme_images/Evolution-Run-timestep-40,000.png)
 
