@@ -184,16 +184,6 @@
     <Font Include="media\fonts\Roboto-Regular.ttf" />
     <Font Include="media\fonts\Teko.ttf" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="media\readme_images\Evolution-Run-timestep-10,000.png" />
-    <Image Include="media\readme_images\Evolution-Run-timestep-100,000.png" />
-    <Image Include="media\readme_images\Evolution-Run-timestep-40,000.png" />
-    <Image Include="media\readme_images\Zoom in of large organism 1.png" />
-    <Image Include="media\readme_images\Zoom in of large organism 2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="README.md" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
