@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../settings.h"
 #include "../Utils/Random.h"
 
 #include <SFML/Graphics/Color.hpp>
@@ -9,8 +8,10 @@
 #include <cmath>
 #include <unordered_map>
 #include <algorithm>
-#include <optional>
 #include <unordered_set>
+
+// TODO - put the gene fetch and retrive stuff into a class
+// TODO - explain the code a bit more
 
 // Preset genetic configurations for protozoa, this defines which cells are connected by springs
 struct GeneticPresets
@@ -156,68 +157,74 @@ struct Genome : public GeneticPresets, public GeneSettings
     sf::Color spring_outer_color = {220, 220, 220, transparency};
     sf::Color spring_inner_color = {200, 200, 200, transparency};
 
+
     // Now in order to create mutations for the cells and springs, we need to map their id's to their genome class.
-
-public:
-    // Maps from unique object id -> gene data
+	// Maps from unique object id -> gene data
     // Cell and spring ids live in separate id spaces and are tracked separately
-    std::unordered_map<int, CellGene> cell_genes;
-    std::unordered_map<int, SpringGene> spring_genes;
+    std::vector<std::optional<CellGene>> cell_genes;
+    std::vector<std::optional<SpringGene>> spring_genes;
 
-    // Add or initialize gene entries for new objects
-    void add_cell_gene(int cell_id)
+
+    void ensure_cell_capacity(const int id)
     {
-        cell_genes.emplace(cell_id, CellGene());
+        if (id >= cell_genes.size())
+            cell_genes.resize(id + 1);
     }
 
-    void add_spring_gene(int spring_id)
+    void add_cell_gene(const int id)
     {
-        spring_genes.emplace(spring_id, SpringGene());
+        ensure_cell_capacity(id);
+        cell_genes[id].emplace();
     }
 
-    // Remove gene entries when objects are deleted
-    void remove_cell_gene(int cell_id)
+    void remove_cell_gene(const int id)
     {
-        cell_genes.erase(cell_id);
+        if (id < cell_genes.size())
+            cell_genes[id].reset();
     }
 
-    void remove_spring_gene(int spring_id)
+    CellGene* get_cell_gene(const int id)
     {
-        spring_genes.erase(spring_id);
+        if (id >= cell_genes.size() || !cell_genes[id])
+            return nullptr;
+        return &*cell_genes[id];
     }
 
-    // Accessors (return nullptr if not present)
-    CellGene* get_cell_gene(int cell_id)
+    void ensure_spring_capacity(const int id)
     {
-        auto it = cell_genes.find(cell_id);
-        return it == cell_genes.end() ? nullptr : &it->second;
+        if (id >= spring_genes.size())
+            spring_genes.resize(id + 1);
     }
 
-    const CellGene* get_cell_gene(int cell_id) const
+    void add_spring_gene(const int id)
     {
-        auto it = cell_genes.find(cell_id);
-        return it == cell_genes.end() ? nullptr : &it->second;
+        ensure_spring_capacity(id);
+        spring_genes[id].emplace();
     }
 
-    SpringGene* get_spring_gene(int spring_id)
+    void remove_spring_gene(const int id)
     {
-        auto it = spring_genes.find(spring_id);
-        return it == spring_genes.end() ? nullptr : &it->second;
+        if (id < spring_genes.size())
+            spring_genes[id].reset();
     }
 
-    const SpringGene* get_spring_gene(int spring_id) const
+    SpringGene* get_spring_gene(const int id)
     {
-        auto it = spring_genes.find(spring_id);
-        return it == spring_genes.end() ? nullptr : &it->second;
+        if (id >= spring_genes.size() || !spring_genes[id])
+            return nullptr;
+        return &*spring_genes[id];
     }
+
 
     // Mutate the per-object genes (sin-wave parameters, damping, constants)
     void mutate_spring_and_cell_genes()
     {
         // Mutate cell genes
-        for (auto& kv : cell_genes)
+        for (auto& opt : cell_genes)
         {
-            CellGene& g = kv.second;
+            if (!opt) continue;              // skip empty slots
+
+            CellGene& g = *opt;              // or opt.value()
             g.amplitude += Random::rand11_float() * mutation_range;
             g.frequency += Random::rand11_float() * mutation_range;
             g.offset += Random::rand11_float() * mutation_range;
@@ -227,9 +234,11 @@ public:
         }
 
         // Mutate spring genes
-        for (auto& kv : spring_genes)
+        for (auto& opt : spring_genes)
         {
-            SpringGene& g = kv.second;
+            if (!opt) continue;              // skip empty slots
+
+            SpringGene& g = *opt;              // or opt.value()
             g.amplitude += Random::rand11_float() * mutation_range;
             g.frequency += Random::rand11_float() * mutation_range;
             g.offset += Random::rand11_float() * mutation_range;
@@ -240,7 +249,7 @@ public:
             // clamp spring constant and damping to sensible ranges
             g.damping = std::clamp(g.damping, init_damping_range.x, init_damping_range.y);
             g.spring_constant = std::clamp(g.spring_constant, init_spring_const_range.x, init_spring_const_range.y);
-            g.offset = std::fmod(g.offset + 2.f * static_cast<float>(3.14159f), 2.f * static_cast<float>(3.14159f));
+            g.offset = std::fmod(g.offset + 2.f * static_cast<float>(3.14159f), 2.f * static_cast<float>(3.14159f)); // todo
         }
     }
 
@@ -301,7 +310,7 @@ public:
 
 private:
     // Helper: softly clamp (keeps exploration gentle)
-    static float soften_clamp(float value, float minv, float maxv, float softness = 0.15f)
+    static float soften_clamp(const float value, const float minv, const float maxv, const float softness = 0.15f)
     {
         if (value < minv) return minv + (value - minv) * softness;
         if (value > maxv) return maxv + (value - maxv) * softness;
@@ -309,7 +318,7 @@ private:
     }
 
     // Mutates a color in an "organic" constrained HSL space. Taken/ported from previous code.
-    static sf::Color mutate_color(const sf::Color& color, float mutation_rate = 0.002f)
+    static sf::Color mutate_color(const sf::Color& color, const float mutation_rate = 0.002f)
     {
         float r = color.r / 255.f;
         float g = color.g / 255.f;

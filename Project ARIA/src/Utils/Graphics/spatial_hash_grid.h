@@ -4,7 +4,6 @@
 #include <vector>
 
 #include <cstdint>
-#include <array>
 
 // todo: make it so agents / entities only have to store the first value in their indexes instead of all the indexes
 // todo: remove dll files

@@ -2,14 +2,12 @@
 #include <SFML/Graphics.hpp>
 #include "../settings.h"
 #include "../Utils/Graphics/Circle.h"
-#include "../Utils/Graphics/spatial_hash_grid.h"
 #include "cell.h"
 #include "spring.h"
 
 
 #include "../Utils/o_vector.hpp"
 #include "../food_manager.h"
-#include "../Utils/random.h"
 #include "genome.h"
 
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs
@@ -65,11 +63,7 @@ public:
 	void mutate();
 	void add_cell();
 	static void remove_cell();
-	void load_preset(Preset& preset);
-	void init_cell_genome_dictionaries();
-	void init_spring_genome_dictionaries();
-	void update_spring_gene_connections();
-	void update_cell_gene_connections();
+	void load_preset(Preset& preset, sf::Vector2f position = {0, 0});
 	void render_protozoa_springs();
 	void render_debug(bool skeleton_mode, bool show_connections, bool show_bounding_boxes);
 
@@ -128,16 +122,12 @@ public:
 		int idx = 0;
 		for (Cell& cell : m_cells_)
 		{
-			cell.protozoa_id = id;
 			cell.generation = other->m_cells_[idx++].generation;
 		}
 	}
 
 	void generate_random();
 
-	// initialisation
-	void initialise_cells();
-	void initialise_springs();
 
 private:
 	// rendering

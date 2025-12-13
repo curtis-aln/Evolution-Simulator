@@ -157,21 +157,17 @@ void Protozoa::add_cell()
 
     // creating the new cell and adding it to our cells
     const int cell_id = m_cells_.size();
-    Cell new_cell{ cell_id, id, position};
+    Cell new_cell{ cell_id, position};
     m_cells_.push_back(new_cell);
 
     // creating a spring connection to that cell
-	const auto id = static_cast<int>(m_springs_.size());
-    Spring new_spring{ id, parent_index, cell_id };
+	const auto spring_id = static_cast<int>(m_springs_.size());
+    Spring new_spring{ spring_id, parent_index, cell_id };
     m_springs_.push_back(new_spring);
 
 	// Now we need to update our genome dictionaries to account for the new cell and spring
     add_cell_gene(cell_id);
-	add_spring_gene(cell_id);
-
-	// Finally we tell the cell and spring about their genes
-	m_cells_.back().set_cell_gene(get_cell_gene(cell_id));
-    m_springs_.back().set_spring_gene(get_spring_gene(cell_id));
+	add_spring_gene(spring_id);
 
 }
 
@@ -181,13 +177,20 @@ void Protozoa::remove_cell()
 }
 
 
-void Protozoa::load_preset(Preset& preset)
+void Protozoa::load_preset(Preset& preset, sf::Vector2f position)
 {
-    // Clear existing genetic data
+    /*
+	The load preset function initializes the protozoa's cells and springs with a pre-defined structure.
+	The preset is a list of connections between cell IDs, where each connection represents a spring between two cells.
+	If a position is provided, the protozoa will be spawned around that position instead of a random location.
+    We can simply create genetic variation by choosing a small percentage of these cells to undergo some mutation cycles
+     */
+
+    // Clear existing genetic data Just In Case
     m_cells_.clear();
     m_springs_.clear();
 
-    // Create unique cells based on the preset
+	// Create unique cells based on the preset - Stops duplicates
     std::unordered_set<int> unique_cells;
     for (const auto& connection : preset) 
     {
@@ -195,14 +198,19 @@ void Protozoa::load_preset(Preset& preset)
         unique_cells.insert(connection.second);
     }
 
-    // Initialize cells
-    const float world_rad = m_world_bounds_->radius;
-    sf::Vector2f center = Random::rand_pos_in_circle(m_world_bounds_->center, world_rad);
+	// Determine spawn area
+	sf::Vector2f center;
+	if (position == sf::Vector2f{ 0, 0 })
+	{
+        const float world_rad = m_world_bounds_->radius;
+        center = Random::rand_pos_in_circle(m_world_bounds_->center, world_rad);
+	}
     const Circle protozoa_area = { center, spawn_radius };
 
+	// Create cells
     for (int cell_id : unique_cells) 
     {
-        m_cells_.emplace_back(cell_id, id, protozoa_area.rand_pos());
+        m_cells_.emplace_back(cell_id, protozoa_area.rand_pos());
     }
 
     // Create springs
@@ -212,74 +220,13 @@ void Protozoa::load_preset(Preset& preset)
         m_springs_.emplace_back(i++, connection.first, connection.second);
     }
 
-    init_cell_genome_dictionaries();
-	init_spring_genome_dictionaries();
-
-    update_spring_gene_connections();
-    update_cell_gene_connections();
-}
-
-
-// Initialize gene dictionaries from existing cells and springs.
-    // For any cell/spring that lacks a gene entry, a default gene will be created.
-void Protozoa::init_cell_genome_dictionaries()
-{
-    // Ensure cell genes exist for each cell id
-    for (const Cell& c : m_cells_)
+	// Finally we need to tell the genome about these new cells and springs
+    for (int cell_id : unique_cells)
     {
-        int id = static_cast<int>(c.id);
-        if (cell_genes.find(id) == cell_genes.end())
-        {
-            cell_genes.emplace(id, CellGene());
-        }
+        add_cell_gene(cell_id);
     }
-
-    // Remove orphaned cell genes
-    for (auto it = cell_genes.begin(); it != cell_genes.end(); )
+    for (int spring_id = 0; spring_id < m_springs_.size(); ++spring_id)
     {
-        int id = it->first;
-        auto found = std::find_if(m_cells_.begin(), m_cells_.end(), [id](const Cell& c) { return static_cast<int>(c.id) == id; });
-        if (found == m_cells_.end()) it = cell_genes.erase(it);
-        else ++it;
-    }
-}
-
-void Protozoa::init_spring_genome_dictionaries()
-{
-    // Ensure spring genes exist for each spring id
-    for (const Spring& s : m_springs_)
-    {
-        int id = static_cast<int>(s.id);
-        if (spring_genes.find(id) == spring_genes.end())
-        {
-            spring_genes.emplace(id, SpringGene());
-        }
-    }
-
-    // Remove orphaned spring genes
-    for (auto it = spring_genes.begin(); it != spring_genes.end(); )
-    {
-        int id = it->first;
-        auto found = std::find_if(m_springs_.begin(), m_springs_.end(), [id](const Spring& s) { return static_cast<int>(s.id) == id; });
-        if (found == m_springs_.end()) it = spring_genes.erase(it);
-        else ++it;
-    }
-}
-
-void Protozoa::update_spring_gene_connections()
-{
-    // Tell each spring about its gene
-    for (Spring& spring : m_springs_)
-    {
-        spring.set_spring_gene(get_spring_gene(static_cast<int>(spring.id)));
-    }
-}
-
-// Now for cells
-void Protozoa::update_cell_gene_connections()
-{
-    for (Cell& cell : m_cells_)
-    {
-        cell.set_cell_gene(get_cell_gene(static_cast<int>(cell.id)));
-    }
+        add_spring_gene(spring_id);
+	}
 }

@@ -9,7 +9,7 @@ inline static constexpr  size_t food_positions_container_reserve = 30;
 
 
 Protozoa::Protozoa(const int id_, Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
-	: id(id_), m_window_(window), m_world_bounds_(world_bounds)
+	: m_window_(window), m_world_bounds_(world_bounds), id(id_)
 {
 
 	food_positions_nearby.reserve(cell_positions_container_reserve);
@@ -25,55 +25,14 @@ Protozoa::Protozoa(const int id_, Circle* world_bounds, sf::RenderWindow* window
 	if (!init_cells)
 		return;
 
-	auto preset = Random::rand_val_in_vector(presets);
-	load_preset(preset);
-	initialise_cells();
-	initialise_springs();
-	
+	generate_random();
 }
 
 
 void Protozoa::generate_random()
 {
-	m_cells_.clear();
-	m_springs_.clear();
-	initialise_cells();
-	initialise_springs();
-}
-
-void Protozoa::initialise_cells()
-{
-	// cells are spawned in clusters around an origin
-	const float world_rad = m_world_bounds_->radius;
-	sf::Vector2f center = Random::rand_pos_in_circle(m_world_bounds_->center, world_rad);
-	const Circle protozoa_area = { center, spawn_radius };
-
-	const int cell_count = Random::rand_range(cell_amount_range);
-	m_cells_.reserve(cell_count);
-	for (int i = 0; i < cell_count; ++i)
-	{
-		m_cells_.emplace_back(i, id, protozoa_area.rand_pos());
-	}
-
-	init_cell_genome_dictionaries();
-	update_cell_gene_connections();
-}
-
-
-void Protozoa::initialise_springs()
-{
-	const int cell_count = m_cells_.size();
-
-	m_springs_.reserve(cell_count);
-
-	for (int i = 1; i < cell_count; ++i)
-	{
-		const auto id = static_cast<int>(m_springs_.size());
-		m_springs_.emplace_back(id, i, Random::rand_range(0, i - 1));
-	}
-
-	init_spring_genome_dictionaries();
-	update_spring_gene_connections();
+	auto preset = Random::rand_val_in_vector(presets);
+	load_preset(preset);
 }
 
 
@@ -110,7 +69,7 @@ void Protozoa::update_springs()
 	{
 		Cell& cell_A = m_cells_[spring.cell_A_id];
 		Cell& cell_B = m_cells_[spring.cell_B_id];
-		spring.update(cell_A, cell_B, frames_alive);
+		spring.update(cell_A, cell_B, frames_alive, get_spring_gene(spring.id));
 	}
 }
 
@@ -119,7 +78,7 @@ void Protozoa::update_cells()
 	// updates each cell in the organism
 	for (Cell& cell : m_cells_)
 	{
-		cell.update(frames_alive);
+		cell.update(frames_alive, get_cell_gene(cell.id));
 	}
 }
 

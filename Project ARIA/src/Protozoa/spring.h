@@ -1,17 +1,15 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "../settings.h"
-#include "../Utils/random.h"
 #include "cell.h"
 #include "genome.h"
 
 struct Spring
 {
-	SpringGene* gene = nullptr;
-
 	int cell_A_id{};
 	int cell_B_id{};
 
+	// unique spring ID, used for genome referencing, must not change during the spring's lifetime
 	int id{};
 
 	// for debugging
@@ -19,18 +17,13 @@ struct Spring
 	sf::Vector2f direction_B_force{};
 
 
-	Spring(const int _id, const int _cell_A_id, const int _cell_B_id, SpringGene* spring_gene = nullptr)
-		: id(_id), cell_A_id(_cell_A_id), cell_B_id(_cell_B_id), gene(spring_gene)
+	Spring(const int _id, const int _cell_A_id, const int _cell_B_id)
+		: cell_A_id(_cell_A_id), cell_B_id(_cell_B_id), id(_id)
 	{
 
 	}
 
-	void set_spring_gene(SpringGene* spring_gene)
-	{
-		gene = spring_gene;
-	}
-
-	void update(Cell& cell_a, Cell& cell_b, const int internal_clock)
+	void update(Cell& cell_a, Cell& cell_b, const int internal_clock, SpringGene* gene)
 	{
 		const sf::Vector2f pos_a = cell_a.position_;
 		const sf::Vector2f pos_b = cell_b.position_;

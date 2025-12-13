@@ -4,7 +4,6 @@
 
 #include "genome.h"
 #include "../Utils/utility.h"
-#include "../Utils/random.h"
 
 // Each organism consists of cells which work together via springs
 // Each cell has their own radius and friction coefficient, as well as cosmetic factors such as color
@@ -15,15 +14,12 @@ inline static constexpr float max_speed = 30;
 
 struct Cell 
 {
-	int id{}; // Unique identifier relative to the protozoa
-	int protozoa_id{}; // Unique identifier pointing to its protozoa
+	// The Cell ID is used when referencing the cell inside the protozoa, and identifying its genome
+	int id{}; 
 
 	int generation = 0;
 
-	CellGene* gene = nullptr;
-
 	float radius = CellSettings::cell_radius;
-
 
 	float sinwave_current_phase_;
 	float sinwave_current_friction_;
@@ -33,15 +29,10 @@ struct Cell
 	sf::Vector2f velocity_{};
 
 
-	Cell(const int _id, const int _protozoa_id, const sf::Vector2f position, CellGene* cell_gene = nullptr)
-		: id(_id), protozoa_id(_protozoa_id), position_(position), gene(cell_gene)
+	Cell(const int _id, const sf::Vector2f position, CellGene* cell_gene = nullptr)
+		: id(_id), position_(position)
 	{
 
-	}
-
-	void set_cell_gene(CellGene* cell_gene)
-	{
-		gene = cell_gene;
 	}
 
 	void reset()
@@ -49,7 +40,7 @@ struct Cell
 		generation = 0;
 	}
 
-	void update(const int internal_clock)
+	void update(const int internal_clock, CellGene* gene)
 	{
 		// updating velocity and position vectors
 		clamp_velocity();
