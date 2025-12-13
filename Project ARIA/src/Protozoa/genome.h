@@ -56,12 +56,15 @@ struct GeneSettings
     inline static const sf::Vector2i cell_amount_range = { 2, 4 }; // for the protozoa randomly generated
 
     // chances of adding or removing a cell per mutation event
-    inline static constexpr float add_cell_chance = 0.2f;
-    inline static constexpr float remove_cell_chance = 0.02f;
+    inline static constexpr float add_cell_chance = 0.01f;
+    inline static constexpr float remove_cell_chance = 0.01f;
     
     // This determines the protozoa's mutation rate and mutation range
-    inline static const sf::Vector2f init_mutation_rate_range = { 0.1f, .3f };
-    inline static const sf::Vector2f init_mutation_range_range = { 0.1f, .4f };
+    inline static const sf::Vector2f init_mutation_rate_range = { 0.01f, .1f };
+    inline static const sf::Vector2f init_mutation_range_range = { 0.01f, .1f };
+
+	// This is the chance that a colour mutates each generation
+    inline static constexpr float colour_mutation_rate = 0.001f;
 
 	// This is how much the mutation rate and mutation range mutates by each generation
 	inline static constexpr float delta_mutation_rate = 0.0075f; // mutation rate: chance of mutation occurring
@@ -152,11 +155,19 @@ struct Genome : public GeneticPresets, public GeneSettings
     unsigned generation = 0u;
 
     // Colors for appearance (alpha will be clamped to transparency setting)
-    sf::Color cell_outer_color = {200, 200, 200, transparency};
-    sf::Color cell_inner_color = {180, 180, 180, transparency};
-    sf::Color spring_outer_color = {220, 220, 220, transparency};
-    sf::Color spring_inner_color = {200, 200, 200, transparency};
+    sf::Color cell_outer_color   = Random::rand_color({50, 50, 100}, {255, 255, 255});
+    sf::Color cell_inner_color   = Random::rand_color({50, 50, 100}, {255, 255, 255});
+    sf::Color spring_outer_color = Random::rand_color({50, 50, 100}, {255, 255, 255});
+    sf::Color spring_inner_color = Random::rand_color({ 50, 50, 100 }, { 255, 255, 255 });
+    // setting transparency
 
+    Genome()
+    {
+        cell_outer_color.a   = transparency;
+        cell_inner_color.a   = transparency;
+        spring_outer_color.a = transparency;
+        spring_inner_color.a = transparency;
+	}
 
     // Now in order to create mutations for the cells and springs, we need to map their id's to their genome class.
 	// Maps from unique object id -> gene data
@@ -268,10 +279,11 @@ struct Genome : public GeneticPresets, public GeneSettings
         mutate_spring_and_cell_genes();
 
         // Mutate colors
-        cell_outer_color = mutate_color(cell_outer_color, mutation_rate);
-        cell_inner_color = mutate_color(cell_inner_color, mutation_rate);
-        spring_outer_color = mutate_color(spring_outer_color, mutation_rate);
-        spring_inner_color = mutate_color(spring_inner_color, mutation_rate);
+        
+        cell_outer_color = mutate_color(cell_outer_color, colour_mutation_rate);
+        cell_inner_color = mutate_color(cell_inner_color, colour_mutation_rate);
+        spring_outer_color = mutate_color(spring_outer_color, colour_mutation_rate);
+        spring_inner_color = mutate_color(spring_inner_color, colour_mutation_rate);
 
         // Ensure alpha matches settings
         cell_outer_color.a   = transparency;

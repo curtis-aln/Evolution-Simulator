@@ -154,6 +154,12 @@ void World::update_nearby_container(int& neighbours_size,
 //#pragma omp parallel for
 	for (uint8_t idx = 0; idx < size; ++idx)
 	{
+		if (neighbours_size >= nearby_ids.size())
+		{
+			std::cout << "[WARNING]: Nearby IDs buffer overflow, increase its size to avoid data loss.\n";
+			break;
+		}
+
 		nearby_ids[neighbours_size++] = contents[idx];
 	}
 }

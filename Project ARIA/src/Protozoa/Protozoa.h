@@ -104,6 +104,7 @@ public:
 		stomach = 0;
 		total_food_eaten = 0;
 		offspring_count = 0;
+		energy = initial_energy;
 
 		for (Cell& cell : m_cells_)
 		{

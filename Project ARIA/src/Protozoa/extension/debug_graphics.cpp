@@ -170,20 +170,30 @@ void Protozoa::draw_spring_information() const
         const sf::Vector2f& cell_A_pos = m_cells_[spring.cell_A_id].position_;
         const sf::Vector2f& cell_B_pos = m_cells_[spring.cell_B_id].position_;
 
-        const sf::Vector2f mid_point = get_midpoint(cell_A_pos, cell_B_pos);
+        const sf::Vector2f mid_point      = get_midpoint(cell_A_pos, cell_B_pos);
         const sf::Vector2f upper_quartile = get_midpoint(mid_point, cell_B_pos);
         const sf::Vector2f lower_quartile = get_midpoint(cell_A_pos, mid_point);
+		const sf::Vector2f interquartile_range = upper_quartile - lower_quartile;
 
         const sf::Vector2f& f1 = spring.direction_A_force;
         const sf::Vector2f& f2 = spring.direction_B_force;
 
         std::ostringstream vectorF1;
-        vectorF1 << "(" << denary_to_str(f1.x, 1) << ", " << denary_to_str(f1.y, 1) << ")";
+        vectorF1 << "force A: (" << denary_to_str(f1.x, 2) << ", " << denary_to_str(f1.y, 2) << ")";
         std::ostringstream vectorF2;
-        vectorF2 << "(" << denary_to_str(f2.x, 1) << ", " << denary_to_str(f2.y, 1) << ")";
+        vectorF2 << "force B: (" << denary_to_str(f2.x, 2) << ", " << denary_to_str(f2.y, 2) << ")";
+		std::ostringstream length;
+		length << "length: " << denary_to_str(spring.spring_length, 2);
+		std::ostringstream breaking;
+		breaking << "breaking: " << denary_to_str(spring.breaking_length, 2);
+		std::ostringstream broken;
+		broken << "broken: " << spring.broken;
 
         TextSettings::cell_statistic_font.draw(lower_quartile, vectorF1.str(), true);
         TextSettings::cell_statistic_font.draw(upper_quartile, vectorF2.str(), true);
+		TextSettings::cell_statistic_font.draw(lower_quartile + interquartile_range/3.f, length.str(), true);
+		TextSettings::cell_statistic_font.draw(upper_quartile - interquartile_range/3.f, breaking.str(), true);
+		TextSettings::cell_statistic_font.draw(upper_quartile - interquartile_range/2.f, broken.str(), true);
     }
 }
 

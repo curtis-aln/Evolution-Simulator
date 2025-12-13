@@ -15,7 +15,11 @@ struct Spring
 	// for debugging
 	sf::Vector2f direction_A_force{};
 	sf::Vector2f direction_B_force{};
+	float spring_length{};
+	bool broken = false;
 
+	float breaking_length = CellSettings::cell_radius * 2.f * 3.f;
+	
 
 	Spring(const int _id, const int _cell_A_id, const int _cell_B_id)
 		: cell_A_id(_cell_A_id), cell_B_id(_cell_B_id), id(_id)
@@ -23,7 +27,7 @@ struct Spring
 
 	}
 
-	void update(Cell& cell_a, Cell& cell_b, const int internal_clock, SpringGene* gene)
+	bool update(Cell& cell_a, Cell& cell_b, const int internal_clock, SpringGene* gene)
 	{
 		const sf::Vector2f pos_a = cell_a.position_;
 		const sf::Vector2f pos_b = cell_b.position_;
@@ -31,6 +35,7 @@ struct Spring
 		const sf::Vector2f vel_b = cell_b.velocity_;
 
 		const float dist = length(pos_b - pos_a);
+		spring_length = dist;
 
 		// finding the rest length of the spring
 		const float phase = gene->amplitude * sinf(gene->frequency * internal_clock + gene->offset) + gene->vertical_shift;
@@ -53,5 +58,9 @@ struct Spring
 
 		direction_B_force = total_force * ((pos_a - pos_b) / dist);
 		cell_b.accelerate(direction_B_force);
+
+		// finally we check if the spring should break (if its length surpasses breaking length) and return that information
+		broken = dist > breaking_length;
+		return broken;
 	}
 };

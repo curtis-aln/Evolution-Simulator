@@ -40,3 +40,9 @@ int main()
 
 // before, fps: 30
 // collision resolution improvements, fps: 38
+
+
+// before i go to bed
+// Reduce the mutation rate of the colours
+// Reduce the mutation rate of the spawning
+// Fix colours
