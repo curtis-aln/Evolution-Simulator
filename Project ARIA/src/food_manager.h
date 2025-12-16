@@ -1,12 +1,14 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
-#include "Utils/Graphics/buffer_renderer.h" // to render all the food
+#include "Utils/Graphics/CircleBatchRenderer.h" // to render all the food
 #include "Utils/o_vector.hpp" // to allow food to be created and destroyed
 #include "Utils/Graphics/Circle.h" // world boundary
 #include "Utils/random.h"
 #include "settings.h"
 #include "Utils/Graphics/spatial_hash_grid.h"
+#include "../Utils/Graphics/SFML_Grid.h"
+
 
 struct Food
 {
@@ -23,21 +25,25 @@ class FoodManager : FoodSettings
 	sf::RenderWindow* window_ = nullptr;
 	Circle* world_bounds_ = nullptr;
 
-	CircleBuffer food_renderer{ window_ };
+	CircleBatchRenderer food_renderer{ window_ };
 	o_vector<Food, max_food> food_vector{};
 
 	std::vector<sf::Vector2f> food_positions;
 
 public:
 	const float bounds_radius = world_bounds_->radius;
-	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
-	SpatialHashGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_bounds };
+	const sf::FloatRect world_rect_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
+	SpatialHashGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_rect_bounds };
+	SFML_Grid food_grid_renderer; // renders the food spatial hash grid
+
 	const uint8_t max_nearby_capacity = spatial_hash_grid.max_nearby_capacity;
 
 	int frames = 0;
 
 public:
-	FoodManager(sf::RenderWindow* window, Circle* world_bounds) : window_(window), world_bounds_(world_bounds)
+	FoodManager(sf::RenderWindow* window, Circle* world_circular_bounds) 
+	: window_(window), world_bounds_(world_circular_bounds),
+		food_grid_renderer(*window, world_rect_bounds, FoodSettings::cells_x, FoodSettings::cells_y)
 	{
 		init_renderer();
 		init_food();
@@ -95,6 +101,11 @@ public:
 	Food* at(const int idx)
 	{
 		return food_vector.at(idx);
+	}
+
+	void draw_food_grid()
+	{
+		food_grid_renderer.draw();
 	}
 
 private:

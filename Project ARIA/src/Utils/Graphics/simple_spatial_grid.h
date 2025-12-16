@@ -52,6 +52,13 @@ public:
 	// adding an object to the spatial hash render_grid_ by a position and storing its obj_id
 	cell_idx inline add_object(const float x, const float y, const size_t obj_id)
 	{
+		// raise error if screen size isn't set
+		if (m_screenSize.width == 0.f || m_screenSize.height == 0)
+		{
+			std::cerr << "[ERROR]: SimpleSpatialGrid::add_object called before screen size was set.\n";
+			return static_cast<cell_idx>(-1);
+		}
+
 		const cell_idx index = hash(x, y);
 
 		// adding the atom and incrementing the size

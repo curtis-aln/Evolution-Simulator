@@ -29,7 +29,7 @@
 // - display offspring count and track average accross all protozoa
 // - track average cells accross all protozoa
 
-// add o_vector compatability for the circleBuffer and spatial_hash_grid
+// add o_vector compatability for the circleBuffer and spatial_hash_grid_
 
 int main()
 {

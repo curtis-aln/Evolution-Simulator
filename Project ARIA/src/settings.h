@@ -84,8 +84,8 @@ public:
 	// The two line graphs should exist at the bottom of the screen starting from the middle going out 5/6ths
 	// of the way to the border.
 	
-	static constexpr unsigned line_maximum_data = 120;
-	static constexpr unsigned line_x_axis_increments = 20;
+	static constexpr unsigned line_maximum_data = 150;
+	static constexpr unsigned line_x_axis_increments = 100;
 
 	inline static const sf::FloatRect protozoa_graph_bounds = 
 	{ line_graph_buffer/2, line_graph_y, line_graph_width, line_graph_height };
@@ -104,13 +104,13 @@ public:
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 60'000;
+	static constexpr float bounds_radius = 340'000;
 
 	static constexpr unsigned max_protozoa = 30'000;
-	static constexpr unsigned initial_protozoa = 3'000;
+	static constexpr unsigned initial_protozoa = 10'000;
 
-	inline static constexpr size_t cells_x = 110;
-	inline static constexpr size_t cells_y = 110;
+	inline static constexpr size_t cells_x = 210;
+	inline static constexpr size_t cells_y = 210;
 	inline static constexpr size_t cell_capacity = 18;
 };
 

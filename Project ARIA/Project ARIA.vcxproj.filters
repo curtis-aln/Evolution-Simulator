@@ -36,6 +36,9 @@
     <ClCompile Include="src\Protozoa\extension\organic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Protozoa\extension\SinWaveManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\simulation\simulation.h">
@@ -113,7 +116,7 @@
     <ClInclude Include="src\Utils\Graphics\font_renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Utils\Graphics\buffer_renderer.h">
+    <ClInclude Include="src\Utils\Graphics\CircleBatchRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Utils\Graphics\spatial_hash_grid.h">
@@ -129,6 +132,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Protozoa\genome.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Utils\Graphics\sin_wave_grapher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Protozoa\extension\SinWaveManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

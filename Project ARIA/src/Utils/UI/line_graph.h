@@ -14,7 +14,7 @@ struct LineGraphSettings
 	std::string y_axis_name = "y";
 
 	
-	sf::Uint8 transparency = 255;
+	sf::Uint8 transparency = 150;
 	sf::Color graph_line_color = sf::Color::White;
 	sf::Color under_graph_color = sf::Color::White;
 	sf::Color background_color = { 40, 40, 40, transparency };

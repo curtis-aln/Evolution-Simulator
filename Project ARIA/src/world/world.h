@@ -10,39 +10,42 @@
 #include "../Utils/thread_pool.h"
 #include "../Utils/o_vector.hpp"
 #include "../Utils/Graphics/Circle.h"
-#include "../Utils/Graphics/buffer_renderer.h"
+#include "../Utils/Graphics/CircleBatchRenderer.h"
 #include "../food_manager.h"
 
 #include "../Utils/Graphics/simple_spatial_grid.h"
 
 #include "../Utils/Graphics/SFML_Grid.h"
 
-
+// The World class manages the entire simulation environment, including protozoa, food, and rendering.
+// It handles updates, collisions, reproduction, and rendering of all entities within the worl.
 class World : WorldSettings
 {
+	// render window is created in the simulation class and passed down here
 	sf::RenderWindow* m_window_ = nullptr;
 
-	Protozoa::Protozoa_Vector all_protozoa{};
+	Protozoa::Protozoa_Vector all_protozoa_{};
 
-	Circle m_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
+	// the world is circular to avoid protozoa getting stuck in corners. We also have a rectangular bounds for the spatial hash grid
+	Circle world_circular_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
+	sf::FloatRect world_rect_bounds_{ 0.f, 0.f, bounds_radius * 2.f, bounds_radius * 2.f };
+	sf::VertexArray world_border_renderer_{};
 
-	sf::VertexArray border_render_{};
+	// We use these Object of Arrays approach to efficiently render large numbers of protozoa cells.
+	std::vector<sf::Color> outer_color_data_{};
+	std::vector<sf::Color> inner_color_data_{};
+	std::vector<sf::Vector2f> position_data_{};
 
-	// rendering
-	std::vector<sf::Color> outer_color_data{};
-	std::vector<sf::Color> inner_color_data{};
-	std::vector<sf::Vector2f> position_data{};
+	// Each Cell is drawn with a simple outer and inner circle, we use batch rendering to draw all cells efficiently.
+	CircleBatchRenderer outer_circle_renderer_{ m_window_ };
+	CircleBatchRenderer inner_circle_renderer_{ m_window_ };
 
-	CircleBuffer outer_circle_buffer{ m_window_ };
-	CircleBuffer inner_circle_buffer{ m_window_ };
+	// This handles all food related tasks like spawning, rendering, and updating food items.
+	FoodManager food_manager_{ m_window_, &world_circular_bounds_ };
 
-	FoodManager food_manager{ m_window_, &m_bounds_ };
-
-	// to handle collisions
-	const sf::FloatRect world_bounds = { 0, 0, bounds_radius * 2, bounds_radius * 2 };
-	SimpleSpatialGrid<cells_x, cells_y> spatial_hash_grid{ world_bounds };
-	SFML_Grid cell_grid_renderer;
-	SFML_Grid food_grid_renderer;
+	// for our collision detection we use a spatial hash grid to see what cells are nearby others
+	SimpleSpatialGrid<cells_x, cells_y> spatial_hash_grid_{world_rect_bounds_};
+	SFML_Grid cell_grid_renderer; // renders the cell spatial hash grid
 
 	std::vector<Cell*> temp_cells_container;
 
@@ -103,12 +106,12 @@ public:
 
 	int get_protozoa_count() const
 	{
-		return all_protozoa.size();
+		return all_protozoa_.size();
 	}
 
 	int get_food_count() const
 	{
-		return food_manager.get_size();
+		return food_manager_.get_size();
 	}
 
 private:

@@ -22,7 +22,8 @@ inline sf::Texture generateCircleTexture(float radius)
 }
 
 
-class CircleBuffer
+// 
+class CircleBatchRenderer
 {
     sf::RenderWindow* window_ = nullptr;
     sf::Texture texture;
@@ -31,7 +32,7 @@ class CircleBuffer
     int max_circles = 0;
 
 public:
-    CircleBuffer(sf::RenderWindow* window) : window_(window)
+    CircleBatchRenderer(sf::RenderWindow* window) : window_(window)
     {
     
     }

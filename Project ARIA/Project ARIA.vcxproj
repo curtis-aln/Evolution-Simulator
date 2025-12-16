@@ -140,6 +140,7 @@
     <ClCompile Include="src\Protozoa\extension\debug_graphics.cpp" />
     <ClCompile Include="src\Protozoa\extension\organic.cpp" />
     <ClCompile Include="src\Protozoa\extension\physics.cpp" />
+    <ClCompile Include="src\Protozoa\extension\SinWaveManager.cpp" />
     <ClCompile Include="src\simulation\simulation.cpp" />
     <ClCompile Include="src\world\world.cpp" />
   </ItemGroup>
@@ -147,15 +148,17 @@
     <ClInclude Include="src\builder\builder.h" />
     <ClInclude Include="src\food_manager.h" />
     <ClInclude Include="src\Protozoa\cell.h" />
+    <ClInclude Include="src\Protozoa\extension\SinWaveManager.h" />
     <ClInclude Include="src\Protozoa\genome.h" />
     <ClInclude Include="src\Protozoa\Protozoa.h" />
     <ClInclude Include="src\Protozoa\spring.h" />
     <ClInclude Include="src\settings.h" />
     <ClInclude Include="src\simulation\simulation.h" />
-    <ClInclude Include="src\Utils\Graphics\buffer_renderer.h" />
+    <ClInclude Include="src\Utils\Graphics\CircleBatchRenderer.h" />
     <ClInclude Include="src\Utils\Graphics\font_renderer.hpp" />
     <ClInclude Include="src\Utils\Graphics\SFML_Grid.h" />
     <ClInclude Include="src\Utils\Graphics\simple_spatial_grid.h" />
+    <ClInclude Include="src\Utils\Graphics\sin_wave_grapher.h" />
     <ClInclude Include="src\Utils\Graphics\spatial_hash_grid.h" />
     <ClInclude Include="src\Utils\thread_pool.h" />
     <ClInclude Include="src\Utils\UI\text_box.h" />

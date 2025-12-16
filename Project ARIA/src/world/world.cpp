@@ -1,12 +1,11 @@
 #include "world.h"
 #include "../Utils/utility_SFML.h"
-#include "../Utils/Graphics/buffer_renderer.h"
+#include "../Utils/Graphics/CircleBatchRenderer.h"
 
 World::World(sf::RenderWindow* window)
 	: m_window_(window),
-	border_render_(make_circle(m_bounds_.radius, m_bounds_.center)),
-	cell_grid_renderer(*window, world_bounds, cells_x, cells_y),
-	food_grid_renderer(*window, world_bounds, FoodSettings::cells_x, FoodSettings::cells_y),
+	world_border_renderer_(make_circle(world_circular_bounds_.radius, world_circular_bounds_.center)),
+	cell_grid_renderer(*window, world_rect_bounds_, cells_x, cells_y),
 	thread_pool(8)
 { 
 	init_organisms();
@@ -15,13 +14,13 @@ World::World(sf::RenderWindow* window)
 
 	temp_cells_container.reserve(max_protozoa * GeneSettings::cell_amount_range.y);
 
-	const size_t protozoa_count = all_protozoa.size();
+	const size_t protozoa_count = all_protozoa_.size();
 	const size_t predicted_cells = protozoa_count * GeneSettings::cell_amount_range.y;
 
 	// reserving nessesary data
-	outer_color_data.reserve(predicted_cells);
-	inner_color_data.reserve(predicted_cells);
-	position_data.reserve(predicted_cells);
+	outer_color_data_.reserve(predicted_cells);
+	inner_color_data_.reserve(predicted_cells);
+	position_data_.reserve(predicted_cells);
 }
 
 void World::update_world(const bool pause)
@@ -45,7 +44,7 @@ void World::update_world(const bool pause)
 
 	if (!pause)
 	{ 
-		food_manager.update();
+		food_manager_.update();
 		update_protozoas();
 	}
 }
@@ -82,8 +81,8 @@ void World::update_grid_cell(const int grid_cell_id)
 	update_nearby_container(neighbours_size, cell_index_x + 1, cell_index_y + 1, true, true);
 
 	// updating the particles
-	const auto& cell_contents = spatial_hash_grid.grid[grid_cell_id];
-	const uint8_t cell_size = spatial_hash_grid.objects_count[grid_cell_id];
+	const auto& cell_contents = spatial_hash_grid_.grid[grid_cell_id];
+	const uint8_t cell_size = spatial_hash_grid_.objects_count[grid_cell_id];
 
 //#pragma omp parallel for
 	for (uint8_t idx = 0; idx < cell_size; ++idx)
@@ -147,8 +146,8 @@ void World::update_nearby_container(int& neighbours_size,
 
 	// fetching data for copying
 	const uint32_t neighbour_index = neighbour_index_y * cells_x + neighbour_index_x;
-	const auto& contents = spatial_hash_grid.grid[neighbour_index];
-	const auto size = spatial_hash_grid.objects_count[neighbour_index];
+	const auto& contents = spatial_hash_grid_.grid[neighbour_index];
+	const auto size = spatial_hash_grid_.objects_count[neighbour_index];
 
 	// adding the neighbour data to the array
 //#pragma omp parallel for
@@ -169,9 +168,9 @@ void World::update_protozoas()
 {
 	std::vector<int> reproduce_indexes{};
 	reproduce_indexes.reserve(max_protozoa);
-	for (Protozoa* protozoa : all_protozoa)
+	for (Protozoa* protozoa : all_protozoa_)
 	{
-		protozoa->update(food_manager, debug_mode);
+		protozoa->update(food_manager_, debug_mode);
 
 		if (protozoa->reproduce)
 		{
@@ -180,24 +179,24 @@ void World::update_protozoas()
 
 		if (protozoa->dead)
 		{
-			all_protozoa.remove(protozoa);
+			all_protozoa_.remove(protozoa);
 		}
 	}
 
 	for (int idx : reproduce_indexes)
 	{
-		reproduce_protozoa(all_protozoa.at(idx));
+		reproduce_protozoa(all_protozoa_.at(idx));
 	}
 }
 
 Protozoa* World::find_an_offspring()
 {
-	Protozoa* offspring = all_protozoa.add();
+	Protozoa* offspring = all_protozoa_.add();
 
 	if (offspring == nullptr)
 	{
-		const size_t idx = Random::rand_range(unsigned(0), all_protozoa.size() - 1);
-		offspring = all_protozoa.at(idx);
+		const size_t idx = Random::rand_range(unsigned(0), all_protozoa_.size() - 1);
+		offspring = all_protozoa_.at(idx);
 	}
 	return offspring;
 }
@@ -218,7 +217,7 @@ void World::update_cells_container()
 {
 	temp_cells_container.clear();
 
-	for (Protozoa* protozoa : all_protozoa)
+	for (Protozoa* protozoa : all_protozoa_)
 	{
 		for (Cell& cell : protozoa->get_cells())
 		{
@@ -230,11 +229,11 @@ void World::update_cells_container()
 
 void World::handle_extinction_event()
 {
-	if (all_protozoa.size() == 0)
+	if (all_protozoa_.size() == 0)
 	{
 		for (int i = 0; i < initial_protozoa; ++i)
 		{
-			Protozoa* protozoa = all_protozoa.add();
+			Protozoa* protozoa = all_protozoa_.add();
 			protozoa->generate_random();
 		}
 	}
@@ -242,12 +241,12 @@ void World::handle_extinction_event()
 
 void World::add_cells_to_hash_grid()
 {
-	spatial_hash_grid.clear();
+	spatial_hash_grid_.clear();
 	int idx = 0;
 	for (Cell* cell : temp_cells_container)
 	{
-		cell->bound(m_bounds_);
-		spatial_hash_grid.add_object(cell->position_.x, cell->position_.y, idx++);
+		cell->bound(world_circular_bounds_);
+		spatial_hash_grid_.add_object(cell->position_.x, cell->position_.y, idx++);
 	}
 }
 
@@ -271,42 +270,44 @@ void World::render_world()
 
 	if (draw_food_grid)
 	{
-		food_grid_renderer.draw();
+		food_manager_.draw_food_grid();
 	}
 
 	update_position_data();
 	render_protozoa();
 
 	// drawing the world bounds
-	m_window_->draw(border_render_);
+	m_window_->draw(world_border_renderer_);
 }
 
 void World::render_protozoa()
 {
 	constexpr float radius_inner = CellSettings::cell_radius;
 	const float radius_outer = radius_inner + CellSettings::cell_outline_thickness;
-	const int size = position_data.size();
+	const int size = position_data_.size();
 
-	outer_circle_buffer.init_texture(outer_color_data, radius_outer, size);
+	outer_circle_renderer_.init_texture(outer_color_data_, radius_outer, size);
 
 	// if simple mode is off then we init the inner circle texture
 	if (!simple_mode)
 	{
-		inner_circle_buffer.init_texture(inner_color_data, radius_inner, size);
+		inner_circle_renderer_.init_texture(inner_color_data_, radius_inner, size);
 	}
 
 	// we want the springs to be rendered behind the cells
 	if (selected_protozoa != nullptr && debug_mode && !skeleton_mode)
 	{
 		selected_protozoa->render_protozoa_springs();
+
+		
 	}
 
 	// rendering the rest of the protozoas
-	outer_circle_buffer.render(position_data);
+	outer_circle_renderer_.render(position_data_);
 
 	if (!simple_mode)
 	{
-		inner_circle_buffer.render(position_data);
+		inner_circle_renderer_.render(position_data_);
 	}
 
 	// if our selected cell needs debugging
@@ -316,7 +317,7 @@ void World::render_protozoa()
 	}
 
 	// clearing all of their nearby data to be re-written to
-	for (Protozoa* protozoa : all_protozoa)
+	for (Protozoa* protozoa : all_protozoa_)
 	{
 		protozoa->cell_positions_nearby.clear();
 	}
@@ -324,19 +325,19 @@ void World::render_protozoa()
 
 void World::update_position_data()
 {
-	outer_color_data.clear();
-	inner_color_data.clear();
-	position_data.clear();
+	outer_color_data_.clear();
+	inner_color_data_.clear();
+	position_data_.clear();
 
-	food_manager.render();
+	food_manager_.render();
 
-	for (Protozoa* protozoa : all_protozoa)
+	for (Protozoa* protozoa : all_protozoa_)
 	{
 		for (Cell& cell : protozoa->get_cells())
 		{
-			outer_color_data.push_back(protozoa->cell_outer_color);
-			inner_color_data.push_back(protozoa->cell_inner_color);
-			position_data.push_back(cell.position_);
+			outer_color_data_.push_back(protozoa->cell_outer_color);
+			inner_color_data_.push_back(protozoa->cell_inner_color);
+			position_data_.push_back(cell.position_);
 		}
 	}
 }
@@ -346,11 +347,11 @@ void World::init_organisms()
 {
 	for (int i = 0; i < max_protozoa; ++i)
 	{
-		all_protozoa.emplace({ i, &m_bounds_, m_window_, true });
+		all_protozoa_.emplace({ i, &world_circular_bounds_, m_window_, true });
 	}
 	for (int i = 0; i < max_protozoa - initial_protozoa; ++i)
 	{
-		all_protozoa.remove(i);
+		all_protozoa_.remove(i);
 	}
 }
 
@@ -371,7 +372,7 @@ void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_posit
 		return;
 
 
-	for (Protozoa* protozoa : all_protozoa)
+	for (Protozoa* protozoa : all_protozoa_)
 	{
 		if (protozoa->is_hovered_on(mouse_position))
 		{
@@ -382,7 +383,7 @@ void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_posit
 
 bool World::check_pressed(const sf::Vector2f mouse_position)
 {
-	for (Protozoa* protozoa : all_protozoa)
+	for (Protozoa* protozoa : all_protozoa_)
 	{
 		if (protozoa->is_hovered_on(mouse_position, true))
 		{
@@ -406,9 +407,9 @@ void World::de_select_protozoa() const
 float World::calculate_average_generation() const
 {
 	float sum = 0.f;
-	for (Protozoa* protozoa : all_protozoa)
+	for (Protozoa* protozoa : all_protozoa_)
 	{
 		sum += protozoa->generation;
 	}
-	return sum / all_protozoa.size();
+	return sum / all_protozoa_.size();
 }
