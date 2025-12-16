@@ -115,19 +115,19 @@ void Simulation::update_one_frame()
 
 	if (m_tick_frame_time)
 	{
-		m_world_.update_world(false);
+		m_world_.update(false);
 		m_tick_frame_time = false;
 	}
 	else if (!m_world_.paused)
 	{
-		m_world_.update_world(false);	
+		m_world_.update(false);	
 	}
 
 
 	if (m_debug_)
 	{
-		m_world_.update_debug(mouse_pos);
-		Protozoa* selected = m_world_.selected_protozoa;
+		m_world_.move_cell_in_selected_protozoa(mouse_pos);
+		Protozoa* selected = m_world_.get_selected_protozoa();
 
 		if (selected != nullptr)
 		{
@@ -179,7 +179,7 @@ void Simulation::update_line_graphs()
 
 void Simulation::draw_everything()
 {
-	m_world_.render_world();
+	m_world_.render();
 	
 	if (!m_world_.simple_mode)
 	{
@@ -222,13 +222,13 @@ void Simulation::handle_events()
 		// if the mouse button is pressed, we see if it pressed on a protozoa bounding box. if so then we have it selected
 		else if (event.type == sf::Event::MouseButtonPressed)
 		{
-			if (m_world_.check_pressed(cam_pos) || m_builder_.check_mouse_input())
+			if (m_world_.handle_mouse_click(cam_pos) || m_builder_.check_mouse_input())
 			{
 				mouse_pressed_event = true;
 			}
 			else
 			{
-				m_world_.selected_protozoa = nullptr;
+				m_world_.deselect_protozoa();
 			}
 		}
 
@@ -240,7 +240,7 @@ void Simulation::handle_events()
 		}
 	}
 
-	if (m_world_.selected_protozoa == nullptr)
+	if (m_world_.get_selected_protozoa() == nullptr)
 	{
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && !mouse_pressed_event)
 		{
@@ -248,7 +248,7 @@ void Simulation::handle_events()
 		}
 
 		// mouse hovering over a protozoa
-		m_world_.check_hovering(m_debug_, cam_pos, mouse_pressed_event);
+		m_world_.check_if_mouse_is_hovering(m_debug_, cam_pos, mouse_pressed_event);
 	}
 
 	// updating camera translations
@@ -337,6 +337,6 @@ void Simulation::manage_frame_rate()
 		<< " | FPS: " << std::fixed << std::setprecision(1) << fps_ 
 		<< " | protozoa: " << m_world_.get_protozoa_count() 
 		<< " | food: " << m_world_.get_food_count()
-		<< " | average generation: " << m_world_.calculate_average_generation();
+		<< " | average generation: " << m_world_.get_average_generation();
 	m_window_.setTitle(title.str());
 }

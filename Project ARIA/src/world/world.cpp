@@ -6,13 +6,13 @@ World::World(sf::RenderWindow* window)
 	: m_window_(window),
 	world_border_renderer_(make_circle(world_circular_bounds_.radius, world_circular_bounds_.center)),
 	cell_grid_renderer(*window, world_rect_bounds_, cells_x, cells_y),
-	thread_pool(8)
+	thread_pool_(8)
 { 
 	init_organisms();
 	init_food();
 	init_environment();
 
-	temp_cells_container.reserve(max_protozoa * GeneSettings::cell_amount_range.y);
+	global_cell_vector_.reserve(max_protozoa * GeneSettings::cell_amount_range.y);
 
 	const size_t protozoa_count = all_protozoa_.size();
 	const size_t predicted_cells = protozoa_count * GeneSettings::cell_amount_range.y;
@@ -23,41 +23,36 @@ World::World(sf::RenderWindow* window)
 	position_data_.reserve(predicted_cells);
 }
 
-void World::update_world(const bool pause)
+void World::update(const bool pause)
 {
-	handle_extinction_event();
+	check_for_extinction_event();
 
-	ticks++;
-	update_cells_container();
-	add_cells_to_hash_grid();
+	iterations_++;
+	update_global_cell_vector();
+	update_spatial_grid();
 
 	if (toggle_collisions)
 	{
-		optimized_cell_collisions();
+		// iterating over each grid cell, we update as per the cell instead of as per the particle
+		for (int cell_id = 0; cell_id < cells_x * cells_y; ++cell_id)
+		{
+			update_grid_cell(cell_id);
+		}
 	}
 
 	// if our selected protozoa has died we can no longer track it
-	if (selected_protozoa != nullptr && selected_protozoa->dead)
+	if (selected_protozoa_ != nullptr && selected_protozoa_->dead)
 	{
-		selected_protozoa = nullptr;
+		selected_protozoa_ = nullptr;
 	}
 
 	if (!pause)
 	{ 
 		food_manager_.update();
-		update_protozoas();
+		update_all_protozoa();
 	}
 }
 
-
-void World::optimized_cell_collisions()
-{
-	// iterating over each cell, we update as per the cell instead of as per the particle
-	for (int cell_id = 0; cell_id < cells_x * cells_y; ++cell_id)
-	{
-		update_grid_cell(cell_id);
-	}
-}
 
 void World::update_grid_cell(const int grid_cell_id)
 {
@@ -93,11 +88,11 @@ void World::update_grid_cell(const int grid_cell_id)
 
 void World::update_protozoa_cell(const int protozoa_cell_index, const int neighbours_size) const
 {
-	Cell* cell = temp_cells_container[protozoa_cell_index];
+	Cell* cell = global_cell_vector_[protozoa_cell_index];
 
 	for (uint32_t i{ 0 }; i < neighbours_size; ++i)
 	{
-		Cell* other_cell = temp_cells_container[nearby_ids[i]];
+		Cell* other_cell = global_cell_vector_[nearby_ids[i]];
 		const sf::Vector2f other_pos = other_cell->position_;
 
 		const float dist_sq = dist_squared(cell->position_, other_pos);
@@ -164,7 +159,7 @@ void World::update_nearby_container(int& neighbours_size,
 }
 
 
-void World::update_protozoas()
+void World::update_all_protozoa()
 {
 	std::vector<int> reproduce_indexes{};
 	reproduce_indexes.reserve(max_protozoa);
@@ -185,12 +180,14 @@ void World::update_protozoas()
 
 	for (int idx : reproduce_indexes)
 	{
-		reproduce_protozoa(all_protozoa_.at(idx));
+		create_offspring(all_protozoa_.at(idx));
 	}
 }
 
-Protozoa* World::find_an_offspring()
+Protozoa* World::get_unallocated_protozoa()
 {
+	// This function will either return an unallocated protozoa from the pool, or if none are available, 
+	// it will return a random existing protozoa to be overwritten.
 	Protozoa* offspring = all_protozoa_.add();
 
 	if (offspring == nullptr)
@@ -201,9 +198,9 @@ Protozoa* World::find_an_offspring()
 	return offspring;
 }
 
-void World::reproduce_protozoa(Protozoa* parent)
+void World::create_offspring(Protozoa* parent)
 {
-	Protozoa* offspring = find_an_offspring();
+	Protozoa* offspring = get_unallocated_protozoa();
 	parent->reproduce = false;
 	
 	// first we assign the genetic aspects of the offspring to match that of the parents, then reconstruct it
@@ -213,22 +210,23 @@ void World::reproduce_protozoa(Protozoa* parent)
 	offspring->mutate();
 }
 
-void World::update_cells_container()
+void World::update_global_cell_vector()
 {
-	temp_cells_container.clear();
+	global_cell_vector_.clear();
 
 	for (Protozoa* protozoa : all_protozoa_)
 	{
 		for (Cell& cell : protozoa->get_cells())
 		{
-			temp_cells_container.push_back(&cell);
+			global_cell_vector_.push_back(&cell);
 		}
 	}
 }
 
 
-void World::handle_extinction_event()
+void World::check_for_extinction_event()
 {
+	// if there are no protozoa left, we need to respawn some and create random genes for them
 	if (all_protozoa_.size() == 0)
 	{
 		for (int i = 0; i < initial_protozoa; ++i)
@@ -239,11 +237,11 @@ void World::handle_extinction_event()
 	}
 }
 
-void World::add_cells_to_hash_grid()
+void World::update_spatial_grid()
 {
 	spatial_hash_grid_.clear();
 	int idx = 0;
-	for (Cell* cell : temp_cells_container)
+	for (Cell* cell : global_cell_vector_)
 	{
 		cell->bound(world_circular_bounds_);
 		spatial_hash_grid_.add_object(cell->position_.x, cell->position_.y, idx++);
@@ -251,16 +249,16 @@ void World::add_cells_to_hash_grid()
 }
 
 
-void World::update_debug(const sf::Vector2f mouse_position) const
+void World::move_cell_in_selected_protozoa(const sf::Vector2f mouse_position) const
 {
-	if (selected_protozoa != nullptr)
+	if (selected_protozoa_ != nullptr)
 	{
-		selected_protozoa->move_selected_cell(mouse_position);
+		selected_protozoa_->move_selected_cell(mouse_position);
 	}
 }
 
 
-void World::render_world()
+void World::render()
 {
 	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.
 	if (draw_cell_grid)
@@ -273,7 +271,7 @@ void World::render_world()
 		food_manager_.draw_food_grid();
 	}
 
-	update_position_data();
+	update_position_container();
 	render_protozoa();
 
 	// drawing the world bounds
@@ -295,9 +293,9 @@ void World::render_protozoa()
 	}
 
 	// we want the springs to be rendered behind the cells
-	if (selected_protozoa != nullptr && debug_mode && !skeleton_mode)
+	if (selected_protozoa_ != nullptr && debug_mode && !skeleton_mode)
 	{
-		selected_protozoa->render_protozoa_springs();
+		selected_protozoa_->render_protozoa_springs();
 
 		
 	}
@@ -311,9 +309,9 @@ void World::render_protozoa()
 	}
 
 	// if our selected cell needs debugging
-	if (debug_mode && selected_protozoa != nullptr)
+	if (debug_mode && selected_protozoa_ != nullptr)
 	{
-		selected_protozoa->render_debug(skeleton_mode, show_connections, show_bounding_boxes);
+		selected_protozoa_->render_debug(skeleton_mode, show_connections, show_bounding_boxes);
 	}
 
 	// clearing all of their nearby data to be re-written to
@@ -323,7 +321,7 @@ void World::render_protozoa()
 	}
 }
 
-void World::update_position_data()
+void World::update_position_container()
 {
 	outer_color_data_.clear();
 	inner_color_data_.clear();
@@ -366,7 +364,7 @@ void World::init_environment()
 
 }
 
-void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_position, bool mouse_pressed) const
+void World::check_if_mouse_is_hovering(const bool debug_mode, const sf::Vector2f mouse_position, bool mouse_pressed) const
 {
 	if (!debug_mode)
 		return;
@@ -381,13 +379,13 @@ void World::check_hovering(const bool debug_mode, const sf::Vector2f mouse_posit
 	}
 }
 
-bool World::check_pressed(const sf::Vector2f mouse_position)
+bool World::handle_mouse_click(const sf::Vector2f mouse_position)
 {
 	for (Protozoa* protozoa : all_protozoa_)
 	{
 		if (protozoa->is_hovered_on(mouse_position, true))
 		{
-			selected_protozoa = protozoa;
+			selected_protozoa_ = protozoa;
 			return true;
 		}
 	}
@@ -396,15 +394,15 @@ bool World::check_pressed(const sf::Vector2f mouse_position)
 
 void World::de_select_protozoa() const
 {
-	if (selected_protozoa != nullptr)
+	if (selected_protozoa_ != nullptr)
 	{
-		//selected_protozoa->deselect_cell();
-		//selected_protozoa = nullptr;
+		//selected_protozoa_->deselect_cell();
+		//selected_protozoa_ = nullptr;
 	}
 }
 
 
-float World::calculate_average_generation() const
+float World::get_average_generation() const
 {
 	float sum = 0.f;
 	for (Protozoa* protozoa : all_protozoa_)
