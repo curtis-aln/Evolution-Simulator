@@ -143,6 +143,7 @@
     <ClCompile Include="src\Protozoa\extension\SinWaveManager.cpp" />
     <ClCompile Include="src\simulation\simulation.cpp" />
     <ClCompile Include="src\world\world.cpp" />
+    <ClCompile Include="src\world\world_updating.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\builder\builder.h" />
