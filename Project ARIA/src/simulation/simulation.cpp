@@ -234,7 +234,7 @@ void Simulation::handle_events()
 
 		else if (event.type == sf::Event::MouseButtonReleased)
 		{
-			m_world_.de_select_protozoa();
+			m_world_.deselect_protozoa();
 			m_builder_.de_select_protozoa();
 			mouse_pressed_event = false;
 		}

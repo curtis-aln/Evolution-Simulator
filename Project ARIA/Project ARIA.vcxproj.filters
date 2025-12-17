@@ -140,6 +140,9 @@
     <ClInclude Include="src\Protozoa\extension\SinWaveManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\world\ProtozoaManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="media\fonts\Calibri.ttf" />

@@ -49,7 +49,7 @@ void World::update(const bool pause)
 	if (!pause)
 	{ 
 		food_manager_.update();
-		update_all_protozoa();
+		update_all_protozoa(food_manager_, debug_mode);
 	}
 }
 
@@ -159,83 +159,6 @@ void World::update_nearby_container(int& neighbours_size,
 }
 
 
-void World::update_all_protozoa()
-{
-	std::vector<int> reproduce_indexes{};
-	reproduce_indexes.reserve(max_protozoa);
-	for (Protozoa* protozoa : all_protozoa_)
-	{
-		protozoa->update(food_manager_, debug_mode);
-
-		if (protozoa->reproduce)
-		{
-			reproduce_indexes.push_back(protozoa->id);
-		}
-
-		if (protozoa->dead)
-		{
-			all_protozoa_.remove(protozoa);
-		}
-	}
-
-	for (int idx : reproduce_indexes)
-	{
-		create_offspring(all_protozoa_.at(idx));
-	}
-}
-
-Protozoa* World::get_unallocated_protozoa()
-{
-	// This function will either return an unallocated protozoa from the pool, or if none are available, 
-	// it will return a random existing protozoa to be overwritten.
-	Protozoa* offspring = all_protozoa_.add();
-
-	if (offspring == nullptr)
-	{
-		const size_t idx = Random::rand_range(unsigned(0), all_protozoa_.size() - 1);
-		offspring = all_protozoa_.at(idx);
-	}
-	return offspring;
-}
-
-void World::create_offspring(Protozoa* parent)
-{
-	Protozoa* offspring = get_unallocated_protozoa();
-	parent->reproduce = false;
-	
-	// first we assign the genetic aspects of the offspring to match that of the parents, then reconstruct it
-	offspring->reset_protozoa();
-	offspring->set_protozoa_attributes(parent);
-	offspring->generation += 1;
-	offspring->mutate();
-}
-
-void World::update_global_cell_vector()
-{
-	global_cell_vector_.clear();
-
-	for (Protozoa* protozoa : all_protozoa_)
-	{
-		for (Cell& cell : protozoa->get_cells())
-		{
-			global_cell_vector_.push_back(&cell);
-		}
-	}
-}
-
-
-void World::check_for_extinction_event()
-{
-	// if there are no protozoa left, we need to respawn some and create random genes for them
-	if (all_protozoa_.size() == 0)
-	{
-		for (int i = 0; i < initial_protozoa; ++i)
-		{
-			Protozoa* protozoa = all_protozoa_.add();
-			protozoa->generate_random();
-		}
-	}
-}
 
 void World::update_spatial_grid()
 {
@@ -321,32 +244,15 @@ void World::render_protozoa()
 	}
 }
 
-void World::update_position_container()
-{
-	outer_color_data_.clear();
-	inner_color_data_.clear();
-	position_data_.clear();
-
-	food_manager_.render();
-
-	for (Protozoa* protozoa : all_protozoa_)
-	{
-		for (Cell& cell : protozoa->get_cells())
-		{
-			outer_color_data_.push_back(protozoa->cell_outer_color);
-			inner_color_data_.push_back(protozoa->cell_inner_color);
-			position_data_.push_back(cell.position_);
-		}
-	}
-}
-
 
 void World::init_organisms()
 {
+	// emplace creates all the actual objects of the protozoa
 	for (int i = 0; i < max_protozoa; ++i)
 	{
 		all_protozoa_.emplace({ i, &world_circular_bounds_, m_window_, true });
 	}
+	// we only want to start with a certain amount of protozoa so we "remove" some
 	for (int i = 0; i < max_protozoa - initial_protozoa; ++i)
 	{
 		all_protozoa_.remove(i);
@@ -392,22 +298,22 @@ bool World::handle_mouse_click(const sf::Vector2f mouse_position)
 	return false;
 }
 
-void World::de_select_protozoa() const
-{
-	if (selected_protozoa_ != nullptr)
-	{
-		//selected_protozoa_->deselect_cell();
-		//selected_protozoa_ = nullptr;
-	}
-}
 
-
-float World::get_average_generation() const
+void World::update_position_container()
 {
-	float sum = 0.f;
+	outer_color_data_.clear();
+	inner_color_data_.clear();
+	position_data_.clear();
+
+	food_manager_.render();
+
 	for (Protozoa* protozoa : all_protozoa_)
 	{
-		sum += protozoa->generation;
+		for (Cell& cell : protozoa->get_cells())
+		{
+			outer_color_data_.push_back(protozoa->cell_outer_color);
+			inner_color_data_.push_back(protozoa->cell_inner_color);
+			position_data_.push_back(cell.position_);
+		}
 	}
-	return sum / all_protozoa_.size();
 }

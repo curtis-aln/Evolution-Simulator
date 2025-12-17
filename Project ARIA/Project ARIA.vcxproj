@@ -177,6 +177,7 @@
     <ClInclude Include="src\Utils\utility.h" />
     <ClInclude Include="src\Utils\utility_SFML.h" />
     <ClInclude Include="src\Utils\UI\Camera.hpp" />
+    <ClInclude Include="src\world\ProtozoaManager.h" />
     <ClInclude Include="src\world\world.h" />
   </ItemGroup>
   <ItemGroup>
