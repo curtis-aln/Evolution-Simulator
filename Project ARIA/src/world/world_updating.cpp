@@ -28,8 +28,10 @@ void World::update(const bool pause)
 	if (!pause)
 	{
 		food_manager_.update();
-		update_all_protozoa(food_manager_, debug_mode);
+		update_all_protozoa(food_manager_, debug_mode, min_speed);
 	}
+
+	min_speed += 0.00002f;
 }
 
 

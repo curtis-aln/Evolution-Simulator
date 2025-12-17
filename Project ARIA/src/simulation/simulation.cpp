@@ -3,7 +3,7 @@
 inline static constexpr float lerp_factor = 0.025f; // Adjust for smoothness (0 = no movement, 1 = instant movement)
 
 
-inline void draw_debug_circle(sf::RenderWindow* window, const sf::Vector2f position)
+static inline void draw_debug_circle(sf::RenderWindow* window, const sf::Vector2f position)
 {
 	if (!window) return; // Ensure the window pointer is valid
 
@@ -64,6 +64,7 @@ void Simulation::init_text_box()
 	text_box.add_statistic("float", "fps", &fps_);
 	text_box.add_statistic("bool", "paused", &m_world_.paused);
 	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
+	text_box.add_statistic("float", "min_Speed", &m_world_.min_speed);
 
 	text_box.add_text("[R]: Toggle Rendering");
 	text_box.add_text("[G]: toggle cell grid");
@@ -216,7 +217,10 @@ void Simulation::handle_events()
 			running = false;
 
 		else if (event.type == sf::Event::KeyPressed)
+		{
 			keyboard_input(event.key.code);
+			m_world_.keyboardEvents(event.key.code);
+		}
 
 		else if (event.type == sf::Event::MouseWheelScrolled)
 			camera_.zoom(event.mouseWheelScroll.delta);

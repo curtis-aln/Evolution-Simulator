@@ -58,13 +58,13 @@ public:
 
 
 protected:
-	void update_all_protozoa(FoodManager& food_manager_, bool debug_mode)
+	void update_all_protozoa(FoodManager& food_manager_, bool debug_mode, float min_speed)
 	{
 		std::vector<int> reproduce_indexes{};
 		reproduce_indexes.reserve(max_protozoa);
 		for (Protozoa* protozoa : all_protozoa_)
 		{
-			protozoa->update(food_manager_, debug_mode);
+			protozoa->update(food_manager_, debug_mode, min_speed);
 
 			if (protozoa->reproduce)
 			{

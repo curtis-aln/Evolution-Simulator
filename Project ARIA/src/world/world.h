@@ -68,6 +68,8 @@ public:
 	// for the simple spatial grid, we need a temporary array to store nearby cell ids
 	std::array<int, cell_capacity * 9> nearby_ids = {};
 
+	float min_speed = 0;
+
 public:
 	World(sf::RenderWindow* window = nullptr);
 

@@ -104,13 +104,13 @@ public:
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 340'000;
+	static constexpr float bounds_radius = 30'000;
 
 	static constexpr unsigned max_protozoa = 30'000;
-	static constexpr unsigned initial_protozoa = 10'000;
+	static constexpr unsigned initial_protozoa = 300;
 
-	inline static constexpr size_t cells_x = 210;
-	inline static constexpr size_t cells_y = 210;
+	inline static constexpr size_t cells_x = 50;
+	inline static constexpr size_t cells_y = 50;
 	inline static constexpr size_t cell_capacity = 18;
 };
 
@@ -157,12 +157,12 @@ struct BuilderSettings
 
 struct FoodSettings
 {
-	inline static constexpr size_t cells_x = 130;
-	inline static constexpr size_t cells_y = 130;
-	inline static constexpr size_t cell_capacity = 25;
+	inline static constexpr size_t cells_x = 80;
+	inline static constexpr size_t cells_y = 80;
+	inline static constexpr size_t cell_capacity = 20;
 
 	static constexpr unsigned max_food = 80'000;
-	static constexpr unsigned initial_food = 60'000;
+	static constexpr unsigned initial_food = 10'000;
 	inline static constexpr float food_radius = 30.f;
 	inline static constexpr float friction = 0.99f;
 

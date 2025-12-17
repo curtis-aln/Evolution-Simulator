@@ -6,9 +6,8 @@
 #include <vector>
 #include <utility>
 #include <cmath>
-#include <unordered_map>
 #include <algorithm>
-#include <unordered_set>
+#include  "../Utils/Graphics/OrganicColorMutator.h"
 
 // TODO - put the gene fetch and retrive stuff into a class
 // TODO - explain the code a bit more
@@ -175,7 +174,7 @@ struct Genome : public GeneticPresets, public GeneSettings
     std::vector<std::optional<CellGene>> cell_genes;
     std::vector<std::optional<SpringGene>> spring_genes;
 
-
+	// make sure the cell_genes vector can hold the given id
     void ensure_cell_capacity(const int id)
     {
         if (id >= cell_genes.size())
@@ -194,6 +193,7 @@ struct Genome : public GeneticPresets, public GeneSettings
             cell_genes[id].reset();
     }
 
+	// fetch cell gene by id, or nullptr if not found
     CellGene* get_cell_gene(const int id)
     {
         if (id >= cell_genes.size() || !cell_genes[id])
@@ -201,6 +201,7 @@ struct Genome : public GeneticPresets, public GeneSettings
         return &*cell_genes[id];
     }
 
+	// make sure the spring_genes vector can hold the given id
     void ensure_spring_capacity(const int id)
     {
         if (id >= spring_genes.size())
@@ -219,6 +220,7 @@ struct Genome : public GeneticPresets, public GeneSettings
             spring_genes[id].reset();
     }
 
+	// fetch spring gene by id, or nullptr if not found
     SpringGene* get_spring_gene(const int id)
     {
         if (id >= spring_genes.size() || !spring_genes[id])
@@ -318,74 +320,5 @@ struct Genome : public GeneticPresets, public GeneSettings
         spring_genes = model_genome.spring_genes;
 
         generation = model_genome.generation;
-    }
-
-private:
-    // Helper: softly clamp (keeps exploration gentle)
-    static float soften_clamp(const float value, const float minv, const float maxv, const float softness = 0.15f)
-    {
-        if (value < minv) return minv + (value - minv) * softness;
-        if (value > maxv) return maxv + (value - maxv) * softness;
-        return value;
-    }
-
-    // Mutates a color in an "organic" constrained HSL space. Taken/ported from previous code.
-    static sf::Color mutate_color(const sf::Color& color, const float mutation_rate = 0.002f)
-    {
-        float r = color.r / 255.f;
-        float g = color.g / 255.f;
-        float b = color.b / 255.f;
-
-        float maxv = std::max({ r, g, b });
-        float minv = std::min({ r, g, b });
-        float delta = maxv - minv;
-
-        float h = 0.f;
-        float l = 0.5f * (maxv + minv);
-        float s = 0.f;
-
-        if (delta > 0.f)
-        {
-            s = delta / (1.f - std::abs(2.f * l - 1.f));
-            if (maxv == r)
-                h = 60.f * fmod(((g - b) / delta), 6.f);
-            else if (maxv == g)
-                h = 60.f * (((b - r) / delta) + 2.f);
-            else
-                h = 60.f * (((r - g) / delta) + 4.f);
-            if (h < 0.f) h += 360.f;
-        }
-
-        h += Random::rand_range(-20.f, 20.f);
-        s += Random::rand_range(-mutation_rate, mutation_rate);
-        l += Random::rand_range(-mutation_rate, mutation_rate);
-
-        h = fmod(h + 360.f, 360.f);
-        h = soften_clamp(h, 20.f, 320.f, 0.25f);
-        s = soften_clamp(s, 0.25f, 0.75f, 0.20f);
-        l = soften_clamp(l, 0.35f, 0.70f, 0.20f);
-        s = std::clamp(s, 0.f, 1.f);
-        l = std::clamp(l, 0.f, 1.f);
-
-        float c = (1.f - std::abs(2.f * l - 1.f)) * s;
-        float hprime = h / 60.f;
-        float x = c * (1.f - std::abs(fmod(hprime, 2.f) - 1.f));
-
-        float r1 = 0.f, g1 = 0.f, b1 = 0.f;
-        if (hprime < 1) { r1 = c; g1 = x; }
-        else if (hprime < 2) { r1 = x; g1 = c; }
-        else if (hprime < 3) { g1 = c; b1 = x; }
-        else if (hprime < 4) { g1 = x; b1 = c; }
-        else if (hprime < 5) { r1 = x; b1 = c; }
-        else { r1 = c; b1 = x; }
-
-        float m = l - c * 0.5f;
-
-        return sf::Color(
-            static_cast<sf::Uint8>(std::round((r1 + m) * 255.f)),
-            static_cast<sf::Uint8>(std::round((g1 + m) * 255.f)),
-            static_cast<sf::Uint8>(std::round((b1 + m) * 255.f)),
-            color.a
-        );
     }
 };

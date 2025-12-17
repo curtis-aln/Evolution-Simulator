@@ -157,6 +157,7 @@
     <ClInclude Include="src\simulation\simulation.h" />
     <ClInclude Include="src\Utils\Graphics\CircleBatchRenderer.h" />
     <ClInclude Include="src\Utils\Graphics\font_renderer.hpp" />
+    <ClInclude Include="src\Utils\Graphics\OrganicColorMutator.h" />
     <ClInclude Include="src\Utils\Graphics\SFML_Grid.h" />
     <ClInclude Include="src\Utils\Graphics\simple_spatial_grid.h" />
     <ClInclude Include="src\Utils\Graphics\sin_wave_grapher.h" />

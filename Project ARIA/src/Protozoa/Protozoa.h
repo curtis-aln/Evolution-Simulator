@@ -58,7 +58,7 @@ public:
 
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
-	void update(FoodManager& food_manager, bool debug);
+	void update(FoodManager& food_manager, bool debug, float min_speed);
 	void handle_food(FoodManager& food_manager, bool debug);
 	void mutate();
 	void add_cell();

@@ -146,6 +146,9 @@
     <ClInclude Include="src\world\ProtozoaManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils\Graphics\OrganicColorMutator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Font Include="media\fonts\Calibri.ttf" />
