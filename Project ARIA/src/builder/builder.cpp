@@ -1,7 +1,9 @@
 #include "builder.h"
 
 
-Builder::Builder(sf::RenderWindow* window) : m_window_(window), m_protozoa_(0, nullptr, window)
+Builder::Builder(sf::RenderWindow* window, Font* title_font, Font* regular_font, Font* cell_statistic_font) 
+: m_window_(window), m_protozoa_(0, nullptr, window), 
+title_font_(title_font), regular_font_(regular_font), cell_statistic_font_(cell_statistic_font)
 {
 	init_bounds();
 	init_protozoa();
@@ -153,14 +155,14 @@ void Builder::render_ui()
 
 void Builder::render_text() const
 {
-	title_font.draw(title);
-	regular_font.draw(instructions);
+	title_font_->draw(title);
+	regular_font_->draw(instructions);
 }
 
 
 void Builder::render_protozoa()
 {
-	m_protozoa_.render_debug(false, false, false);
+	m_protozoa_.render_debug(cell_statistic_font_, false, false, false);
 
 	if (start_cell != nullptr)
 	{
@@ -183,7 +185,7 @@ void Builder::init_text_packets()
 	};
 
 
-	const sf::Vector2f text_size = regular_font.get_text_size(box_instructions);
+	const sf::Vector2f text_size = regular_font_->get_text_size(box_instructions);
 	const sf::Vector2f instructions_pos = {
 		bounds_pos.x + bounds_size.x - instructions_buffer.x - text_size.x,
 		bounds_pos.y + bounds_size.y - instructions_buffer.y - text_size.y};

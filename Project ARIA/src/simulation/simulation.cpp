@@ -182,7 +182,7 @@ void Simulation::update_line_graphs()
 
 void Simulation::draw_everything()
 {
-	m_world_.render();
+	m_world_.render(&cell_statistic_font);
 	
 	if (!m_world_.simple_mode)
 	{

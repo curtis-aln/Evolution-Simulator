@@ -75,7 +75,7 @@ public:
 
 	// updating functions
 	void update(bool pause);
-	void render();
+	void render(Font* font);
 
 	// fetch functions
 	int get_food_count() const { return food_manager_.get_size(); }
@@ -95,7 +95,7 @@ private:
 	void update_spatial_grid();
 
 	// rendering functions
-	void render_protozoa();
+	void render_protozoa(Font* font);
 	
 	// initialization functions
 	void init_organisms();

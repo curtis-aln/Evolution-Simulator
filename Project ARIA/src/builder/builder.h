@@ -31,9 +31,13 @@ class Builder : BuilderSettings, ButtonSettings, TextSettings, UI_Settings
 	bool debug_mode_ = false;
 	Button debug_toggle{};
 
+	Font* title_font_;
+	Font* regular_font_;
+	Font* cell_statistic_font_;
+
 
 public:
-	explicit Builder(sf::RenderWindow* window);
+	explicit Builder(sf::RenderWindow* window, Font* title_font, Font* regular_font, Font* cell_statistic_font);
 	void init_text_packets();
 
 	void render();

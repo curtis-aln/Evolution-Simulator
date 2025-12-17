@@ -2,7 +2,6 @@
 
 #include <SFMl/Graphics.hpp>
 #include "utility.h"
-#include "Random.h"
 
 inline void draw_protozoa_bounding_box(sf::Vector2f top_left, sf::Vector2f bottom_right, sf::RenderWindow& window, const sf::RenderStates& render_states = sf::RenderStates())
 {

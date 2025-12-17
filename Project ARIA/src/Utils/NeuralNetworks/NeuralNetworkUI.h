@@ -3,7 +3,6 @@
 #include "../Graphics/font_renderer.hpp"
 #include "../UI/button.h"
 #include "../utility_SFML.h"
-#include "../../settings.h"
 
 
 struct NodeRenderInfo
@@ -13,8 +12,17 @@ struct NodeRenderInfo
 	std::pair<int, int> node_index{};
 };
 
+struct Network_UI_Settings
+{
+	inline static const sf::Color border_fill_color = { 30, 30, 30 };
+	inline static const sf::Color border_outline_color = { 50, 50, 50 };
+	static constexpr float border_outline_thickness = 12;
+	static constexpr sf::Uint8 transparency = 220;
+};
 
-class NetworkRenderer : TextSettings, ButtonSettings, UI_Settings
+
+
+class NetworkRenderer : ButtonSettings, Network_UI_Settings
 {
 	GeneticNeuralNetwork* m_network_pointer_ = nullptr;
 	sf::RenderWindow* m_render_window_ = nullptr;
@@ -40,11 +48,16 @@ class NetworkRenderer : TextSettings, ButtonSettings, UI_Settings
 	sf::Color positive_color = { 20, 240, 40 };
 	sf::Color negative_color = { 240, 30, 20 };
 
+	Font* title_font_;
+	Font* regular_font_;
+	Font* cell_statistic_font_;
+
 
 public:
-	explicit NetworkRenderer(const sf::Rect<float>& border = {}, sf::RenderWindow* render_window = nullptr, 
+	explicit NetworkRenderer(Font* title_font, Font* regular_font, Font* cell_statistic_font, 
+		const sf::Rect<float>& border = {}, sf::RenderWindow* render_window = nullptr,
 		GeneticNeuralNetwork* network_pointer = nullptr)
-	: m_border_(border)
+		: m_border_(border), title_font_(title_font), regular_font_(regular_font), cell_statistic_font_(cell_statistic_font)
 	{
 		set_pointer(network_pointer);
 		set_render_window(render_window);
@@ -79,7 +92,7 @@ public:
 	{
 		const sf::Vector2f border_pos = m_border_.getPosition();
 		const sf::Vector2f border_size = m_border_.getSize();
-		const sf::Vector2f text_size = title_font.get_text_size(text);
+		const sf::Vector2f text_size = title_font_->get_text_size(text);
 		const sf::Vector2f position = { border_pos.x + border_size.x / 2.f, border_pos.y + text_size.y };
 		
 		m_title_ = { position, text, 0, true };
@@ -95,7 +108,7 @@ public:
 
 		for (int i = 0; i < names.size(); ++i)
 		{
-			const sf::Vector2f size = regular_font.get_text_size(names[i]);
+			const sf::Vector2f size = regular_font_->get_text_size(names[i]);
 			const sf::Vector2f pos = m_node_render_info_[0][i].pos - sf::Vector2f{ size.x + 10, 0 };
 			input_names[i] = { pos, names[i], 0, true };
 		}
@@ -112,7 +125,7 @@ public:
 
 		for (int i = 0; i < names.size(); ++i)
 		{
-			const sf::Vector2f size = regular_font.get_text_size(names[i]);
+			const sf::Vector2f size = regular_font_->get_text_size(names[i]);
 			const sf::Vector2f pos = m_node_render_info_[m_node_render_info_.size()-1][i].pos + sf::Vector2f{ size.x + 10, 0};
 			output_names[i] = { pos, names[i], 0, true };
 		}
@@ -161,7 +174,7 @@ private:
 		const sf::Color outline_color = { 200, 200, 200 };
 
 		debug_toggle = Button(m_render_window_, rect);
-		debug_toggle.init_font("Debug Toggle", regular_font_location, sf::Color::White, b_font_size);
+		debug_toggle.init_font("Debug Toggle", regular_font_->get_font_location(), sf::Color::White, b_font_size);
 		debug_toggle.init_graphics(default_color, active_color, outline_color, b_thickness);
 	}
 
@@ -239,7 +252,7 @@ private:
 	void render_border() const
 	{
 		m_render_window_->draw(m_render_border_);
-		title_font.draw(m_title_);
+		title_font_->draw(m_title_);
 	}
 
 	void render_UI()
@@ -308,7 +321,7 @@ private:
 			}
 		
 			const std::string val = denary_to_str(state2, 1);
-			cell_statistic_font.draw(text_pos, val, true, rotation);
+			cell_statistic_font_->draw(text_pos, val, true, rotation);
 		}
 	}	
 		
@@ -321,9 +334,9 @@ private:
 	{
 		// drawing inputs and outputs
 		for (const TextPacket& packet : input_names)
-			regular_font.draw(packet);
+			regular_font_->draw(packet);
 		for (const TextPacket& packet : output_names)
-			regular_font.draw(packet);
+			regular_font_->draw(packet);
 
 		// if it is debug mode then we can draw values on each of the weights
 		if (!debug_mode_)
@@ -337,8 +350,8 @@ private:
 			{
 				const std::string val = denary_to_str(network[layer_idx][node_idx].output, 2);
 				const sf::Vector2f pos = m_node_render_info_[layer_idx][node_idx].pos;
-				const float text_size_y = cell_statistic_font.get_text_size(val).y;
-				cell_statistic_font.draw(pos + sf::Vector2f{0, node_radius + text_size_y/2 + 8.f}, val, true);
+				const float text_size_y = cell_statistic_font_->get_text_size(val).y;
+				cell_statistic_font_->draw(pos + sf::Vector2f{0, node_radius + text_size_y/2 + 8.f}, val, true);
 			}
 		}
 	}

@@ -11,7 +11,7 @@ void Protozoa::render_protozoa_springs()
 	}
 }
 
-void Protozoa::render_debug(const bool skeleton_mode, const bool show_connections, const bool show_bounding_boxes)
+void Protozoa::render_debug(Font* font, const bool skeleton_mode, const bool show_connections, const bool show_bounding_boxes)
 {
 	// skeleton mode just hides the cell bodies and leaves only the outlines of the cells
 	if (skeleton_mode)
@@ -26,9 +26,9 @@ void Protozoa::render_debug(const bool skeleton_mode, const bool show_connection
 		draw_protozoa_bounding_box(m_personal_bounds_, *m_window_);
 	}
 
-	draw_cell_physics();
-	draw_protozoa_information();
-	draw_spring_information();
+	draw_cell_physics(font);
+	draw_protozoa_information(font);
+	draw_spring_information(font);
 
 	if (show_connections)
 	{
@@ -93,10 +93,8 @@ void Protozoa::render_cell_connections(Cell& cell, const bool thick_lines) const
 }
 
 
-void Protozoa::draw_cell_physics() const
+void Protozoa::draw_cell_physics(Font* font) const
 {
-	Font& font = TextSettings::cell_statistic_font;
-
 	// for each cell we draw its bounding box
     for (const Cell& cell : m_cells_)
     {
@@ -115,20 +113,18 @@ void Protozoa::draw_cell_physics() const
 
         // drawing cell stats
         const auto top_left = rect.getPosition();
-        const auto spacing = font.get_text_size("0").y;
+        const auto spacing = font->get_text_size("0").y;
         const sf::Vector2f offset = { 0, spacing };
-        font.draw(top_left, "id: " + std::to_string(cell.id), false);
-        font.draw(top_left + offset, "phase: " + std::to_string(cell.sinwave_current_phase_), false);
-        font.draw(top_left + offset * 2.f, "friction: " + std::to_string(cell.sinwave_current_friction_), false);
-        font.draw(top_left + offset * 3.f, "gen: " + std::to_string(cell.generation), false);
+        font->draw(top_left, "id: " + std::to_string(cell.id), false);
+        font->draw(top_left + offset, "phase: " + std::to_string(cell.sinwave_current_phase_), false);
+        font->draw(top_left + offset * 2.f, "friction: " + std::to_string(cell.sinwave_current_friction_), false);
+        font->draw(top_left + offset * 3.f, "gen: " + std::to_string(cell.generation), false);
     }
 }
 
 
-void Protozoa::draw_protozoa_information()
+void Protozoa::draw_protozoa_information(Font* font)
 {
-	Font& font = TextSettings::cell_statistic_font;
-
 	// protozoa information under the bounding box
 	sf::Vector2f start_pos = { m_personal_bounds_.left, m_personal_bounds_.top + m_personal_bounds_.height + 10 };
 
@@ -150,7 +146,7 @@ void Protozoa::draw_protozoa_information()
 		denary_to_str(mutation_range, 3) + "/" + denary_to_str(mutation_rate, 3);
 
 
-	font.draw(start_pos, combined_string, false);
+	font->draw(start_pos, combined_string, false);
 
 	// top statistics
 	const float speed = length(velocity);
@@ -158,11 +154,11 @@ void Protozoa::draw_protozoa_information()
 	start_pos = { m_personal_bounds_.left, m_personal_bounds_.top - 70 };
 	const std::string text = "position: " + vector_to_string(get_center(), 1)
 		+ "\nvelocity: " + vector_to_string(velocity, 1) + "\nspeed: " + denary_to_str(speed, 1);
-	font.draw(start_pos, text, false);
+	font->draw(start_pos, text, false);
 }
 
 
-void Protozoa::draw_spring_information() const
+void Protozoa::draw_spring_information(Font* font) const
 {
 	// spring information
     for (const Spring& spring : m_springs_)
@@ -189,11 +185,11 @@ void Protozoa::draw_spring_information() const
 		std::ostringstream broken;
 		broken << "broken: " << spring.broken;
 
-        TextSettings::cell_statistic_font.draw(lower_quartile, vectorF1.str(), true);
-        TextSettings::cell_statistic_font.draw(upper_quartile, vectorF2.str(), true);
-		TextSettings::cell_statistic_font.draw(lower_quartile + interquartile_range/3.f, length.str(), true);
-		TextSettings::cell_statistic_font.draw(upper_quartile - interquartile_range/3.f, breaking.str(), true);
-		TextSettings::cell_statistic_font.draw(upper_quartile - interquartile_range/2.f, broken.str(), true);
+        font->draw(lower_quartile, vectorF1.str(), true);
+        font->draw(upper_quartile, vectorF2.str(), true);
+		font->draw(lower_quartile + interquartile_range/3.f, length.str(), true);
+		font->draw(upper_quartile - interquartile_range/3.f, breaking.str(), true);
+		font->draw(upper_quartile - interquartile_range/2.f, broken.str(), true);
     }
 }
 

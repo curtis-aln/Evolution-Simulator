@@ -13,16 +13,7 @@ struct TextSettings
 	static constexpr unsigned regular_font_size = 40;
 	static constexpr unsigned cell_statistic_font_size = 20;
 
-	static Font title_font;
-	static Font regular_font;
-	static Font cell_statistic_font;
 };
-
-// Initialize static Font members with appropriate parameters - Which needs to happen outside the class
-inline Font TextSettings::title_font{ nullptr, title_font_size, bold_font_location };
-inline Font TextSettings::regular_font{ nullptr, regular_font_size, regular_font_location };
-inline Font TextSettings::cell_statistic_font{ nullptr, cell_statistic_font_size, regular_font_location };
-
 
 
 struct ButtonSettings

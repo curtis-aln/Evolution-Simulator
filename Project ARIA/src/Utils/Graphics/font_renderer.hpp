@@ -17,12 +17,14 @@ class Font
     sf::Font m_font_;
     sf::Text m_text_;
     sf::RenderWindow* m_window_;
+    std::string font_location_;
 
 public:
     // Constructor taking m_font_ size and file location
     Font(sf::RenderWindow* window = nullptr, const unsigned font_size = 0,  // todo make path relative
         const std::string& font_location = "media/fonts/Roboto-Bold.ttf") : m_window_(window)
     {
+        font_location_ = font_location;
         if (!font_location.empty())
         {
             set_font(font_location);
@@ -42,12 +44,18 @@ public:
 
     void set_font(const std::string& font_location)
     {
+		font_location_ = font_location;
         if (!m_font_.loadFromFile(font_location))
         {
             std::cerr << "[ERROR]: Failed to load m_font_ from: " << font_location << '\n';
         }
         m_text_.setFont(m_font_);
     }
+
+    std::string& get_font_location()
+    {
+        return font_location_;
+	}
 
     void set_render_window(sf::RenderWindow* window)
     {

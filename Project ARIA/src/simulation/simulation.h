@@ -30,13 +30,17 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 		return sf::VideoMode(new_width, new_height);
 	}
 
+	Font title_font{ nullptr, title_font_size, bold_font_location };
+	Font regular_font{ nullptr, regular_font_size, regular_font_location };
+	Font cell_statistic_font{ nullptr, cell_statistic_font_size, regular_font_location };
+
 	sf::VideoMode videoMode = full_screen ? sf::VideoMode::getDesktopMode() : getAdjustedVideoMode();
 	sf::Uint32 windowStyle = full_screen ? sf::Style::Fullscreen : (sf::Style::Titlebar | sf::Style::Close);
 	sf::RenderWindow m_window_{videoMode, "Project ARIA", windowStyle};
 
 	FrameRateSmoothing<frame_smoothing> m_clock_{};
 	Camera camera_{&m_window_, 1.f};
-	Builder m_builder_{&m_window_};
+	Builder m_builder_{&m_window_, &title_font, &regular_font, &cell_statistic_font};
 
 	// managing time
 	StopWatch m_delta_time_{};
@@ -55,7 +59,7 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	LineGraph<line_maximum_data, line_x_axis_increments> food_population_graph_{ &m_window_, food_graph_bounds };
 
 	GeneticNeuralNetwork network{ 2, 1, 2 };
-	NetworkRenderer net_renderer{ {200, 1750, 1800, 900}, &m_window_, &network };
+	NetworkRenderer net_renderer{ &title_font, &regular_font, &cell_statistic_font, {200, 1750, 1800, 900}, &m_window_, &network };
 	TextBox text_box{ text_renderer_bounds, &m_window_ };
 
 	bool mouse_pressed_event = false;
@@ -66,7 +70,6 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 
 	// statistics
 	float fps_;
-
 
 public:
 	Simulation();

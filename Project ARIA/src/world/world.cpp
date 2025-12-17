@@ -32,7 +32,7 @@ void World::move_cell_in_selected_protozoa(const sf::Vector2f mouse_position) co
 }
 
 
-void World::render()
+void World::render(Font* font)
 {
 	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.
 	if (draw_cell_grid)
@@ -46,13 +46,13 @@ void World::render()
 	}
 
 	update_position_container();
-	render_protozoa();
+	render_protozoa(font);
 
 	// drawing the world bounds
 	m_window_->draw(world_border_renderer_);
 }
 
-void World::render_protozoa()
+void World::render_protozoa(Font* font)
 {
 	constexpr float radius_inner = CellSettings::cell_radius;
 	const float radius_outer = radius_inner + CellSettings::cell_outline_thickness;
@@ -85,7 +85,7 @@ void World::render_protozoa()
 	// if our selected cell needs debugging
 	if (debug_mode && selected_protozoa_ != nullptr)
 	{
-		selected_protozoa_->render_debug(skeleton_mode, show_connections, show_bounding_boxes);
+		selected_protozoa_->render_debug(font, skeleton_mode, show_connections, show_bounding_boxes);
 	}
 
 	// clearing all of their nearby data to be re-written to

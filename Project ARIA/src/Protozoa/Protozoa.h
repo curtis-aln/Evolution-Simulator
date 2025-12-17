@@ -65,7 +65,7 @@ public:
 	static void remove_cell();
 	void load_preset(Preset& preset, sf::Vector2f position = {0, 0});
 	void render_protozoa_springs();
-	void render_debug(bool skeleton_mode, bool show_connections, bool show_bounding_boxes);
+	void render_debug(Font* font, bool skeleton_mode, bool show_connections, bool show_bounding_boxes);
 
 	void draw_cell_outlines() const;
 
@@ -132,9 +132,9 @@ public:
 
 private:
 	// rendering
-	void draw_cell_physics() const;
-	void draw_protozoa_information();
-	void draw_spring_information() const;
+	void draw_cell_physics(Font* font) const;
+	void draw_protozoa_information(Font* font);
+	void draw_spring_information(Font* font) const;
 	void render_cell_connections(Cell& cell, bool thick_lines = false) const;
 
 	// updating
