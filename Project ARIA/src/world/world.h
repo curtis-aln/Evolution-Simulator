@@ -78,8 +78,9 @@ public:
 	// fetch functions
 	int get_food_count() const { return food_manager_.get_size(); }
 
-	void check_if_mouse_is_hovering(bool debug_mode, sf::Vector2f mouse_position, bool mouse_pressed) const;
+	void check_if_mouse_is_hovering(sf::Vector2f mouse_position, bool mouse_pressed) const;
 	bool handle_mouse_click(sf::Vector2f mouse_position);
+	void keyboardEvents(const sf::Keyboard::Key& event_key_code);
 	void move_cell_in_selected_protozoa(sf::Vector2f mouse_position) const;
 
 private:

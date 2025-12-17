@@ -47,7 +47,6 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 
 	// user controlled variables
 	bool m_rendering_ = true;
-	bool m_debug_ = false;
 
 	bool m_tick_frame = false;
 	bool m_tick_frame_time = false;
@@ -79,6 +78,7 @@ public:
 
 private:
 	void update_one_frame();
+	void camera_follow_selected_protozoa();
 	static void update_test_data();
 	void update_line_graphs();
 	void draw_everything();

@@ -65,16 +65,18 @@ void Simulation::init_text_box()
 	text_box.add_statistic("bool", "paused", &m_world_.paused);
 	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
 
-	text_box.add_text("R: Toggle Rendering");
-	text_box.add_text("G: toggle cell grid");
-	text_box.add_text("C: toggle collisions");
-	text_box.add_text("F: toggle food grid");
-	text_box.add_text("S: toggle simple mode");
-	text_box.add_text("O: tick frames");
-	text_box.add_text("[Debug] D: debug mode");
-	text_box.add_text("[Debug] K: skelleton mode");
-	text_box.add_text("[Debug] C: toggle connections");
-	text_box.add_text("[Debug] B: toggle bounding boxes");
+	text_box.add_text("[R]: Toggle Rendering");
+	text_box.add_text("[G]: toggle cell grid");
+	text_box.add_text("[C]: toggle collisions");
+	text_box.add_text("[F]: toggle food grid");
+	text_box.add_text("[S]: toggle simple mode");
+	text_box.add_text("[O]: tick frames");
+	text_box.add_text("");
+	text_box.add_text("[Debug Settings]");
+	text_box.add_text("[D]: debug mode");
+	text_box.add_text("[K]: skeleton mode");
+	text_box.add_text("[C]: toggle connections");
+	text_box.add_text("[B]: toggle bounding boxes");
 }
 
 void Simulation::init_network_renderer()
@@ -123,27 +125,11 @@ void Simulation::update_one_frame()
 		m_world_.update(false);	
 	}
 
-
-	if (m_debug_)
+	// in debug mode we want the camera to follow the selected protozoa
+	if (m_world_.debug_mode)
 	{
 		m_world_.move_cell_in_selected_protozoa(mouse_pos);
-		Protozoa* selected = m_world_.get_selected_protozoa();
-
-		if (selected != nullptr)
-		{
-			// comparing the difference between the camera center and the protozoa center and subtractign them to find out the camera translation
-			sf::Vector2f win_center = sf::Vector2f(m_window_.getSize()) / 2.f;
-			sf::Vector2f cam_center = camera_.window_pos_to_world_pos(win_center);
-
-			sf::Rect<float> bounds = selected->get_bounds();
-			sf::Vector2f center = bounds.getPosition() + bounds.getSize() / 2.f;
-			
-			sf::Vector2f new_position = cam_center + (cam_center - center) * lerp_factor;
-			sf::Vector2f translation = new_position - cam_center;
-
-			camera_.translate(translation);
-
-		}
+		camera_follow_selected_protozoa();
 	}
 
 	m_builder_.update(mouse_pos);
@@ -155,6 +141,22 @@ void Simulation::update_one_frame()
 	update_test_data();
 }
 
+
+void Simulation::camera_follow_selected_protozoa()
+{
+	Protozoa* selected = m_world_.get_selected_protozoa();
+	if (selected != nullptr)
+	{
+		// comparing the difference between the camera center and the protozoa center and subtractign them to find out the camera translation
+		sf::Vector2f win_center = sf::Vector2f(m_window_.getSize()) / 2.f;
+		sf::Vector2f cam_center = camera_.window_pos_to_world_pos(win_center);
+		sf::Rect<float> bounds = selected->get_bounds();
+		sf::Vector2f center = bounds.getPosition() + bounds.getSize() / 2.f;
+		sf::Vector2f new_position = cam_center + (cam_center - center) * lerp_factor;
+		sf::Vector2f translation = new_position - cam_center;
+		camera_.translate(translation);
+	}
+}
 
 void Simulation::update_test_data()
 {
@@ -248,7 +250,7 @@ void Simulation::handle_events()
 		}
 
 		// mouse hovering over a protozoa
-		m_world_.check_if_mouse_is_hovering(m_debug_, cam_pos, mouse_pressed_event);
+		m_world_.check_if_mouse_is_hovering(cam_pos, mouse_pressed_event);
 	}
 
 	// updating camera translations
@@ -258,9 +260,12 @@ void Simulation::handle_events()
 
 void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 {
-	switch (event_key_code) // todo move the world parts into the world class and make their respective variables private
+	switch (event_key_code)
 	{
-	case sf::Keyboard::Escape: running = false; break;
+	case sf::Keyboard::Escape:
+		running = false; 
+		break;
+
 	case sf::Keyboard::Space:  
 		m_world_.paused = not m_world_.paused; 
 		
@@ -269,48 +274,15 @@ void Simulation::keyboard_input(const sf::Keyboard::Key& event_key_code)
 			m_tick_frame = false;
 			m_tick_frame_time = false;
 		}
-		
-		break;
-	case sf::Keyboard::R:      m_rendering_ = not m_rendering_; break;
-	case sf::Keyboard::G:      m_world_.draw_cell_grid = not m_world_.draw_cell_grid; break;
-	
-	case sf::Keyboard::C: 
-		if (m_debug_)
-			m_world_.show_connections = not m_world_.show_connections;
-		else
-			m_world_.toggle_collisions = not m_world_.toggle_collisions; 
 		break;
 
-	case sf::Keyboard::F:      m_world_.draw_food_grid = not m_world_.draw_food_grid; break;
-	case sf::Keyboard::S:      m_world_.simple_mode = not m_world_.simple_mode; break;
+	case sf::Keyboard::R:      
+		m_rendering_ = not m_rendering_; 
+		break;
+
 	case sf::Keyboard::O:
 		m_tick_frame_time = true;
 		break;
-
-	case sf::Keyboard::D:
-		m_debug_ = not m_debug_;
-		m_world_.debug_mode = not m_world_.debug_mode;
-		break;
-	case sf::Keyboard::K:
-		if (m_debug_)
-			m_world_.skeleton_mode = not m_world_.skeleton_mode; break;
-		
-
-	case sf::Keyboard::B:
-		if (m_debug_)
-			m_world_.show_bounding_boxes = not m_world_.show_bounding_boxes; break;
-	
-	// todo
-	//case sf::Keyboard::Key::S:
-	//	if (shifting)
-	//		saveData();
-	//	break;
-	//
-	//case sf::Keyboard::Key::L:
-	//	if (shifting)
-	//		loadData();
-	//	break;
-
 
 	default:
 		break;

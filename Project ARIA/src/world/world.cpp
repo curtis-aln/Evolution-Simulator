@@ -121,7 +121,7 @@ void World::init_environment()
 
 }
 
-void World::check_if_mouse_is_hovering(const bool debug_mode, const sf::Vector2f mouse_position, bool mouse_pressed) const
+void World::check_if_mouse_is_hovering(const sf::Vector2f mouse_position, bool mouse_pressed) const
 {
 	if (!debug_mode)
 		return;
@@ -147,4 +147,48 @@ bool World::handle_mouse_click(const sf::Vector2f mouse_position)
 		}
 	}
 	return false;
+}
+
+void World::keyboardEvents(const sf::Keyboard::Key& event_key_code)
+{
+	
+	switch (event_key_code) // todo move the world parts into the world class and make their respective variables private
+	{
+	case sf::Keyboard::G:      
+		draw_cell_grid = not draw_cell_grid; 
+		break;
+
+	case sf::Keyboard::C:
+		if (debug_mode)
+			show_connections = not show_connections;
+		else
+			toggle_collisions = not toggle_collisions;
+		break;
+
+	case sf::Keyboard::F:      
+		draw_food_grid = not draw_food_grid; 
+		break;
+
+	case sf::Keyboard::S:      
+		simple_mode = not simple_mode; 
+		break;
+
+	case sf::Keyboard::D:
+		debug_mode = not debug_mode;
+		break;
+
+	case sf::Keyboard::K:
+		if (debug_mode)
+			skeleton_mode = not skeleton_mode; 
+		break;
+
+	case sf::Keyboard::B:
+		if (debug_mode)
+			show_bounding_boxes = not show_bounding_boxes; 
+		break;
+
+	default:
+		break;
+
+	}
 }
