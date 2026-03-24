@@ -1,0 +1,217 @@
+#include "simulation.h"
+
+inline static constexpr float lerp_factor = 0.025f; // Adjust for smoothness (0 = no movement, 1 = instant movement)
+
+
+static inline void draw_debug_circle(sf::RenderWindow* window, const sf::Vector2f position)
+{
+	if (!window) return; // Ensure the window pointer is valid
+
+	sf::CircleShape circle(60); // Small debug circle
+	circle.setFillColor(sf::Color::Red); // Red for visibility
+	circle.setOrigin({ 5.f, 5.f }); // Center the origin
+	circle.setPosition(position); // Set position
+
+	window->draw(circle); // Draw the circle to the window
+}
+
+Simulation::Simulation() : m_world_(&m_window_)
+{
+	m_window_.setFramerateLimit(frame_rate);
+	m_window_.setVerticalSyncEnabled(vsync);
+
+	constexpr float rad = WorldSettings::bounds_radius;
+	camera_.translate({ -rad, -rad });
+	camera_.zoom(-1000);
+	camera_.update_window_view();
+
+	title_font.set_render_window(&m_window_); 
+	regular_font.set_render_window(&m_window_);
+	cell_statistic_font.set_render_window(&m_window_);
+
+	title_font.set_font_size(title_font_size);
+	regular_font.set_font_size(regular_font_size);
+	cell_statistic_font.set_font_size(cell_statistic_font_size);
+
+	init_line_graphs();
+	init_network_renderer();
+	init_text_box();
+		
+}
+
+void Simulation::init_line_graphs()
+{
+	LineGraphSettings settings = {
+		"Protozoa Population", "Time", "Population",
+		transparency, protozoa_graph_line_color, protozoa_under_graph_color, border_fill_color, border_outline_color,
+		{ 50, 50, 50, transparency }, border_outline_thickness, regular_font_size,
+		regular_font_size, cell_statistic_font_size, bold_font_location, regular_font_location };
+
+	protozoa_population_graph_.set_settings(settings);
+	settings.title = "Food Population";
+	settings.graph_line_color = food_graph_line_color;
+	settings.under_graph_color = food_under_graph_color;
+	food_population_graph_.set_settings(settings);
+}
+
+void Simulation::init_text_box()
+{
+	text_box.set_fonts(regular_font, cell_statistic_font);
+	text_box.set_title("Protozoa Simulation");
+	text_box.init_graphics(border_fill_color, border_outline_color, border_outline_thickness);
+
+	text_box.add_statistic("int", "frames", &m_ticks_);
+	text_box.add_statistic("float", "fps", &fps_);
+	text_box.add_statistic("bool", "paused", &m_world_.paused);
+	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
+	text_box.add_statistic("float", "min_Speed", &m_world_.min_speed);
+
+	text_box.add_text("[R]: Toggle Rendering");
+	text_box.add_text("[G]: toggle cell grid");
+	text_box.add_text("[C]: toggle collisions");
+	text_box.add_text("[F]: toggle food grid");
+	text_box.add_text("[S]: toggle simple mode");
+	text_box.add_text("[O]: tick frames");
+	text_box.add_text("");
+	text_box.add_text("[Debug Settings]");
+	text_box.add_text("[D]: debug mode");
+	text_box.add_text("[K]: skeleton mode");
+	text_box.add_text("[C]: toggle connections");
+	text_box.add_text("[B]: toggle bounding boxes");
+}
+
+void Simulation::init_network_renderer()
+{
+	//net_renderer.set_title("Test Network");
+	//.set_input_node_names({ "input A", "Input B" });
+	//net_renderer.set_output_node_names({ "output A", "output B" });
+}
+
+
+void Simulation::run_simulation()
+{
+	while (running)
+	{
+		handle_events();
+
+		update_one_frame();
+
+
+		if (m_rendering_)
+		{
+			render();
+		}
+	}
+
+}
+
+void Simulation::update_one_frame()
+{
+	manage_frame_rate();
+	const sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();
+
+	if (m_tick_frame_time)
+	{
+		m_world_.update(false);
+		m_tick_frame_time = false;
+	}
+	else if (!m_world_.paused)
+	{
+		m_world_.update(false);	
+	}
+
+	// in debug mode we want the camera to follow the selected protozoa
+	if (m_world_.debug_mode)
+	{
+		m_world_.move_cell_in_selected_protozoa(mouse_pos);
+		camera_follow_selected_protozoa();
+	}
+
+	m_builder_.update(mouse_pos);
+	protozoa_population_graph_.update(mouse_pos);
+	food_population_graph_.update(mouse_pos);
+	//net_renderer.update(mouse_pos);
+
+	update_line_graphs();
+	update_test_data();
+}
+
+
+void Simulation::camera_follow_selected_protozoa()
+{
+	Protozoa* selected = m_world_.get_selected_protozoa();
+	if (selected != nullptr)
+	{
+		// comparing the difference between the camera center and the protozoa center and subtractign them to find out the camera translation
+		sf::Vector2f win_center = sf::Vector2f(m_window_.getSize()) / 2.f;
+		sf::Vector2f cam_center = camera_.window_pos_to_world_pos(win_center);
+		sf::Rect<float> bounds = selected->get_bounds();
+		sf::Vector2f center = bounds.position + bounds.size / 2.f;
+		sf::Vector2f new_position = cam_center + (cam_center - center) * lerp_factor;
+		sf::Vector2f translation = new_position - cam_center;
+		camera_.translate(translation);
+	}
+}
+
+void Simulation::update_test_data()
+{
+	//network.inputs[0] = std::tanh(test_data3);
+	//network.inputs[1] = std::tanh(test_data4);
+	//network.forward_propagate();
+}
+
+
+void Simulation::update_line_graphs()
+{
+	++m_ticks_;
+	m_total_time_elapsed_ += static_cast<float>(m_delta_time_.get_delta());
+
+	if (m_ticks_ % line_x_axis_increments == 0)
+	{
+		protozoa_population_graph_.add_data(m_world_.get_protozoa_count());
+		food_population_graph_.add_data(m_world_.get_food_count());
+	}
+}
+
+
+void Simulation::draw_everything()
+{
+	m_world_.render(&cell_statistic_font);
+	
+	if (!m_world_.simple_mode)
+	{
+		m_builder_.render();
+
+		protozoa_population_graph_.render(camera_);
+		food_population_graph_.render(camera_);
+
+		//net_renderer.render();
+		text_box.render(camera_);
+	}
+}
+
+void Simulation::render()
+{
+	m_window_.clear(window_color);
+
+	draw_everything();
+
+	m_window_.display();
+}
+
+
+
+void Simulation::manage_frame_rate()
+{
+	fps_ = static_cast<float>(m_clock_.get_average_frame_rate());
+	m_clock_.update_frame_rate();
+
+	// Display FPS in the title bar
+	std::ostringstream title;
+	title << simulation_name 
+		<< " | FPS: " << std::fixed << std::setprecision(1) << fps_ 
+		<< " | protozoa: " << m_world_.get_protozoa_count() 
+		<< " | food: " << m_world_.get_food_count()
+		<< " | average generation: " << m_world_.get_average_generation();
+	m_window_.setTitle(title.str());
+}
