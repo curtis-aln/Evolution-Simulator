@@ -33,6 +33,7 @@ void Protozoa::generate_random()
 {
 	auto preset = Random::rand_val_in_vector(presets);
 	load_preset(preset);
+	update_bounding_box();
 }
 
 

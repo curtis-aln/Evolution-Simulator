@@ -32,8 +32,9 @@ void Protozoa::handle_food(FoodManager& food_manager, const bool debug)
             total_food_eaten++;
             stomach++;
             energy += 10;
-
-            if (stomach > 1)
+            
+            // The organism can only reproduce after eating its bodymass in food
+            if (stomach > m_cells_.size())
             {
                 stomach = 0;
                 reproduce = true;

@@ -88,6 +88,16 @@ public:
 	// information setting
 	void set_render_window(sf::RenderWindow* window);
 	void set_bounds(Circle* bounds);
+	void move_center_location_to(const sf::Vector2f new_center)
+	{
+		const sf::Vector2f center = get_center();
+		const sf::Vector2f translation = new_center - center;
+		for (Cell& cell : m_cells_)
+		{
+			cell.position_ += translation;
+		}
+		update_bounding_box();
+	}
 
 	sf::Vector2f get_center() const
 	{
@@ -125,6 +135,7 @@ public:
 		{
 			cell.generation = other->m_cells_[idx++].generation;
 		}
+		update_bounding_box();
 	}
 
 	void generate_random();

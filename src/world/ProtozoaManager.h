@@ -66,14 +66,15 @@ protected:
 		{
 			protozoa->update(food_manager_, debug_mode, min_speed);
 
-			if (protozoa->reproduce)
-			{
-				reproduce_indexes.push_back(protozoa->id);
-			}
-
 			if (protozoa->dead)
 			{
 				all_protozoa_.remove(protozoa);
+				continue; // causes indexing issues if the orgasanism is removed before we check for reproduction
+			}
+
+			if (protozoa->reproduce)
+			{
+				reproduce_indexes.push_back(protozoa->id);
 			}
 		}
 
@@ -107,6 +108,14 @@ protected:
 		offspring->set_protozoa_attributes(parent);
 		offspring->generation += 1;
 		offspring->mutate();
+
+		// we offset the offspring's position slightly from the parent as if it spawns directly in its parent
+		// it can cause a sudden push on eachovers cells which could result in spring breaking and cell death
+		float parent_bounds_x = parent->get_bounds().size.x;
+		float parent_bounds_y = parent->get_bounds().size.y;
+		float disp_x = Random::rand_range(-parent_bounds_x, parent_bounds_x);
+		float disp_y = Random::rand_range(-parent_bounds_y, parent_bounds_y);
+		offspring->move_center_location_to(parent->get_center() + sf::Vector2f{ disp_x, disp_y });
 	}
 
 	void update_global_cell_vector()

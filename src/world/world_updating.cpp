@@ -31,7 +31,7 @@ void World::update(const bool pause)
 		update_all_protozoa(food_manager_, debug_mode, min_speed);
 	}
 
-	min_speed += 0.00002f;
+	//min_speed += 0.00002f;
 }
 
 
