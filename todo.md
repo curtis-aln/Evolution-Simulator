@@ -42,7 +42,7 @@
 // [DONE] get_average_generation() divide-by-zero - Guard with if (all_protozoa_.size() == 0) return 0.f;
 // - Builder stubs (builder_add_cell, make_connection) - Either implement them properly, or hide the builder UI entirely until they work. Don't ship broken UI features to beta testers.
 // - Thread pool created but never used (8 idle threads) - Either wire dispatch() into update_all_protozoa() and the collision grid loop, or reduce to 0 threads and remove it until you're ready to parallelize properly.
-// - CMake project named MyApp - Rename project(MyApp) and add_executable(MyApp) to ProjectARIA or similar.
+// [DONE] CMake project named MyApp - Rename project(MyApp) and add_executable(MyApp) to ProjectARIA or similar.
 // - file(GLOB_RECURSE) in CMake - Replace with an explicit list of .cpp files, or add a comment warning to re-run CMake when files are added.
 // [DONE] - #include ordering in settings.h - Move #include <unordered_map> and #include <vector> to the top of the file.
 // - Food eating uses AABB not per-cell collision - Replace m_personal_bounds_.contains() with a per-cell circle check: iterate m_cells_, check dist_sq(cell.pos, food.pos) < (cell.radius + food_radius)^2.
