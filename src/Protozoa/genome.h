@@ -55,7 +55,7 @@ struct GeneSettings
     inline static const sf::Vector2i cell_amount_range = { 2, 4 }; // for the protozoa randomly generated
 
     // chances of adding or removing a cell per mutation event
-    inline static constexpr float add_cell_chance = 0.01f;
+    inline static constexpr float add_cell_chance = 0.08f;
     inline static constexpr float remove_cell_chance = 0.01f;
     
     // This determines the protozoa's mutation rate and mutation range

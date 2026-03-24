@@ -77,8 +77,8 @@ public:
 	// The two line graphs should exist at the bottom of the screen starting from the middle going out 5/6ths
 	// of the way to the border.
 	
-	static constexpr unsigned line_maximum_data = 150;
-	static constexpr unsigned line_x_axis_increments = 100;
+	static constexpr unsigned line_maximum_data = 200;
+	static constexpr unsigned line_x_axis_increments = 250;
 
 	// SFML 3.x change: FloatRect constructor takes position and size
 	inline static const sf::FloatRect protozoa_graph_bounds = 
