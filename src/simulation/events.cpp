@@ -69,6 +69,7 @@ void Simulation::dispatch_event(const sf::Event& event, const sf::Vector2f& cam_
 	{
 		handle_keyboard_events(key->code);
 		m_world_.keyboardEvents(key->code);
+		throw std::runtime_error("Test crash message");
 	}
 	else if (const auto* scroll = event.getIf<sf::Event::MouseWheelScrolled>())
 		camera_.zoom(scroll->delta);

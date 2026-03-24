@@ -38,6 +38,9 @@ public:
 
 	float get_average_generation() const
 	{
+		if (all_protozoa_.size() == 0) 
+			return 0.f;
+
 		float sum = 0.f;
 		for (Protozoa* protozoa : all_protozoa_)
 		{

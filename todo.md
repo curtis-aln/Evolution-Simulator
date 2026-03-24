@@ -39,7 +39,7 @@
 // - Unbounded gene drift causing mass spring-breaking deaths - Clamp amplitude, frequency, and vertical_shift after mutation. Use std::numbers::pi instead of the literal 3.14159f. Decide on biologically sensible gene ranges.
 // - FoodManager UB — dereferencing pointer before assignment - Move bounds_radius and world_rect_bounds into the constructor body, or pass them as constructor parameters before member init.
 // - No binary release for beta testers - Build a Release binary on Windows (and ideally Linux). Attach to a GitHub Release with a zip containing the exe + media/ folder.
-// - get_average_generation() divide-by-zero - Guard with if (all_protozoa_.size() == 0) return 0.f;
+// [DONE] get_average_generation() divide-by-zero - Guard with if (all_protozoa_.size() == 0) return 0.f;
 // - Builder stubs (builder_add_cell, make_connection) - Either implement them properly, or hide the builder UI entirely until they work. Don't ship broken UI features to beta testers.
 // - Thread pool created but never used (8 idle threads) - Either wire dispatch() into update_all_protozoa() and the collision grid loop, or reduce to 0 threads and remove it until you're ready to parallelize properly.
 // - CMake project named MyApp - Rename project(MyApp) and add_executable(MyApp) to ProjectARIA or similar.
@@ -47,7 +47,7 @@
 // [DONE] - #include ordering in settings.h - Move #include <unordered_map> and #include <vector> to the top of the file.
 // - Food eating uses AABB not per-cell collision - Replace m_personal_bounds_.contains() with a per-cell circle check: iterate m_cells_, check dist_sq(cell.pos, food.pos) < (cell.radius + food_radius)^2.
 // - std::cout debug prints in production code - Add a constexpr bool DEBUG_LOGGING = false flag in settings and gate all std::cout behind it, or use a proper logger.
-// - No crash handling — exceptions kill silently - Wrap Simulation::run_simulation() in main() with a try/catch that writes to a crash.log file and shows an sf::Text error screen before closing.
+// [DONE] No crash handling — exceptions kill silently - Wrap Simulation::run_simulation() in main() with a try/catch that writes to a crash.log file and shows an sf::Text error screen before closing.
 // - double texcoords written twice in CircleBatchRenderer - Delete the duplicate texcoord block (lines u0,v0 through u0,v1 are copy-pasted twice).
 // - README references .sln file that doesn't exist - Update README to only document the CMake build path, remove the Visual Studio .sln reference. Add clear step-by-step CMake build instructions.
 // - min_speed rising floor poorly documented - Add a comment or UI label explaining it as a selective pressure mechanic. Expose it as a tunable in settings. Consider whether it should apply to all protozoa equally.
