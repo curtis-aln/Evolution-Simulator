@@ -48,7 +48,6 @@ void Simulation::handle_pause_toggle()
 
 void Simulation::handle_keyboard_events(const sf::Keyboard::Key& event_key_code)
 {
-	throw "Unknown key code received in keyboard event handling";
 	switch (event_key_code)
 	{
 	case sf::Keyboard::Key::Escape: running = false;          break;
