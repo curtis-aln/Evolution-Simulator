@@ -269,7 +269,7 @@ struct Genome : public GeneticPresets, public GeneSettings
 
     // Mutate the genome and apply mutations to the provided cells and springs.
     // Returns a pair<bool,bool> indicating (should_add_cell, should_remove_cell).
-    std::pair<bool, bool> mutate_genome()
+    void mutate_genome()
     {
 		// raise an exception if there are no cells or springs in the dictionaries to mutate
         if (cell_genes.empty() && spring_genes.empty())
@@ -281,7 +281,6 @@ struct Genome : public GeneticPresets, public GeneSettings
         mutate_spring_and_cell_genes();
 
         // Mutate colors
-        
         cell_outer_color = mutate_color(cell_outer_color, colour_mutation_rate);
         cell_inner_color = mutate_color(cell_inner_color, colour_mutation_rate);
         spring_outer_color = mutate_color(spring_outer_color, colour_mutation_rate);
@@ -293,16 +292,17 @@ struct Genome : public GeneticPresets, public GeneSettings
         spring_outer_color.a = transparency;
         spring_inner_color.a = transparency;
 
-        // Possibly add/remove cell based on probabilities
-        bool will_add = (Random::rand01_float() < add_cell_chance);
-        bool will_remove = (Random::rand01_float() < remove_cell_chance);
-
         // Drift mutation_rate and mutation_range slightly
         mutation_rate += Random::rand11_float() * delta_mutation_rate;
         mutation_range += Random::rand11_float() * delta_mutation_range;
-
-        return { will_add, will_remove };
     }
+
+    std::pair<bool, bool> get_add_remove_cell_signals()
+    {
+        bool will_add = (Random::rand01_float() < add_cell_chance);
+        bool will_remove = (Random::rand01_float() < remove_cell_chance);
+        return { will_add, will_remove };
+	}
 
     // Reset genome to given settings (preserve colors if desired)
     void reset(const Genome& model_genome)

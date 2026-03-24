@@ -46,19 +46,14 @@ void Protozoa::handle_food(FoodManager& food_manager, const bool debug)
 
 void Protozoa::mutate()
 {
-	// mutations: mutate genome and get flags for adding/removing cells
-    std::pair<bool, bool> mutations = mutate_genome();
+	// First we mutate the genome, which will update the gene values for each cell and spring, as well as the colors and mutation settings
+	mutate_genome();
 
-    // adding new components to the organism
-    if (mutations.first)
-    {
-        add_cell();
-    }
+	// Check if we should add or remove a cell based on the genome's mutation logic
+    auto [add_cell_prob, remove_cell_prob] = get_add_remove_cell_signals();
 
-    if (mutations.second)
-    {
-        remove_cell();
-    }
+    if (add_cell_prob)   add_cell();
+    if (remove_cell_prob) remove_spring();
 }
 
 void Protozoa::add_cell()
@@ -83,9 +78,20 @@ void Protozoa::add_cell()
 
 }
 
-void Protozoa::remove_cell()
+void Protozoa::remove_spring()
 {
-    // todo
+	// instead of removing cells, springs are removed, and cells can then get detached or "abandoned" if they have no springs connecting them to the rest of the protozoa. 
+    // This is because removing cells can cause a lot of complications with ID remapping and spring connections, whereas removing a spring is simpler and more biologically plausible (like a limb falling off).
+    // NOTE, TODO, this can cause protozoa to split off into two new organisms, for now we will have a simple (if the cells are too far away they die), but
+	// in the future we can have them split off into a new protozoa with its own genome and everything.
+
+    if (m_springs_.empty() || m_springs_.size() <= 1)
+        return;
+
+	const auto spring_id = Random::rand_range(size_t(0), m_springs_.size() - 1);
+
+	// removing the spring by sweapping it with the last spring and popping back (O(1) removal)
+    // TODO
 }
 
 

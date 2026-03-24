@@ -62,7 +62,7 @@ public:
 	void handle_food(FoodManager& food_manager, bool debug);
 	void mutate();
 	void add_cell();
-	static void remove_cell();
+	void remove_spring();
 	void load_preset(Preset& preset, sf::Vector2f position = {0, 0});
 	void render_protozoa_springs();
 	void render_debug(Font* font, bool skeleton_mode, bool show_connections, bool show_bounding_boxes);
