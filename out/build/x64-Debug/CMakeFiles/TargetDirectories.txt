@@ -1,2 +1,0 @@
-D:/Dev/Programming/Programming/year 2026/ARIA CMake/out/build/x64-Debug/CMakeFiles/edit_cache.dir
-D:/Dev/Programming/Programming/year 2026/ARIA CMake/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
