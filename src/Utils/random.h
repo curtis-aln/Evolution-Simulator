@@ -88,8 +88,8 @@ namespace Random
     template<typename Type>
     sf::Vector2<Type> rand_pos_in_circle(const sf::Vector2<Type>& center, float radius)
     {
-        float u = rand_float_0_1(); // [0,1]
-        float v = rand_float_0_1(); // [0,1]
+        float u = rand01_float(); // [0,1]
+        float v = rand01_float(); // [0,1]
 
         float r = radius * std::sqrt(u);
         float theta = 2.0f * 3.1415926535f * v;

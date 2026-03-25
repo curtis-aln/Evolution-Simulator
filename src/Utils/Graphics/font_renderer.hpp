@@ -1,7 +1,32 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <filesystem>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+// Helper: returns the directory containing the running executable
+inline std::filesystem::path exe_dir()
+{
+#ifdef _WIN32
+    wchar_t buf[MAX_PATH];
+    GetModuleFileNameW(nullptr, buf, MAX_PATH);
+    return std::filesystem::path(buf).parent_path();
+#else
+    return std::filesystem::canonical("/proc/self/exe").parent_path();
+#endif
+}
+
+inline std::string resolve_media_path(const std::string& relative)
+{
+    // Try relative to exe first, fall back to cwd
+    auto candidate = exe_dir() / relative;
+    if (std::filesystem::exists(candidate))
+        return candidate.string();
+    return relative; // fallback — lets SFML produce its own error
+}
 
 struct TextPacket
 {
@@ -26,7 +51,7 @@ public:
         font_location_ = font_location;
         if (!font_location.empty())
         {
-            set_font(font_location);
+            set_font(resolve_media_path(font_location));
             set_font_size(font_size);
         }
     }
@@ -43,11 +68,11 @@ public:
 
     void set_font(const std::string& font_location)
     {
-		font_location_ = font_location;
-        // SFML 3.x change: openFromFile instead of loadFromFile
-        if (!m_font_.openFromFile(font_location))
+        font_location_ = font_location;
+        const auto resolved = resolve_media_path(font_location);
+        if (!m_font_.openFromFile(resolved))
         {
-            std::cerr << "[ERROR]: Failed to load m_font_ from: " << font_location << '\n';
+            std::cerr << "[ERROR]: Failed to load font from: " << resolved << '\n';
         }
         m_text_.setFont(m_font_);
     }
