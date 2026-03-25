@@ -57,7 +57,7 @@
 // [DONE] text doesnt show when you run the executable
 // - make the spatial hash grid scalable, then have the world gradually increase in size
 // - implement pezzas work datastructure 
-// - translating the screen should have accelaration & de-accelaration instead of being instant
+// [DONE] translating the screen should have accelaration & de-accelaration instead of being instant
 // - you cant select protozoa without holding 
 // [DONE] statistics continue even when simulation is paused, should pause them aswell
 // - textbox showing stats and controls is messed up

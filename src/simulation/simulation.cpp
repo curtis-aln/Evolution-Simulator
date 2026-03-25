@@ -20,12 +20,15 @@ Simulation::Simulation() : m_world_(&m_window_)
 	m_window_.setFramerateLimit(frame_rate);
 	m_window_.setVerticalSyncEnabled(vsync);
 
-	ImGui::SFML::Init(m_window_);
+	if (!ImGui::SFML::Init(m_window_))
+	{
+		std::cerr << "[ERROR]: Failed to initialize ImGui-SFML\n";
+	}
 
+	// center the view on the world
 	constexpr float rad = WorldSettings::bounds_radius;
-	//camera_.translate({ -rad, -rad });
-	//camera_.zoom(-1000);
-	//camera_.update_window_view();
+	camera_.m_view_.setCenter({ rad, rad });
+	camera_.update_window_view();
 
 	title_font.set_render_window(&m_window_); 
 	regular_font.set_render_window(&m_window_);
@@ -103,6 +106,10 @@ void Simulation::run_simulation()
 		{
 			render();
 		}
+		else
+		{
+			ImGui::EndFrame(); // pair with the Update() call in handle_imGUI()
+		}
 	}
 
 }
@@ -141,18 +148,18 @@ void Simulation::update_one_frame()
 
 void Simulation::camera_follow_selected_protozoa()
 {
-	Protozoa* selected = m_world_.get_selected_protozoa();
-	if (selected != nullptr)
-	{
-		// comparing the difference between the camera center and the protozoa center and subtractign them to find out the camera translation
-		sf::Vector2f win_center = sf::Vector2f(m_window_.getSize()) / 2.f;
-		sf::Vector2f cam_center = camera_.window_pos_to_world_pos(win_center);
-		sf::Rect<float> bounds = selected->get_bounds();
-		sf::Vector2f center = bounds.position + bounds.size / 2.f;
-		sf::Vector2f new_position = cam_center + (cam_center - center) * lerp_factor;
-		sf::Vector2f translation = new_position - cam_center;
-		//camera_.translate(translation);
-	}
+    Protozoa* selected = m_world_.get_selected_protozoa();
+    if (selected == nullptr)
+        return;
+
+    const sf::Rect<float> bounds = selected->get_bounds();
+    const sf::Vector2f target = bounds.position + bounds.size / 2.f;
+
+    const sf::Vector2f current = camera_.m_view_.getCenter();
+    const sf::Vector2f new_center = current + (target - current) * lerp_factor;
+
+    camera_.m_view_.setCenter(new_center);
+    camera_.update_window_view();
 }
 
 void Simulation::update_test_data()
