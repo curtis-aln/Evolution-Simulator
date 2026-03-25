@@ -23,9 +23,9 @@ Simulation::Simulation() : m_world_(&m_window_)
 	ImGui::SFML::Init(m_window_);
 
 	constexpr float rad = WorldSettings::bounds_radius;
-	camera_.translate({ -rad, -rad });
-	camera_.zoom(-1000);
-	camera_.update_window_view();
+	//camera_.translate({ -rad, -rad });
+	//camera_.zoom(-1000);
+	//camera_.update_window_view();
 
 	title_font.set_render_window(&m_window_); 
 	regular_font.set_render_window(&m_window_);
@@ -151,7 +151,7 @@ void Simulation::camera_follow_selected_protozoa()
 		sf::Vector2f center = bounds.position + bounds.size / 2.f;
 		sf::Vector2f new_position = cam_center + (cam_center - center) * lerp_factor;
 		sf::Vector2f translation = new_position - cam_center;
-		camera_.translate(translation);
+		//camera_.translate(translation);
 	}
 }
 

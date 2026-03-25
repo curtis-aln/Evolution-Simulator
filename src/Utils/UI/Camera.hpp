@@ -1,118 +1,89 @@
 class Camera
 {
 public:
-    float m_currentScroll = 1.f;
-    float m_targetScroll = 1.f;  // Target zoom level
-    float m_zoom_velocity = 0.f; // Controls the smoothness of zooming
-
     sf::View m_view_{};
+
+    float m_pan_friction_ = 8.0f;   // lower = slides longer after release
+    float m_pan_lerp_ = 10.0f;  // lower = more lag when starting/changing direction
 
 private:
     sf::RenderWindow* m_window_ = nullptr;
-    sf::Vector2f m_mouse_position_before_{};
-    sf::Vector2f m_delta_{};
+
+    // zoom
+    float m_current_zoom_ = 1.f;
+    float m_target_zoom_ = 1.f;
     float m_zoom_strength_ = 0.08f;
-    float m_smooth_zoom_speed = 5.0f;  // Adjust smoothness
+    float m_smooth_zoom_speed_ = 8.0f;
+
+    // pan
+    sf::Vector2f m_mouse_prev_{};
+    sf::Vector2f m_pan_velocity_{};
+
+    bool m_is_panning_ = false;
 
 public:
     explicit Camera(sf::RenderWindow* window_ptr, const float scale = 1.f)
-        : m_window_(window_ptr)
+        : m_window_(window_ptr), m_current_zoom_(scale), m_target_zoom_(scale)
     {
         const auto dims = sf::Vector2f(m_window_->getSize());
         m_view_ = sf::View(sf::Rect<float>{{0.f, 0.f}, { dims.x, dims.y }});
-
-        m_currentScroll *= scale;
-        m_targetScroll = m_currentScroll;
-        zoom(0);
+        m_view_.setSize(dims / m_current_zoom_);
+        update_window_view();
     }
 
+    // call at the start of each frame, before event handling
+    void update(const float dt)
+    {
+        const sf::Vector2f mouse_pos = sf::Vector2f(sf::Mouse::getPosition(*m_window_));
+        const sf::Vector2f raw_delta = mouse_pos - m_mouse_prev_;
+        m_mouse_prev_ = mouse_pos;
+
+        if (m_is_panning_)
+        {
+            // smoothly accelerate toward the mouse movement rather than snapping to it
+            m_pan_velocity_ += (raw_delta - m_pan_velocity_) * m_pan_lerp_ * dt;
+        }
+        else
+        {
+            // decelerate with friction when released
+            m_pan_velocity_ -= m_pan_velocity_ * m_pan_friction_ * dt;
+        }
+
+        m_view_.move(-m_pan_velocity_ / m_current_zoom_);
+
+        smooth_zoom(dt);
+        update_window_view();
+    }
+
+    void begin_pan() { m_is_panning_ = true; }
+    void end_pan() { m_is_panning_ = false; }
+
+    void zoom(const float scroll_delta)
+    {
+        if (scroll_delta > 0)
+            m_target_zoom_ *= (1.0f + m_zoom_strength_);
+        else
+            m_target_zoom_ *= (1.0f - m_zoom_strength_);
+    }
+
+    sf::Vector2f get_world_mouse_pos() const
+    {
+        return m_window_->mapPixelToCoords(sf::Mouse::getPosition(*m_window_), m_view_);
+    }
+
+    template<typename T>
+    sf::Vector2f window_pos_to_world_pos(const sf::Vector2<T> window_pos) const
+    {
+        return m_window_->mapPixelToCoords(static_cast<sf::Vector2i>(window_pos), m_view_);
+    }
 
     template<typename F>
     void call_draw_at_absolute_position(F&& fn)
     {
-        auto currentView = m_window_->getView();
+        const auto saved = m_window_->getView();
         m_window_->setView(m_window_->getDefaultView());
-
         fn();
-
-        m_window_->setView(currentView);
-    }
-
-    
-
-    sf::Vector2f get_world_mouse_pos() const
-    {
-        return window_pos_to_world_pos(sf::Mouse::getPosition(*m_window_));
-    }
-
-    template<typename T>
-    sf::Vector2f window_pos_to_world_pos(const sf::Vector2<T> window_position) const
-    {
-        return m_window_->mapPixelToCoords(static_cast<sf::Vector2i>(window_position), m_view_);
-    }
-
-    void translate(sf::Vector2f delta = { 0.f, 0.f })
-    {
-        if (delta.x == 0.f && delta.y == 0.f)
-        {
-            delta = m_delta_;
-        }
-
-        // Invert the signs of the components to move in the correct direction
-        const sf::Vector2f final_translation = { -delta.x / m_currentScroll, -delta.y / m_currentScroll };
-        m_view_.move(final_translation);
-
-        update_window_view();
-    }
-
-    void update(const float deltaTime)
-    {
-        const auto mouse_pos = sf::Vector2f(sf::Mouse::getPosition(*m_window_));
-        m_delta_ = mouse_pos - m_mouse_position_before_;
-        m_mouse_position_before_ = mouse_pos;
-
-        // Smooth zoom
-        smooth_zoom(deltaTime);
-    }
-
-    void zoom(const float delta_scroll)
-    {
-        const sf::Vector2f before_mouse_pos = m_window_->mapPixelToCoords(sf::Mouse::getPosition(*m_window_), m_view_);
-
-        float scale = get_zoom_scale(delta_scroll);
-        m_targetScroll *= scale;  // Set the target zoom level
-
-        const sf::Vector2f after_mouse_pos = m_window_->mapPixelToCoords(sf::Mouse::getPosition(*m_window_), m_view_);
-        const sf::Vector2f offset = before_mouse_pos - after_mouse_pos;
-
-        m_view_.move(offset);
-    }
-
-    void smooth_zoom(const float deltaTime)
-    {
-        if (std::abs(m_currentScroll - m_targetScroll) < 0.001f)
-            return; // Prevent unnecessary updates
-
-        // Get the mouse world position before zoom
-        const sf::Vector2f before_mouse_pos = get_world_mouse_pos();
-
-        // Interpolate zoom velocity
-        m_zoom_velocity = (m_targetScroll - m_currentScroll) * m_smooth_zoom_speed;
-
-        // Apply velocity
-        m_currentScroll += m_zoom_velocity * deltaTime;
-
-        // Update the view size
-        m_view_.setSize({ m_window_->getSize().x / m_currentScroll, m_window_->getSize().y / m_currentScroll });
-
-        // Get the mouse world position after zoom
-        const sf::Vector2f after_mouse_pos = get_world_mouse_pos();
-
-        // Adjust the view to compensate for the shift in mouse position
-        const sf::Vector2f offset = before_mouse_pos - after_mouse_pos;
-        m_view_.move(offset);
-
-        update_window_view();
+        m_window_->setView(saved);
     }
 
     void update_window_view() const
@@ -121,8 +92,17 @@ public:
     }
 
 private:
-    [[nodiscard]] float get_zoom_scale(const float delta) const
+    void smooth_zoom(const float dt)
     {
-        return delta > 0 ? 1.0f + m_zoom_strength_ : 1.0f - m_zoom_strength_;
+        if (std::abs(m_current_zoom_ - m_target_zoom_) < 0.0001f)
+            return;
+
+        const sf::Vector2f before = get_world_mouse_pos();
+
+        m_current_zoom_ += (m_target_zoom_ - m_current_zoom_) * m_smooth_zoom_speed_ * dt;
+        m_view_.setSize(sf::Vector2f(m_window_->getSize()) / m_current_zoom_);
+
+        const sf::Vector2f after = get_world_mouse_pos();
+        m_view_.move(before - after);
     }
 };

@@ -61,3 +61,9 @@
 // - you cant select protozoa without holding 
 // [DONE] statistics continue even when simulation is paused, should pause them aswell
 // - textbox showing stats and controls is messed up
+
+ImGUI Todo
+- Add all the main statistics tracking to ImGUI
+- Add all of the controls to ImGUI
+- Make it so that if you are moving the gui the screen remains static
+- Add buttons to imgui
