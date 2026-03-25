@@ -20,6 +20,8 @@ Simulation::Simulation() : m_world_(&m_window_)
 	m_window_.setFramerateLimit(frame_rate);
 	m_window_.setVerticalSyncEnabled(vsync);
 
+	ImGui::SFML::Init(m_window_);
+
 	constexpr float rad = WorldSettings::bounds_radius;
 	camera_.translate({ -rad, -rad });
 	camera_.zoom(-1000);
@@ -107,6 +109,7 @@ void Simulation::run_simulation()
 
 void Simulation::update_one_frame()
 {
+	handle_imGUI();
 	manage_frame_rate();
 	const sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();
 
@@ -189,11 +192,25 @@ void Simulation::draw_everything()
 	}
 }
 
+
+void Simulation::handle_imGUI()
+{
+	ImGui::SFML::Update(m_window_, m_delta_time_.get_delta_sfml());
+
+	// your ImGui panels go here, e.g.:
+	ImGui::Begin("Simulation");
+	ImGui::End();
+
+}
+
+
 void Simulation::render()
 {
 	m_window_.clear(window_color);
 
 	draw_everything();
+
+	ImGui::SFML::Render(m_window_);
 
 	m_window_.display();
 }

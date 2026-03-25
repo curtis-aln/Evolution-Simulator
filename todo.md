@@ -54,7 +54,7 @@
 // [DONE] rand_pos_in_circle infinite loop risk - Add a maximum iteration count with a fallback (return center if exceeded) or use the polar coordinate method instead.
 // [DONE] add todo, crashlog to the gitignore
 
-// - text doesnt show when you run the executable
+// [DONE] text doesnt show when you run the executable
 // - make the spatial hash grid scalable, then have the world gradually increase in size
 // - implement pezzas work datastructure 
 // - translating the screen should have accelaration & de-accelaration instead of being instant

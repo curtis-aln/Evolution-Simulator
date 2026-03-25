@@ -13,10 +13,25 @@ FetchContent_Declare(SFML
   GIT_TAG 3.0.0
 )
 
+FetchContent_Declare(ImGui
+  GIT_REPOSITORY https://github.com/ocornut/imgui.git
+  GIT_TAG v1.91.1
+)
+
+FetchContent_Declare(ImGui-SFML
+  GIT_REPOSITORY https://github.com/SFML/imgui-sfml.git
+  GIT_TAG master
+)
+
 set(SFML_USE_SYSTEM_DEPS OFF CACHE BOOL "" FORCE)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
 
 FetchContent_MakeAvailable(SFML)
+FetchContent_MakeAvailable(ImGui)
+
+set(IMGUI_DIR ${imgui_SOURCE_DIR} CACHE PATH "" FORCE)
+
+FetchContent_MakeAvailable(ImGui-SFML)
 
 file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
   "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
@@ -24,9 +39,13 @@ file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
 
 add_executable(ProjectARIA ${APP_SOURCES} "src/Utils/UI/CrashLogger.h")
 
-target_link_libraries(ProjectARIA PRIVATE SFML::Graphics SFML::Window SFML::System)
+target_link_libraries(ProjectARIA PRIVATE
+  SFML::Graphics
+  SFML::Window
+  SFML::System
+  ImGui-SFML::ImGui-SFML
+)
 
-# ADDED: dbghelp required for std::stacktrace on Windows
 if(MSVC)
     target_link_libraries(ProjectARIA PRIVATE dbghelp)
 endif()
@@ -35,13 +54,12 @@ target_compile_definitions(ProjectARIA PRIVATE
     PROJECT_ROOT="${CMAKE_SOURCE_DIR}"
 )
 
-# ADDED: MSVC compiler flags for C++23, debug info, and hardware exception catching
 if(MSVC)
     target_compile_options(ProjectARIA PRIVATE
         /std:c++23preview
         /Zi
         /EHa
-        /Zc:__cplusplus     # ADDED: make __cplusplus report the actual standard version
+        /Zc:__cplusplus
     )
     target_link_options(ProjectARIA PRIVATE
         /DEBUG

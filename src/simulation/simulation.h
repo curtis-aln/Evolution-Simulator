@@ -18,6 +18,9 @@
 #include <atomic>
 #include <cstdint>
 
+#include <imgui.h>
+#include <imgui-SFML.h>
+
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
 {
@@ -88,6 +91,7 @@ private:
 
 	// rendering
 	void draw_everything();
+	void handle_imGUI();
 	void render();
 	void manage_frame_rate();
 

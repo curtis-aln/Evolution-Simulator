@@ -87,7 +87,10 @@ void Simulation::handle_events()
 	const sf::Vector2f cam_pos = camera_.get_world_mouse_pos();
 
 	while (const std::optional event = m_window_.pollEvent())
+	{
+		ImGui::SFML::ProcessEvent(m_window_, *event);
 		dispatch_event(*event, cam_pos);
+	}
 
 	handle_camera_and_hover(cam_pos);
 	camera_.update(m_clock_.get_delta_time());
