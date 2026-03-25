@@ -69,6 +69,7 @@ public:
 	std::array<int, cell_capacity * 9> nearby_ids = {};
 
 	float min_speed = 0;
+	float delta_min_speed = 0.0;
 
 public:
 	World(sf::RenderWindow* window = nullptr);

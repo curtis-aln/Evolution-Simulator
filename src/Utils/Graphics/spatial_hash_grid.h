@@ -118,7 +118,17 @@ struct SpatialHashGrid
 		const sf::Vector2<uint32_t> cIdx = posTo2dIdx(pos);
 
 		if (!checkValidIndex(cIdx))
-			throw std::out_of_range("position argument out of range");
+		{
+			throw std::out_of_range(
+				"SpatialHashGrid::addAtom() - position out of range\n"
+				"  position:    (" + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ")\n"
+				"  cell index:  (" + std::to_string(cIdx.x) + ", " + std::to_string(cIdx.y) + ")\n"
+				"  grid dims:   (" + std::to_string(dimsX) + " x " + std::to_string(dimsY) + ")\n"
+				"  bounds:      pos(" + std::to_string(m_screenSize.position.x) + ", " + std::to_string(m_screenSize.position.y) + ")"
+				"  size(" + std::to_string(m_screenSize.size.x) + ", " + std::to_string(m_screenSize.size.y) + ")\n"
+				"  atom id:     " + std::to_string(atom)
+			);
+		}
 
 		const uint32_t idx = idx2dTo1d(cIdx);
 
@@ -139,7 +149,16 @@ struct SpatialHashGrid
 
 		const sf::Vector2<uint32_t> cIdx = posTo2dIdx(position);
 		if (!checkValidIndex(cIdx))
-			throw std::out_of_range("find() position argument out of range");
+		{
+			throw std::out_of_range(
+				"SpatialHashGrid::find() - position out of range\n"
+				"  position:    (" + std::to_string(position.x) + ", " + std::to_string(position.y) + ")\n"
+				"  cell index:  (" + std::to_string(cIdx.x) + ", " + std::to_string(cIdx.y) + ")\n"
+				"  grid dims:   (" + std::to_string(dimsX) + " x " + std::to_string(dimsY) + ")\n"
+				"  bounds:      pos(" + std::to_string(m_screenSize.position.x) + ", " + std::to_string(m_screenSize.position.y) + ")"
+				"  size(" + std::to_string(m_screenSize.size.x) + ", " + std::to_string(m_screenSize.size.y) + ")"
+			);
+		}
 
 		// getting the indexes needed
 		for (unsigned x = (cIdx.x > 0 ? cIdx.x - 1 : 0); x <= (cIdx.x + 1 < dimsX ? cIdx.x + 1 : dimsX - 1); ++x)

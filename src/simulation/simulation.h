@@ -10,7 +10,6 @@
 #include "../Utils/UI/line_graph.h"
 #include "../Utils/NeuralNetworks/GeneticNeuralNetwork.h"
 #include "../Utils/NeuralNetworks/NeuralNetworkUI.h"
-#include "../Utils/UI/text_box.h"
 
 // multithreading imports, rendering and updating happens on two separate threads, with rendering on the main thread
 #include <thread>
@@ -63,9 +62,6 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	LineGraph<line_maximum_data, line_x_axis_increments> food_population_graph_{ &m_window_, food_graph_bounds };
 
 	GeneticNeuralNetwork network{ 2, 1, 2 };
-	//NetworkRenderer net_renderer{ &title_font, &regular_font, &cell_statistic_font, &m_window_ };
-
-	TextBox text_box{ {}, & m_window_ };
 
 	bool mouse_pressed_event = false;
 	bool running = true;
@@ -79,7 +75,6 @@ public:
 private:
 	// init
 	void init_line_graphs();
-	void init_text_box();
 	void init_network_renderer();
 
 	// updating

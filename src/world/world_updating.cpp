@@ -4,6 +4,7 @@
 
 void World::update(const bool pause)
 {
+	min_speed += delta_min_speed;
 	check_for_extinction_event();
 
 	iterations_++;

@@ -39,9 +39,7 @@ Simulation::Simulation() : m_world_(&m_window_)
 	cell_statistic_font.set_font_size(cell_statistic_font_size);
 
 	init_line_graphs();
-	init_network_renderer();
-	init_text_box();
-		
+	init_network_renderer();		
 }
 
 void Simulation::init_line_graphs()
@@ -59,31 +57,6 @@ void Simulation::init_line_graphs()
 	food_population_graph_.set_settings(settings);
 }
 
-void Simulation::init_text_box()
-{
-	text_box.set_fonts(regular_font, cell_statistic_font);
-	text_box.set_title("Protozoa Simulation");
-	text_box.init_graphics(border_fill_color, border_outline_color, border_outline_thickness);
-
-	text_box.add_statistic("int", "frames", &m_ticks_);
-	text_box.add_statistic("float", "fps", &fps_);
-	text_box.add_statistic("bool", "paused", &m_world_.paused);
-	text_box.add_statistic("float", "time", &m_total_time_elapsed_);
-	text_box.add_statistic("float", "min_Speed", &m_world_.min_speed);
-
-	text_box.add_text("[R]: Toggle Rendering");
-	text_box.add_text("[G]: toggle cell grid");
-	text_box.add_text("[C]: toggle collisions");
-	text_box.add_text("[F]: toggle food grid");
-	text_box.add_text("[S]: toggle simple mode");
-	text_box.add_text("[O]: tick frames");
-	text_box.add_text("");
-	text_box.add_text("[Debug Settings]");
-	text_box.add_text("[D]: debug mode");
-	text_box.add_text("[K]: skeleton mode");
-	text_box.add_text("[C]: toggle connections");
-	text_box.add_text("[B]: toggle bounding boxes");
-}
 
 void Simulation::init_network_renderer()
 {
@@ -193,9 +166,6 @@ void Simulation::draw_everything()
 
 		protozoa_population_graph_.render(camera_);
 		food_population_graph_.render(camera_);
-
-		//net_renderer.render();
-		text_box.render(camera_);
 	}
 }
 
@@ -204,10 +174,74 @@ void Simulation::handle_imGUI()
 {
 	ImGui::SFML::Update(m_window_, m_delta_time_.get_delta_sfml());
 
-	// your ImGui panels go here, e.g.:
-	ImGui::Begin("Simulation");
+	// ── Simulation Stats ─────────────────────────────────────────
+	ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(260, 0), ImGuiCond_FirstUseEver);
+	ImGui::Begin("Simulation Stats");
+
+	ImGui::SeparatorText("Performance");
+	ImGui::Text("FPS:               %.1f", fps_);
+	ImGui::Text("Frames:            %d", m_ticks_);
+	ImGui::Text("Time Elapsed:      %.2fs", m_total_time_elapsed_);
+	ImGui::Text("Paused:            %s", m_world_.paused ? "Yes" : "No");
+
+	ImGui::SeparatorText("Population");
+	ImGui::Text("Protozoa:          %d", m_world_.get_protozoa_count());
+	ImGui::Text("Food:              %d", m_world_.get_food_count());
+	ImGui::Text("Avg Generation:    %.2f", m_world_.get_average_generation());
+	ImGui::Text("Min Speed:         %.3f", m_world_.min_speed);
+	ImGui::Text("Delta Min Speed:   %.3f", m_world_.delta_min_speed);
+
 	ImGui::End();
 
+	// ── Controls ─────────────────────────────────────────────────
+	ImGui::SetNextWindowPos(ImVec2(10, 300), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(260, 0), ImGuiCond_FirstUseEver);
+	ImGui::Begin("Controls");
+
+	ImGui::SeparatorText("Simulation");
+	ImGui::BulletText("[Space]    Pause / Unpause");
+	ImGui::BulletText("[R]        Toggle rendering");
+	ImGui::BulletText("[O]        Step one frame (paused)");
+	ImGui::BulletText("[Escape]   Quit");
+
+	ImGui::SeparatorText("Display");
+	ImGui::BulletText("[S]        Simple mode (outer cells only)");
+	ImGui::BulletText("[G]        Cell collision grid overlay");
+	ImGui::BulletText("[F]        Food grid overlay");
+	ImGui::BulletText("[C]        Toggle collisions");
+
+	ImGui::SeparatorText("Debug Mode  [D]");
+	ImGui::BulletText("[K]        Skeleton mode");
+	ImGui::BulletText("[B]        Bounding boxes");
+	ImGui::BulletText("[C]        Toggle connections");
+
+	ImGui::SeparatorText("Camera");
+	ImGui::BulletText("[Scroll]   Zoom in / out");
+	ImGui::BulletText("[L-Hold]   Pan camera");
+
+	ImGui::End();
+
+	// ── Simulation Tuning ─────────────────────────────────────────
+	ImGui::SetNextWindowPos(ImVec2(10, 600), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(260, 0), ImGuiCond_FirstUseEver);
+	ImGui::Begin("Tuning");
+
+	ImGui::SeparatorText("World");
+	ImGui::SliderFloat("Min Speed", &m_world_.min_speed, 0.0f, 135.0f);
+
+	// scale up for display, scale down for storage
+	float display_val = m_world_.delta_min_speed * 1000.f;
+	if (ImGui::SliderFloat("Delta Min Speed (x1000)", &display_val, 0.2f, 2.0f))
+		m_world_.delta_min_speed = display_val / 1000.f;
+
+	ImGui::SeparatorText("Flags");
+	ImGui::Checkbox("Rendering", &m_rendering_);
+	ImGui::Checkbox("Paused", &m_world_.paused);
+	ImGui::Checkbox("Debug Mode", &m_world_.debug_mode);
+	ImGui::Checkbox("Simple Mode", &m_world_.simple_mode);
+
+	ImGui::End();
 }
 
 

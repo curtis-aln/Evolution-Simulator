@@ -42,7 +42,7 @@ void Protozoa::update(FoodManager& food_manager, const bool debug, const float m
 	if (m_cells_.empty()) // No computation is needed if there are no cells
 		return;
 
-	float sp = min_speed / (m_cells_.size()*15);
+	float sp = min_speed;
 	if (velocity.x * velocity.x + velocity.y * velocity.y < sp * sp)
 	{
 		dead = true;
