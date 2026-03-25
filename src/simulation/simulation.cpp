@@ -114,10 +114,15 @@ void Simulation::update_one_frame()
 	{
 		m_world_.update(false);
 		m_tick_frame_time = false;
+
+		protozoa_population_graph_.handle_mouse_press(mouse_pos);
+		food_population_graph_.handle_mouse_press(mouse_pos);
 	}
 	else if (!m_world_.paused)
 	{
 		m_world_.update(false);	
+		update_line_graphs();
+		update_test_data();
 	}
 
 	// in debug mode we want the camera to follow the selected protozoa
@@ -128,12 +133,6 @@ void Simulation::update_one_frame()
 	}
 
 	m_builder_.update(mouse_pos);
-	protozoa_population_graph_.update(mouse_pos);
-	food_population_graph_.update(mouse_pos);
-	//net_renderer.update(mouse_pos);
-
-	update_line_graphs();
-	update_test_data();
 }
 
 

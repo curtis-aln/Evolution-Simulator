@@ -129,9 +129,12 @@ public:
 	}
 
 
-	void update(const sf::Vector2f mouse_pos)
+	void handle_mouse_press(const sf::Vector2f mouse_pos)
 	{
-		update_button(mouse_pos);
+		if (debug_toggle.check_click(mouse_pos))
+		{
+			debug_mode_ = not debug_mode_;
+		}
 	}
 
 	void set_top_left(const sf::Vector2f topleft)
@@ -264,14 +267,6 @@ private:
 		
 	}
 
-
-	void update_button(const sf::Vector2f mouse_pos)
-	{
-		if (debug_toggle.check_click(mouse_pos))
-		{
-			debug_mode_ = not debug_mode_;
-		}
-	}
 
 
 	void render_bounds() const

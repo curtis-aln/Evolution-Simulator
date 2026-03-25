@@ -3,3 +3,5 @@ out/
 *.user
 *.suo
 .cache/
+todo.md
+crash.log

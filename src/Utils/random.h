@@ -86,20 +86,20 @@ namespace Random
     }
 
     template<typename Type>
-    sf::Vector2<Type> rand_pos_in_circle(const sf::Vector2<Type> center, const float radius)
+    sf::Vector2<Type> rand_pos_in_circle(const sf::Vector2<Type>& center, float radius)
     {
-        const sf::Rect<Type> rect = { {center.x - radius, center.y - radius}, {radius * 2, radius * 2} };
-    
-        while (true)
-        {
-            const sf::Vector2<Type> pos = rand_pos_in_rect(rect);
-            const sf::Vector2<Type> delta = pos - center;
-            const float dist_sq = delta.x * delta.x + delta.y * delta.y;
+        float u = rand_float_0_1(); // [0,1]
+        float v = rand_float_0_1(); // [0,1]
 
-            if (dist_sq <= radius * radius)
-                return pos;
-        }
+        float r = radius * std::sqrt(u);
+        float theta = 2.0f * 3.1415926535f * v;
+
+        return {
+            center.x + r * std::cos(theta),
+            center.y + r * std::sin(theta)
+        };
     }
+
     inline void set_seed(const unsigned int seed = std::random_device{}())
     {
         rng.seed(seed);

@@ -3,10 +3,6 @@
 
 // ********** Currently Working On ********** //
 
-/* Features */
-// World size gradually increases
-// A Dynamic Quad Tree with auto local and global resizing
-
 
 /* Graphics */
 // Create a RectBuffer and re-introduce the connections
@@ -38,7 +34,7 @@
 // [DONE] - Add LICENSE file - Choose MIT or similar, add LICENSE to repo root, update README.
 // - Unbounded gene drift causing mass spring-breaking deaths - Clamp amplitude, frequency, and vertical_shift after mutation. Use std::numbers::pi instead of the literal 3.14159f. Decide on biologically sensible gene ranges.
 // - FoodManager UB — dereferencing pointer before assignment - Move bounds_radius and world_rect_bounds into the constructor body, or pass them as constructor parameters before member init.
-// - No binary release for beta testers - Build a Release binary on Windows (and ideally Linux). Attach to a GitHub Release with a zip containing the exe + media/ folder.
+// [DONE] No binary release for beta testers - Build a Release binary on Windows (and ideally Linux). Attach to a GitHub Release with a zip containing the exe + media/ folder.
 // [DONE] get_average_generation() divide-by-zero - Guard with if (all_protozoa_.size() == 0) return 0.f;
 // - Builder stubs (builder_add_cell, make_connection) - Either implement them properly, or hide the builder UI entirely until they work. Don't ship broken UI features to beta testers.
 // - Thread pool created but never used (8 idle threads) - Either wire dispatch() into update_all_protozoa() and the collision grid loop, or reduce to 0 threads and remove it until you're ready to parallelize properly.
@@ -49,12 +45,19 @@
 // - std::cout debug prints in production code - Add a constexpr bool DEBUG_LOGGING = false flag in settings and gate all std::cout behind it, or use a proper logger.
 // [DONE] No crash handling — exceptions kill silently - Wrap Simulation::run_simulation() in main() with a try/catch that writes to a crash.log file and shows an sf::Text error screen before closing.
 // - double texcoords written twice in CircleBatchRenderer - Delete the duplicate texcoord block (lines u0,v0 through u0,v1 are copy-pasted twice).
-// - README references .sln file that doesn't exist - Update README to only document the CMake build path, remove the Visual Studio .sln reference. Add clear step-by-step CMake build instructions.
+// [DONE] README references .sln file that doesn't exist - Update README to only document the CMake build path, remove the Visual Studio .sln reference. Add clear step-by-step CMake build instructions.
 // - min_speed rising floor poorly documented - Add a comment or UI label explaining it as a selective pressure mechanic. Expose it as a tunable in settings. Consider whether it should apply to all protozoa equally.
 // - o_vector::add() is O(N) - Add a free-list (stack of inactive indices) to make add/remove O(1). This matters at 30k organisms.
 // - Simulation inherits from settings structs - Refactor settings to be accessed as static structs directly (they already are static), and remove the private inheritance from Simulation, World, etc.
-// - Reproduction threshold too low (2 food items) - Balance test: raise threshold, add energy cost to reproduction, consider a size-scaled energy requirement.
-// - All keyboard controls not in README - Add a full controls table to the README.
-// - rand_pos_in_circle infinite loop risk - Add a maximum iteration count with a fallback (return center if exceeded) or use the polar coordinate method instead.
+// [DONE] Reproduction threshold too low (2 food items) - Balance test: raise threshold, add energy cost to reproduction, consider a size-scaled energy requirement.
+// [DONE] All keyboard controls not in README - Add a full controls table to the README.
+// [DONE] rand_pos_in_circle infinite loop risk - Add a maximum iteration count with a fallback (return center if exceeded) or use the polar coordinate method instead.
+// [DONE] add todo, crashlog to the gitignore
 
+// - text doesnt show when you run the executable
+// - make the spatial hash grid scalable, then have the world gradually increase in size
 // - implement pezzas work datastructure 
+// - translating the screen should have accelaration & de-accelaration instead of being instant
+// - you cant select protozoa without holding 
+// [DONE] statistics continue even when simulation is paused, should pause them aswell
+// - textbox showing stats and controls is messed up
