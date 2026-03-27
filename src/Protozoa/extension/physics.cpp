@@ -37,31 +37,59 @@ void Protozoa::generate_random()
 }
 
 
-void Protozoa::update(FoodManager& food_manager, const bool debug, const float min_speed)
+bool Protozoa::death_condition_check(const float min_speed)
 {
-	if (m_cells_.empty()) // No computation is needed if there are no cells
-		return;
-
-	float sp = min_speed;
-	if (velocity.x * velocity.x + velocity.y * velocity.y < sp * sp)
+	if (velocity.x * velocity.x + velocity.y * velocity.y < min_speed * min_speed)
 	{
 		dead = true;
+		return true;
 	}
+
+	if (m_cells_.empty()) // No computation is needed if there are no cells
+	{
+		throw std::runtime_error("death_condition_check called on a protozoa with no cells.");
+		return true;
+	}
+
+	if (energy <= 0)
+	{
+		dead = true;
+		return true;
+	}
+
+	return false;
+}
+
+
+
+
+
+void Protozoa::update(FoodManager& food_manager, const bool debug, const float min_speed)
+{
+	if (death_condition_check(min_speed))
+		return;
+
+	// foood handling must happen befure updating the position due to its position potentially leaving the defined bounds and crashing the spatial grid
+	handle_food(food_manager, debug);
 
 	update_springs();
 	update_cells();
 
-	update_bounding_box();
-
-	handle_food(food_manager, debug);
-
 	++frames_alive;
+	const float energy_loss = 0.15f + 0.0005f * frames_alive; // energy loss increases slightly as the protozoa gets older to encourage faster reproduction
+	energy -= energy_loss;
 
-	energy -= 0.15;
-	if (energy <= 0)
+	
+}
+
+void Protozoa::update_protozoa_position()
+{
+	for (Cell& cell : m_cells_)
 	{
-		dead = true;
+		cell.update_cell_position();
 	}
+
+	update_bounding_box();
 
 	const sf::Vector2f center = get_center();
 	velocity = center - previous_position;
@@ -77,6 +105,7 @@ void Protozoa::update_springs()
 		Cell& cell_A = m_cells_[spring.cell_A_id];
 		Cell& cell_B = m_cells_[spring.cell_B_id];
 		bool broken = spring.update(cell_A, cell_B, frames_alive, get_spring_gene(spring.id));
+
 		if (broken)
 		{
 			dead = true;
@@ -89,7 +118,7 @@ void Protozoa::update_cells()
 	// updates each cell in the organism
 	for (Cell& cell : m_cells_)
 	{
-		cell.update(frames_alive, get_cell_gene(cell.id));
+		cell.update_velocity_vector(frames_alive, get_cell_gene(cell.id));
 	}
 }
 

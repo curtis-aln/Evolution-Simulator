@@ -40,7 +40,7 @@ struct Cell
 		generation = 0;
 	}
 
-	void update(const int internal_clock, CellGene* gene)
+	void update_velocity_vector(const int internal_clock, CellGene* gene)
 	{
 		// updating velocity and position vectors
 		clamp_velocity();
@@ -54,7 +54,10 @@ struct Cell
 		
 		// updating the velocity with the new friction
 		velocity_ *= sinwave_current_friction_;
+	}
 
+	void update_cell_position()
+	{
 		position_ += velocity_;
 	}
 

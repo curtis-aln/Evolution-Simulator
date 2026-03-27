@@ -58,9 +58,14 @@ public:
 
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
 
-	void update(FoodManager& food_manager, bool debug, float min_speed);
 	void handle_food(FoodManager& food_manager, bool debug);
-	void mutate();
+    void consume_food(FoodManager &food_manager, Food *food);
+
+    void update(FoodManager& food_manager, bool debug, float min_speed);
+
+    void update_protozoa_position();
+
+    void mutate();
 	void add_cell();
 	void remove_spring();
 	void load_preset(Preset& preset, sf::Vector2f position = {0, 0});
@@ -140,6 +145,7 @@ public:
 
 	void generate_random();
 
+    bool death_condition_check(const float min_speed);
 
 private:
 	// rendering

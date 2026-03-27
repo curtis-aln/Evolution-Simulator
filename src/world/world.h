@@ -75,10 +75,11 @@ public:
 	World(sf::RenderWindow* window = nullptr);
 
 	// updating functions
-	void update(bool pause);
-	void render(Font* font);
+	void update();
+    void cell_collision_resolution();
+    void render(Font *font);
 
-	// fetch functions
+    // fetch functions
 	int get_food_count() const { return food_manager_.get_size(); }
 
 	void check_if_mouse_is_hovering(sf::Vector2f mouse_position, bool mouse_pressed) const;

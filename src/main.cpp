@@ -12,3 +12,4 @@ int main()
     catch (const std::exception& e) { CrashLogger::handle(e); }
     catch (...) { CrashLogger::handle(); }
 }
+

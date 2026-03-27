@@ -59,8 +59,8 @@ struct GeneSettings
     inline static constexpr float remove_cell_chance = 0.01f;
     
     // This determines the protozoa's mutation rate and mutation range
-    inline static const sf::Vector2f init_mutation_rate_range = { 0.01f, .1f };
-    inline static const sf::Vector2f init_mutation_range_range = { 0.01f, .1f };
+    inline static const sf::Vector2f init_mutation_rate_range = { 0.01f, .2f };
+    inline static const sf::Vector2f init_mutation_range_range = { 0.01f, .2f };
 
 	// This is the chance that a colour mutates each generation
     inline static constexpr float colour_mutation_rate = 0.001f;
