@@ -1,15 +1,15 @@
 ==================== CRASH REPORT ====================
-Time     : 2026-03-27 04:00:11.1138974
-Uptime   : 0h 0m 16s
+Time     : 2026-03-31 19:44:07.2536120
+Uptime   : 0h 24m 19s
 Type     : std::exception
 Message  : SpatialHashGrid::find() - position out of range
-  position:    (60205.367188, 30793.031250)
-  cell index:  (80, 41)
-  grid dims:   (80 x 80)
-  bounds:      pos(0.000000, 0.000000)  size(60000.000000, 60000.000000)
+  position:    (98985.390625, 200011.937500)
+  cell index:  (59, 120)
+  grid dims:   (120 x 120)
+  bounds:      pos(0.000000, 0.000000)  size(200000.000000, 200000.000000)
 
 --- Build Info ---
-Compiled: Mar 27 2026 03:59:38  |  C++202302  |  MSVC 1950
+Compiled: Mar 31 2026 20:05:05  |  C++202302  |  MSVC 1950
 
 --- Stack Trace ---
 --- Your Code (most recent call first) ---

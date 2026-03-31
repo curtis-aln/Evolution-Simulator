@@ -7,9 +7,6 @@
 #include "../Utils/time.h"
 #include "../Utils/fps_manager.h"
 #include "../Utils/UI/Camera.hpp"
-#include "../Utils/UI/line_graph.h"
-#include "../Utils/NeuralNetworks/GeneticNeuralNetwork.h"
-#include "../Utils/NeuralNetworks/NeuralNetworkUI.h"
 
 // multithreading imports, rendering and updating happens on two separate threads, with rendering on the main thread
 #include <thread>
@@ -59,15 +56,12 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	bool m_tick_frame = false;
 	bool m_tick_frame_time = false;
 
-
-	GeneticNeuralNetwork network{ 2, 1, 2 };
-
 	bool mouse_pressed_event = false;
 	bool running = true;
 	float fps_ = 0;
 
 	// ImPlot
-	static constexpr int graph_history = 9500;
+	static constexpr int graph_history = 40'000;
 	std::vector<float> time_history_;
 	std::vector<float> protozoa_history_;
 	std::vector<float> food_history_;
@@ -83,16 +77,18 @@ public:
 	void run_simulation();
 
 private:
-	// init
-	void init_line_graphs();
-	void init_network_renderer();
+	void init_imGUI();
 
 	// updating
 
 	void update_one_frame();
 	void camera_follow_selected_protozoa();
-	void update_test_data();
 	void update_line_graphs();
+
+	void imgui_stats_panel();
+	void imgui_controls_panel();
+	void imgui_tuning_panel();
+	void imgui_population_graph();
 
 	// rendering
 	void draw_everything();
