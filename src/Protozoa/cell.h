@@ -21,8 +21,8 @@ struct Cell
 
 	float radius = CellSettings::cell_radius;
 
-	float sinwave_current_phase_;
-	float sinwave_current_friction_;
+	float sinwave_current_phase_ = 0.f;
+	float sinwave_current_friction_ = 0.f;
 
 
 	sf::Vector2f position_{};

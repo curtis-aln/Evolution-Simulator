@@ -323,7 +323,12 @@ private:
         );
 
         sf::Font font;
-        font.openFromFile(font_path);
+        
+        if (!font.openFromFile(font_path))
+        {
+            std::cout << "Failed to load font for crash window: " << font_path << "\n"
+				<< "Ensure the path is correct and the file is accessible.\n";
+        }
 
         sf::Text t_title(font, "Project ARIA has crashed", font_size_title);
         sf::Text t_reason(font, "Type    : " + reason, font_size_message);

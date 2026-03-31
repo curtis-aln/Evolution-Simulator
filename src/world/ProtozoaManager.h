@@ -16,18 +16,16 @@ protected:
 	std::vector<Cell*> global_cell_vector_;
 
 	// statistics - To be displayed on the screen
-	float average_cells_per_protozoa_; // TODO
-	float average_offspring_count_;
-	float average_mutation_rate_;
-	float average_mutation_range_;
+	float average_cells_per_protozoa_ = 0.f; 
+	float average_offspring_count_ = 0.f;
+	float average_mutation_rate_ = 0.f;
+	float average_mutation_range_ = 0.f;
 
 
 	
 public:
-	ProtozoaManager()
-	{
-		
-	}
+	ProtozoaManager() = default;
+
 
 	Protozoa* get_selected_protozoa() const { return selected_protozoa_; }
 

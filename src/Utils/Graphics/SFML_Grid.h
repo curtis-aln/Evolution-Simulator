@@ -25,7 +25,11 @@ public:
 		std::vector<sf::Vertex> vertices((cells_x + cells_y) * 2);
 
 		vertexBuffer = sf::VertexBuffer(sf::PrimitiveType::Lines, sf::VertexBuffer::Usage::Static);
-		vertexBuffer.create(vertices.size());
+		
+		if (!vertexBuffer.create(vertices.size()))
+		{
+			std::cout << "[Warning]: Failed to create vertex buffer for grid rendering." << std::endl;
+		}
 
 		size_t counter = 0;
 		for (size_t x = 0; x < cells_x; x++)
@@ -49,7 +53,10 @@ public:
 			vertices[x].color = color;
 		}
 
-		vertexBuffer.update(vertices.data(), vertices.size(), 0);
+		if (!vertexBuffer.update(vertices.data(), vertices.size(), 0))
+		{
+			std::cout << "[Warning]: Failed to update vertex buffer for grid rendering." << std::endl;
+		}
 	}
 
 

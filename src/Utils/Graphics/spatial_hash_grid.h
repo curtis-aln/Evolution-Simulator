@@ -203,7 +203,11 @@ struct SpatialHashGrid
 		std::vector<sf::Vertex> vertices((dimsX + dimsY) * 2 + 4);
 
 		m_renderGrid = sf::VertexBuffer(sf::PrimitiveType::Lines, sf::VertexBuffer::Usage::Static);
-		m_renderGrid.create(vertices.size());
+		
+		if (!m_renderGrid.create(vertices.size()))
+		{
+			std::cout << "[Warning]: Failed to create vertex buffer for grid rendering." << std::endl;
+		}
 
 		size_t counter = 0;
 		for (unsigned i = 0; i <= dimsX; i++)
@@ -227,6 +231,9 @@ struct SpatialHashGrid
 			vertex.color = sf::Color(40, 40, 40);
 		}
 
-		m_renderGrid.update(vertices.data(), vertices.size(), 0);
+		if (!m_renderGrid.update(vertices.data(), vertices.size(), 0))
+		{
+			std::cout << "[Warning]: Failed to update vertex buffer for grid rendering." << std::endl;
+		}
 	}
 };
