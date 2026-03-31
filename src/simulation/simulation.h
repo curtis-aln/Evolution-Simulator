@@ -19,6 +19,7 @@
 
 #include <imgui.h>
 #include <imgui-SFML.h>
+#include <implot.h>
 
 
 class Simulation : SimulationSettings, UI_Settings, TextSettings
@@ -58,14 +59,23 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	bool m_tick_frame = false;
 	bool m_tick_frame_time = false;
 
-	LineGraph<line_maximum_data, line_x_axis_increments> protozoa_population_graph_{ &m_window_, protozoa_graph_bounds };
-	LineGraph<line_maximum_data, line_x_axis_increments> food_population_graph_{ &m_window_, food_graph_bounds };
 
 	GeneticNeuralNetwork network{ 2, 1, 2 };
 
 	bool mouse_pressed_event = false;
 	bool running = true;
 	float fps_ = 0;
+
+	// ImPlot
+	static constexpr int graph_history = 9500;
+	std::vector<float> time_history_;
+	std::vector<float> protozoa_history_;
+	std::vector<float> food_history_;
+	int   graph_offset_ = 0;
+
+	ImPlotColormap m_plot_colormap_{};
+
+	int graph_count_ = 0; // how many samples have been recorded
 
 public:
 	Simulation();

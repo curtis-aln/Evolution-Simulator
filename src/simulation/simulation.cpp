@@ -1,4 +1,6 @@
 #include "simulation.h"
+#include <implot.h>
+
 
 inline static constexpr float lerp_factor = 0.025f; // Adjust for smoothness (0 = no movement, 1 = instant movement)
 
@@ -17,12 +19,31 @@ static inline void draw_debug_circle(sf::RenderWindow* window, const sf::Vector2
 
 Simulation::Simulation() : m_world_(&m_window_)
 {
+
 	m_window_.setFramerateLimit(frame_rate);
 	m_window_.setVerticalSyncEnabled(vsync);
+
+	if (!ImGui::SFML::Init(m_window_))  // 1. ImGui first
+	{
+		std::cerr << "[ERROR]: Failed to initialize ImGui-SFML\n";
+	}
+
+	ImPlot::CreateContext();            // 2. ImPlot second, after ImGui
+
+	static const ImVec4 colors[2] = {  // 3. colormap third, after context
+		{0.3f, 0.6f, 1.0f, 1.f},
+		{1.0f, 0.4f, 0.4f, 1.f},
+	};
+	m_plot_colormap_ = ImPlot::AddColormap("ARIAColors", colors, 2, false);
 
 	if (!ImGui::SFML::Init(m_window_))
 	{
 		std::cerr << "[ERROR]: Failed to initialize ImGui-SFML\n";
+	}
+
+	if (!ImPlot::CreateContext())
+	{
+		std::cerr << "[ERROR]: Failed to create ImPlot context\n";
 	}
 
 	// center the view on the world
@@ -39,7 +60,7 @@ Simulation::Simulation() : m_world_(&m_window_)
 	cell_statistic_font.set_font_size(cell_statistic_font_size);
 
 	init_line_graphs();
-	init_network_renderer();		
+	init_network_renderer();
 }
 
 void Simulation::init_line_graphs()
@@ -50,11 +71,9 @@ void Simulation::init_line_graphs()
 		{ 50, 50, 50, transparency }, border_outline_thickness, regular_font_size,
 		regular_font_size, cell_statistic_font_size, bold_font_location, regular_font_location };
 
-	protozoa_population_graph_.set_settings(settings);
 	settings.title = "Food Population";
 	settings.graph_line_color = food_graph_line_color;
 	settings.under_graph_color = food_under_graph_color;
-	food_population_graph_.set_settings(settings);
 }
 
 
@@ -85,6 +104,8 @@ void Simulation::run_simulation()
 		}
 	}
 
+	ImGui::SFML::Shutdown();
+	ImPlot::DestroyContext();
 }
 
 void Simulation::update_one_frame()
@@ -97,9 +118,6 @@ void Simulation::update_one_frame()
 	{
 		m_world_.update(false);
 		m_tick_frame_time = false;
-
-		protozoa_population_graph_.handle_mouse_press(mouse_pos);
-		food_population_graph_.handle_mouse_press(mouse_pos);
 	}
 	else if (!m_world_.paused)
 	{
@@ -150,8 +168,16 @@ void Simulation::update_line_graphs()
 
 	if (m_ticks_ % line_x_axis_increments == 0)
 	{
-		protozoa_population_graph_.add_data(m_world_.get_protozoa_count());
-		food_population_graph_.add_data(m_world_.get_food_count());
+		time_history_.push_back(m_total_time_elapsed_);
+		protozoa_history_.push_back(static_cast<float>(m_world_.get_protozoa_count()));
+		food_history_.push_back(static_cast<float>(m_world_.get_food_count()));
+
+		if (static_cast<int>(time_history_.size()) > graph_history)
+		{
+			time_history_.erase(time_history_.begin());
+			protozoa_history_.erase(protozoa_history_.begin());
+			food_history_.erase(food_history_.begin());
+		}
 	}
 }
 
@@ -163,9 +189,6 @@ void Simulation::draw_everything()
 	if (!m_world_.simple_mode)
 	{
 		m_builder_.render();
-
-		protozoa_population_graph_.render(camera_);
-		food_population_graph_.render(camera_);
 	}
 }
 
@@ -240,6 +263,28 @@ void Simulation::handle_imGUI()
 	ImGui::Checkbox("Paused", &m_world_.paused);
 	ImGui::Checkbox("Debug Mode", &m_world_.debug_mode);
 	ImGui::Checkbox("Simple Mode", &m_world_.simple_mode);
+
+	ImGui::End();
+
+	
+	// ── Population Graphs ─────────────────────────────────────
+	ImGui::SetNextWindowPos(ImVec2(10, 800), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(350, 160), ImGuiCond_FirstUseEver);
+	ImGui::Begin("Population", nullptr, ImGuiWindowFlags_NoTitleBar);
+
+	if (ImPlot::BeginPlot("##pop", ImVec2(-1, -1), ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect | ImPlotFlags_NoMouseText))
+	{
+		ImPlot::SetupAxes(nullptr, nullptr, ImPlotAxisFlags_NoTickLabels, ImPlotAxisFlags_NoTickLabels);
+		ImPlot::SetupAxisLimits(ImAxis_X1, m_total_time_elapsed_ - 60.f, m_total_time_elapsed_, ImGuiCond_Always);
+		ImPlot::SetupAxisLimits(ImAxis_Y1, 0, static_cast<float>(std::max(WorldSettings::max_protozoa, FoodSettings::max_food)), ImGuiCond_Once);
+
+		ImPlot::PushColormap(m_plot_colormap_);
+		ImPlot::PlotLine("Protozoa", time_history_.data(), protozoa_history_.data(), static_cast<int>(protozoa_history_.size()));
+		ImPlot::PlotLine("Food", time_history_.data(), food_history_.data(), static_cast<int>(food_history_.size()));
+		ImPlot::PopColormap();
+
+		ImPlot::EndPlot();
+	}
 
 	ImGui::End();
 }

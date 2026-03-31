@@ -23,6 +23,12 @@ FetchContent_Declare(ImGui-SFML
   GIT_TAG master
 )
 
+FetchContent_Declare(ImPlot
+  GIT_REPOSITORY https://github.com/epezent/implot.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(ImPlot)
+
 set(SFML_USE_SYSTEM_DEPS OFF CACHE BOOL "" FORCE)
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
 
@@ -44,6 +50,12 @@ target_link_libraries(ProjectARIA PRIVATE
   SFML::Window
   SFML::System
   ImGui-SFML::ImGui-SFML
+)
+
+target_include_directories(ProjectARIA PRIVATE ${implot_SOURCE_DIR})
+target_sources(ProjectARIA PRIVATE
+    ${implot_SOURCE_DIR}/implot.cpp
+    ${implot_SOURCE_DIR}/implot_items.cpp
 )
 
 if(MSVC)
