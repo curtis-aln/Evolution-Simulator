@@ -95,7 +95,7 @@ void Simulation::update_one_frame()
 
 	if (m_tick_frame_time)
 	{
-		m_world_.update();
+		m_world_.update(false);
 		m_tick_frame_time = false;
 
 		protozoa_population_graph_.handle_mouse_press(mouse_pos);
@@ -103,7 +103,7 @@ void Simulation::update_one_frame()
 	}
 	else if (!m_world_.paused)
 	{
-		m_world_.update();	
+		m_world_.update(false);	
 		update_line_graphs();
 		update_test_data();
 	}

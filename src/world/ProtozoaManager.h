@@ -67,9 +67,7 @@ protected:
 		reproduce_indexes.reserve(max_protozoa);
 		for (Protozoa* protozoa : all_protozoa_)
 		{
-			protozoa->bound_cells(); // in this specific order
 			protozoa->update(food_manager_, debug_mode, min_speed);
-			
 
 			if (protozoa->dead)
 			{
@@ -83,14 +81,6 @@ protected:
 			}
 		}
 
-		// after we ahve calculated all the velocity vectors for the cells, we can then update the positions of all the protozoa
-		//this way we avoid any issues with the order of updates affecting the physics AND out of bounds issues
-		for (Protozoa* protozoa : all_protozoa_)
-		{
-			protozoa->update_protozoa_position();
-		}
-
-		// handle reproduction
 		for (int idx : reproduce_indexes)
 		{
 			create_offspring(all_protozoa_.at(idx));

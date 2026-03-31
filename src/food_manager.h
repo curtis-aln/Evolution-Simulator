@@ -63,13 +63,12 @@ public:
 		int size = food_vector.size();
 		if (size < initial_food && frames++ % 2 == 0)
 		{
-			const int to_spawn = 30;
-			for (int i = 0; i < to_spawn; ++i)
+			for (int i = 0; i < 14; ++i)
 			{
 				Food* food = food_vector.add();
 				if (food == nullptr)
 					break;
-				food->position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius - food_radius);
+				food->position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
 			}
 		}
 

@@ -2,7 +2,7 @@
 
 
 
-void World::update()
+void World::update(const bool pause)
 {
 	min_speed += delta_min_speed;
 	check_for_extinction_event();
@@ -11,26 +11,28 @@ void World::update()
 	update_global_cell_vector();
 	update_spatial_grid();
 
-	// if our selected protozoa has died we can no longer track it
-	selected_protozoa_ = (selected_protozoa_ && selected_protozoa_->dead) ? nullptr : selected_protozoa_;
-
-	food_manager_.update();
-	update_all_protozoa(food_manager_, debug_mode, min_speed);
-	
-
-	cell_collision_resolution();
-}
-
-void World::cell_collision_resolution()
-{
-	if (!toggle_collisions)
-		return;
-	// we iterate over each cell and check for collisions with nearby cells, we can do this in parallel as there are no data dependencies between cells
-	//#pragma omp parallel for
-	for (int cell_id = 0; cell_id < cells_x * cells_y; ++cell_id)
+	if (toggle_collisions)
 	{
-		update_grid_cell(cell_id);
+		// iterating over each grid cell, we update as per the cell instead of as per the particle
+		for (int cell_id = 0; cell_id < cells_x * cells_y; ++cell_id)
+		{
+			update_grid_cell(cell_id);
+		}
 	}
+
+	// if our selected protozoa has died we can no longer track it
+	if (selected_protozoa_ != nullptr && selected_protozoa_->dead)
+	{
+		selected_protozoa_ = nullptr;
+	}
+
+	if (!pause)
+	{
+		food_manager_.update();
+		update_all_protozoa(food_manager_, debug_mode, min_speed);
+	}
+
+	//min_speed += 0.00002f;
 }
 
 
