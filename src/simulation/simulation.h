@@ -35,7 +35,7 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	Font cell_statistic_font{ nullptr, cell_statistic_font_size, regular_font_location };
 
 	sf::VideoMode videoMode = full_screen ? sf::VideoMode::getDesktopMode() : getAdjustedVideoMode();
-	std::uint32_t windowStyle = full_screen ? sf::Style::None : (sf::Style::Titlebar | sf::Style::Close);
+	std::uint32_t windowStyle = sf::Style::None;
 	sf::RenderWindow m_window_{videoMode, "Project ARIA", windowStyle};
 
 	FrameRateSmoothing<frame_smoothing> m_clock_{};
@@ -69,6 +69,7 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 
 	int graph_count_ = 0; // how many samples have been recorded
 
+
 public:
 	Simulation();
 
@@ -93,6 +94,8 @@ private:
 	void handle_imGUI();
 	void render();
 	void manage_frame_rate();
+
+	void imgui_debug_panel(Cell* selected_cell, Protozoa* selected_protozoa);
 
 	// events 
 	void handle_events();

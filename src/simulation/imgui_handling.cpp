@@ -55,23 +55,37 @@ void Simulation::imgui_controls_panel()
     ImGui::SetNextWindowSize(panel_size, ImGuiCond_FirstUseEver);
     ImGui::Begin("Controls");
 
+    // ------------------ Simulation ------------------
     ImGui::SeparatorText("Simulation");
-    ImGui::BulletText("[O]        Step one frame (paused)");
-    ImGui::BulletText("[Escape]   Quit");
 
-    ImGui::SeparatorText("Display");
-    ImGui::BulletText("[G]        Cell collision grid overlay");
-    ImGui::BulletText("[F]        Food grid overlay");
-    ImGui::BulletText("[C]        Toggle collisions");
-    ImGui::BulletText("[K]        Skeleton mode");
-    ImGui::BulletText("[B]        Bounding boxes");
+    ImGui::Text("Step Frame");
+    ImGui::SameLine();
+    ImGui::TextDisabled("[O]");
 
+    // ------------------ Camera ------------------
     ImGui::SeparatorText("Camera");
-    ImGui::BulletText("[Scroll]   Zoom in / out");
-    ImGui::BulletText("[L-Hold]   Pan camera");
+
+    ImGui::Text("Zoom");
+    ImGui::SameLine();
+    ImGui::TextDisabled("[Scroll]");
+
+    ImGui::Text("Pan");
+    ImGui::SameLine();
+    ImGui::TextDisabled("[LMB Hold]");
+
+    // ------------------ Exit ------------------
+    ImGui::Separator();
+
+    if (ImGui::Button("Exit Program [ESC]", { -1, 0 }))
+    {
+		running = false;
+    }
+    ImGui::SameLine();
+    ImGui::TextDisabled("[Esc]");
 
     ImGui::End();
 }
+
 
 void Simulation::imgui_tuning_panel()
 {
@@ -83,32 +97,75 @@ void Simulation::imgui_tuning_panel()
     constexpr float delta_speed_slider_max = 2.0f;
     constexpr float min_speed_slider_min = 0.0f;
     constexpr float min_speed_slider_max = 135.0f;
-    constexpr ImVec2 button_size = { 240.f, 0.f };
 
     ImGui::SetNextWindowPos(panel_pos, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize(panel_size, ImGuiCond_FirstUseEver);
     ImGui::Begin("Tuning");
 
+    // ------------------ World ------------------
     ImGui::SeparatorText("World");
+
     ImGui::SliderFloat("Min Speed", &m_world_.min_speed, min_speed_slider_min, min_speed_slider_max);
 
     float delta_speed_display = m_world_.delta_min_speed * delta_speed_scale;
     if (ImGui::SliderFloat("Delta Min Speed (x1000)", &delta_speed_display, delta_speed_slider_min, delta_speed_slider_max))
         m_world_.delta_min_speed = delta_speed_display / delta_speed_scale;
 
+    // ------------------ Simulation + Display (side-by-side) ------------------
     ImGui::SeparatorText("Flags");
 
-    if (ImGui::Button(m_rendering_ ? "Rendering: ON  [R]" : "Rendering: OFF [R]", button_size))
-        m_rendering_ = !m_rendering_;
+    float full_width = ImGui::GetContentRegionAvail().x;
+    float column_width = full_width * 0.5f;
 
-    if (ImGui::Button(m_world_.paused ? "Paused         [Space]" : "Running        [Space]", button_size))
-        m_world_.paused = !m_world_.paused;
+    // LEFT COLUMN (Simulation)
+    ImGui::BeginChild("SimFlags", ImVec2(column_width, 0), false);
 
-    if (ImGui::Button(m_world_.debug_mode ? "Debug: ON  [D]" : "Debug: OFF [D]", button_size))
-        m_world_.debug_mode = !m_world_.debug_mode;
+    ImGui::TextDisabled("Simulation");
 
-    if (ImGui::Button(m_world_.simple_mode ? "Simple: ON  [S]" : "Simple: OFF [S]", button_size))
-        m_world_.simple_mode = !m_world_.simple_mode;
+    ImGui::Checkbox("Rendering", &m_rendering_);
+    ImGui::SameLine(); ImGui::TextDisabled("[R]");
+
+    ImGui::Checkbox("Paused", &m_world_.paused);
+    ImGui::SameLine(); ImGui::TextDisabled("[Space]");
+
+    ImGui::Checkbox("Debug", &m_world_.debug_mode);
+    ImGui::SameLine(); ImGui::TextDisabled("[D]");
+
+    ImGui::Checkbox("Simple", &m_world_.simple_mode);
+    ImGui::SameLine(); ImGui::TextDisabled("[S]");
+
+    if (m_world_.paused)
+    {
+        if (ImGui::Button("Step"))
+        {
+            // step logic
+        }
+        ImGui::SameLine();
+        ImGui::TextDisabled("[O]");
+    }
+
+    ImGui::EndChild();
+
+    ImGui::SameLine();
+
+    // RIGHT COLUMN (Display)
+    ImGui::BeginChild("DisplayFlags", ImVec2(0, 0), false);
+
+    ImGui::TextDisabled("Display");
+
+    ImGui::Checkbox("Cell Grid", &m_world_.draw_cell_grid);
+    ImGui::SameLine(); ImGui::TextDisabled("[G]");
+
+    ImGui::Checkbox("Food Grid", &m_world_.draw_food_grid);
+    ImGui::SameLine(); ImGui::TextDisabled("[F]");
+
+    ImGui::Checkbox("Collisions", &m_world_.toggle_collisions);
+    ImGui::SameLine(); ImGui::TextDisabled("[C]");
+
+    ImGui::Checkbox("Track Stats", &m_world_.track_statistics);
+    ImGui::SameLine(); ImGui::TextDisabled("[T]");
+
+    ImGui::EndChild();
 
     ImGui::End();
 }
@@ -169,4 +226,105 @@ void Simulation::handle_imGUI()
     imgui_controls_panel();
     imgui_tuning_panel();
     imgui_population_graph();
+
+    if (m_world_.selected_protozoa_ && m_world_.debug_mode)
+		imgui_debug_panel(nullptr, m_world_.selected_protozoa_);
+}
+
+
+
+void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_protozoa)
+{
+    if (!selected_cell && !selected_protozoa)
+        return;
+
+    ImGui::Begin("Debug Inspector");
+
+    float full_width = ImGui::GetContentRegionAvail().x;
+    float column_width = full_width * 0.5f;
+
+    // ------------------ CELL ------------------
+    if (selected_cell)
+    {
+        ImGui::SeparatorText("Cell");
+
+        ImGui::Text("ID: %d", selected_cell->id);
+        ImGui::Text("Generation: %d", selected_cell->generation);
+        ImGui::Text("Phase: %.3f", selected_cell->sinwave_current_phase_);
+        ImGui::Text("Friction: %.3f", selected_cell->sinwave_current_friction_);
+
+        ImGui::Spacing();
+
+        ImGui::Text("Position: (%.2f, %.2f)", selected_cell->position_.x, selected_cell->position_.y);
+        ImGui::Text("Velocity: (%.2f, %.2f)", selected_cell->velocity_.x, selected_cell->velocity_.y);
+        ImGui::Text("Speed: %.2f", selected_cell->velocity_.length());
+
+        ImGui::Spacing();
+
+        ImGui::Text("Radius: %.2f", selected_cell->radius);
+    }
+
+    // ------------------ PROTOZOA (TWO COLUMNS) ------------------
+    if (selected_protozoa)
+    {
+        ImGui::SeparatorText("Protozoa");
+
+        // LEFT COLUMN
+        ImGui::BeginChild("Protozoa_Left", ImVec2(column_width, 0), false);
+
+        ImGui::Text("ID: %d", selected_protozoa->id);
+        ImGui::Text("Generation: %d", selected_protozoa->generation);
+        ImGui::Text("Age: %d", selected_protozoa->frames_alive);
+
+        ImGui::Spacing();
+
+        ImGui::Text("Cells: %d", (int)selected_protozoa->get_cells().size());
+        ImGui::Text("Springs: %d", (int)selected_protozoa->m_springs_.size());
+        ImGui::Text("Offspring: %d", selected_protozoa->offspring_count);
+
+        ImGui::Spacing();
+
+        ImGui::Text("Energy: %.2f", selected_protozoa->energy);
+        ImGui::Text("Food: %.2f", selected_protozoa->total_food_eaten);
+
+        ImGui::EndChild();
+
+        ImGui::SameLine();
+
+        // RIGHT COLUMN
+        ImGui::BeginChild("Protozoa_Right", ImVec2(0, 0), false);
+
+        ImGui::TextDisabled("Mutation");
+
+        ImGui::Text("Range: %.4f", selected_protozoa->mutation_range);
+        ImGui::Text("Rate: %.4f", selected_protozoa->mutation_rate);
+
+        ImGui::Spacing();
+
+        ImGui::TextDisabled("Transform");
+
+        ImGui::Text("Position: (%.2f, %.2f)",
+            selected_protozoa->get_center().x,
+            selected_protozoa->get_center().y);
+
+        ImGui::Text("Velocity: (%.2f, %.2f)",
+            selected_protozoa->velocity.x,
+            selected_protozoa->velocity.y);
+
+        ImGui::Text("Speed: %.2f", selected_protozoa->velocity.length());
+
+        ImGui::Spacing();
+
+        ImGui::TextDisabled("Display");
+
+        ImGui::Checkbox("Skeleton", &m_world_.skeleton_mode);
+        ImGui::SameLine(); ImGui::TextDisabled("[K]");
+
+        ImGui::Checkbox("Bounds", &m_world_.show_bounding_boxes);
+        ImGui::SameLine(); ImGui::TextDisabled("[B]");
+
+        ImGui::EndChild();
+    }
+
+    ImGui::End();
 }

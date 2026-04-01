@@ -2,7 +2,7 @@
 #include <implot.h>
 
 
-inline static constexpr float lerp_factor = 0.025f; // Adjust for smoothness (0 = no movement, 1 = instant movement)
+inline static constexpr float lerp_factor = 0.04f; // Adjust for smoothness (0 = no movement, 1 = instant movement)
 
 
 static inline void draw_debug_circle(sf::RenderWindow* window, const sf::Vector2f position)
@@ -48,16 +48,9 @@ void Simulation::run_simulation()
 		handle_events();
 
 		update_one_frame();
-
-
-		if (m_rendering_)
-		{
-			render();
-		}
-		else
-		{
-			ImGui::EndFrame(); // pair with the Update() call in handle_imGUI()
-		}
+		
+		render();
+		
 	}
 
 	ImGui::SFML::Shutdown();
@@ -72,20 +65,18 @@ void Simulation::update_one_frame()
 
 	if (m_tick_frame_time)
 	{
-		m_world_.update(false);
+		m_world_.update();
 		m_tick_frame_time = false;
 	}
 	else if (!m_world_.paused)
 	{
-		m_world_.update(false);	
-		update_line_graphs();
+		m_world_.update();
+
+		if (m_world_.track_statistics)
+			update_line_graphs();
 	}
 
-	// in debug mode we want the camera to follow the selected protozoa
-	if (m_world_.debug_mode)
-	{
-		camera_follow_selected_protozoa();
-	}
+	camera_follow_selected_protozoa();
 }
 
 
@@ -129,19 +120,14 @@ void Simulation::update_line_graphs()
 }
 
 
-void Simulation::draw_everything()
-{
-	m_world_.render(&cell_statistic_font);
-}
-
-
-
-
 void Simulation::render()
 {
 	m_window_.clear(window_color);
 
-	draw_everything();
+	if (m_rendering_)
+	{
+		m_world_.render(&cell_statistic_font);
+	}
 
 	ImGui::SFML::Render(m_window_);
 

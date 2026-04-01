@@ -20,6 +20,7 @@ inline static constexpr float initial_energy = 300.f; // energy the protozoa spa
 // The Genome class handles anything that has to do with mutation and genetics
 class Protozoa : ProtozoaSettings, public Genome
 {
+public:
 	sf::RenderWindow* m_window_ = nullptr;
 	Circle* m_world_bounds_ = nullptr;
 
@@ -37,7 +38,6 @@ class Protozoa : ProtozoaSettings, public Genome
 	unsigned stomach = 0;
 	unsigned total_food_eaten = 0;
 	
-public:
 	// debugging
 	std::vector<sf::Vector2f> food_positions_nearby{};
 	std::vector<sf::Vector2f> cell_positions_nearby{};

@@ -73,15 +73,15 @@ ImGUI Todo
 [Done] statistic for average mutation rate and mutation range
 [Done] statistic for average number of cells per protozoa
 [Done] make the buttons actuall buttons instead of checkboxes and add the keybind next to it, then remove it from the controls
-- Align the buttons better
-- pressing o when not paused should pause the sim
+[Done] Align the buttons better
+[Done] pressing o when not paused should pause the sim
 
 Organism Statistic page popup
 When you click on an organism a statistics page should show up showing all the information about that organism
 additionally
 - the x and y space it takes up plus its square area
 - distance to its birth location
-- Move the debug control settings and buttons into this mini popup menu
+[Done] Move the debug control settings and buttons into this mini popup menu
 - scroll wheel press should be used for translating the screen
 - Ability to hide IMGUI screens completely with a keybind (for screenshots)
 - Reset Simulation Button with controls for world size, initial protozoa count, food spawn rate, and mutation rate/range

@@ -157,6 +157,8 @@ void World::keyboardEvents(const sf::Keyboard::Key& event_key_code)
 		debug_mode = not debug_mode;
 		break;
 
+	case sf::Keyboard::Key::T:      track_statistics = !track_statistics; break;
+
 	case sf::Keyboard::Key::K:
 		if (debug_mode)
 			skeleton_mode = not skeleton_mode; 

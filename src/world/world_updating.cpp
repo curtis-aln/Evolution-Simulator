@@ -2,7 +2,7 @@
 
 
 
-void World::update(const bool pause)
+void World::update()
 {
 	min_speed += delta_min_speed;
 	check_for_extinction_event();
@@ -10,7 +10,9 @@ void World::update(const bool pause)
 	iterations_++;
 	update_global_cell_vector();
 	update_spatial_grid();
-	update_statistics();
+
+	if (track_statistics)
+		update_statistics();
 
 	if (toggle_collisions)
 	{
@@ -27,13 +29,9 @@ void World::update(const bool pause)
 		selected_protozoa_ = nullptr;
 	}
 
-	if (!pause)
-	{
-		food_manager_.update();
-		update_all_protozoa(food_manager_, debug_mode, min_speed);
-	}
-
-	//min_speed += 0.00002f;
+	food_manager_.update();
+	update_all_protozoa(food_manager_, debug_mode, min_speed, track_statistics);
+	
 }
 
 

@@ -63,6 +63,7 @@ public:
 	bool toggle_collisions = true;   // enables or disables cell collision handling
 	bool show_connections = true;    // shows spring connections between cells
 	bool show_bounding_boxes = true; // shows bounding boxes around protozoa
+	bool track_statistics = true;
 
 	// for the simple spatial grid, we need a temporary array to store nearby cell ids
 	std::array<int, cell_capacity * 9> nearby_ids = {};
@@ -85,13 +86,10 @@ public:
 	
 	
 	
-	
-
-public:
 	World(sf::RenderWindow* window = nullptr);
 
 	// updating functions
-	void update(bool pause);
+	void update();
 	void render(Font* font);
 
 	// fetch functions

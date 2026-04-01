@@ -8,18 +8,15 @@ class ProtozoaManager : protected WorldSettings
 protected:
 	Protozoa::Protozoa_Vector all_protozoa_{};
 
-	// The user can click on a protozoa to select it for debugging purposes. we store a pointer to it here.
-	Protozoa* selected_protozoa_ = nullptr;
-
 	// All cells are stored inside their respective protozoa, but we also maintain a global 
 	// vector of cell pointers for easy access during collision detection and updates.
 	std::vector<Cell*> global_cell_vector_;
 
 	
-
-
-	
 public:
+	// The user can click on a protozoa to select it for debugging purposes. we store a pointer to it here.
+	Protozoa* selected_protozoa_ = nullptr;
+
 	float average_lifetime_ = 0.f; // the average lifetime of the 500 most recent protozoa deaths
 	float deaths_per_hundered_frames_ = 0.f; // the amount of protozoa that have died per hundred frames, used to track the death rate of the population
 	float births_per_hundered_frames_ = 0.f; // the amount of protozoa that have been born per hundred frames, used to track the birth rate of the population
@@ -66,7 +63,7 @@ public:
 
 
 protected:
-	void update_all_protozoa(FoodManager& food_manager_, bool debug_mode, float min_speed)
+	void update_all_protozoa(FoodManager& food_manager_, bool debug_mode, float min_speed, bool track_statistics)
 	{
 		std::vector<int> reproduce_indexes{};
 		reproduce_indexes.reserve(max_protozoa);
@@ -76,7 +73,8 @@ protected:
 
 			if (protozoa->dead)
 			{
-				register_death_stat(protozoa->frames_alive);
+				if (track_statistics)
+					register_death_stat(protozoa->frames_alive);
 				all_protozoa_.remove(protozoa);
 				continue; // causes indexing issues if the orgasanism is removed before we check for reproduction
 			}
@@ -90,6 +88,8 @@ protected:
 		for (int idx : reproduce_indexes)
 		{
 			create_offspring(all_protozoa_.at(idx));
+			if (track_statistics)
+				register_birth_stat();
 		}
 	}
 
@@ -125,8 +125,6 @@ protected:
 		float disp_x = Random::rand_range(-parent_bounds_x, parent_bounds_x);
 		float disp_y = Random::rand_range(-parent_bounds_y, parent_bounds_y);
 		offspring->move_center_location_to(parent->get_center() + sf::Vector2f{ disp_x, disp_y });
-
-		register_birth_stat();
 	}
 
 	void update_global_cell_vector()
