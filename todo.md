@@ -29,6 +29,7 @@
 /* To-fix before releasing public version */
 // - remove_cell() is a stub - implement: remove cell from m_cells_, remove connected springs from m_springs_, call remove_cell_gene() and remove_spring_gene() for each. Ensure IDs remain valid (consider ID remapping or tombstoning).
 
+// - Implement spring connection creation
 // - nearby_ids shared array — correctness bug & data race - Change to a local variable inside update_grid_cell() or use a per-thread buffer. Remove the #pragma omp stubs until threading is intentionally added. 
 // - Death + reproduce same frame = invalid at() call - Process reproduction only after fully completing the death/remove pass. Use a separate reproduce_indexes collected before any removals and validate the index is still active before calling create_offspring.
 // [DONE] - Add LICENSE file - Choose MIT or similar, add LICENSE to repo root, update README.

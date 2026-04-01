@@ -84,7 +84,6 @@ void Simulation::update_one_frame()
 	// in debug mode we want the camera to follow the selected protozoa
 	if (m_world_.debug_mode)
 	{
-		m_world_.move_cell_in_selected_protozoa(mouse_pos);
 		camera_follow_selected_protozoa();
 	}
 }

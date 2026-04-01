@@ -23,14 +23,6 @@ World::World(sf::RenderWindow* window)
 	position_data_.reserve(predicted_cells);
 }
 
-void World::move_cell_in_selected_protozoa(const sf::Vector2f mouse_position) const
-{
-	if (selected_protozoa_ != nullptr)
-	{
-		selected_protozoa_->move_selected_cell(mouse_position);
-	}
-}
-
 
 void World::render(Font* font)
 {

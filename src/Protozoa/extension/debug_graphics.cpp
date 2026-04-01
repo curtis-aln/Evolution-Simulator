@@ -193,24 +193,6 @@ void Protozoa::draw_spring_information(Font* font) const
     }
 }
 
-void Protozoa::move_selected_cell(const sf::Vector2f mouse_position)
-{
-	if (selected_cell_id >= 0)
-	{
-		m_cells_[selected_cell_id].position_ = mouse_position;
-	}
-}
-
-
-void Protozoa::deselect_cell()
-{
-	if (selected_cell_id >= 0)
-	{
-		selected_cell_id = -1;
-	}
-}
-
-
 // TODO: Implement spring connection creation
 void Protozoa::make_connection(const int cell1_id, const int cell2_id)
 {
@@ -235,36 +217,25 @@ bool Protozoa::is_hovered_on(const sf::Vector2f mousePosition, const bool tolera
 
 bool Protozoa::check_press(const sf::Vector2f mouse_position)
 {
-	Cell* selected_cell = get_selected_cell(mouse_position);
-
-	if (selected_cell != nullptr)
-	{
-		selected_cell_id = selected_cell->id;
-	}
-
-	if (m_personal_bounds_.contains(mouse_position))
-	{
-		return true;
-	}
-
-	return selected_cell != nullptr;
+	return m_personal_bounds_.contains(mouse_position);
 }
 
 
 Cell* Protozoa::get_selected_cell(const sf::Vector2f mouse_pos)
 {
-	if (is_hovered_on(mouse_pos))
+	if (!is_hovered_on(mouse_pos))
+		return nullptr;
+	
+	for (Cell& cell : m_cells_)
 	{
-		for (Cell& cell : m_cells_)
+		const float dist_sq = dist_squared(cell.position_, mouse_pos);
+		const float rad = cell.radius;
+		if (dist_sq < rad * rad)
 		{
-			const float dist_sq = dist_squared(cell.position_, mouse_pos);
-			const float rad = cell.radius;
-			if (dist_sq < rad * rad)
-			{
-				return &cell;
-			}
+			return &cell;
 		}
 	}
+	
 	return nullptr;
 }
 

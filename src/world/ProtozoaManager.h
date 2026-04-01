@@ -52,7 +52,6 @@ public:
 	{
 		if (selected_protozoa_ != nullptr)
 		{
-			selected_protozoa_->deselect_cell();
 			selected_protozoa_ = nullptr;
 		}
 	}

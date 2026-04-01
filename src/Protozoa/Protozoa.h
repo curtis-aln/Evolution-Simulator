@@ -75,7 +75,6 @@ public:
 	// debugging and modifying settings
 	bool is_hovered_on(sf::Vector2f mousePosition, bool tollarance_check = false) const;
 	bool check_press(sf::Vector2f mouse_position);
-	void deselect_cell();
 	static void make_connection(int cell1_id, int cell2_id);
 	void move_selected_cell(sf::Vector2f mouse_position);
 
