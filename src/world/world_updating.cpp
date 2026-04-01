@@ -10,6 +10,7 @@ void World::update(const bool pause)
 	iterations_++;
 	update_global_cell_vector();
 	update_spatial_grid();
+	update_statistics();
 
 	if (toggle_collisions)
 	{
@@ -171,3 +172,51 @@ void World::update_position_container()
 		}
 	}
 }
+
+
+void World::update_statistics()
+{
+	++frames_since_last_gen_change;
+
+	average_generation_ = get_average_generation();
+
+	if (int(tracked_generation_) != int(average_generation_))
+	{
+		frames_per_generation_ = (tracked_generation_ != 0.f)
+			? (iterations_ - frames_since_last_gen_change) : iterations_;
+		frames_since_last_gen_change = 0;
+		tracked_generation_ = average_generation_;
+	}
+
+	float protozoa_count = static_cast<float>(all_protozoa_.size());
+	if (protozoa_count == 0)
+		return;
+
+	average_cells_per_protozoa_ = 0.f;
+	average_offspring_count_ = 0.f;
+	average_mutation_rate_ = 0.f;
+	average_mutation_range_ = 0.f;
+	for (Protozoa* protozoa : all_protozoa_)
+	{
+		average_cells_per_protozoa_ += protozoa->get_cells().size();
+		average_offspring_count_ += protozoa->offspring_count;
+		average_mutation_rate_ += protozoa->mutation_rate;
+		average_mutation_range_ += protozoa->mutation_range;
+	}
+
+	average_cells_per_protozoa_ /= protozoa_count;
+	average_offspring_count_ /= protozoa_count;
+	average_mutation_rate_ /= protozoa_count;
+	average_mutation_range_ /= protozoa_count;
+
+	if (iterations_ % survival_rate_window_size_ == 0)
+	{
+		deaths_per_hundered_frames_ = static_cast<float>(deaths_this_window_);
+		births_per_hundered_frames_ = static_cast<float>(births_this_window_);
+
+		// Reset window
+		deaths_this_window_ = 0;
+		births_this_window_ = 0;
+	}
+}
+

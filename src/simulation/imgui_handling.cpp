@@ -29,6 +29,20 @@ void Simulation::imgui_stats_panel()
     ImGui::Text("Frames:          %d", m_ticks_);
     ImGui::Text("Time Elapsed:    %.2fs", m_total_time_elapsed_);
 
+    ImGui::SeparatorText("World");
+    m_world_.frames_per_generation_ == -1
+        ? ImGui::Text("Frames per Gen: insufficient data")
+        : ImGui::Text("Frames per Gen: ", m_world_.frames_per_generation_);
+
+    ImGui::Text("Avg Cells per Proto: %.1f", m_world_.average_cells_per_protozoa_);
+    ImGui::Text("Avg Offspring: %.1f", m_world_.average_offspring_count_);
+    ImGui::Text("Avg Mut Rate: %.4f", m_world_.average_mutation_rate_);
+    ImGui::Text("Avg Mut Range: %.4f", m_world_.average_mutation_range_);
+
+    ImGui::Text("Avg Lifetime: %.2f", m_world_.average_lifetime_);
+    ImGui::Text("Births /100f: %.2f", m_world_.births_per_hundered_frames_);
+    ImGui::Text("Deaths /100f: %.2f", m_world_.deaths_per_hundered_frames_);
+
     ImGui::End();
 }
 
@@ -125,7 +139,7 @@ void Simulation::imgui_population_graph()
     ImGui::Text("Food: %d", m_world_.get_food_count());
     ImGui::SameLine(0, 20);
 
-    ImGui::Text("Avg Gen: %.2f", m_world_.get_average_generation());
+    ImGui::Text("Avg Gen: %.2f", m_world_.average_generation_);
     ImGui::SameLine(0, 20);
 
     ImGui::Text("Frames: %d", m_ticks_);

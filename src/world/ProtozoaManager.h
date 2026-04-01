@@ -15,15 +15,23 @@ protected:
 	// vector of cell pointers for easy access during collision detection and updates.
 	std::vector<Cell*> global_cell_vector_;
 
-	// statistics - To be displayed on the screen
-	float average_cells_per_protozoa_ = 0.f; 
-	float average_offspring_count_ = 0.f;
-	float average_mutation_rate_ = 0.f;
-	float average_mutation_range_ = 0.f;
+	
 
 
 	
 public:
+	float average_lifetime_ = 0.f; // the average lifetime of the 500 most recent protozoa deaths
+	float deaths_per_hundered_frames_ = 0.f; // the amount of protozoa that have died per hundred frames, used to track the death rate of the population
+	float births_per_hundered_frames_ = 0.f; // the amount of protozoa that have been born per hundred frames, used to track the birth rate of the population
+
+	std::vector<float> recent_lifetimes_ = {}; // a vector storing the lifetimes of the 500 most recent protozoa deaths, used to calculate average_lifetime_
+
+	static constexpr size_t max_lifetime_samples_ = 500;
+
+	int deaths_this_window_ = 0;
+	int births_this_window_ = 0;
+	static constexpr int survival_rate_window_size_ = 100;
+
 	ProtozoaManager() = default;
 
 
@@ -68,6 +76,7 @@ protected:
 
 			if (protozoa->dead)
 			{
+				register_death_stat(protozoa->frames_alive);
 				all_protozoa_.remove(protozoa);
 				continue; // causes indexing issues if the orgasanism is removed before we check for reproduction
 			}
@@ -116,6 +125,8 @@ protected:
 		float disp_x = Random::rand_range(-parent_bounds_x, parent_bounds_x);
 		float disp_y = Random::rand_range(-parent_bounds_y, parent_bounds_y);
 		offspring->move_center_location_to(parent->get_center() + sf::Vector2f{ disp_x, disp_y });
+
+		register_birth_stat();
 	}
 
 	void update_global_cell_vector()
@@ -143,5 +154,28 @@ protected:
 				protozoa->generate_random();
 			}
 		}
+	}
+
+	void register_death_stat(float lifetime)
+	{
+		// Track lifetime
+		recent_lifetimes_.push_back(lifetime);
+		if (recent_lifetimes_.size() > max_lifetime_samples_)
+			recent_lifetimes_.erase(recent_lifetimes_.begin());
+
+		// Update average lifetime
+		float sum = 0.f;
+		for (float l : recent_lifetimes_)
+			sum += l;
+
+		average_lifetime_ = recent_lifetimes_.empty() ? 0.f : sum / recent_lifetimes_.size();
+
+		// Track death rate
+		deaths_this_window_++;
+	}
+
+	void register_birth_stat()
+	{
+		births_this_window_++;
 	}
 };

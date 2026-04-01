@@ -44,7 +44,6 @@ class World : public ProtozoaManager
 	SFML_Grid cell_grid_renderer; // renders the cell spatial hash grid
 
 
-
 	// Tracking the number of iterations have passed in this world
 	int iterations_ = 0;
 
@@ -71,6 +70,23 @@ public:
 	float min_speed = 0;
 	float delta_min_speed = 0.0;
 
+	// statistics
+	float average_generation_ = 0.f; // The average generation of all protozoa
+
+	float frames_per_generation_ = -1.f; // The amount of frames it takes for a new generation to be born, negative values represent undefined
+	float tracked_generation_ = 0.f; // The generation we are currently tracking, used to calculate frames_per_generation_
+	float frames_since_last_gen_change = 0.f; // The time when the tracked generation was born, used to calculate frames_per_generation_
+
+	float average_cells_per_protozoa_ = 0.f;
+	float average_offspring_count_ = 0.f;
+	float average_mutation_rate_ = 0.f;
+	float average_mutation_range_ = 0.f;
+
+	
+	
+	
+	
+
 public:
 	World(sf::RenderWindow* window = nullptr);
 
@@ -92,6 +108,8 @@ private:
 	void update_nearby_container(int& neighbours_size, int32_t neighbour_index_x, int32_t neighbour_index_y, bool check_x, bool check_y);
 	
 	void update_position_container();
+	void update_statistics();
+
 	void update_spatial_grid();
 
 	// rendering functions
@@ -99,7 +117,5 @@ private:
 	
 	// initialization functions
 	void init_organisms();
-	static void init_food();
-	static void init_environment();
 
 };

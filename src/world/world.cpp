@@ -9,8 +9,6 @@ World::World(sf::RenderWindow* window)
 	thread_pool_(8)
 { 
 	init_organisms();
-	init_food();
-	init_environment();
 
 	global_cell_vector_.reserve(max_protozoa * GeneSettings::cell_amount_range.y);
 
@@ -102,16 +100,6 @@ void World::init_organisms()
 	}
 }
 
-
-void World::init_food()
-{
-
-}
-
-void World::init_environment()
-{
-
-}
 
 void World::check_if_mouse_is_hovering(const sf::Vector2f mouse_position, bool mouse_pressed) const
 {

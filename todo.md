@@ -65,14 +65,15 @@
 // each protozoa stores cell_positions_nearby and food positions for debugging, just have it once in the protozoa manager
 
 ImGUI Todo
-- add x and y axis indicators to Line graph
-- min speed and delta min speed are redundant
-- statistic for time per generation change
-- statistic for average amount of offspring
-- statistic for average lifetime
-- statistic for average mutation rate and mutation range
-- statistic for average number of cells per protozoa
-- make the buttons actuall buttons instead of checkboxes and add the keybind next to it, then remove it from the controls
+[Done] add x and y axis indicators to Line graph
+[Done] min speed and delta min speed are redundant
+[Done] statistic for time per generation change
+[Done] statistic for average amount of offspring
+[Done] statistic for average lifetime
+[Done] statistic for average mutation rate and mutation range
+[Done] statistic for average number of cells per protozoa
+[Done] make the buttons actuall buttons instead of checkboxes and add the keybind next to it, then remove it from the controls
+- Align the buttons better
 - pressing o when not paused should pause the sim
 
 Organism Statistic page popup
