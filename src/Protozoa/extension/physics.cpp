@@ -1,7 +1,6 @@
 #include "../Protozoa.h"
 #include "../../Utils/random.h"
 
-#include "../../Utils/Graphics/spatial_hash_grid.h"
 #include "../../food_manager.h"
 
 inline static constexpr  size_t cell_positions_container_reserve = 30;

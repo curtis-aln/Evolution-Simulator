@@ -5,43 +5,43 @@
 #include <unordered_set>
 
 
+void Protozoa::record_nearby_food(Food* food)
+{
+    food_positions_nearby.push_back(food->position);
+}
+
+void Protozoa::consume(Food* food, FoodManager& food_manager)
+{
+    food_manager.remove_food(food->id);
+    total_food_eaten++;
+    stomach++;
+    energy += 25;
+
+    const bool ready_to_reproduce = stomach >= m_cells_.size();
+    if (ready_to_reproduce)
+    {
+        stomach = 0;
+        reproduce = true;
+        offspring_count++;
+    }
+}
+
 void Protozoa::handle_food(FoodManager& food_manager, const bool debug)
 {
-	const sf::Vector2f center = get_center();
-	c_Vec<food_manager.spatial_hash_grid.max_nearby_capacity>& nearby =
-		food_manager.spatial_hash_grid.find(center);
+    const sf::Vector2f center = get_center();
+    FixedSpan<obj_idx, cell_capacity * 9> nearby = food_manager.spatial_hash_grid.find(center.x, center.y);
 
-    if (debug)
+    if (debug) food_positions_nearby.clear();
+
+    for (int32_t id : nearby)
     {
-        food_positions_nearby.clear();
+        Food* food = food_manager.at(id);
+
+        if (debug) record_nearby_food(food);
+
+        if (m_personal_bounds_.contains(food->position))
+            consume(food, food_manager);
     }
-
-	for (int i = 0; i < nearby.size; ++i)
-	{
-		Food* food_particle = food_manager.at(nearby.at(i));
-
-        if (debug)
-        {
-            food_positions_nearby.push_back(food_particle->position);
-        }
-
-		if (m_personal_bounds_.contains(food_particle->position)) // todo better collision handling
-		{
-			food_manager.remove_food(food_particle->id);
-
-            total_food_eaten++;
-            stomach++;
-            energy += 10;
-            
-            // The organism can only reproduce after eating its bodymass in food
-            if (stomach > m_cells_.size())
-            {
-                stomach = 0;
-                reproduce = true;
-                offspring_count++;
-            }
-		}
-	}
 }
 
 

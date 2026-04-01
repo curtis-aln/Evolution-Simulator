@@ -2,7 +2,6 @@
 #include <SFML/Graphics.hpp>
 #include "../settings.h"
 #include "../world/world.h"
-#include "../builder/builder.h"
 
 #include "../Utils/time.h"
 #include "../Utils/fps_manager.h"
@@ -41,7 +40,6 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 
 	FrameRateSmoothing<frame_smoothing> m_clock_{};
 	Camera camera_{&m_window_, 1.f};
-	Builder m_builder_{&m_window_, &title_font, &regular_font, &cell_statistic_font};
 
 	// managing time
 	StopWatch m_delta_time_{};

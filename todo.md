@@ -61,6 +61,7 @@
 // - you cant select protozoa without holding 
 // [DONE] statistics continue even when simulation is paused, should pause them aswell
 // [DONE] textbox showing stats and controls is messed up
+// each protozoa stores cell_positions_nearby and food positions for debugging, just have it once in the protozoa manager
 
 ImGUI Todo
 - add x and y axis indicators to Line graph

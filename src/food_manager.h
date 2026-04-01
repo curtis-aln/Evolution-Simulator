@@ -6,7 +6,7 @@
 #include "Utils/Graphics/Circle.h" // world boundary
 #include "Utils/random.h"
 #include "settings.h"
-#include "Utils/Graphics/spatial_hash_grid.h"
+#include "Utils/Graphics/simple_spatial_grid.h"
 #include "Utils/Graphics/SFML_Grid.h"
 
 
@@ -33,10 +33,9 @@ class FoodManager : FoodSettings
 public:
 	const float bounds_radius = world_bounds_->radius;
 	const sf::FloatRect world_rect_bounds = { {0, 0}, {bounds_radius * 2, bounds_radius * 2} };
-	SpatialHashGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_rect_bounds };
-	SFML_Grid food_grid_renderer; // renders the food spatial hash grid
 
-	const uint8_t max_nearby_capacity = spatial_hash_grid.max_nearby_capacity;
+	SimpleSpatialGrid<cells_x, cells_y> spatial_hash_grid{ world_rect_bounds };
+	SFML_Grid food_grid_renderer; // renders the food spatial hash grid
 
 	int frames = 0;
 
@@ -75,7 +74,7 @@ public:
 		spatial_hash_grid.clear();
 		for (Food* food : food_vector)
 		{
-			spatial_hash_grid.addAtom(food->position, food->id);
+			spatial_hash_grid.add_object(food->position.x, food->position.y, food->id);
 		}
 	}
 

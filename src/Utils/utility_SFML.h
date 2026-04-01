@@ -70,14 +70,6 @@ inline sf::Rect<float> resize_rect(const sf::Rect<float>& rect, const sf::Vector
 	);
 }
 
-template<typename T>
-sf::Vector2<T> get_rect_center(sf::Rect<T> rect)
-{
-	// SFML 3.x change: use getCenter() method
-	return rect.getCenter();
-}
-
-
 inline sf::Rect<float> convert_coordinates(const sf::Vector2f& v1, const sf::Vector2f& v2) {
 	const float x = std::min(v1.x, v2.x);
 	const float y = std::min(v1.y, v2.y);
@@ -209,7 +201,7 @@ inline void draw_direction(sf::RenderWindow& window, const sf::Vector2f& positio
 	const float thickness, const float arrow_size, const sf::Color& fill_color, const sf::Color& outline_color)
 {
 	// Calculate end position based on velocity and length
-	const sf::Vector2f end_pos = position + length * normalize(velocity);
+	const sf::Vector2f end_pos = position + length * velocity.normalized();
 
 	// Draw the arrow
 	draw_arrow(window, position, end_pos, thickness, arrow_size, fill_color, outline_color);
@@ -245,13 +237,6 @@ inline sf::Color interpolate_colors(const sf::Color& color_a, const sf::Color& c
 	 
 	// Return the interpolated color
 	return {r, g, b};
-}
-
-
-template<typename T>
-sf::Vector2<T> get_midpoint(const sf::Vector2<T> vec1, const sf::Vector2<T> vec2)
-{
-	return { (vec1.x + vec2.x) / 2, (vec1.y + vec2.y) / 2 };
 }
 
 

@@ -34,7 +34,7 @@ struct Spring
 		const sf::Vector2f vel_a = cell_a.velocity_;
 		const sf::Vector2f vel_b = cell_b.velocity_;
 
-		const float dist = length(pos_b - pos_a);
+		const float dist = (pos_b - pos_a).length();
 		spring_length = dist;
 
 		// finding the rest length of the spring
@@ -47,7 +47,7 @@ struct Spring
 		// Calculating the damping force
 		const sf::Vector2f normalised_dir = ((pos_b - pos_a) / dist);
 		const sf::Vector2f vel_difference = (vel_b - vel_a);
-		const float damping_force = dot(normalised_dir, vel_difference) * gene->damping;
+		const float damping_force = normalised_dir.dot(vel_difference) * gene->damping;
 
 		// Calculating total force (sum of the two forces)
 		const float total_force = spring_force + damping_force;

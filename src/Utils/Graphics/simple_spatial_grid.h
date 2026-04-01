@@ -24,6 +24,23 @@ using obj_idx = uint32_t;
 static constexpr uint8_t cell_capacity = 25;
 
 
+// A non-owning view over a fixed contiguous buffer.
+// Zero allocation, zero overhead — drop-in replacement for c_Vec query results.
+template<typename T, uint8_t Capacity>
+struct FixedSpan
+{
+	T      data[Capacity];
+	uint8_t size = 0;
+
+	void     add(T val) { if (size < Capacity) data[size++] = val; }
+	T        operator[](uint8_t i)  const { return data[i]; }
+	T* begin() { return data; }
+	T* end() { return data + size; }
+	const T* begin()                 const { return data; }
+	const T* end()                   const { return data + size; }
+	void     clear() { size = 0; }
+};
+
 
 template<size_t CellsX, size_t CellsY>
 struct SimpleSpatialGrid
@@ -95,6 +112,31 @@ public:
 				window.draw(text);
 			}
 		}
+	}
+
+	FixedSpan<obj_idx, cell_capacity * 9> find(const float x, const float y)
+	{
+		FixedSpan<obj_idx, cell_capacity * 9> result{};
+
+		const auto cell_x = static_cast<int>(x / m_cellSize.x);
+		const auto cell_y = static_cast<int>(y / m_cellSize.y);
+
+		for (int nx = cell_x - 1; nx <= cell_x + 1; ++nx)
+		{
+			for (int ny = cell_y - 1; ny <= cell_y + 1; ++ny)
+			{
+				if (nx < 0 || ny < 0 || nx >= static_cast<int>(CellsX) || ny >= static_cast<int>(CellsY))
+					continue;
+
+				const cell_idx index = ny * CellsX + nx;
+				const uint8_t  count = objects_count[index];
+
+				for (uint8_t i = 0; i < count; ++i)
+					result.add(grid[index][i]);
+			}
+		}
+
+		return result;
 	}
 
 private:

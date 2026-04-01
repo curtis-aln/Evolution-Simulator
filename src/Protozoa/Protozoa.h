@@ -15,6 +15,8 @@
 
 inline static constexpr float initial_energy = 300.f; // energy the protozoa spawn with
 
+
+
 // The Genome class handles anything that has to do with mutation and genetics
 class Protozoa : ProtozoaSettings, public Genome
 {
@@ -43,10 +45,6 @@ public:
 	float energy = initial_energy;
 	unsigned frames_alive = 0u;
 
-	// When in debugging mode, you can pull at cells inside this protozoa | storing the location of it in memory 
-	// -1 means none selected
-	int selected_cell_id = -1;
-
 	using Protozoa_Vector = o_vector<Protozoa, WorldSettings::max_protozoa>;
 
 	int id = 0;
@@ -60,6 +58,9 @@ public:
 
 	void update(FoodManager& food_manager, bool debug, float min_speed);
 	void handle_food(FoodManager& food_manager, bool debug);
+	void record_nearby_food(Food* food);
+	void consume(Food* food, FoodManager& food_manager);
+
 	void mutate();
 	void add_cell();
 	void remove_spring();
@@ -76,7 +77,6 @@ public:
 	bool check_press(sf::Vector2f mouse_position);
 	void deselect_cell();
 	static void make_connection(int cell1_id, int cell2_id);
-	static void builder_add_cell(sf::Vector2f center);
 	void move_selected_cell(sf::Vector2f mouse_position);
 
 	// information fetching

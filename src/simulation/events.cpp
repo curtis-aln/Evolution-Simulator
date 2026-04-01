@@ -4,7 +4,7 @@
 
 bool Simulation::try_select_protozoa(const sf::Vector2f& cam_pos)
 {
-	return m_world_.handle_mouse_click(cam_pos) || m_builder_.check_mouse_input();
+	return m_world_.handle_mouse_click(cam_pos);
 }
 
 void Simulation::handle_mouse_press(const sf::Vector2f& cam_pos)
@@ -21,7 +21,6 @@ void Simulation::handle_mouse_press(const sf::Vector2f& cam_pos)
 void Simulation::handle_mouse_release()
 {
 	m_world_.deselect_protozoa();
-	m_builder_.de_select_protozoa();
 	mouse_pressed_event = false;
 	camera_.end_pan();
 }

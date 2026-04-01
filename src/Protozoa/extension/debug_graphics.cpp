@@ -107,7 +107,7 @@ void Protozoa::draw_cell_physics(Font* font) const
         render_cell_connections(const_cast<Cell&>(cell));
 
         // drawing the direction of the cell
-        const float arrow_length = std::min(rad * 4, length(cell.velocity_) * rad);
+        const float arrow_length = std::min(rad * 4, cell.velocity_.length() * rad);
         draw_direction(*m_window_, pos, cell.velocity_, arrow_length, 6, 10,
             { 200, 220, 200 }, { 190, 200, 190 });
 
@@ -149,7 +149,7 @@ void Protozoa::draw_protozoa_information(Font* font)
 	font->draw(start_pos, combined_string, false);
 
 	// top statistics
-	const float speed = length(velocity);
+	const float speed = velocity.length();
 
 	start_pos = { m_personal_bounds_.position.x, m_personal_bounds_.position.y - 70 };
 	const std::string text = "position: " + vector_to_string(get_center(), 1)
@@ -166,9 +166,9 @@ void Protozoa::draw_spring_information(Font* font) const
         const sf::Vector2f& cell_A_pos = m_cells_[spring.cell_A_id].position_;
         const sf::Vector2f& cell_B_pos = m_cells_[spring.cell_B_id].position_;
 
-        const sf::Vector2f mid_point      = get_midpoint(cell_A_pos, cell_B_pos);
-        const sf::Vector2f upper_quartile = get_midpoint(mid_point, cell_B_pos);
-        const sf::Vector2f lower_quartile = get_midpoint(cell_A_pos, mid_point);
+		const sf::Vector2f mid_point = (cell_A_pos + cell_B_pos) * 0.5f;
+		const sf::Vector2f upper_quartile = (mid_point + cell_B_pos) * 0.5f;
+		const sf::Vector2f lower_quartile = (cell_A_pos + mid_point) * 0.5f;
 		const sf::Vector2f interquartile_range = upper_quartile - lower_quartile;
 
         const sf::Vector2f& f1 = spring.direction_A_force;
@@ -192,13 +192,6 @@ void Protozoa::draw_spring_information(Font* font) const
 		font->draw(upper_quartile - interquartile_range/2.f, broken.str(), true);
     }
 }
-
-
-void Protozoa::builder_add_cell(const sf::Vector2f center)
-{
-    // TODO: Implement cell addition in builder mode (currently not implemented)
-}
-
 
 void Protozoa::move_selected_cell(const sf::Vector2f mouse_position)
 {

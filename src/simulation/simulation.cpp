@@ -87,8 +87,6 @@ void Simulation::update_one_frame()
 		m_world_.move_cell_in_selected_protozoa(mouse_pos);
 		camera_follow_selected_protozoa();
 	}
-
-	m_builder_.update(mouse_pos);
 }
 
 
@@ -135,11 +133,6 @@ void Simulation::update_line_graphs()
 void Simulation::draw_everything()
 {
 	m_world_.render(&cell_statistic_font);
-	
-	if (!m_world_.simple_mode)
-	{
-		m_builder_.render();
-	}
 }
 
 
