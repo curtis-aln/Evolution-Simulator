@@ -117,6 +117,7 @@ protected:
 		offspring->set_protozoa_attributes(parent);
 		offspring->generation += 1;
 		offspring->mutate();
+		offspring->birth_location = parent->get_center();
 
 		// we offset the offspring's position slightly from the parent as if it spawns directly in its parent
 		// it can cause a sudden push on eachovers cells which could result in spring breaking and cell death

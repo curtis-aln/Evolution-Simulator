@@ -129,7 +129,13 @@ void Simulation::render()
 		m_world_.render(&cell_statistic_font);
 	}
 
-	ImGui::SFML::Render(m_window_);
+	if (!hide_panels)
+		ImGui::SFML::Render(m_window_);
+	else
+	{
+		// prevent imgui from crashing
+		ImGui::EndFrame();
+	}
 
 	m_window_.display();
 }

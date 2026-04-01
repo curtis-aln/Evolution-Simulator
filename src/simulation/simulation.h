@@ -50,6 +50,7 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 
 	// user controlled variables
 	bool m_rendering_ = true;
+	bool hide_panels = false;
 
 	bool m_tick_frame = false;
 	bool m_tick_frame_time = false;

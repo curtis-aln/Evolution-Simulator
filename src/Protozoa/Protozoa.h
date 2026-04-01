@@ -39,6 +39,8 @@ public:
 	unsigned total_food_eaten = 0;
 	
 	// debugging
+	sf::Vector2f birth_location = { 0, 0 };
+
 	std::vector<sf::Vector2f> food_positions_nearby{};
 	std::vector<sf::Vector2f> cell_positions_nearby{};
 

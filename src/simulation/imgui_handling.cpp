@@ -128,21 +128,21 @@ void Simulation::imgui_tuning_panel()
     ImGui::Checkbox("Paused", &m_world_.paused);
     ImGui::SameLine(); ImGui::TextDisabled("[Space]");
 
+    ImGui::Checkbox("Collisions", &m_world_.toggle_collisions);
+    ImGui::SameLine(); ImGui::TextDisabled("[C]");
+
     ImGui::Checkbox("Debug", &m_world_.debug_mode);
     ImGui::SameLine(); ImGui::TextDisabled("[D]");
 
-    ImGui::Checkbox("Simple", &m_world_.simple_mode);
-    ImGui::SameLine(); ImGui::TextDisabled("[S]");
-
-    if (m_world_.paused)
+   
+    if (ImGui::Button("Step"))
     {
-        if (ImGui::Button("Step"))
-        {
-            // step logic
-        }
-        ImGui::SameLine();
-        ImGui::TextDisabled("[O]");
+        m_tick_frame_time = true;
+        m_world_.paused = true;
     }
+    ImGui::SameLine();
+    ImGui::TextDisabled("[O]");
+   
 
     ImGui::EndChild();
 
@@ -159,11 +159,14 @@ void Simulation::imgui_tuning_panel()
     ImGui::Checkbox("Food Grid", &m_world_.draw_food_grid);
     ImGui::SameLine(); ImGui::TextDisabled("[F]");
 
-    ImGui::Checkbox("Collisions", &m_world_.toggle_collisions);
-    ImGui::SameLine(); ImGui::TextDisabled("[C]");
+    ImGui::Checkbox("Simple", &m_world_.simple_mode);
+    ImGui::SameLine(); ImGui::TextDisabled("[S]");
 
     ImGui::Checkbox("Track Stats", &m_world_.track_statistics);
     ImGui::SameLine(); ImGui::TextDisabled("[T]");
+
+    ImGui::Checkbox("Hide Panels", &hide_panels);
+    ImGui::SameLine(); ImGui::TextDisabled("[Q]");
 
     ImGui::EndChild();
 
@@ -241,7 +244,7 @@ void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_proto
     ImGui::Begin("Debug Inspector");
 
     float full_width = ImGui::GetContentRegionAvail().x;
-    float column_width = full_width * 0.5f;
+    float column_width = full_width * 0.4f;
 
     // ------------------ CELL ------------------
     if (selected_cell)
@@ -286,6 +289,13 @@ void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_proto
 
         ImGui::Text("Energy: %.2f", selected_protozoa->energy);
         ImGui::Text("Food: %.2f", selected_protozoa->total_food_eaten);
+        ImGui::TextDisabled("Display");
+
+        ImGui::Checkbox("Skeleton", &m_world_.skeleton_mode);
+        ImGui::SameLine(); ImGui::TextDisabled("[K]");
+
+        ImGui::Checkbox("Bounds", &m_world_.show_bounding_boxes);
+        ImGui::SameLine(); ImGui::TextDisabled("[B]");
 
         ImGui::EndChild();
 
@@ -307,21 +317,24 @@ void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_proto
             selected_protozoa->get_center().x,
             selected_protozoa->get_center().y);
 
+        const auto& bounds = selected_protozoa->m_personal_bounds_;
+        ImGui::Text("Bounds: (%.0f, %.0f)",
+            bounds.size.x, bounds.size.y);
+        ImGui::Text("Area: %.0f", bounds.size.x * bounds.size.y);
+
         ImGui::Text("Velocity: (%.2f, %.2f)",
             selected_protozoa->velocity.x,
             selected_protozoa->velocity.y);
 
-        ImGui::Text("Speed: %.2f", selected_protozoa->velocity.length());
+        ImGui::Text("Speed: %.1f", selected_protozoa->velocity.length());
+
+        const sf::Vector2f pos = selected_protozoa->get_center();
+        const float dist_to_birth_loc = std::sqrt(std::pow(pos.x - selected_protozoa->birth_location.x, 2) +
+			std::pow(pos.y - selected_protozoa->birth_location.y, 2));
+
+		ImGui::Text("Dist to Birth Loc: %.0f", dist_to_birth_loc);
 
         ImGui::Spacing();
-
-        ImGui::TextDisabled("Display");
-
-        ImGui::Checkbox("Skeleton", &m_world_.skeleton_mode);
-        ImGui::SameLine(); ImGui::TextDisabled("[K]");
-
-        ImGui::Checkbox("Bounds", &m_world_.show_bounding_boxes);
-        ImGui::SameLine(); ImGui::TextDisabled("[B]");
 
         ImGui::EndChild();
     }
