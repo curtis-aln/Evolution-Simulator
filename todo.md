@@ -87,7 +87,7 @@ additionally
 		- add all settings to a json file and have the program read from it on starrtup, then add a "save settings" button to write the current settings back to the file. 
 This allows for easy tweaking without recompiling, and sharing of settings between users.
 - add protozoa and food population counts to the statistics graph instead 
-- paused statistic on the main bit is redundant
+[Done] paused statistic on the main bit is redundant
 - add the ability to change the worldsize in real time, regardless of if the spatial hash grid can change with it yet
 - add the ability to pinch, pin, and throw organisms around 
 - add a zoom slider for users who are using a trackpad
