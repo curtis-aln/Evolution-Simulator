@@ -112,7 +112,7 @@ void Simulation::imgui_population_graph()
     constexpr ImVec2 panel_pos = { 10.f, 800.f };
     constexpr ImVec2 panel_size = { 350.f, 160.f };
     constexpr ImVec2 plot_size = { -1.f, -1.f };   // fill available space
-    constexpr float  scroll_window = 560.f;            // seconds of history shown
+    constexpr float  scroll_window = 60.f;            // seconds of history shown
 
     const float x_min = m_total_time_elapsed_ - scroll_window;
     const float x_max = m_total_time_elapsed_;

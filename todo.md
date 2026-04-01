@@ -60,10 +60,56 @@
 // [DONE] translating the screen should have accelaration & de-accelaration instead of being instant
 // - you cant select protozoa without holding 
 // [DONE] statistics continue even when simulation is paused, should pause them aswell
-// - textbox showing stats and controls is messed up
+// [DONE] textbox showing stats and controls is messed up
 
 ImGUI Todo
-- Add all the main statistics tracking to ImGUI
-- Add all of the controls to ImGUI
-- Make it so that if you are moving the gui the screen remains static
-- Add buttons to imgui
+- add x and y axis indicators to Line graph
+- min speed and delta min speed are redundant
+- statistic for time per generation change
+- statistic for average amount of offspring
+- statistic for average lifetime
+- statistic for average mutation rate and mutation range
+- statistic for average number of cells per protozoa
+- make the buttons actuall buttons instead of checkboxes and add the keybind next to it, then remove it from the controls
+- pressing o when not paused should pause the sim
+
+Organism Statistic page popup
+When you click on an organism a statistics page should show up showing all the information about that organism
+additionally
+- the x and y space it takes up plus its square area
+- distance to its birth location
+- Move the debug control settings and buttons into this mini popup menu
+- scroll wheel press should be used for translating the screen
+- Ability to hide IMGUI screens completely with a keybind (for screenshots)
+- Reset Simulation Button with controls for world size, initial protozoa count, food spawn rate, and mutation rate/range
+		- add all settings to a json file and have the program read from it on starrtup, then add a "save settings" button to write the current settings back to the file. 
+This allows for easy tweaking without recompiling, and sharing of settings between users.
+- add protozoa and food population counts to the statistics graph instead 
+- paused statistic on the main bit is redundant
+- add the ability to change the worldsize in real time, regardless of if the spatial hash grid can change with it yet
+- add the ability to pinch, pin, and throw organisms around 
+- add a zoom slider for users who are using a trackpad
+- add a "Navigate to most sucessfull organism" button which locks on to the organism which has reporoduced the most
+- add the ability to save organisms to file
+- add the ability to spawn a saved organism
+- add the ability to fill the world with a saved organism (with mutations optional)
+- Add a "total" for the protozoa, food line graph
+- Add a layered background like you saw in that video
+- Add ambient music with mild bubble sound effects
+- Add black holes which can pull in protozoa and food, but not kill them, just make them orbit until they get pulled out by another protozoa or food item
+  can be modified by the user. if the gravitational pull is negative it becomes a white hole which pushes things away instead of pulling them in
+- Worlds should be able to be saved and loaded
+- Add radiation zones which mutates an organism based on their proximity to the center of the zone, the closer they are the higher the mutation rate and range, but also the higher the energy cost for existing in that zone
+- Organism tagging, ability to tag an organism and it will be outlined and visible, will show up on the tagged organisms screen
+- Add tabs for these IMgui screens because i imagine there will be a lot of them eventually and it will get cluttered, so maybe have one for statistics, one for controls, one for the tagged organisms, etc.
+- Time-lapse / fast-forward mode — run simulation at 10x-100x with minimal rendering for long-run experiments
+- Ability to make organisms immortal
+- Ability to force organism to reproduce or die
+- Force feed: manually inject energy into a selected organism, useful for keeping a favourite alive during experiments
+- Genome editor: directly tweak a selected organism's trait values via sliders, bypassing mutation. Great for controlled experiments
+- Clone: duplicate an organism exactly, spawn the copy nearby
+- Death notifications: optional toast notification when a tagged organism dies, with cause of death (starvation, age, etc.)
+
+- and then last but not least, figure out how to put rendering and updating on seperate threads, then you can publish a video
+
+Update Name: Playing God
