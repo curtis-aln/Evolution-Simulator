@@ -18,7 +18,7 @@
 #include <implot.h>
 
 
-class Simulation : SimulationSettings, UI_Settings, TextSettings
+class Simulation : SimulationSettings, TextSettings
 {
 	// Get the desktop resolution but shrinks it by 80%
 	static sf::VideoMode getAdjustedVideoMode()
@@ -51,6 +51,7 @@ class Simulation : SimulationSettings, UI_Settings, TextSettings
 	// user controlled variables
 	bool m_rendering_ = true;
 	bool hide_panels = false;
+	bool open_extinction_window = false;
 
 	bool m_tick_frame = false;
 	bool m_tick_frame_time = false;
@@ -91,8 +92,8 @@ private:
 	void imgui_population_graph();
 
 	// rendering
-	void draw_everything();
 	void handle_imGUI();
+	void extinction_popup();
 	void render();
 	void manage_frame_rate();
 

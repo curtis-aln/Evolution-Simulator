@@ -79,10 +79,12 @@ ImGUI Todo
 [Done] the x and y space it takes up plus its square area
 [Done] distance to its birth location
 [Done] Move the debug control settings and buttons into this mini popup menu
-- Ability to hide IMGUI screens completely with a keybind (for screenshots)
+[Done] Ability to hide IMGUI screens completely with a keybind (for screenshots)
 - Reset Simulation Button with controls for world size, initial protozoa count, food spawn rate, and mutation rate/range
 		- add all settings to a json file and have the program read from it on starrtup, then add a "save settings" button to write the current settings back to the file. 
 This allows for easy tweaking without recompiling, and sharing of settings between users.
+
+- Simulation should start more zoomed out
 - add protozoa and food population counts to the statistics graph instead 
 [Done] paused statistic on the main bit is redundant
 - add the ability to change the worldsize in real time, regardless of if the spatial hash grid can change with it yet
@@ -107,8 +109,12 @@ This allows for easy tweaking without recompiling, and sharing of settings betwe
 - Force feed: manually inject energy into a selected organism, useful for keeping a favourite alive during experiments
 - Genome editor: directly tweak a selected organism's trait values via sliders, bypassing mutation. Great for controlled experiments
 - Clone: duplicate an organism exactly, spawn the copy nearby
-- Death notifications: optional toast notification when a tagged organism dies, with cause of death (starvation, age, etc.)
-
+- Death notifications: optional toast notification when a tagged organism dies, with cause of death (starvation, age, etc.
+- statistic showing total alive entities
 - and then last but not least, figure out how to put rendering and updating on seperate threads, then you can publish a video
+- create a cell body class
+- spatial hash grid should dynamically change density as the population changes, and should be able to change size too
+- when a new cell is created it should have very low friction and generally not affect the organism too much, test this
+- add infant mortality stat
 
 Update Name: Playing God

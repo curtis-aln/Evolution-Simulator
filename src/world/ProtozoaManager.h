@@ -1,7 +1,6 @@
 #pragma once
 #include "../Protozoa/Protozoa.h"
 
-
 // A Class which handles all protozoa related stuff in the world. updating, collisions, reproduction, etc.
 class ProtozoaManager : protected WorldSettings
 {
@@ -47,7 +46,7 @@ public:
 		float sum = 0.f;
 		for (Protozoa* protozoa : all_protozoa_)
 		{
-			sum += protozoa->generation;
+			//sum += protozoa->generation; // todo
 		}
 		return sum / all_protozoa_.size();
 	}
@@ -61,8 +60,40 @@ public:
 		}
 	}
 
+	inline static constexpr int max_evolutionary_iterations = 5;
+	inline static constexpr int desired_cell_count = 4;
+
+
 
 protected:
+	inline void generate_protozoa(Protozoa& protozoa, Circle& world_bounds)
+	{
+		if (protozoa.get_cells().size() > 0)
+		{
+			std::cout << "[WARNING]: Protozoa already has cells, generation process may produce unexpected results.\n";
+		}
+
+		protozoa.m_cells_.emplace_back(0, world_bounds.rand_pos());
+
+
+		for (int i = 0; i < max_evolutionary_iterations; ++i)
+		{
+			protozoa.mutate(true, 0.2f, 0.03f);
+
+			// as soon as we reach the criteria passing the desired cell count, the chance of breaking out the loop increases 
+			// gradually until max evolutionary iterations
+			const size_t cell_count = protozoa.get_cells().size();
+			if (cell_count < desired_cell_count)
+				continue;
+			
+			float break_chance = float(cell_count - desired_cell_count) / float(max_evolutionary_iterations - desired_cell_count);
+			if (Random::rand01_float() < break_chance)
+				break;
+		}
+
+		protozoa.bound_cells();
+	}
+
 	void update_all_protozoa(FoodManager& food_manager_, bool debug_mode, float min_speed, bool track_statistics)
 	{
 		std::vector<int> reproduce_indexes{};
@@ -115,7 +146,7 @@ protected:
 		// first we assign the genetic aspects of the offspring to match that of the parents, then reconstruct it
 		offspring->reset_protozoa();
 		offspring->set_protozoa_attributes(parent);
-		offspring->generation += 1;
+		// offspring->generation += 1; // todo
 		offspring->mutate();
 		offspring->birth_location = parent->get_center();
 
@@ -149,8 +180,8 @@ protected:
 		{
 			for (int i = 0; i < initial_protozoa; ++i)
 			{
-				Protozoa* protozoa = all_protozoa_.add();
-				protozoa->generate_random();
+				//Protozoa* protozoa = all_protozoa_.add();
+				//protozoa->generate_random(); // todo
 			}
 		}
 	}

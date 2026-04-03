@@ -76,7 +76,7 @@ void World::update_protozoa_cell(const int protozoa_cell_index, const int neighb
 		Cell* other_cell = global_cell_vector_[nearby_ids[i]];
 		const sf::Vector2f other_pos = other_cell->position_;
 
-		const float dist_sq = dist_squared(cell->position_, other_pos);
+		const float dist_sq = (cell->position_ - other_pos).lengthSquared();
 		const float local_diam = cell->radius * 2.f;
 
 		if (dist_sq > local_diam * local_diam)
@@ -131,7 +131,7 @@ void World::update_nearby_container(int& neighbours_size,
 	{
 		if (neighbours_size >= nearby_ids.size())
 		{
-			std::cout << "[WARNING]: Nearby IDs buffer overflow, increase its size to avoid data loss.\n";
+			std::cout << "[WARNING]: Nearby IDs buffer overflow, increase its size to avoid data loss. (world_updating.cpp update_nearby_container())\n";
 			break;
 		}
 
@@ -164,8 +164,8 @@ void World::update_position_container()
 	{
 		for (Cell& cell : protozoa->get_cells())
 		{
-			outer_color_data_.push_back(protozoa->cell_outer_color);
-			inner_color_data_.push_back(protozoa->cell_inner_color);
+			outer_color_data_.push_back(cell.cell_outer_color);
+			inner_color_data_.push_back(cell.cell_inner_color);
 			position_data_.push_back(cell.position_);
 		}
 	}
@@ -194,12 +194,13 @@ void World::update_statistics()
 	average_offspring_count_ = 0.f;
 	average_mutation_rate_ = 0.f;
 	average_mutation_range_ = 0.f;
+	return;
 	for (Protozoa* protozoa : all_protozoa_)
 	{
-		average_cells_per_protozoa_ += protozoa->get_cells().size();
-		average_offspring_count_ += protozoa->offspring_count;
-		average_mutation_rate_ += protozoa->mutation_rate;
-		average_mutation_range_ += protozoa->mutation_range;
+		//average_cells_per_protozoa_ += protozoa->get_cells().size();
+		//average_offspring_count_ += protozoa->offspring_count;
+		//average_mutation_rate_ += protozoa->mutation_rate;
+		//average_mutation_range_ += protozoa->mutation_range; // todo
 	}
 
 	average_cells_per_protozoa_ /= protozoa_count;

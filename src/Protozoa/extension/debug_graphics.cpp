@@ -2,7 +2,6 @@
 #include "../../settings.h"
 #include "../../Utils/utility.h"
 
-
 void Protozoa::render_protozoa_springs()
 {
 	for (Cell& cell : m_cells_)
@@ -27,7 +26,6 @@ void Protozoa::render_debug(Font* font, const bool skeleton_mode, const bool sho
 	}
 
 	draw_cell_physics(font);
-	draw_protozoa_information(font);
 	draw_spring_information(font);
 
 	if (show_connections)
@@ -36,14 +34,14 @@ void Protozoa::render_debug(Font* font, const bool skeleton_mode, const bool sho
 	}
 }
 
-void Protozoa::draw_cell_outlines() const
+void Protozoa::draw_cell_outlines()
 {
     sf::CircleShape circle_outline;
     circle_outline.setPointCount(30); // Reduce aliasing, set once
-    for (const Cell& cell : m_cells_)
+    for (Cell& cell : m_cells_)
     {
         const sf::Vector2f pos = cell.position_;
-        const float rad = cell.radius + CellSettings::cell_outline_thickness;
+        const float rad = cell.radius + GraphicalSettings::cell_outline_thickness;
 
         circle_outline.setRadius(rad);
         circle_outline.setFillColor({ 0, 0, 0 });
@@ -82,8 +80,8 @@ void Protozoa::render_cell_connections(Cell& cell, const bool thick_lines) const
 
         if (thick_lines)
         {
-            draw_thick_line(*m_window_, pos1, pos2, spring_thickness,
-                spring_outline_thickness, spring_outer_color, spring_inner_color);
+            draw_thick_line(*m_window_, pos1, pos2, GraphicalSettings::spring_thickness,
+				GraphicalSettings::spring_outline_thickness, {255, 255, 255}, { 255, 255, 255 }); // todo
         }
         else
         {
@@ -93,10 +91,10 @@ void Protozoa::render_cell_connections(Cell& cell, const bool thick_lines) const
 }
 
 
-void Protozoa::draw_cell_physics(Font* font) const
+void Protozoa::draw_cell_physics(Font* font)
 {
 	// for each cell we draw its bounding box
-    for (const Cell& cell : m_cells_)
+    for (Cell& cell : m_cells_)
     {
         const sf::Vector2f& pos = cell.position_;
         const float rad = cell.radius;
@@ -123,39 +121,6 @@ void Protozoa::draw_cell_physics(Font* font) const
 }
 
 
-void Protozoa::draw_protozoa_information(Font* font)
-{
-	// protozoa information under the bounding box
-	sf::Vector2f start_pos = { m_personal_bounds_.position.x, m_personal_bounds_.position.y + m_personal_bounds_.size.y + 10 };
-
-	const std::string combined_string =
-		// Row 1
-		"id: " + std::to_string(id) +
-		"    generation: " + std::to_string(generation) +
-		"    age: " + std::to_string(frames_alive) + "\n" +
-
-		// Row 2
-		"cells: " + std::to_string(m_cells_.size()) +
-		"    springs: " + std::to_string(m_springs_.size()) +
-		"    offspring: " + std::to_string(offspring_count) + "\n" +
-
-		// Row 3
-		"energy: " + denary_to_str(energy, 1) +
-		"    food eaten: " + denary_to_str(total_food_eaten, 1) +
-		"    Mut range/rate: " +
-		denary_to_str(mutation_range, 3) + "/" + denary_to_str(mutation_rate, 3);
-
-
-	font->draw(start_pos, combined_string, false);
-
-	// top statistics
-	const float speed = velocity.length();
-
-	start_pos = { m_personal_bounds_.position.x, m_personal_bounds_.position.y - 70 };
-	const std::string text = "position: " + vector_to_string(get_center(), 1)
-		+ "\nvelocity: " + vector_to_string(velocity, 1) + "\nspeed: " + denary_to_str(speed, 1);
-	font->draw(start_pos, text, false);
-}
 
 
 void Protozoa::draw_spring_information(Font* font) const
@@ -208,7 +173,7 @@ bool Protozoa::is_hovered_on(const sf::Vector2f mousePosition, const bool tolera
     if (tolerance_check)
     {
         // When the mouse hovers over a protozoa, add extra to its boundary to make it easier to click
-        constexpr float bounds_tolerance = CellSettings::cell_radius * 3.f;
+        constexpr float bounds_tolerance = 30.f;
         sf::FloatRect resized_rect = resize_rect(m_personal_bounds_, { -bounds_tolerance , -bounds_tolerance });
         return resized_rect.contains(mousePosition);
     }
@@ -228,7 +193,7 @@ Cell* Protozoa::get_selected_cell(const sf::Vector2f mouse_pos)
 	
 	for (Cell& cell : m_cells_)
 	{
-		const float dist_sq = dist_squared(cell.position_, mouse_pos);
+		const float dist_sq = (cell.position_ - mouse_pos).lengthSquared();
 		const float rad = cell.radius;
 		if (dist_sq < rad * rad)
 		{

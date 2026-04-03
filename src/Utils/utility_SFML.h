@@ -53,12 +53,6 @@ inline sf::Vector2u clip_to_grid(const sf::Vector2u position, const sf::Vector2u
 }
 
 
-inline float dist_squared(const sf::Vector2f position_a, const sf::Vector2f position_b)
-{
-	const sf::Vector2f delta = position_b - position_a;
-	return delta.x * delta.x + delta.y * delta.y;
-}
-
 inline sf::Rect<float> resize_rect(const sf::Rect<float>& rect, const sf::Vector2f resize)
 {
 	// SFML 3.x change: use getPosition() and getSize()
@@ -150,7 +144,7 @@ inline void draw_thick_line(sf::RenderWindow& window, const sf::Vector2f& point1
 	const float thickness = {}, const float outline_thickness = {}, const sf::Color& fill_color = {}, const sf::Color& outline_color = {})
 {
 	// Calculate the length and angle of the line
-	const float length = std::sqrt(dist_squared(point1, point2));
+	const float length = std::sqrt((point1 - point2).lengthSquared());
 	const float angle = std::atan2(point2.y - point1.y, point2.x - point1.x) * 180 / pi;
 
 	// Create the rectangle shape

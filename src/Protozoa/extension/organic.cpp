@@ -1,5 +1,6 @@
 #include "../Protozoa.h"
 #include "../../food_manager.h"
+#include "../genetics/CellGenome.h"
 
 #include <vector>
 #include <unordered_set>
@@ -45,38 +46,93 @@ void Protozoa::handle_food(FoodManager& food_manager, const bool debug)
 }
 
 
-void Protozoa::mutate()
+void Protozoa::mutate(const bool artificial_add_cell, const float artificial_mutatation_rate, const float artificial_mutatation_range)
 {
 	// First we mutate the genome, which will update the gene values for each cell and spring, as well as the colors and mutation settings
-	mutate_genome();
+    mutate_existing_cells(artificial_mutatation_rate, artificial_mutatation_range);
+    mutate_existing_springs(artificial_mutatation_rate, artificial_mutatation_range);
 
 	// Check if we should add or remove a cell based on the genome's mutation logic
-    auto [add_cell_prob, remove_cell_prob] = get_add_remove_cell_signals();
+	const bool add_cell_ = Random::rand01_float() < CellGenome::add_cell_chance;
+    const bool remove_cell = Random::rand01_float() < CellGenome::remove_cell_chance;
 
-    if (add_cell_prob)   add_cell();
-    if (remove_cell_prob) remove_spring();
+	if (add_cell_ || artificial_add_cell) 
+        add_cell();
+
+    if (remove_cell)
+        remove_spring();
+}
+
+void Protozoa::mutate_existing_cells(float mut_rate, float mut_range)
+{
+    auto chance = [](float rate) { return Random::rand01_float() < rate; };
+    auto rand_sym = [](float range) { return Random::rand_range(-range, range); };
+
+    for (Cell& cell : m_cells_)
+    {
+        // if the defualt mr is zero we set it t othe cells mr
+        mut_rate = (mut_rate == 0.f) ? cell.mutation_rate : mut_rate;
+        mut_range = (mut_range == 0.f) ? cell.mutation_range : mut_range;
+
+        cell.amplitude += rand_sym(mut_range) * chance(mut_rate);
+        cell.frequency += rand_sym(mut_range) * chance(mut_rate);
+        cell.offset += rand_sym(mut_range) * chance(mut_rate);
+        cell.vertical_shift += rand_sym(mut_range) * chance(mut_rate);
+
+        cell.mutation_rate += rand_sym(cell.mutation_rate_range) * chance(cell.mutation_rate_rate);
+        cell.mutation_range += rand_sym(cell.mutation_rate_range) * chance(cell.mutation_rate_rate);
+        
+        if (Random::rand01_float() < cell.colour_mutation_rate)
+            continue;
+
+		cell.cell_inner_color = mutate_color(cell.cell_inner_color, cell.colour_mutation_rate);
+		cell.cell_outer_color = mutate_color(cell.cell_outer_color, cell.colour_mutation_rate);
+    }
+}
+
+void Protozoa::mutate_existing_springs(float mut_rate, float mut_range)
+{
+    auto chance = [](float rate) { return Random::rand01_float() < rate; };
+    auto rand_sym = [](float range) { return Random::rand_range(-range, range); };
+
+    for (Spring& spring : m_springs_)
+    {
+        // if the defualt mr is zero we set it t othe cells mr
+        mut_rate = (mut_rate == 0.f) ? spring.mutation_rate : mut_rate;
+        mut_range = (mut_range == 0.f) ? spring.mutation_range : mut_range;
+
+        spring.amplitude += chance(mut_rate) ? rand_sym(mut_range) : 0.f;
+        spring.frequency += chance(mut_rate) ? rand_sym(mut_range) : 0.f;
+        spring.offset += chance(mut_rate) ? rand_sym(mut_range) : 0.f;
+        spring.vertical_shift += chance(mut_rate) ? rand_sym(mut_range) : 0.f;
+
+        spring.spring_const += chance(mut_rate) ? rand_sym(mut_range) : 0.f;
+        spring.damping += chance(mut_rate) ? rand_sym(mut_range) : 0.f;
+
+        spring.mutation_range += chance(spring.mutation_rate_rate) ? rand_sym(spring.mutation_rate_range) : 0.f;
+        spring.mutation_rate += chance(spring.mutation_rate_rate) ? rand_sym(spring.mutation_rate_range) : 0.f;
+
+    }
 }
 
 void Protozoa::add_cell()
 {
     // finding the parent which will undergo mitosis
     const int parent_index = Random::rand_range(size_t(0), m_cells_.size() - 1);
-    sf::Vector2f position = Random::rand_pos_in_circle(m_cells_[parent_index].position_, m_cells_[parent_index].radius);
+    const Cell& parent = m_cells_[parent_index];
+
+    sf::Vector2f position = Random::rand_pos_in_circle(parent.position_, parent.radius * 3.f);
 
     // creating the new cell and adding it to our cells
-    const int cell_id = m_cells_.size();
-    Cell new_cell{ cell_id, position};
-    m_cells_.push_back(new_cell);
+    Cell child = parent;
+    child.id = m_cells_.size();
+	child.position_ = position;
+    m_cells_.push_back(child);
 
     // creating a spring connection to that cell
 	const auto spring_id = static_cast<int>(m_springs_.size());
-    Spring new_spring{ spring_id, parent_index, cell_id };
+    Spring new_spring{ spring_id, parent_index, child.id };
     m_springs_.push_back(new_spring);
-
-	// Now we need to update our genome dictionaries to account for the new cell and spring
-    add_cell_gene(cell_id);
-	add_spring_gene(spring_id);
-
 }
 
 void Protozoa::remove_spring()
@@ -95,57 +151,3 @@ void Protozoa::remove_spring()
     // TODO
 }
 
-
-void Protozoa::load_preset(Preset& preset, sf::Vector2f position)
-{
-    /*
-	The load preset function initializes the protozoa's cells and springs with a pre-defined structure.
-	The preset is a list of connections between cell IDs, where each connection represents a spring between two cells.
-	If a position is provided, the protozoa will be spawned around that position instead of a random location.
-    We can simply create genetic variation by choosing a small percentage of these cells to undergo some mutation cycles
-     */
-
-    // Clear existing genetic data Just In Case
-    m_cells_.clear();
-    m_springs_.clear();
-
-	// Create unique cells based on the preset - Stops duplicates
-    std::unordered_set<int> unique_cells;
-    for (const auto& connection : preset) 
-    {
-        unique_cells.insert(connection.first);
-        unique_cells.insert(connection.second);
-    }
-
-	// Determine spawn area
-	sf::Vector2f center;
-	if (position == sf::Vector2f{ 0, 0 })
-	{
-        const float world_rad = m_world_bounds_->radius;
-        center = Random::rand_pos_in_circle(m_world_bounds_->center, world_rad);
-	}
-    const Circle protozoa_area = { center, spawn_radius };
-
-	// Create cells
-    for (int cell_id : unique_cells) 
-    {
-        m_cells_.emplace_back(cell_id, protozoa_area.rand_pos());
-    }
-
-    // Create springs
-    int i = 0;
-    for (const auto& connection : preset) 
-    {
-        m_springs_.emplace_back(i++, connection.first, connection.second);
-    }
-
-	// Finally we need to tell the genome about these new cells and springs
-    for (int cell_id : unique_cells)
-    {
-        add_cell_gene(cell_id);
-    }
-    for (int spring_id = 0; spring_id < m_springs_.size(); ++spring_id)
-    {
-        add_spring_gene(spring_id);
-	}
-}

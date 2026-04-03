@@ -3,6 +3,7 @@
 
 int main()
 {
+    Random::set_seed(2);
     CrashLogger::set_exception_translator(); 
 
     try

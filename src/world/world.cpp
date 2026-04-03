@@ -1,6 +1,7 @@
 #include "world.h"
 #include "../Utils/utility_SFML.h"
 #include "../Utils/Graphics/CircleBatchRenderer.h"
+#include "../protozoa/genetics/CellGenome.h"
 
 World::World(sf::RenderWindow* window)
 	: m_window_(window),
@@ -10,10 +11,10 @@ World::World(sf::RenderWindow* window)
 { 
 	init_organisms();
 
-	global_cell_vector_.reserve(max_protozoa * GeneSettings::cell_amount_range.y);
+	global_cell_vector_.reserve(max_protozoa * 5);
 
 	const size_t protozoa_count = all_protozoa_.size();
-	const size_t predicted_cells = protozoa_count * GeneSettings::cell_amount_range.y;
+	const size_t predicted_cells = protozoa_count * 5;
 
 	// reserving nessesary data
 	outer_color_data_.reserve(predicted_cells);
@@ -44,8 +45,8 @@ void World::render(Font* font)
 
 void World::render_protozoa(Font* font)
 {
-	constexpr float radius_inner = CellSettings::cell_radius;
-	const float radius_outer = radius_inner + CellSettings::cell_outline_thickness;
+	const float radius_inner = CellGenome::radius;
+	const float radius_outer = radius_inner + GraphicalSettings::cell_outline_thickness;
 	const int size = position_data_.size();
 
 	outer_circle_renderer_.init_texture(outer_color_data_, radius_outer, size);
@@ -91,12 +92,20 @@ void World::init_organisms()
 	// emplace creates all the actual objects of the protozoa
 	for (int i = 0; i < max_protozoa; ++i)
 	{
-		all_protozoa_.emplace({ i, &world_circular_bounds_, m_window_, true });
+		all_protozoa_.emplace({ i, &world_circular_bounds_, m_window_ });
 	}
 	// we only want to start with a certain amount of protozoa so we "remove" some
 	for (int i = 0; i < max_protozoa - initial_protozoa; ++i)
 	{
+		all_protozoa_.at(i)->dead = true;
+		all_protozoa_.at(i)->reset_protozoa();
 		all_protozoa_.remove(i);
+	}
+
+	// now we grow all of these protozoa
+	for (Protozoa* protozoa : all_protozoa_)
+	{
+		generate_protozoa(*protozoa, world_circular_bounds_);
 	}
 }
 

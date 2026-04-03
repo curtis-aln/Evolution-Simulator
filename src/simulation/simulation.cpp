@@ -122,7 +122,7 @@ void Simulation::update_line_graphs()
 
 void Simulation::render()
 {
-	m_window_.clear(window_color);
+	m_window_.clear(GraphicalSettings::window_color);
 
 	if (m_rendering_)
 	{

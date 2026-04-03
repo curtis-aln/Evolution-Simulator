@@ -2,8 +2,9 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "genome.h"
+#include "genetics/CellGenome.h"
 #include "../Utils/utility.h"
+#include "../Utils/Graphics/Circle.h"
 
 // Each organism consists of cells which work together via springs
 // Each cell has their own radius and friction coefficient, as well as cosmetic factors such as color
@@ -12,14 +13,10 @@ inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong
 inline static constexpr float max_speed = 30;
 
 
-struct Cell 
+struct Cell : public CellGenome
 {
 	// The Cell ID is used when referencing the cell inside the protozoa, and identifying its genome
 	int id{}; 
-
-	int generation = 0;
-
-	float radius = CellSettings::cell_radius;
 
 	float sinwave_current_phase_ = 0.f;
 	float sinwave_current_friction_ = 0.f;
@@ -29,18 +26,21 @@ struct Cell
 	sf::Vector2f velocity_{};
 
 
-	Cell(const int _id, const sf::Vector2f position, CellGene* cell_gene = nullptr)
-		: id(_id), position_(position)
+	Cell(const int _id, const sf::Vector2f position)
+		: id(_id), position_(position), CellGenome()
 	{
-
+		
 	}
 
 	void reset()
 	{
 		generation = 0;
+		sinwave_current_phase_ = 0.f;
+		sinwave_current_friction_ = 0.f;
 	}
 
-	void update(const int internal_clock, CellGene* gene)
+
+	void update(const int internal_clock)
 	{
 		// updating velocity and position vectors
 		clamp_velocity();
@@ -49,8 +49,8 @@ struct Cell
 		// as it is expecting a radian input rather than a degree-like input
 		const float scaled_clock = fmod(internal_clock, 360.f) * pi / 180.f;
 
-		sinwave_current_phase_ = fmod(internal_clock * gene->frequency + gene->offset, 360.f) * pi / 180.f;
-		sinwave_current_friction_ = gene->amplitude * sinf(gene->frequency * internal_clock + gene->offset) + gene->vertical_shift;
+		sinwave_current_phase_ = fmod(internal_clock * frequency + offset, 360.f) * pi / 180.f;
+		sinwave_current_friction_ = amplitude * sinf(frequency * internal_clock + offset) + vertical_shift;
 		
 		// updating the velocity with the new friction
 		velocity_ *= sinwave_current_friction_;
@@ -62,8 +62,9 @@ struct Cell
 
 	void bound(const Circle& bounds)
 	{
+
 		const sf::Vector2f direction = position_ - bounds.center;
-		const float dist_sq = dist_squared(position_, bounds.center);
+		const float dist_sq = (position_ - bounds.center).lengthSquared();
 		const float bounds_radius = bounds.radius - radius - radius * 0.1f; // Ensure the entire circle stays inside
 		const float bounds_radius_sq = bounds_radius * bounds_radius;
 

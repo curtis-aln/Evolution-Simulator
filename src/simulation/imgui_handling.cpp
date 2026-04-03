@@ -13,6 +13,11 @@ void Simulation::init_imGUI()
         {1.0f, 0.4f, 0.4f, 1.f},  // food      — red
     };
     m_plot_colormap_ = ImPlot::AddColormap("ARIAColors", plot_colors, 2, false);
+
+    ImGuiStyle& style = ImGui::GetStyle();
+
+    style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0.7f);
+    style.Colors[ImGuiCol_PopupBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
 }
 
 void Simulation::imgui_stats_panel()
@@ -61,6 +66,11 @@ void Simulation::imgui_controls_panel()
     ImGui::Text("Step Frame");
     ImGui::SameLine();
     ImGui::TextDisabled("[O]");
+
+    if (ImGui::Button("Reset Simulation"))
+    {
+        open_extinction_window = true;
+    }
 
     // ------------------ Camera ------------------
     ImGui::SeparatorText("Camera");
@@ -232,6 +242,77 @@ void Simulation::handle_imGUI()
 
     if (m_world_.selected_protozoa_ && m_world_.debug_mode)
 		imgui_debug_panel(nullptr, m_world_.selected_protozoa_);
+
+    if (open_extinction_window)
+    {
+        ImGui::OpenPopup("New Simulation");
+        open_extinction_window = false;
+    }
+    extinction_popup();
+
+}
+
+
+void Simulation::extinction_popup()
+{
+    if (ImGui::BeginPopupModal("New Simulation", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        // Center the popup
+        ImGui::SetWindowPos(
+            ImVec2(
+                (ImGui::GetIO().DisplaySize.x - ImGui::GetWindowSize().x) * 0.5f,
+                (ImGui::GetIO().DisplaySize.y - ImGui::GetWindowSize().y) * 0.5f
+            )
+        );
+
+        static int starting_food = 1000;
+        static int starting_protozoa = 50;
+        static int max_food = 2000;
+        static int max_protozoa = 200;
+        static float world_radius = 10'000;
+
+        static float mutation_rate = 0.01f;
+        static float mutation_range = 0.1f;
+        static float food_spawn_rate = 0.5f;
+
+        ImGui::SeparatorText("Simulation Settings");
+
+        int step_1 = 100;
+        int step_fast = 1000;
+        ImGui::InputInt("Starting Food", &starting_food, step_1, step_fast);
+        ImGui::InputInt("Starting Protozoa", &starting_protozoa, step_1, step_fast);
+        ImGui::InputInt("Max Food", &max_food, step_1, step_fast);
+        ImGui::InputInt("Max Protozoa", &max_protozoa, step_1, step_fast);
+
+        step_1 = 1000;
+        step_fast = 10'000;
+        ImGui::InputFloat("World radius", &world_radius, step_1, step_fast);
+#
+        ImGui::Spacing();
+
+        ImGui::SeparatorText("Evolution Settings");
+
+        ImGui::InputFloat("Mutation Rate", &mutation_rate, 0.001f, 0.01f, "%.4f");
+        ImGui::InputFloat("Mutation Range", &mutation_range, 0.01f, 0.1f, "%.4f");
+        ImGui::InputFloat("Food Spawn Rate", &food_spawn_rate, 0.01f, 1.0f, "%.2f");
+
+        ImGui::Spacing();
+
+        if (ImGui::Button("Start"))
+        {
+
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
 }
 
 
@@ -276,7 +357,7 @@ void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_proto
         ImGui::BeginChild("Protozoa_Left", ImVec2(column_width, 0), false);
 
         ImGui::Text("ID: %d", selected_protozoa->id);
-        ImGui::Text("Generation: %d", selected_protozoa->generation);
+        // ImGui::Text("Generation: %d", selected_protozoa->generation); // todo
         ImGui::Text("Age: %d", selected_protozoa->frames_alive);
 
         ImGui::Spacing();
@@ -306,8 +387,8 @@ void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_proto
 
         ImGui::TextDisabled("Mutation");
 
-        ImGui::Text("Range: %.4f", selected_protozoa->mutation_range);
-        ImGui::Text("Rate: %.4f", selected_protozoa->mutation_rate);
+        //ImGui::Text("Range: %.4f", selected_protozoa->mutation_range);
+        //ImGui::Text("Rate: %.4f", selected_protozoa->mutation_rate); // todo
 
         ImGui::Spacing();
 

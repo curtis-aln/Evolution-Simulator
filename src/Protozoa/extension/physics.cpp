@@ -7,10 +7,9 @@ inline static constexpr  size_t cell_positions_container_reserve = 30;
 inline static constexpr  size_t food_positions_container_reserve = 30;
 
 
-Protozoa::Protozoa(const int id_, Circle* world_bounds, sf::RenderWindow* window, const bool init_cells)
-	: m_window_(window), m_world_bounds_(world_bounds), id(id_)
+Protozoa::Protozoa(const int id_, Circle* world_bounds, sf::RenderWindow* window)
+	: m_window_(window), m_world_bounds_(world_bounds), id(id_), GenomeManager(&m_cells_, &m_springs_)
 {
-
 	food_positions_nearby.reserve(cell_positions_container_reserve);
 	cell_positions_nearby.reserve(food_positions_container_reserve);
 
@@ -20,19 +19,6 @@ Protozoa::Protozoa(const int id_, Circle* world_bounds, sf::RenderWindow* window
 		std::cerr << "ERROR: Protozoa was created without world bounds, cannot initialise cells.\n";
 		std::cerr << "Protozoa ID: " << id_ << " is window nullptr: " << (window == nullptr) << "\n";
 	}
-
-	if (!init_cells)
-		return;
-
-	generate_random();
-}
-
-
-void Protozoa::generate_random()
-{
-	auto preset = Random::rand_val_in_vector(presets);
-	load_preset(preset);
-	update_bounding_box();
 }
 
 
@@ -75,7 +61,8 @@ void Protozoa::update_springs()
 	{
 		Cell& cell_A = m_cells_[spring.cell_A_id];
 		Cell& cell_B = m_cells_[spring.cell_B_id];
-		bool broken = spring.update(cell_A, cell_B, frames_alive, get_spring_gene(spring.id));
+		bool broken = spring.update(cell_A, cell_B, frames_alive);
+
 		if (broken)
 		{
 			dead = true;
@@ -88,7 +75,7 @@ void Protozoa::update_cells()
 	// updates each cell in the organism
 	for (Cell& cell : m_cells_)
 	{
-		cell.update(frames_alive, get_cell_gene(cell.id));
+		cell.update(frames_alive);
 	}
 }
 
@@ -107,6 +94,7 @@ void Protozoa::update_bounding_box()
 	// Calculates the bounding box of the protozoa by finding the outer cells coordinates
 	const sf::Vector2f cell0_pos = m_cells_[0].position_;
 	const float radius = m_cells_[0].radius;
+
 	float min_x = cell0_pos.x - radius;
 	float min_y = cell0_pos.y - radius;
 	float max_x = cell0_pos.x + radius;

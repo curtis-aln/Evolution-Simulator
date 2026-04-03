@@ -8,7 +8,7 @@
 
 #include "../Utils/o_vector.hpp"
 #include "../food_manager.h"
-#include "genome.h"
+#include "genetics/GenomeManager.h"
 
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs
 // the protozoa class is responsible for connecting the springs and cells
@@ -18,7 +18,7 @@ inline static constexpr float initial_energy = 300.f; // energy the protozoa spa
 
 
 // The Genome class handles anything that has to do with mutation and genetics
-class Protozoa : ProtozoaSettings, public Genome
+class Protozoa : ProtozoaSettings, public GenomeManager
 {
 public:
 	sf::RenderWindow* m_window_ = nullptr;
@@ -56,21 +56,20 @@ public:
 	bool reproduce = false;
 	bool dead = false;
 
-	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr, bool init_cells = false);
+	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr);
 
 	void update(FoodManager& food_manager, bool debug, float min_speed);
 	void handle_food(FoodManager& food_manager, bool debug);
 	void record_nearby_food(Food* food);
 	void consume(Food* food, FoodManager& food_manager);
 
-	void mutate();
+	void mutate(const bool artificial_add_cell = false, const float artificial_mutatation_rate = 0.f, const float artificial_mutatation_range = 0.f);
 	void add_cell();
 	void remove_spring();
-	void load_preset(Preset& preset, sf::Vector2f position = {0, 0});
 	void render_protozoa_springs();
 	void render_debug(Font* font, bool skeleton_mode, bool show_connections, bool show_bounding_boxes);
 
-	void draw_cell_outlines() const;
+	void draw_cell_outlines();
 
 	void nearby_food_information() const;
 
@@ -128,24 +127,13 @@ public:
 	{
 		m_cells_ = other->m_cells_;
 		m_springs_ = other->m_springs_;
-		
-		reset(*other); // genome
 
-		int idx = 0;
-		for (Cell& cell : m_cells_)
-		{
-			cell.generation = other->m_cells_[idx++].generation;
-		}
 		update_bounding_box();
 	}
 
-	void generate_random();
-
-
 private:
 	// rendering
-	void draw_cell_physics(Font* font) const;
-	void draw_protozoa_information(Font* font);
+	void draw_cell_physics(Font* font);
 	void draw_spring_information(Font* font) const;
 	void render_cell_connections(Cell& cell, bool thick_lines = false) const;
 
@@ -153,4 +141,7 @@ private:
 	void update_bounding_box();
 	void update_springs();
 	void update_cells();
+
+	void mutate_existing_cells(float mut_rate = 0.f, float mut_range = 0.f);
+	void mutate_existing_springs(float mut_rate = 0.f, float mut_range = 0.f);
 };

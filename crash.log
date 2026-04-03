@@ -1,20 +1,16 @@
 ==================== CRASH REPORT ====================
-Time     : 2026-03-31 19:44:07.2536120
-Uptime   : 0h 24m 19s
+Time     : 2026-04-01 21:48:23.6632684
+Uptime   : 0h 6m 26s
 Type     : std::exception
-Message  : SpatialHashGrid::find() - position out of range
-  position:    (98985.390625, 200011.937500)
-  cell index:  (59, 120)
-  grid dims:   (120 x 120)
-  bounds:      pos(0.000000, 0.000000)  size(200000.000000, 200000.000000)
+Message  : ERROR: Cell 2 has no gene assigned to it.
 
 --- Build Info ---
-Compiled: Mar 31 2026 20:05:05  |  C++202302  |  MSVC 1950
+Compiled: Apr  1 2026 22:39:35  |  C++202302  |  MSVC 1950
 
 --- Stack Trace ---
 --- Your Code (most recent call first) ---
   (none found — ensure /Zi and /DEBUG flags are set in CMake)
 
-  (8 system/runtime frames omitted)
+  (11 system/runtime frames omitted)
 
 =======================================================

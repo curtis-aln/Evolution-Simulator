@@ -2,10 +2,11 @@
 #include <SFML/Graphics.hpp>
 #include "../settings.h"
 #include "cell.h"
-#include "genome.h"
+#include "genetics/SpringGenome.h"
 
-struct Spring
+struct Spring : public SpringGenome
 {
+	// we store the id's of the cells here so whe we call update in the main class we know where to look for the cells
 	int cell_A_id{};
 	int cell_B_id{};
 
@@ -16,18 +17,18 @@ struct Spring
 	sf::Vector2f direction_A_force{};
 	sf::Vector2f direction_B_force{};
 	float spring_length{};
-	bool broken = false;
 
-	float breaking_length = CellSettings::cell_radius * 2.f * 3.f;
+	bool broken = false;
+	float breaking_length = 600.f;
 	
 
 	Spring(const int _id, const int _cell_A_id, const int _cell_B_id)
-		: cell_A_id(_cell_A_id), cell_B_id(_cell_B_id), id(_id)
+		: cell_A_id(_cell_A_id), cell_B_id(_cell_B_id), id(_id), SpringGenome()
 	{
 
 	}
 
-	bool update(Cell& cell_a, Cell& cell_b, const int internal_clock, SpringGene* gene)
+	bool update(Cell& cell_a, Cell& cell_b, const int internal_clock)
 	{
 		const sf::Vector2f pos_a = cell_a.position_;
 		const sf::Vector2f pos_b = cell_b.position_;
@@ -38,16 +39,16 @@ struct Spring
 		spring_length = dist;
 
 		// finding the rest length of the spring
-		const float phase = gene->amplitude * sinf(gene->frequency * internal_clock + gene->offset) + gene->vertical_shift;
-		const float rest_length = phase * CellSettings::cell_radius * 2;
+		const float phase = amplitude * sinf(frequency * internal_clock + offset) + vertical_shift;
+		const float rest_length = phase * (cell_a.radius + cell_b.radius);
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
-		const float spring_force = gene->spring_constant * (dist - rest_length);
+		const float spring_force = spring_const * (dist - rest_length);
 
 		// Calculating the damping force
 		const sf::Vector2f normalised_dir = ((pos_b - pos_a) / dist);
 		const sf::Vector2f vel_difference = (vel_b - vel_a);
-		const float damping_force = normalised_dir.dot(vel_difference) * gene->damping;
+		const float damping_force = normalised_dir.dot(vel_difference) * damping;
 
 		// Calculating total force (sum of the two forces)
 		const float total_force = spring_force + damping_force;

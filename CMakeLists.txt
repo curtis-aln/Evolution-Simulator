@@ -43,7 +43,7 @@ file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
   "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-add_executable(ProjectARIA ${APP_SOURCES} "src/Utils/UI/CrashLogger.h" "src/simulation/imgui_handling.cpp")
+add_executable(ProjectARIA ${APP_SOURCES} "src/Utils/UI/CrashLogger.h" "src/simulation/imgui_handling.cpp" "src/Protozoa/genetics/CellGenome.h" )
 
 target_link_libraries(ProjectARIA PRIVATE
   SFML::Graphics
