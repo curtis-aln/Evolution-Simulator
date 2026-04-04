@@ -34,15 +34,17 @@ void Protozoa::update(FoodManager& food_manager, const bool debug, const float m
 	}
 
 	update_springs();
-	update_cells();
+	
 
 	update_bounding_box();
+
+	update_cells();
 
 	handle_food(food_manager, debug);
 
 	++frames_alive;
 
-	energy -= 0.15;
+	energy -= energy_decay_rate;
 	if (energy <= 0)
 	{
 		dead = true;
@@ -76,6 +78,12 @@ void Protozoa::update_cells()
 	for (Cell& cell : m_cells_)
 	{
 		cell.update(frames_alive);
+
+		if (cell_wander_check(cell))
+		{
+			dead = true;
+			return;
+		}
 	}
 }
 

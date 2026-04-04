@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+#include "../Utils/random.h"
 struct CellGenome
 {
     // The creation genes are genes used when a protozoa is created from scratch, such as starting up the sim or following an extinction event
@@ -9,15 +10,17 @@ struct CellGenome
     int generation = 0;
 
     // chances of adding or removing a cell per mutation event
-    inline static constexpr float add_cell_chance = 0.05f;      // chance of cell being added
-    inline static constexpr float remove_cell_chance = 0.03f;   // chance of cell being removed
+    inline static constexpr float add_cell_chance      = 0.13f;      // chance of cell being added
+    inline static constexpr float remove_cell_chance   = 0.13f;   // chance of cell being removed
+    inline static constexpr float add_spring_chance    = 0.13f;      // chance of cell being added
+    inline static constexpr float remove_spring_chance = 0.13f;   // chance of cell being removed
 
     float mutation_rate = 0.2f;         // chance of mutation occurring
     float mutation_range = 0.2f;
     inline static constexpr float mutation_rate_rate = 0.1;     // chance of mutation rate mutating
     inline static constexpr float mutation_rate_range = 0.01;
 
-    float colour_mutation_rate = 0.01f; // chance of color mutating
+    float colour_mutation_range = 0.001f; // chance of color mutating
     inline static constexpr float radius = 90.f;
     std::uint8_t transparency = 140;
 

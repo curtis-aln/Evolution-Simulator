@@ -14,7 +14,7 @@
  */
 
 
-// add this as a public parent struct to the Obj class/structure
+ // add this as a public parent struct to the Obj class/structure
 struct o_vec_object
 {
     unsigned o_vec_index = 0;
@@ -24,7 +24,7 @@ struct o_vec_object
 };
 
 
-template <class Obj, std::size_t N>
+template <class Obj>
 class o_vector
 {
 public:
@@ -33,7 +33,7 @@ public:
 
 private:
     // this array contains all the items and is never directly modified
-    std::array<Obj*, N> array{};
+    std::vector<Obj*> array{};
 
     // this tracks the actual initilised and implemented Objects being used
     unsigned array_size = 0;
@@ -58,13 +58,14 @@ private:
 
         Iterator& operator++()
         {
-            do { ++currentIndex; } while (currentIndex < vectorPtr->array.size() && !vectorPtr->array[currentIndex]->active);
+            ++currentIndex;
+            while (currentIndex < vectorPtr->array_size && !vectorPtr->array[currentIndex]->active)
+                ++currentIndex;
             return *this;
         }
 
         pointer operator*()   const { return vectorPtr->array[currentIndex]; }
         pointer operator->()  const { return vectorPtr->array[currentIndex]; }
-
 
         bool operator==(const Iterator& other) const { return currentIndex == other.currentIndex; }
         bool operator!=(const Iterator& other) const { return !(*this == other); }
@@ -78,26 +79,29 @@ private:
     unsigned getFirstAvalableIteration() const
     {
         unsigned currentIndex = 0;
-        while (currentIndex < N && !array[currentIndex]->active)
+        while (currentIndex < array_size && !array[currentIndex]->active)
             ++currentIndex;
         return currentIndex;
     }
 
 
 public:
-    explicit o_vector() { objectStore.reserve(N); }
+    explicit o_vector(const std::size_t N)
+    {
+        objectStore.reserve(N);
+        array.reserve(N);
+    }
 
     [[nodiscard]] Iterator begin() const { return Iterator(const_cast<o_vector*>(this), getFirstAvalableIteration()); }
-    [[nodiscard]] Iterator end() const { return Iterator(nullptr, static_cast<unsigned>(N)); }
-    [[nodiscard]] unsigned size() const { return active_objs; }
-
+    [[nodiscard]] Iterator end()   const { return Iterator(const_cast<o_vector*>(this), array_size); }
+    [[nodiscard]] unsigned size()  const { return active_objs; }
 
 
     // used to initilise items inside of objectStore.
     void emplace(Obj item)
     {
         objectStore.emplace_back(item);
-        array[array_size] = &objectStore[array_size];
+        array.push_back(&objectStore.back());
         ++array_size;
         ++active_objs;
     }

@@ -80,8 +80,12 @@ void Protozoa::render_cell_connections(Cell& cell, const bool thick_lines) const
 
         if (thick_lines)
         {
+            // the outline color should be that of cell a, the inline cololour should be that of cell b
+			const sf::Color outline_color = m_cells_[spring.cell_A_id].cell_outer_color;
+			const sf::Color fill_color = m_cells_[spring.cell_B_id].cell_outer_color;
+
             draw_thick_line(*m_window_, pos1, pos2, GraphicalSettings::spring_thickness,
-				GraphicalSettings::spring_outline_thickness, {255, 255, 255}, { 255, 255, 255 }); // todo
+				GraphicalSettings::spring_outline_thickness, fill_color, outline_color);
         }
         else
         {
@@ -158,10 +162,8 @@ void Protozoa::draw_spring_information(Font* font) const
     }
 }
 
-// TODO: Implement spring connection creation
 void Protozoa::make_connection(const int cell1_id, const int cell2_id)
 {
-	// todo
 	//const SpringGene& genetics = create_cell_connection(cell1_id, cell2_id);
 	//m_springs_.emplace_back(genetics.connecting_cell_ids, genetics.colors, genetics.rest_length,
 	//	genetics.spring_constant, genetics.damping);

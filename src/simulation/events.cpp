@@ -25,11 +25,6 @@ void Simulation::handle_mouse_release()
 	camera_.end_pan();
 }
 
-void Simulation::handle_hover(const sf::Vector2f& cam_pos)
-{
-	m_world_.check_if_mouse_is_hovering(cam_pos, mouse_pressed_event);
-}
-
 // ---- Keyboard helpers ---------------------------------------------
 
 void Simulation::handle_pause_toggle()
@@ -97,6 +92,5 @@ void Simulation::handle_events()
 		dispatch_event(*event, cam_pos);
 	}
 
-	handle_hover(cam_pos);
 	camera_.update(m_clock_.get_delta_time());
 }

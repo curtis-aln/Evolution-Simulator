@@ -38,6 +38,13 @@ struct Spring : public SpringGenome
 		const float dist = (pos_b - pos_a).length();
 		spring_length = dist;
 
+		if (dist < 1e-6f)
+		{
+			std::cerr << "Warning: Spring " << id << " has zero length. Skipping.\n";
+			return false;
+		}
+
+
 		// finding the rest length of the spring
 		const float phase = amplitude * sinf(frequency * internal_clock + offset) + vertical_shift;
 		const float rest_length = phase * (cell_a.radius + cell_b.radius);

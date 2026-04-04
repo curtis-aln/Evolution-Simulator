@@ -9,9 +9,6 @@
 // Each organism consists of cells which work together via springs
 // Each cell has their own radius and friction coefficient, as well as cosmetic factors such as color
 
-inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
-inline static constexpr float max_speed = 30;
-
 
 struct Cell : public CellGenome
 {
@@ -77,7 +74,7 @@ struct Cell : public CellGenome
 			position_ = bounds.center + normal * bounds_radius;
 
 			// Apply velocity adjustment to prevent escaping
-			velocity_ -= normal * (border_repulsion_magnitude * (dist - bounds_radius));
+			velocity_ -= normal * (WorldSettings::border_repulsion_magnitude * (dist - bounds_radius));
 		}
 	}
 
@@ -92,10 +89,10 @@ private:
 	{
 		const float speed_squared = velocity_.x * velocity_.x + velocity_.y * velocity_.y;
 
-		if (speed_squared > max_speed * max_speed)
+		if (speed_squared > WorldSettings::max_speed * WorldSettings::max_speed)
 		{
 			const float speed = sqrt(speed_squared);
-			velocity_ *= max_speed / speed;
+			velocity_ *= WorldSettings::max_speed / speed;
 		}
 	}
 };

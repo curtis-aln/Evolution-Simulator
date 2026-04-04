@@ -20,9 +20,6 @@
 using cell_idx = uint32_t;
 using obj_idx = uint32_t;
 
-// maximum number of objects a cell can hold
-static constexpr uint8_t cell_capacity = 25;
-
 
 // A non-owning view over a fixed contiguous buffer.
 // Zero allocation, zero overhead — drop-in replacement for c_Vec query results.
@@ -42,7 +39,7 @@ struct FixedSpan
 };
 
 
-template<size_t CellsX, size_t CellsY>
+template<size_t CellsX, size_t CellsY, size_t cell_capacity>
 struct SimpleSpatialGrid
 {
 public:
@@ -181,8 +178,6 @@ private:
 			std::cerr << "[ERROR]: Failed to load font from: "
 				<< font_location << '\n';
 		}
-		// todo
-		//text = sf::Text("", font, char_size);
 	}
 
 	void init_graphics()

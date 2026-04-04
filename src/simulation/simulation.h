@@ -104,7 +104,6 @@ private:
 	bool try_select_protozoa(const sf::Vector2f& cam_pos);
 	void handle_mouse_press(const sf::Vector2f& cam_pos);
 	void handle_mouse_release();
-	void handle_hover(const sf::Vector2f& cam_pos);
 	void handle_pause_toggle();
 	void handle_keyboard_events(const sf::Keyboard::Key& event_key_code);
 	void dispatch_event(const sf::Event& event, const sf::Vector2f& cam_pos);

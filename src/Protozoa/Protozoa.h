@@ -47,8 +47,6 @@ public:
 	float energy = initial_energy;
 	unsigned frames_alive = 0u;
 
-	using Protozoa_Vector = o_vector<Protozoa, WorldSettings::max_protozoa>;
-
 	int id = 0;
 	bool active = true; // for o_vector.h
 
@@ -72,6 +70,7 @@ public:
 	void draw_cell_outlines();
 
 	void nearby_food_information() const;
+	void update_generation();
 
 	// debugging and modifying settings
 	bool is_hovered_on(sf::Vector2f mousePosition, bool tollarance_check = false) const;
@@ -106,10 +105,11 @@ public:
 	
 	void bound_cells();
 
-	void reset_protozoa()
+	void soft_reset()
 	{
 		frames_alive = 0.f;
 		dead = false;
+		reproduce = false;
 
 		stomach = 0;
 		total_food_eaten = 0;
@@ -122,6 +122,28 @@ public:
 		}
 	}
 
+
+	void hard_reset()
+	{
+		soft_reset();
+		
+		// setting the containers back to zero size, for when we are restarting the simulation
+		m_cells_.clear();
+		m_springs_.clear();
+		
+		m_personal_bounds_ = { {0.f, 0.f}, {0.f, 0.f } };
+
+		// position and velocity tracking
+		previous_position = { 0, 0 };
+		velocity = { 0, 0 };
+		birth_location = { 0, 0 };
+
+
+		food_positions_nearby.clear();
+		cell_positions_nearby.clear();
+
+		active = true; // for o_vector.h
+	}
 
 	void set_protozoa_attributes(Protozoa* other)
 	{
@@ -144,4 +166,13 @@ private:
 
 	void mutate_existing_cells(float mut_rate = 0.f, float mut_range = 0.f);
 	void mutate_existing_springs(float mut_rate = 0.f, float mut_range = 0.f);
+
+
+	bool cell_wander_check(Cell& cell);
+	
+
+
+	void remove_cell();
+	void add_spring();
+
 };

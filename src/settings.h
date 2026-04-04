@@ -2,6 +2,7 @@
 #include "Utils/utility_SFML.h"
 #include "Utils/Graphics/font_renderer.hpp"
 #include <cstdint>
+#include "Protozoa/genetics/CellGenome.h"
 
 struct TextSettings
 {
@@ -21,14 +22,14 @@ struct SimulationSettings
 {
 
 public:
-	inline static constexpr int frame_smoothing = 10;
+	inline static constexpr int frame_smoothing = 30;
 	inline static constexpr bool full_screen = false;  // Change this value to toggle fullscreen mode
 	inline static constexpr double resize_shrinkage = 0.95;
 
 	inline static const std::string simulation_name = "Project A.R.I.A";
 	static constexpr bool vsync = false;
 
-	static constexpr unsigned frame_rate = 60;
+	static constexpr unsigned frame_rate = 0;
 
 	static constexpr unsigned line_maximum_data = 200;
 	static constexpr unsigned line_x_axis_increments = 20;
@@ -58,34 +59,40 @@ struct GraphicalSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 80'000;
+	static constexpr float bounds_radius = 25'000;
 
-	static constexpr unsigned max_protozoa = 20'000;
-	static constexpr unsigned initial_protozoa = 5'000;
+	static constexpr unsigned max_protozoa = 50'000;
+	static constexpr unsigned initial_protozoa = 2'000;
 
-	inline static constexpr size_t cells_x = 140;
-	inline static constexpr size_t cells_y = 140;
-	inline static constexpr size_t cell_capacity = 18;
+	inline static constexpr size_t cells_x = 100;
+	inline static constexpr size_t cells_y = cells_x;
+	inline static constexpr size_t cell_capacity = 40;
+
+	inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
+	inline static constexpr float max_speed = 30;
 };
 
 struct ProtozoaSettings
 {
 	static constexpr float spawn_radius = 100.f;
 
-	static constexpr float rest_length = 120.f;
-	static constexpr float spring_constant = 0.75f;
-	static constexpr float damping_factor = 0.50f;
+	static constexpr float energy_decay_rate = 0.15f; // how quickly energy decays per frame
+
+	inline static constexpr float wander_threshold = CellGenome::radius * 30.f; // if a cell wanders too far away from the protozoa it kills the whole thing
 };
 
 
 struct FoodSettings
 {
-	inline static constexpr size_t cells_x = 120;
-	inline static constexpr size_t cells_y = 120;
-	inline static constexpr size_t cell_capacity = 20;
+	inline static constexpr size_t cells_x = WorldSettings::cells_x;
+	inline static constexpr size_t cells_y = WorldSettings::cells_y;
+	inline static constexpr size_t cell_capacity = 6;
 
-	static constexpr unsigned max_food = 40'000;
-	static constexpr unsigned initial_food = 40'000;
+	static constexpr unsigned max_food = 4'000;
+	static constexpr unsigned initial_food = 4'000;
 	inline static constexpr float food_radius = 30.f;
 	inline static constexpr float friction = 0.99f;
+
+	inline static constexpr int food_spawn_amount = 14;
+	inline static constexpr int food_spawn_interval = 2; // frames between spawns
 };

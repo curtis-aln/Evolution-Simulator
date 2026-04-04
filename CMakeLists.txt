@@ -43,7 +43,7 @@ file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
   "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-add_executable(ProjectARIA ${APP_SOURCES} "src/Utils/UI/CrashLogger.h" "src/simulation/imgui_handling.cpp" "src/Protozoa/genetics/CellGenome.h" )
+add_executable(ProjectARIA ${APP_SOURCES} "src/Utils/UI/CrashLogger.h" "src/simulation/imgui_handling.cpp" "src/Protozoa/genetics/CellGenome.h"  "src/Protozoa/extension/mutations.cpp")
 
 target_link_libraries(ProjectARIA PRIVATE
   SFML::Graphics
@@ -75,6 +75,13 @@ if(MSVC)
     )
     target_link_options(ProjectARIA PRIVATE
         /DEBUG
+    )
+    # Release: keep symbols, enable optimisation
+    target_compile_options(ProjectARIA PRIVATE
+        $<$<CONFIG:Release>:/O2>
+    )
+    target_link_options(ProjectARIA PRIVATE
+        $<$<CONFIG:Release>:/OPT:REF /OPT:ICF>
     )
 endif()
 

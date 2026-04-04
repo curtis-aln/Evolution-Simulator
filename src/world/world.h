@@ -32,6 +32,8 @@ class World : public ProtozoaManager
 	std::vector<sf::Color> inner_color_data_{};
 	std::vector<sf::Vector2f> position_data_{};
 
+	
+
 	// Each Cell is drawn with a simple outer and inner circle, we use batch rendering to draw all cells efficiently.
 	CircleBatchRenderer outer_circle_renderer_{ m_window_ };
 	CircleBatchRenderer inner_circle_renderer_{ m_window_ };
@@ -40,7 +42,7 @@ class World : public ProtozoaManager
 	FoodManager food_manager_{ m_window_, &world_circular_bounds_ };
 
 	// for our collision detection we use a spatial hash grid to see what cells are nearby others
-	SimpleSpatialGrid<cells_x, cells_y> spatial_hash_grid_{world_rect_bounds_};
+	SimpleSpatialGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid_{world_rect_bounds_};
 	SFML_Grid cell_grid_renderer; // renders the cell spatial hash grid
 
 
@@ -95,20 +97,17 @@ public:
 	// fetch functions
 	int get_food_count() const { return food_manager_.get_size(); }
 
-	void check_if_mouse_is_hovering(sf::Vector2f mouse_position, bool mouse_pressed) const;
 	bool handle_mouse_click(sf::Vector2f mouse_position);
 	void keyboardEvents(const sf::Keyboard::Key& event_key_code);
 
 private:
 	// update functions
 	void update_grid_cell(const int grid_cell_id);
-	void update_protozoa_cell(int protozoa_cell_index, int neighbours_size) const;
-	void update_nearby_container(int& neighbours_size, int32_t neighbour_index_x, int32_t neighbour_index_y, bool check_x, bool check_y);
+	void update_protozoa_cell(int protozoa_cell_index, int neighbours_size);
+	void update_nearby_container(int& neighbours_size, int32_t neighbour_index_x, int32_t neighbour_index_y);
 	
 	void update_position_container();
 	void update_statistics();
-
-	void update_spatial_grid();
 
 	// rendering functions
 	void render_protozoa(Font* font);

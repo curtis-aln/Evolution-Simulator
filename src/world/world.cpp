@@ -11,15 +11,14 @@ World::World(sf::RenderWindow* window)
 { 
 	init_organisms();
 
-	global_cell_vector_.reserve(max_protozoa * 5);
-
-	const size_t protozoa_count = all_protozoa_.size();
-	const size_t predicted_cells = protozoa_count * 5;
+	const size_t predicted_cells = max_protozoa * 5;
 
 	// reserving nessesary data
 	outer_color_data_.reserve(predicted_cells);
 	inner_color_data_.reserve(predicted_cells);
 	position_data_.reserve(predicted_cells);
+
+	collision_resolutions.reserve(predicted_cells);
 }
 
 
@@ -35,8 +34,8 @@ void World::render(Font* font)
 	{
 		food_manager_.draw_food_grid();
 	}
-
-	update_position_container();
+	
+	food_manager_.render();
 	render_protozoa(font);
 
 	// drawing the world bounds
@@ -98,7 +97,7 @@ void World::init_organisms()
 	for (int i = 0; i < max_protozoa - initial_protozoa; ++i)
 	{
 		all_protozoa_.at(i)->dead = true;
-		all_protozoa_.at(i)->reset_protozoa();
+		all_protozoa_.at(i)->soft_reset();
 		all_protozoa_.remove(i);
 	}
 
@@ -106,22 +105,6 @@ void World::init_organisms()
 	for (Protozoa* protozoa : all_protozoa_)
 	{
 		generate_protozoa(*protozoa, world_circular_bounds_);
-	}
-}
-
-
-void World::check_if_mouse_is_hovering(const sf::Vector2f mouse_position, bool mouse_pressed) const
-{
-	if (!debug_mode)
-		return;
-
-
-	for (Protozoa* protozoa : all_protozoa_)
-	{
-		if (protozoa->is_hovered_on(mouse_position))
-		{
-			break; // todo
-		}
 	}
 }
 

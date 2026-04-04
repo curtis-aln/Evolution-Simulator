@@ -26,7 +26,7 @@ class FoodManager : FoodSettings
 	Circle* world_bounds_ = nullptr;
 
 	CircleBatchRenderer food_renderer{ window_ };
-	o_vector<Food, max_food> food_vector{};
+	o_vector<Food> food_vector{max_food};
 
 	std::vector<sf::Vector2f> food_positions;
 
@@ -34,7 +34,7 @@ public:
 	const float bounds_radius = world_bounds_->radius;
 	const sf::FloatRect world_rect_bounds = { {0, 0}, {bounds_radius * 2, bounds_radius * 2} };
 
-	SimpleSpatialGrid<cells_x, cells_y> spatial_hash_grid{ world_rect_bounds };
+	SimpleSpatialGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_rect_bounds };
 	SFML_Grid food_grid_renderer; // renders the food spatial hash grid
 
 	int frames = 0;
@@ -59,23 +59,8 @@ public:
 
 	void update()
 	{
-		int size = food_vector.size();
-		if (size < initial_food && frames++ % 2 == 0)
-		{
-			for (int i = 0; i < 14; ++i)
-			{
-				Food* food = food_vector.add();
-				if (food == nullptr)
-					break;
-				food->position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
-			}
-		}
-
-		spatial_hash_grid.clear();
-		for (Food* food : food_vector)
-		{
-			spatial_hash_grid.add_object(food->position.x, food->position.y, food->id);
-		}
+		spawn_food();
+		update_hash_grid();
 	}
 
 	void render()
@@ -109,6 +94,36 @@ public:
 	}
 
 private:
+	void spawn_food()
+	{
+		int size = food_vector.size();
+		if (food_vector.size() > max_food)
+			return;
+
+		if (frames++ % food_spawn_interval != 0)
+			return;
+
+		for (int i = 0; i < food_spawn_amount; ++i)
+		{
+			Food* food = food_vector.add();
+
+			if (food == nullptr)
+				break;
+
+			food->position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
+		}
+		
+	}
+
+	void update_hash_grid()
+	{
+		spatial_hash_grid.clear();
+		for (Food* food : food_vector)
+		{
+			spatial_hash_grid.add_object(food->position.x, food->position.y, food->id);
+		}
+	}
+
 	void init_renderer()
 	{
 		// 

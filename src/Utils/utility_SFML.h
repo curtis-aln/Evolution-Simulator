@@ -194,6 +194,9 @@ inline void draw_arrow(sf::RenderWindow& window, const sf::Vector2f& start_pos, 
 inline void draw_direction(sf::RenderWindow& window, const sf::Vector2f& position, const sf::Vector2f& velocity, const float length,
 	const float thickness, const float arrow_size, const sf::Color& fill_color, const sf::Color& outline_color)
 {
+	if (length == 0 || velocity.lengthSquared() == 0)
+		return;
+
 	// Calculate end position based on velocity and length
 	const sf::Vector2f end_pos = position + length * velocity.normalized();
 

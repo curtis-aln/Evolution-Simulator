@@ -53,7 +53,7 @@
 // [DONE] Reproduction threshold too low (2 food items) - Balance test: raise threshold, add energy cost to reproduction, consider a size-scaled energy requirement.
 // [DONE] All keyboard controls not in README - Add a full controls table to the README.
 // [DONE] rand_pos_in_circle infinite loop risk - Add a maximum iteration count with a fallback (return center if exceeded) or use the polar coordinate method instead.
-// [DONE] add todo, crashlog to the gitignore
+// [DONE] add to do, crashlog to the gitignore
 
 // [DONE] text doesnt show when you run the executable
 // - make the spatial hash grid scalable, then have the world gradually increase in size
@@ -64,7 +64,7 @@
 // [DONE] textbox showing stats and controls is messed up
 // each protozoa stores cell_positions_nearby and food positions for debugging, just have it once in the protozoa manager
 
-ImGUI Todo
+ImGUI To do
 [Done] add x and y axis indicators to Line graph
 [Done] min speed and delta min speed are redundant
 [Done] statistic for time per generation change
@@ -80,6 +80,8 @@ ImGUI Todo
 [Done] distance to its birth location
 [Done] Move the debug control settings and buttons into this mini popup menu
 [Done] Ability to hide IMGUI screens completely with a keybind (for screenshots)
+- Fix all missing statistics from re-writing the genome
+- figure out why program runs so slow and fix it, dont stop until you get from 60fps -> 600fps
 - Reset Simulation Button with controls for world size, initial protozoa count, food spawn rate, and mutation rate/range
 		- add all settings to a json file and have the program read from it on starrtup, then add a "save settings" button to write the current settings back to the file. 
 This allows for easy tweaking without recompiling, and sharing of settings between users.
@@ -116,5 +118,37 @@ This allows for easy tweaking without recompiling, and sharing of settings betwe
 - spatial hash grid should dynamically change density as the population changes, and should be able to change size too
 - when a new cell is created it should have very low friction and generally not affect the organism too much, test this
 - add infant mortality stat
+- time elapsed in hours minutes seconds
+- if zoomed too far out you cant select on protozoa
+- ability to see the protozoa connections when clicked on them, hide the stats or add check boxes to select which ones
 
 Update Name: Playing God
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Optimization
+baseline: 7.3fps
+upping the hash grid count: 12.2fps
+
+
+
+
+// Next 60 minutes
+// - Spring add feature
+// - spring remove feature
+// - cell remove feature
