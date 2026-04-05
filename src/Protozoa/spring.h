@@ -19,7 +19,6 @@ struct Spring : public SpringGenome
 	float spring_length{};
 
 	bool broken = false;
-	float breaking_length = 600.f;
 	
 
 	Spring(const int _id, const int _cell_A_id, const int _cell_B_id)
@@ -46,8 +45,7 @@ struct Spring : public SpringGenome
 
 
 		// finding the rest length of the spring
-		const float phase = amplitude * sinf(frequency * internal_clock + offset) + vertical_shift;
-		const float rest_length = phase * (cell_a.radius + cell_b.radius);
+		const float rest_length = calculate_rest_length(cell_a.radius, cell_b.radius, internal_clock);
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
 		const float spring_force = spring_const * (dist - rest_length);
@@ -68,7 +66,17 @@ struct Spring : public SpringGenome
 		cell_b.accelerate(direction_B_force);
 
 		// finally we check if the spring should break (if its length surpasses breaking length) and return that information
-		broken = dist > breaking_length;
+		broken = dist > ProtozoaSettings::breaking_length;
 		return broken;
+	}
+
+
+private:
+	float calculate_rest_length(const float rad_a, const float rad_b, const int internal_clock) const
+	{
+		float length_by_ratio = amplitude * sinf(frequency * internal_clock + offset) + vertical_shift;
+		length_by_ratio = std::clamp(length_by_ratio, 0.f, 1.f);
+		const float length_absolute_value = length_by_ratio * ProtozoaSettings::maximum_extension;
+		return length_absolute_value;
 	}
 };

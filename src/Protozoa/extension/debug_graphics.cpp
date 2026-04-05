@@ -118,7 +118,6 @@ void Protozoa::draw_cell_physics(Font* font)
         const auto spacing = font->get_text_size("0").y;
         const sf::Vector2f offset = { 0, spacing };
         font->draw(top_left, "id: " + std::to_string(cell.id), false);
-        font->draw(top_left + offset, "phase: " + std::to_string(cell.sinwave_current_phase_), false);
         font->draw(top_left + offset * 2.f, "friction: " + std::to_string(cell.sinwave_current_friction_), false);
         font->draw(top_left + offset * 3.f, "gen: " + std::to_string(cell.generation), false);
     }
@@ -149,15 +148,12 @@ void Protozoa::draw_spring_information(Font* font) const
         vectorF2 << "force B: (" << denary_to_str(f2.x, 2) << ", " << denary_to_str(f2.y, 2) << ")";
 		std::ostringstream length;
 		length << "length: " << denary_to_str(spring.spring_length, 2);
-		std::ostringstream breaking;
-		breaking << "breaking: " << denary_to_str(spring.breaking_length, 2);
 		std::ostringstream broken;
 		broken << "broken: " << spring.broken;
 
         font->draw(lower_quartile, vectorF1.str(), true);
         font->draw(upper_quartile, vectorF2.str(), true);
 		font->draw(lower_quartile + interquartile_range/3.f, length.str(), true);
-		font->draw(upper_quartile - interquartile_range/3.f, breaking.str(), true);
 		font->draw(upper_quartile - interquartile_range/2.f, broken.str(), true);
     }
 }

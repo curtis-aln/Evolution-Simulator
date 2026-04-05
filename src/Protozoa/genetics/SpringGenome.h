@@ -15,9 +15,25 @@ struct SpringGenome
     float damping = 0.1f; // velocity lost per update
     float spring_const = 0.5f; // stiffness of the spring
 
+    // the amplitude can range from 0, to 1 and is multiplied by a multiple of the cell radius to figure out extension
+    inline static constexpr float max_amplitude = 1.f;
+
+    // 1 second is 30 frames, so they should only be able to complete one oscillation per second (+- 1/30)
+    inline static constexpr float max_frequency = 1.f / 30.f;
+
+    // offset has a range of +- pi rad, then it loops
+    inline static constexpr float max_offset = pi;
+
+    // vertical shift minimum: -0.5 (graph fully below x axis), maximum: 0.5 (graph fully above x axis), clamping to make sure no vaue escapes [0, 1]
+    inline static constexpr float max_vertical_shift = 0.5f;
+
+    inline static constexpr float max_damping = 1.f;
+    inline static constexpr float max_spring_const = 1.f;
+
+
     // The update function looks as so Extension = A * sin(Bt + C) + D
-    float amplitude = 0.5f;
-    float frequency = 0.5f;
-    float offset = 0.5f;
+    float amplitude = 0.2f;
+    float frequency = 1 / 60.f;
+    float offset = 0.f;
     float vertical_shift = 0.5f;
 };

@@ -58,6 +58,12 @@ void Protozoa::mutate_existing_cells(float mut_rate, float mut_range)
        //cell.remove_cell_chance += rand_sym(mut_range) * chance(mut_rate);
         //cell.add_spring_chance += rand_sym(mut_range) * chance(mut_rate);
         //cell.remove_spring_chance += rand_sym(mut_range) * chance(mut_rate);
+    
+
+        cell.amplitude = std::clamp(cell.amplitude, -cell.max_amplitude, cell.max_amplitude);
+        cell.frequency = std::clamp(cell.frequency, -cell.max_frequency, cell.max_frequency);
+        cell.offset = std::clamp(cell.offset, -cell.max_offset, cell.max_offset);
+        cell.vertical_shift = std::clamp(cell.vertical_shift, -cell.max_vertical_shift, cell.max_vertical_shift);
     }
 }
 
@@ -83,6 +89,13 @@ void Protozoa::mutate_existing_springs(float mut_rate, float mut_range)
         spring.mutation_range += chance(spring.mutation_rate_rate) ? rand_sym(spring.mutation_rate_range) : 0.f;
         spring.mutation_rate += chance(spring.mutation_rate_rate) ? rand_sym(spring.mutation_rate_range) : 0.f;
 
+        // handle clamping of the params
+		spring.spring_const = std::clamp(spring.spring_const, 0.f, spring.max_spring_const);
+		spring.damping = std::clamp(spring.damping, 0.f, spring.max_damping);
+        spring.amplitude = std::clamp(spring.amplitude, 0.f, spring.max_amplitude);
+		spring.frequency = std::clamp(spring.frequency, -spring.max_frequency, spring.max_frequency);
+		spring.offset = std::clamp(spring.offset, -spring.max_offset, spring.max_offset);
+		spring.vertical_shift = std::clamp(spring.vertical_shift, -spring.max_vertical_shift, spring.max_vertical_shift);
     }
 }
 

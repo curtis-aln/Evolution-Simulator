@@ -15,7 +15,6 @@ struct Cell : public CellGenome
 	// The Cell ID is used when referencing the cell inside the protozoa, and identifying its genome
 	int id{}; 
 
-	float sinwave_current_phase_ = 0.f;
 	float sinwave_current_friction_ = 0.f;
 
 
@@ -32,7 +31,6 @@ struct Cell : public CellGenome
 	void reset()
 	{
 		generation = 0;
-		sinwave_current_phase_ = 0.f;
 		sinwave_current_friction_ = 0.f;
 	}
 
@@ -40,14 +38,12 @@ struct Cell : public CellGenome
 	void update(const int internal_clock)
 	{
 		// updating velocity and position vectors
-		clamp_velocity();
+		//clamp_velocity(); todo: just gonna see what happens if we dont clamp vel
 
-		// we first need to scale down the internal clock value, it increments by 1 every frame which is way too large for the sin input
-		// as it is expecting a radian input rather than a degree-like input
-		const float scaled_clock = fmod(internal_clock, 360.f) * pi / 180.f;
-
-		sinwave_current_phase_ = fmod(internal_clock * frequency + offset, 360.f) * pi / 180.f;
 		sinwave_current_friction_ = amplitude * sinf(frequency * internal_clock + offset) + vertical_shift;
+
+		// clamping friction to [0, 1]
+		sinwave_current_friction_ = std::clamp(sinwave_current_friction_, 0.f, 1.f);
 		
 		// updating the velocity with the new friction
 		velocity_ *= sinwave_current_friction_;

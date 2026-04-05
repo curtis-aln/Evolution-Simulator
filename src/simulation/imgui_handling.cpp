@@ -334,7 +334,6 @@ void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_proto
 
         ImGui::Text("ID: %d", selected_cell->id);
         ImGui::Text("Generation: %d", selected_cell->generation);
-        ImGui::Text("Phase: %.3f", selected_cell->sinwave_current_phase_);
         ImGui::Text("Friction: %.3f", selected_cell->sinwave_current_friction_);
 
         ImGui::Spacing();

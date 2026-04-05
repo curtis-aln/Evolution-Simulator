@@ -61,7 +61,7 @@ struct WorldSettings
 {
 	static constexpr float bounds_radius = 25'000;
 
-	static constexpr unsigned max_protozoa = 50'000;
+	static constexpr unsigned max_protozoa = 5'000;
 	static constexpr unsigned initial_protozoa = 2'000;
 
 	inline static constexpr size_t cells_x = 100;
@@ -78,7 +78,10 @@ struct ProtozoaSettings
 
 	static constexpr float energy_decay_rate = 0.15f; // how quickly energy decays per frame
 
-	inline static constexpr float wander_threshold = CellGenome::radius * 30.f; // if a cell wanders too far away from the protozoa it kills the whole thing
+	inline static constexpr float wander_threshold = CellGenome::radius * 25.f; // if a cell wanders too far away from the protozoa it kills the whole thing
+
+	inline static constexpr float breaking_length = CellGenome::radius * 6.f;
+	inline static constexpr float maximum_extension = CellGenome::radius * 4.f;
 };
 
 

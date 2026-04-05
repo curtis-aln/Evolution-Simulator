@@ -3,6 +3,9 @@
 #include <SFML/Graphics.hpp>
 
 #include "../Utils/random.h"
+
+
+
 struct CellGenome
 {
     // The creation genes are genes used when a protozoa is created from scratch, such as starting up the sim or following an extinction event
@@ -27,11 +30,29 @@ struct CellGenome
     sf::Color cell_outer_color = Random::rand_color();
 	sf::Color cell_inner_color = Random::rand_color();
 
+    // limits
+    
+    
+	
+    // max amplitude of [-2, 2], the friction value gets clamped anyway so this determines how fast it reaches from one limit to the other
+    inline static constexpr float max_amplitude = 2.f;
+
+    // // 1 second is 30 frames, so they should only be able to complete one oscillation per second (+- 1/30)
+    inline static constexpr float max_frequency = 1.f / 30.f;
+
+    // offset has a range of +- pi rad, then it loops
+    inline static constexpr float max_offset = pi;
+
+    // vertical shift minimum: -0.5 (graph fully below x axis), maximum: 0.5 (graph fully above x axis), clamping to make sure no vaue escapes [0, 1]
+    inline static constexpr float max_vertical_shift = 0.5f;
+
     // friction sin-wave parameters, the cell's friction coefficient is determined by a sin wave with these parameters, the input being the internal clock of the protozoa
-    float amplitude = 0.5f;
-    float frequency = 0.5f;
-    float offset = 0.5f;
+    float amplitude = 0.1f;
+    float frequency = 1 / 60.f;
+    float offset = 0.f;
     float vertical_shift = 0.5f;
+
+    
 
 
     CellGenome()
