@@ -12,8 +12,8 @@ struct SpringGenome
 
     int generation = 0;
 
-    float damping = 0.1f; // velocity lost per update
-    float spring_const = 0.5f; // stiffness of the spring
+    float damping = 0.9f; // velocity lost per update
+    float spring_const = 0.3f; // stiffness of the spring
 
     // the amplitude can range from 0, to 1 and is multiplied by a multiple of the cell radius to figure out extension
     inline static constexpr float max_amplitude = 1.f;

@@ -27,7 +27,7 @@ struct Spring : public SpringGenome
 
 	}
 
-	bool update(Cell& cell_a, Cell& cell_b, const int internal_clock)
+	float update(Cell& cell_a, Cell& cell_b, const int internal_clock)
 	{
 		const sf::Vector2f pos_a = cell_a.position_;
 		const sf::Vector2f pos_b = cell_b.position_;
@@ -67,7 +67,11 @@ struct Spring : public SpringGenome
 
 		// finally we check if the spring should break (if its length surpasses breaking length) and return that information
 		broken = dist > ProtozoaSettings::breaking_length;
-		return broken;
+		
+		// we can calculate the amount of energy this contraction / extension took
+		float work_done = std::abs(spring_force) * std::abs(dist - rest_length);
+		work_done *= ProtozoaSettings::spring_work_const; 
+		return work_done;
 	}
 
 

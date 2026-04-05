@@ -63,9 +63,10 @@ void Protozoa::update_springs()
 	{
 		Cell& cell_A = m_cells_[spring.cell_A_id];
 		Cell& cell_B = m_cells_[spring.cell_B_id];
-		bool broken = spring.update(cell_A, cell_B, frames_alive);
+		float energy_expendage = spring.update(cell_A, cell_B, frames_alive);
+		energy -= energy_expendage;
 
-		if (broken)
+		if (spring.broken)
 		{
 			dead = true;
 		}

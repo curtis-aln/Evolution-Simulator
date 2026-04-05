@@ -196,7 +196,3 @@ void Protozoa::remove_spring()
     m_springs_.pop_back(); // pop
 }
 
-
-// When springs are removed, cells may become detached from the main body, so if the cell is greater than a preset distance to the centre of the
-// protozoa it dies
-

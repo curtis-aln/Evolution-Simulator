@@ -13,10 +13,10 @@ struct CellGenome
     int generation = 0;
 
     // chances of adding or removing a cell per mutation event
-    inline static constexpr float add_cell_chance      = 0.13f;      // chance of cell being added
-    inline static constexpr float remove_cell_chance   = 0.13f;   // chance of cell being removed
-    inline static constexpr float add_spring_chance    = 0.13f;      // chance of cell being added
-    inline static constexpr float remove_spring_chance = 0.13f;   // chance of cell being removed
+    inline static constexpr float add_cell_chance      = 0.03f;      // chance of cell being added
+    inline static constexpr float remove_cell_chance   = 0.03f;   // chance of cell being removed
+    inline static constexpr float add_spring_chance    = 0.03f;      // chance of cell being added
+    inline static constexpr float remove_spring_chance = 0.03f;   // chance of cell being removed
 
     float mutation_rate = 0.2f;         // chance of mutation occurring
     float mutation_range = 0.2f;
@@ -47,8 +47,8 @@ struct CellGenome
     inline static constexpr float max_vertical_shift = 0.5f;
 
     // friction sin-wave parameters, the cell's friction coefficient is determined by a sin wave with these parameters, the input being the internal clock of the protozoa
-    float amplitude = 0.1f;
-    float frequency = 1 / 60.f;
+    float amplitude = 0.3f;
+    float frequency = 1 / 120.f;
     float offset = 0.f;
     float vertical_shift = 0.5f;
 

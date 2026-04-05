@@ -78,10 +78,12 @@ struct ProtozoaSettings
 
 	static constexpr float energy_decay_rate = 0.15f; // how quickly energy decays per frame
 
-	inline static constexpr float wander_threshold = CellGenome::radius * 25.f; // if a cell wanders too far away from the protozoa it kills the whole thing
+	inline static constexpr float wander_threshold = CellGenome::radius * 13.f; // if a cell wanders too far away from the protozoa it kills the whole thing
 
 	inline static constexpr float breaking_length = CellGenome::radius * 6.f;
 	inline static constexpr float maximum_extension = CellGenome::radius * 4.f;
+
+	inline static constexpr float spring_work_const = 1.f / 155'000.f; // how we scale the energy cost of springs
 };
 
 
@@ -91,7 +93,7 @@ struct FoodSettings
 	inline static constexpr size_t cells_y = WorldSettings::cells_y;
 	inline static constexpr size_t cell_capacity = 6;
 
-	static constexpr unsigned max_food = 4'000;
+	static constexpr unsigned max_food = 6'000;
 	static constexpr unsigned initial_food = 4'000;
 	inline static constexpr float food_radius = 30.f;
 	inline static constexpr float friction = 0.99f;
