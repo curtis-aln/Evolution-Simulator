@@ -111,10 +111,9 @@ public:
 		}
 	}
 
-	FixedSpan<obj_idx, cell_capacity * 9> find(const float x, const float y)
+	void find(const float x, const float y, FixedSpan<obj_idx, cell_capacity * 9>* const container)
 	{
-		FixedSpan<obj_idx, cell_capacity * 9> result{};
-
+		container->size = 0;
 		const auto cell_x = static_cast<int>(x / m_cellSize.x);
 		const auto cell_y = static_cast<int>(y / m_cellSize.y);
 
@@ -129,11 +128,9 @@ public:
 				const uint8_t  count = objects_count[index];
 
 				for (uint8_t i = 0; i < count; ++i)
-					result.add(grid[index][i]);
+					container->add(grid[index][i]);
 			}
 		}
-
-		return result;
 	}
 
 private:

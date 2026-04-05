@@ -157,6 +157,9 @@ private:
 
 	void update_hash_grid()
 	{
+		if (frames % update_freq != 0)
+			return;
+
 		spatial_hash_grid.clear();
 		for (Food* food : food_vector)
 		{

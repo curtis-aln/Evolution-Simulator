@@ -118,4 +118,5 @@ This allows for easy tweaking without recompiling, and sharing of settings betwe
 Update Name: Playing God
 
 
-// 150fps
+// 25fps
+// 29fps

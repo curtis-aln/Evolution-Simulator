@@ -39,7 +39,9 @@ struct Spring : public SpringGenome
 
 		if (dist < 1e-6f)
 		{
-			std::cerr << "Warning: Spring " << id << " has zero length. Skipping.\n";
+			// i dont know why this happens so we will just kill the organism and let evolution fix the bug
+
+			broken = true;
 			return false;
 		}
 

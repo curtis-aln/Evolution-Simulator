@@ -30,14 +30,18 @@ void Protozoa::consume(Food* food, FoodManager& food_manager)
 void Protozoa::handle_food(FoodManager& food_manager, const bool debug)
 {
     const sf::Vector2f center = get_center();
-    FixedSpan<obj_idx, FoodSettings::cell_capacity * 9> nearby = food_manager.spatial_hash_grid.find(center.x, center.y);
+    food_manager.spatial_hash_grid.find(center.x, center.y, &nearby_food_container);
 
     if (debug) food_positions_nearby.clear();
 
-    for (int32_t id : nearby)
+	for (int i = 0; i < nearby_food_container.size; ++i)
     {
-        Food* food = food_manager.at(id);
+        Food* food = food_manager.at(nearby_food_container[i]);
 		sf::Vector2f food_pos = food->position;
+
+        // if the food isnt within the protozoa bounds we dont bother
+        if (!m_personal_bounds_.contains(food_pos))
+			continue;
 
         for (Cell& cell : m_cells_)
         {

@@ -59,12 +59,12 @@ struct GraphicalSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 25'000;
+	static constexpr float bounds_radius = 125'000;
 
-	static constexpr unsigned max_protozoa = 5'000;
-	static constexpr unsigned initial_protozoa = 2'000;
+	static constexpr unsigned max_protozoa = 50'000;
+	static constexpr unsigned initial_protozoa = 20'000;
 
-	inline static constexpr size_t cells_x = 100;
+	inline static constexpr size_t cells_x = 200;
 	inline static constexpr size_t cells_y = cells_x;
 	inline static constexpr size_t cell_capacity = 20;
 
@@ -94,9 +94,10 @@ struct FoodSettings
 	inline static constexpr size_t cells_x = WorldSettings::cells_x;
 	inline static constexpr size_t cells_y = WorldSettings::cells_y;
 	inline static constexpr size_t cell_capacity = 6;
+	inline static constexpr size_t update_freq = 30; // food do not move that often so they dont have to be updated in the grid every frame
 
-	static constexpr unsigned max_food = 6'000;
-	static constexpr unsigned initial_food = 4'000;
+	static constexpr unsigned max_food = 20'000;
+	static constexpr unsigned initial_food = 20'000;
 	inline static constexpr float food_radius = 30.f;
 	inline static constexpr float friction = 0.965f;
 
