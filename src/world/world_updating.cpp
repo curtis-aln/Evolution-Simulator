@@ -113,10 +113,6 @@ void World::update_nearby_container(int& neighbours_size,
 
 void World::update_position_container()
 {
-	outer_color_data_.clear();
-	inner_color_data_.clear();
-	position_data_.clear();
-
 	spatial_hash_grid_.clear();
 
 	int idx = 0;
@@ -125,15 +121,16 @@ void World::update_position_container()
 		for (Cell& cell : protozoa->get_cells())
 		{
 			cell.bound(world_circular_bounds_);
-			outer_color_data_.push_back(cell.cell_outer_color);
-			inner_color_data_.push_back(cell.cell_inner_color);
-			position_data_.push_back(cell.position_);
+			outer_color_data_[idx] = cell.cell_outer_color;
+			inner_color_data_[idx] = cell.cell_inner_color;
+			position_data_[idx] = cell.position_;
 
-			spatial_hash_grid_.add_object(cell.position_.x, cell.position_.y, idx++);
+			spatial_hash_grid_.add_object(cell.position_.x, cell.position_.y, idx);
+			idx++;
 		}
 	}
 
-	collision_resolutions.resize(position_data_.size(), { 0.f, 0.f });
+	entity_count = idx;
 }
 
 

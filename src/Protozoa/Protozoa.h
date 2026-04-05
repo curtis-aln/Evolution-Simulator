@@ -54,6 +54,8 @@ public:
 	bool reproduce = false;
 	bool dead = false;
 
+	FixedSpan<obj_idx, FoodSettings::cell_capacity * 9> nearby_food_container;
+
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr);
 
 	void update(FoodManager& food_manager, bool debug, float min_speed);
@@ -166,13 +168,10 @@ private:
 
 	void mutate_existing_cells(float mut_rate = 0.f, float mut_range = 0.f);
 	void mutate_existing_springs(float mut_rate = 0.f, float mut_range = 0.f);
-
-
 	bool cell_wander_check(Cell& cell);
 	
-
-
 	void remove_cell();
 	void add_spring();
+	void check_death_conditions(float min_speed);
 
 };

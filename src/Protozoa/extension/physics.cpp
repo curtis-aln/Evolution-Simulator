@@ -27,14 +27,9 @@ void Protozoa::update(FoodManager& food_manager, const bool debug, const float m
 	if (m_cells_.empty()) // No computation is needed if there are no cells
 		return;
 
-	float sp = min_speed;
-	if (velocity.x * velocity.x + velocity.y * velocity.y < sp * sp)
-	{
-		dead = true;
-	}
+	check_death_conditions(min_speed);
 
 	update_springs();
-	
 
 	update_bounding_box();
 
@@ -45,14 +40,26 @@ void Protozoa::update(FoodManager& food_manager, const bool debug, const float m
 	++frames_alive;
 
 	energy -= energy_decay_rate;
-	if (energy <= 0)
-	{
-		dead = true;
-	}
+	
 
 	const sf::Vector2f center = get_center();
 	velocity = center - previous_position;
 	previous_position = center;
+}
+
+
+void Protozoa::check_death_conditions(float min_speed)
+{
+	float sp = min_speed;
+	if (velocity.x * velocity.x + velocity.y * velocity.y < sp * sp)
+	{
+		dead = true;
+	}
+
+	if (energy <= 0)
+	{
+		dead = true;
+	}
 }
 
 
@@ -69,6 +76,7 @@ void Protozoa::update_springs()
 		if (spring.broken)
 		{
 			dead = true;
+			return;
 		}
 	}
 }

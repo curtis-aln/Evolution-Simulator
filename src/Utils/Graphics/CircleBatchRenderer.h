@@ -83,9 +83,9 @@ public:
         }
     }
 
-    void render(std::vector<sf::Vector2f>& positions_x)
+    void render(std::vector<sf::Vector2f>& positions, const float positions_size)
     {
-        const size_t num_circles = positions_x.size();
+        const size_t num_circles = positions_size;
         const sf::Vector2f tex_size_f(static_cast<float>(texture.getSize().x),
                                       static_cast<float>(texture.getSize().y));
         const float r = tex_size_f.x * 0.5f; // assuming square
@@ -113,7 +113,7 @@ public:
         // Write active circles
         const size_t capped = std::min(num_circles, static_cast<size_t>(max_circles));
         for (size_t i = 0; i < capped; ++i)
-            write_circle_positions(i, positions_x[i]);
+            write_circle_positions(i, positions[i]);
 
         // Push any unused circles off-screen (so you still draw max_circles in one call)
         // (You could also shrink the vertex array and avoid this, but this matches your current approach.)

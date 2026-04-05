@@ -112,8 +112,7 @@ protected:
 	void update_all_protozoa(FoodManager& food_manager_, bool debug_mode, float min_speed, bool track_statistics)
 	{
 		int idx = 0;
-		std::vector<int> reproduce_indexes{};
-		reproduce_indexes.reserve(max_protozoa);
+		// resolving collisions
 		for (Protozoa* protozoa : all_protozoa_)
 		{
 			// applying the collision resolution
@@ -121,7 +120,13 @@ protected:
 			{
 				cell.position_ += collision_resolutions[idx++];
 			}
+		}
+		
+		std::vector<int> reproduce_indexes{};
+		reproduce_indexes.reserve(max_protozoa);
 
+		for (Protozoa* protozoa : all_protozoa_)
+		{
 			protozoa->update(food_manager_, debug_mode, min_speed);
 
 			if (protozoa->dead)

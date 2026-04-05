@@ -31,7 +31,7 @@ class World : public ProtozoaManager
 	std::vector<sf::Color> outer_color_data_{};
 	std::vector<sf::Color> inner_color_data_{};
 	std::vector<sf::Vector2f> position_data_{};
-
+	int entity_count = 0; // how many cells are currently in the world
 	
 
 	// Each Cell is drawn with a simple outer and inner circle, we use batch rendering to draw all cells efficiently.

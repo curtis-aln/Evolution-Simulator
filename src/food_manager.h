@@ -13,22 +13,26 @@
 struct Food
 {
 	int id = 0;
+	int age = 0;
 
 	sf::Vector2f position{};
 	sf::Vector2f velocity{};
+	sf::Color color{};
 
 	bool active = true;
 };
 
+
+
 class FoodManager : FoodSettings
 {
-	sf::RenderWindow* window_ = nullptr;
 	Circle* world_bounds_ = nullptr;
 
-	CircleBatchRenderer food_renderer{ window_ };
+	CircleBatchRenderer food_renderer;
 	o_vector<Food> food_vector{max_food};
 
 	std::vector<sf::Vector2f> food_positions;
+	std::vector<sf::Color> food_colors;
 
 public:
 	const float bounds_radius = world_bounds_->radius;
@@ -41,13 +45,14 @@ public:
 
 public:
 	FoodManager(sf::RenderWindow* window, Circle* world_circular_bounds) 
-	: window_(window), world_bounds_(world_circular_bounds),
-		food_grid_renderer(*window, world_rect_bounds, FoodSettings::cells_x, FoodSettings::cells_y)
+	: 
+		world_bounds_(world_circular_bounds), food_renderer(window),
+		food_grid_renderer(*window, world_rect_bounds, cells_x, cells_y)
 	{
-		init_renderer();
 		init_food();
 
-		food_positions.reserve(max_food);
+		food_positions.resize(max_food, {});
+		food_colors.resize(max_food, {});
 
 	}
 
@@ -60,19 +65,29 @@ public:
 	void update()
 	{
 		spawn_food();
+		vibrate_food();
 		update_hash_grid();
 	}
 
 	void render()
 	{
-		food_positions.clear();
-
+		int idx = 0;
 		for (Food* food : food_vector)
 		{
-			food_positions.push_back(food->position);
+			food_positions[idx] = food->position;
+
+			sf::Color c = food->color;
+
+			float age = static_cast<float>(food->age);
+			c.a = std::min(age / kFoodVisibilityRampFrames, 1.f) * kFoodMaxAlpha;
+
+			food_colors[idx] = c;
+
+			idx++;
 		}
 
-		food_renderer.render(food_positions);
+		food_renderer.init_texture(food_colors, food_radius, idx);
+		food_renderer.render(food_positions, idx);
 	}
 
 	// world interacting with the food
@@ -80,6 +95,7 @@ public:
 	{
 		Food* food = food_vector.at(food_id);
 		food->position = { 0, 0 };
+		food->age = 0;
 		food_vector.remove(food_id);
 	}
 
@@ -111,8 +127,32 @@ private:
 				break;
 
 			food->position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
+			food->age = 0.f;
+			food->color = Random::rand_color(food_darkest_color, food_lightest_color);
 		}
 		
+	}
+
+	void vibrate_food()
+	{
+		for (Food* food : food_vector)
+		{
+			food->age++;
+
+			food->velocity = Random::rand_vector(-vibration_strength, vibration_strength);
+			food->velocity *= friction;
+			food->position += food->velocity;
+
+			// keep the food within the world bounds
+			const float dist_sq = (food->position - world_bounds_->center).lengthSquared();
+
+			if (dist_sq > bounds_radius * bounds_radius)
+			{
+				const sf::Vector2f to_center = world_bounds_->center - food->position;
+				const sf::Vector2f normal = to_center.normalized();
+				food->position = world_bounds_->center + normal * bounds_radius;
+			}
+		}
 	}
 
 	void update_hash_grid()
@@ -124,21 +164,6 @@ private:
 		}
 	}
 
-	void init_renderer()
-	{
-		// 
-		std::vector<sf::Color> colors;
-		colors.resize(max_food);
-		for (int i = 0; i < max_food; ++i)
-		{
-			sf::Vector3i rgb_min = { 0, 160, 0 };
-			sf::Vector3i rgb_max = { 80, 255, 100 };
-			colors[i] = Random::rand_color(rgb_min, rgb_max);
-		}
-
-		food_renderer.init_texture(colors, food_radius, max_food);
-	}
-
 	void init_food()
 	{
 		for (int i = 0; i < max_food; ++i)
@@ -147,6 +172,7 @@ private:
 			food.id = i;
 			food.position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
 			food.velocity = Random::rand_vector(-10.f, 10.f);
+			food.color = Random::rand_color(food_darkest_color, food_lightest_color);
 			food_vector.emplace(food);
 		}
 

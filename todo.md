@@ -1,11 +1,4 @@
-// NOTE: do not use cell id's as indexes as when cells are added and removed it can mess up
-// NOTE: if there are multithreading issues check how rendering works with the update thread because i commented out the lock mutex
-
-// ********** Currently Working On ********** //
-
-
 /* Graphics */
-// Create a RectBuffer and re-introduce the connections
 // Cells should fade in and out of existance
 // Statistics graphs should be constantly at the bottom right corner of the screen
 // Food and cell counts should be on the same graph
@@ -59,7 +52,7 @@
 // - make the spatial hash grid scalable, then have the world gradually increase in size
 // - implement pezzas work datastructure 
 // [DONE] translating the screen should have accelaration & de-accelaration instead of being instant
-// - you cant select protozoa without holding 
+// [Done] you cant select protozoa without holding 
 // [DONE] statistics continue even when simulation is paused, should pause them aswell
 // [DONE] textbox showing stats and controls is messed up
 // each protozoa stores cell_positions_nearby and food positions for debugging, just have it once in the protozoa manager
@@ -81,7 +74,7 @@ ImGUI To do
 [Done] Move the debug control settings and buttons into this mini popup menu
 [Done] Ability to hide IMGUI screens completely with a keybind (for screenshots)
 - Fix all missing statistics from re-writing the genome
-- figure out why program runs so slow and fix it, dont stop until you get from 60fps -> 600fps
+[Done] figure out why program runs so slow and fix it, dont stop until you get from 60fps -> 600fps
 - Reset Simulation Button with controls for world size, initial protozoa count, food spawn rate, and mutation rate/range
 		- add all settings to a json file and have the program read from it on starrtup, then add a "save settings" button to write the current settings back to the file. 
 This allows for easy tweaking without recompiling, and sharing of settings between users.
@@ -113,7 +106,7 @@ This allows for easy tweaking without recompiling, and sharing of settings betwe
 - Clone: duplicate an organism exactly, spawn the copy nearby
 - Death notifications: optional toast notification when a tagged organism dies, with cause of death (starvation, age, etc.
 - statistic showing total alive entities
-- and then last but not least, figure out how to put rendering and updating on seperate threads, then you can publish a video
+- figure out how to put rendering and updating on seperate threads
 - create a cell body class
 - spatial hash grid should dynamically change density as the population changes, and should be able to change size too
 - when a new cell is created it should have very low friction and generally not affect the organism too much, test this
@@ -123,3 +116,6 @@ This allows for easy tweaking without recompiling, and sharing of settings betwe
 - ability to see the protozoa connections when clicked on them, hide the stats or add check boxes to select which ones
 
 Update Name: Playing God
+
+
+// 150fps

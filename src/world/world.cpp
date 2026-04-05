@@ -11,14 +11,14 @@ World::World(sf::RenderWindow* window)
 { 
 	init_organisms();
 
-	const size_t predicted_cells = max_protozoa * 5;
+	const size_t maximum_cells = max_protozoa * ProtozoaSettings::max_cells;
 
 	// reserving nessesary data
-	outer_color_data_.reserve(predicted_cells);
-	inner_color_data_.reserve(predicted_cells);
-	position_data_.reserve(predicted_cells);
+	outer_color_data_.resize(maximum_cells);
+	inner_color_data_.resize(maximum_cells);
+	position_data_.resize(maximum_cells);
 
-	collision_resolutions.reserve(predicted_cells);
+	collision_resolutions.resize(maximum_cells);
 }
 
 
@@ -44,45 +44,26 @@ void World::render(Font* font)
 
 void World::render_protozoa(Font* font)
 {
-	const float radius_inner = CellGenome::radius;
-	const float radius_outer = radius_inner + GraphicalSettings::cell_outline_thickness;
-	const int size = position_data_.size();
-
-	outer_circle_renderer_.init_texture(outer_color_data_, radius_outer, size);
-
-	// if simple mode is off then we init the inner circle texture
-	if (!simple_mode)
-	{
-		inner_circle_renderer_.init_texture(inner_color_data_, radius_inner, size);
-	}
-
-	// we want the springs to be rendered behind the cells
-	if (selected_protozoa_ != nullptr && debug_mode && !skeleton_mode)
-	{
-		selected_protozoa_->render_protozoa_springs();
-
-		
-	}
-
-	// rendering the rest of the protozoas
-	outer_circle_renderer_.render(position_data_);
+	outer_circle_renderer_.init_texture(outer_color_data_, CellGenome::radius + GraphicalSettings::cell_outline_thickness, entity_count);
+	outer_circle_renderer_.render(position_data_, entity_count);
 
 	if (!simple_mode)
 	{
-		inner_circle_renderer_.render(position_data_);
+		inner_circle_renderer_.init_texture(inner_color_data_, CellGenome::radius, entity_count);
+		inner_circle_renderer_.render(position_data_, entity_count);
 	}
 
-	// if our selected cell needs debugging
-	if (debug_mode && selected_protozoa_ != nullptr)
+	if (selected_protozoa_ != nullptr)
 	{
-		selected_protozoa_->render_debug(font, skeleton_mode, show_connections, show_bounding_boxes);
+		if (debug_mode && !skeleton_mode)
+			selected_protozoa_->render_protozoa_springs();
+
+		if (debug_mode)
+			selected_protozoa_->render_debug(font, skeleton_mode, show_connections, show_bounding_boxes);
 	}
 
-	// clearing all of their nearby data to be re-written to
 	for (Protozoa* protozoa : all_protozoa_)
-	{
 		protozoa->cell_positions_nearby.clear();
-	}
 }
 
 
@@ -94,7 +75,7 @@ void World::init_organisms()
 		all_protozoa_.emplace({ i, &world_circular_bounds_, m_window_ });
 	}
 	// we only want to start with a certain amount of protozoa so we "remove" some
-	for (int i = 0; i < max_protozoa - initial_protozoa; ++i)
+	for (int i = initial_protozoa; i < max_protozoa; ++i)
 	{
 		all_protozoa_.at(i)->dead = true;
 		all_protozoa_.at(i)->soft_reset();

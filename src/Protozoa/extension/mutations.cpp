@@ -102,6 +102,9 @@ void Protozoa::mutate_existing_springs(float mut_rate, float mut_range)
 
 void Protozoa::add_cell()
 {
+    if (m_cells_.size() == max_cells)
+		return;
+
     // finding the parent which will undergo mitosis
     const int parent_index = Random::rand_range(size_t(0), m_cells_.size() - 1);
     const Cell& parent = m_cells_[parent_index];

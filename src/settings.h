@@ -66,7 +66,7 @@ struct WorldSettings
 
 	inline static constexpr size_t cells_x = 100;
 	inline static constexpr size_t cells_y = cells_x;
-	inline static constexpr size_t cell_capacity = 40;
+	inline static constexpr size_t cell_capacity = 20;
 
 	inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
 	inline static constexpr float max_speed = 30;
@@ -74,6 +74,8 @@ struct WorldSettings
 
 struct ProtozoaSettings
 {
+	static constexpr int max_cells = 15;
+
 	static constexpr float spawn_radius = 100.f;
 
 	static constexpr float energy_decay_rate = 0.15f; // how quickly energy decays per frame
@@ -96,8 +98,15 @@ struct FoodSettings
 	static constexpr unsigned max_food = 6'000;
 	static constexpr unsigned initial_food = 4'000;
 	inline static constexpr float food_radius = 30.f;
-	inline static constexpr float friction = 0.99f;
+	inline static constexpr float friction = 0.965f;
 
 	inline static constexpr int food_spawn_amount = 14;
 	inline static constexpr int food_spawn_interval = 2; // frames between spawns
+
+	inline static sf::Vector3i food_darkest_color = { 0, 160, 0 };
+	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
+	inline static float vibration_strength = 5.f;
+
+	inline static constexpr float kFoodVisibilityRampFrames = 90;
+	inline static constexpr float kFoodMaxAlpha = 200;
 };
