@@ -12,7 +12,7 @@
 #include "../Utils/o_vector.hpp"
 #include "../Utils/Graphics/Circle.h"
 #include "../Utils/Graphics/CircleBatchRenderer.h"
-#include "../Utils/Graphics/simple_spatial_grid.h"
+#include "../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
 #include "../Utils/Graphics/SFML_Grid.h"
 
 // The World class manages the entire simulation environment, including protozoa, food, and rendering.
@@ -42,7 +42,7 @@ class World : public ProtozoaManager
 	FoodManager food_manager_{ m_window_, &world_circular_bounds_ };
 
 	// for our collision detection we use a spatial hash grid to see what cells are nearby others
-	SimpleSpatialGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid_{world_rect_bounds_};
+	SimpleSpatialGrid spatial_hash_grid_{ cells_x, cells_y, cell_max_capacity, bounds_radius * 2.f, bounds_radius * 2.f };
 	SFML_Grid cell_grid_renderer; // renders the cell spatial hash grid
 
 
@@ -68,7 +68,7 @@ public:
 	bool track_statistics = true;
 
 	// for the simple spatial grid, we need a temporary array to store nearby cell ids
-	std::array<int, cell_capacity * 9> nearby_ids = {};
+	std::array<int, cell_max_capacity * 9> nearby_ids = {};
 
 	float min_speed = 0;
 	float delta_min_speed = 0.0;
@@ -92,6 +92,9 @@ public:
 
 	// updating functions
 	void update();
+	SimpleSpatialGrid* get_spatial_grid();
+	SimpleSpatialGrid* get_food_spatial_grid();
+	FoodManager* get_food_manager();
 	void render(Font* font);
 
 	// fetch functions

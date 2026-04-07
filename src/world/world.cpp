@@ -22,6 +22,21 @@ World::World(sf::RenderWindow* window)
 }
 
 
+SimpleSpatialGrid* World::get_spatial_grid()
+{
+	return &spatial_hash_grid_;
+}
+
+SimpleSpatialGrid* World::get_food_spatial_grid()
+{
+	return &food_manager_.spatial_hash_grid;
+}
+
+FoodManager* World::get_food_manager()
+{
+	return &food_manager_;
+}	
+
 void World::render(Font* font)
 {
 	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.

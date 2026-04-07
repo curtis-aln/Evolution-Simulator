@@ -59,14 +59,14 @@ struct GraphicalSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 125'000;
+	static constexpr float bounds_radius = 50'000;
 
-	static constexpr unsigned max_protozoa = 50'000;
-	static constexpr unsigned initial_protozoa = 20'000;
+	static constexpr unsigned max_protozoa = 15'000;
+	static constexpr unsigned initial_protozoa = 8'000;
 
-	inline static constexpr size_t cells_x = 200;
+	inline static constexpr size_t cells_x = 180;
 	inline static constexpr size_t cells_y = cells_x;
-	inline static constexpr size_t cell_capacity = 20;
+	inline static constexpr size_t cell_max_capacity = 25;
 
 	inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
 	inline static constexpr float max_speed = 30;
@@ -85,7 +85,10 @@ struct ProtozoaSettings
 	inline static constexpr float breaking_length = CellGenome::radius * 6.f;
 	inline static constexpr float maximum_extension = CellGenome::radius * 4.f;
 
-	inline static constexpr float spring_work_const = 1.f / 155'000.f; // how we scale the energy cost of springs
+	inline static constexpr float spring_work_const = 1.f / 100'000.f; // how we scale the energy cost of springs
+
+	inline static size_t reproductive_cooldown = 200.f;
+	inline static size_t digestive_time = 100.f; // per cell
 };
 
 
@@ -93,11 +96,11 @@ struct FoodSettings
 {
 	inline static constexpr size_t cells_x = WorldSettings::cells_x;
 	inline static constexpr size_t cells_y = WorldSettings::cells_y;
-	inline static constexpr size_t cell_capacity = 6;
-	inline static constexpr size_t update_freq = 30; // food do not move that often so they dont have to be updated in the grid every frame
+	inline static constexpr size_t cell_max_capacity = 20;
+	inline static constexpr size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
 
 	static constexpr unsigned max_food = 20'000;
-	static constexpr unsigned initial_food = 20'000;
+	static constexpr unsigned initial_food = 2'000;
 	inline static constexpr float food_radius = 30.f;
 	inline static constexpr float friction = 0.965f;
 
@@ -110,4 +113,8 @@ struct FoodSettings
 
 	inline static constexpr float kFoodVisibilityRampFrames = 90;
 	inline static constexpr float kFoodMaxAlpha = 200;
+
+	inline static float spawn_proportionality_constant = 0.015f; // range between [0.001, 0.01]
+	inline static float food_spawn_distance = food_radius * 2.f;
+	inline static size_t reproductive_cooldown = 200.f;
 };

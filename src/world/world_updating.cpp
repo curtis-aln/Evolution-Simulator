@@ -36,6 +36,10 @@ void World::update()
 
 void World::update_grid_cell(const int grid_cell_id)
 {
+	// if the grid cell is empty, dont bother
+	if (spatial_hash_grid_.cell_capacities[grid_cell_id] == 0)
+		return;
+
 	int neighbours_size = 0;
 
 	const int cell_index_x = grid_cell_id % cells_x;
@@ -53,7 +57,7 @@ void World::update_grid_cell(const int grid_cell_id)
 	update_nearby_container(neighbours_size, cell_index_x + 1, cell_index_y + 1);
 
 	const auto& cell_contents = spatial_hash_grid_.grid[grid_cell_id];
-	const uint8_t cell_size = spatial_hash_grid_.objects_count[grid_cell_id];
+	const uint8_t cell_size = spatial_hash_grid_.cell_capacities[grid_cell_id];
 
 	for (uint8_t idx = 0; idx < cell_size; ++idx)
 	{
@@ -102,7 +106,7 @@ void World::update_nearby_container(int& neighbours_size,
 
     const uint32_t neighbour_index = neighbour_index_y * cells_x + neighbour_index_x;
     const auto& contents = spatial_hash_grid_.grid[neighbour_index];
-    const uint8_t size = spatial_hash_grid_.objects_count[neighbour_index];
+    const uint8_t size = spatial_hash_grid_.cell_capacities[neighbour_index];
 
     for (uint8_t idx = 0; idx < size; ++idx)
     {

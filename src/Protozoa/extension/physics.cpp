@@ -10,6 +10,7 @@ inline static constexpr  size_t food_positions_container_reserve = 30;
 Protozoa::Protozoa(const int id_, Circle* world_bounds, sf::RenderWindow* window)
 	: m_window_(window), m_world_bounds_(world_bounds), id(id_), GenomeManager(&m_cells_, &m_springs_)
 {
+
 	food_positions_nearby.reserve(cell_positions_container_reserve);
 	cell_positions_nearby.reserve(food_positions_container_reserve);
 
@@ -36,6 +37,7 @@ void Protozoa::update(FoodManager& food_manager, const bool debug, const float m
 	update_cells();
 
 	handle_food(food_manager, debug);
+	reproduce_check();
 
 	++frames_alive;
 
@@ -66,12 +68,14 @@ void Protozoa::check_death_conditions(float min_speed)
 void Protozoa::update_springs()
 {
 	// updates the springs connecting the cells
+	energy_lost_to_springs = 0.f;
 	for (Spring& spring : m_springs_)
 	{
 		Cell& cell_A = m_cells_[spring.cell_A_id];
 		Cell& cell_B = m_cells_[spring.cell_B_id];
 		float energy_expendage = spring.update(cell_A, cell_B, frames_alive);
 		energy -= energy_expendage;
+		energy_lost_to_springs += energy_expendage;
 
 		if (spring.broken)
 		{

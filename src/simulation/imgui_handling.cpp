@@ -18,6 +18,10 @@ void Simulation::init_imGUI()
 
     style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0.7f);
     style.Colors[ImGuiCol_PopupBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
+
+    // in init_imGUI, after ImGui::SFML::Init
+    constexpr float ui_scale_percent = 250.f;
+    ImGui::GetIO().FontGlobalScale = ui_scale_percent / 100.f;
 }
 
 void Simulation::imgui_stats_panel()
@@ -250,6 +254,7 @@ void Simulation::handle_imGUI()
     }
     extinction_popup();
 
+    imgui_spatial_grid_panel();
 }
 
 
@@ -369,6 +374,7 @@ void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_proto
 
         ImGui::Text("Energy: %.2f", selected_protozoa->energy);
         ImGui::Text("Food: %.2f", selected_protozoa->total_food_eaten);
+		ImGui::Text("Energy lost to springs: %.2f", selected_protozoa->energy_lost_to_springs);
         ImGui::TextDisabled("Display");
 
         ImGui::Checkbox("Skeleton", &m_world_.skeleton_mode);
@@ -417,6 +423,95 @@ void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_proto
         ImGui::Spacing();
 
         ImGui::EndChild();
+    }
+
+    ImGui::End();
+}
+
+void Simulation::imgui_spatial_grid_panel()
+{
+    ImGui::Begin("Spatial Grid Inspector");
+
+    ImGui::Checkbox("Track", &tracking);
+    ImGui::SameLine();
+    ImGui::TextDisabled("(disable to save performance)");
+
+    SimpleSpatialGrid* cell_grid = m_world_.get_spatial_grid();
+    SimpleSpatialGrid* food_grid = m_world_.get_food_spatial_grid();
+
+    auto draw_grid_info = [this](const char* label, SimpleSpatialGrid& grid)
+        {
+            ImGui::SeparatorText(label);
+
+            ImGui::Text("Grid:        %zu x %zu  (%zu cells)", grid.CellsX, grid.CellsY, grid.get_total_cells());
+            ImGui::Text("Cell Size:   %.1f x %.1f px", grid.cell_width, grid.cell_height);
+            ImGui::Text("World Size:  %.0f x %.0f", grid.world_width, grid.world_height);
+            ImGui::Text("Cell Cap:    %zu obj/cell", grid.cell_max_capacity);
+
+            if (!tracking)
+            {
+                ImGui::TextDisabled("(tracking disabled)");
+                return;
+            }
+
+            int total_objects = 0;
+            int max_in_cell = 0;
+            int full_cells = 0;
+            int empty_cells = 0;
+
+            for (size_t i = 0; i < grid.get_total_cells(); ++i)
+            {
+                const int count = static_cast<int>(grid.cell_capacities[i]);
+                total_objects += count;
+                if (count == 0) ++empty_cells;
+                if (count >= static_cast<int>(grid.cell_max_capacity)) ++full_cells;
+                if (count > max_in_cell) max_in_cell = count;
+            }
+
+            const size_t total_cells = grid.get_total_cells();
+
+            const float avg = total_cells > 0
+                ? static_cast<float>(total_objects) / static_cast<float>(total_cells)
+                : 0.f;
+            const float fill_pct = grid.cell_max_capacity > 0
+                ? static_cast<float>(max_in_cell) / static_cast<float>(grid.cell_max_capacity) * 100.f
+                : 0.f;
+            const float empty_pct = total_cells > 0
+                ? static_cast<float>(empty_cells) / static_cast<float>(total_cells) * 100.f
+                : 0.f;
+            const float full_pct = total_cells > 0
+                ? static_cast<float>(full_cells) / static_cast<float>(total_cells) * 100.f
+                : 0.f;
+
+            ImGui::Spacing();
+            ImGui::Text("Total Objects:  %d", total_objects);
+            ImGui::Text("Avg per Cell:   %.2f", avg);
+            ImGui::Text("Max in Cell:    %d  (%.0f%% full)", max_in_cell, fill_pct);
+            ImGui::Text("Full Cells:     %d  (%.1f%% of grid)", full_cells, full_pct);
+            ImGui::Text("Empty Cells:    %d  (%.1f%% of grid)", empty_cells, empty_pct);
+
+            if (full_cells > 0)
+                ImGui::TextColored({ 1.f, 0.4f, 0.4f, 1.f }, "[!] %d cell(s) at capacity — objects may be dropped", full_cells);
+        };
+
+    draw_grid_info("Protozoa Grid", *cell_grid);
+    ImGui::Spacing();
+    draw_grid_info("Food Grid", *food_grid);
+
+    // ------------------ Tuning ------------------
+    ImGui::Spacing();
+    ImGui::SeparatorText("Tuning");
+
+    static int grid_resolution = static_cast<int>(cell_grid->CellsX);
+    ImGui::SliderInt("Grid Resolution (N x N)", &grid_resolution, 10, 500);
+
+    static float world_size = cell_grid->world_width;
+    ImGui::InputFloat("World Size", &world_size, 1000.f, 10000.f, "%.0f");
+
+    if (ImGui::Button("Apply"))
+    {
+        cell_grid->update_cell_dimensions();
+        food_grid->update_cell_dimensions();
     }
 
     ImGui::End();

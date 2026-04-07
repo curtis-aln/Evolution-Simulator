@@ -16,6 +16,7 @@ struct Cell : public CellGenome
 	int id{}; 
 
 	float sinwave_current_friction_ = 0.f;
+	size_t time_since_last_ate = 0;
 
 
 	sf::Vector2f position_{};
@@ -32,11 +33,13 @@ struct Cell : public CellGenome
 	{
 		generation = 0;
 		sinwave_current_friction_ = 0.f;
+		time_since_last_ate = 0.f;
 	}
 
 
 	void update(const int internal_clock)
 	{
+		time_since_last_ate++;
 		// updating velocity and position vectors
 		//clamp_velocity(); todo: just gonna see what happens if we dont clamp vel
 

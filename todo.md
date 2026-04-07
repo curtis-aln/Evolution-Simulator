@@ -73,11 +73,13 @@ ImGUI To do
 [Done] distance to its birth location
 [Done] Move the debug control settings and buttons into this mini popup menu
 [Done] Ability to hide IMGUI screens completely with a keybind (for screenshots)
-- Fix all missing statistics from re-writing the genome
+[Done] Fix all missing statistics from re-writing the genome
 [Done] figure out why program runs so slow and fix it, dont stop until you get from 60fps -> 600fps
 - Reset Simulation Button with controls for world size, initial protozoa count, food spawn rate, and mutation rate/range
 		- add all settings to a json file and have the program read from it on starrtup, then add a "save settings" button to write the current settings back to the file. 
 This allows for easy tweaking without recompiling, and sharing of settings between users.
+
+- major optimization, the same way that cells interact with cells through the batched grid calculation method, should be used for cells with food
 
 - Simulation should start more zoomed out
 - add protozoa and food population counts to the statistics graph instead 
@@ -114,9 +116,13 @@ This allows for easy tweaking without recompiling, and sharing of settings betwe
 - time elapsed in hours minutes seconds
 - if zoomed too far out you cant select on protozoa
 - ability to see the protozoa connections when clicked on them, hide the stats or add check boxes to select which ones
+- Organisms usually span accross more than one cell, so you cant use their centre to determine where to look for food
 
 Update Name: Playing God
 
+
+// The fookd eat cooldown should be PER CELL, thus the more cells you have the more you can eat and reproduce
+// cells should be able to eat as much as tehy want, butit increases t heir mass and it becomes more expensive to move
 
 // 25fps
 // 29fps

@@ -17,14 +17,20 @@ void Protozoa::consume(Food* food, FoodManager& food_manager)
     total_food_eaten++;
     stomach++;
     energy += 25;
+}
 
-    const bool ready_to_reproduce = stomach >= m_cells_.size();
-    if (ready_to_reproduce)
-    {
-        stomach = 0;
-        reproduce = true;
-        offspring_count++;
-    }
+void Protozoa::reproduce_check()
+{
+    if (time_since_last_reproduced++ < reproductive_cooldown / m_cells_.size()) // todo
+        return;
+
+	if (stomach < m_cells_.size())
+        return;
+
+    time_since_last_reproduced = 0.f;
+    stomach = 0;
+    reproduce = true;
+    offspring_count++;
 }
 
 void Protozoa::handle_food(FoodManager& food_manager, const bool debug)
@@ -34,7 +40,7 @@ void Protozoa::handle_food(FoodManager& food_manager, const bool debug)
 
     if (debug) food_positions_nearby.clear();
 
-	for (int i = 0; i < nearby_food_container.size; ++i)
+	for (int i = 0; i < nearby_food_container.count; ++i)
     {
         Food* food = food_manager.at(nearby_food_container[i]);
 		sf::Vector2f food_pos = food->position;
@@ -45,11 +51,15 @@ void Protozoa::handle_food(FoodManager& food_manager, const bool debug)
 
         for (Cell& cell : m_cells_)
         {
+            if (cell.time_since_last_ate < digestive_time)
+				continue;
+
             const float distance_sq = (food_pos - cell.position_).lengthSquared();
 			const float rad = cell.radius + FoodSettings::food_radius;
             if (distance_sq <= rad * rad)
             {
                 consume(food, food_manager);
+                cell.time_since_last_ate = 0;
                 break;
             }
         }

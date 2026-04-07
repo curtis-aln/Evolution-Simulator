@@ -6,14 +6,15 @@
 #include "Utils/Graphics/Circle.h" // world boundary
 #include "Utils/random.h"
 #include "settings.h"
-#include "Utils/Graphics/simple_spatial_grid.h"
 #include "Utils/Graphics/SFML_Grid.h"
+#include "Utils/Graphics/spatial_grid/simple_spatial_grid.h"
 
 
 struct Food
 {
 	int id = 0;
 	int age = 0;
+	int time_since_last_reproduced = 0;
 
 	sf::Vector2f position{};
 	sf::Vector2f velocity{};
@@ -38,7 +39,7 @@ public:
 	const float bounds_radius = world_bounds_->radius;
 	const sf::FloatRect world_rect_bounds = { {0, 0}, {bounds_radius * 2, bounds_radius * 2} };
 
-	SimpleSpatialGrid<cells_x, cells_y, cell_capacity> spatial_hash_grid{ world_rect_bounds };
+	SimpleSpatialGrid spatial_hash_grid{ cells_x, cells_y, cell_max_capacity, bounds_radius * 2, bounds_radius * 2 };
 	SFML_Grid food_grid_renderer; // renders the food spatial hash grid
 
 	int frames = 0;
@@ -64,7 +65,7 @@ public:
 
 	void update()
 	{
-		spawn_food();
+		spawn_food_improved(); //spawn_food();
 		vibrate_food();
 		update_hash_grid();
 	}
@@ -96,6 +97,7 @@ public:
 		Food* food = food_vector.at(food_id);
 		food->position = { 0, 0 };
 		food->age = 0;
+		food->time_since_last_reproduced = 0;
 		food_vector.remove(food_id);
 	}
 
@@ -126,11 +128,46 @@ private:
 			if (food == nullptr)
 				break;
 
+			// spawning the food next to another existing food 
+			sf::Vector2f other_food_pos = 
 			food->position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
 			food->age = 0.f;
 			food->color = Random::rand_color(food_darkest_color, food_lightest_color);
 		}
 		
+	}
+
+	void spawn_food_improved()
+	{
+		int size = food_vector.size();
+		if (food_vector.size() > max_food)
+			return;
+
+		for (Food* food : food_vector)
+		{
+			food->time_since_last_reproduced++;
+
+			if (food->time_since_last_reproduced < reproductive_cooldown)
+				continue;
+
+			float spawn_chance = 1.f - static_cast<float>(size) / static_cast<float>(max_food);
+			spawn_chance = std::clamp(spawn_chance * spawn_proportionality_constant, 0.f, 1.f);
+
+			if (Random::rand01_float() > spawn_chance)
+				continue;
+
+			Food* new_food = food_vector.add();
+			if (new_food == nullptr)
+				break;
+			// spawning the food next to another existing food 
+			sf::Vector2f other_food_pos = food->position;
+			
+			new_food->position = Random::rand_pos_in_circle(other_food_pos, food_radius * food_spawn_distance);
+			new_food->age = 0.f;
+			new_food->color = Random::rand_color(food_darkest_color, food_lightest_color);
+
+			food->time_since_last_reproduced = 0;
+		}
 	}
 
 	void vibrate_food()
@@ -146,11 +183,12 @@ private:
 			// keep the food within the world bounds
 			const float dist_sq = (food->position - world_bounds_->center).lengthSquared();
 
-			if (dist_sq > bounds_radius * bounds_radius)
+			const float max_dist = bounds_radius - food_radius;
+			if (dist_sq > max_dist * max_dist)
 			{
 				const sf::Vector2f to_center = world_bounds_->center - food->position;
 				const sf::Vector2f normal = to_center.normalized();
-				food->position = world_bounds_->center + normal * bounds_radius;
+				food->position = world_bounds_->center + normal * max_dist;
 			}
 		}
 	}

@@ -37,6 +37,8 @@ public:
 	// reproduction related parameters
 	unsigned stomach = 0;
 	unsigned total_food_eaten = 0;
+
+	size_t time_since_last_reproduced = 0;
 	
 	// debugging
 	sf::Vector2f birth_location = { 0, 0 };
@@ -47,6 +49,8 @@ public:
 	float energy = initial_energy;
 	unsigned frames_alive = 0u;
 
+	float energy_lost_to_springs = 0.f;
+
 	int id = 0;
 	bool active = true; // for o_vector.h
 
@@ -54,7 +58,7 @@ public:
 	bool reproduce = false;
 	bool dead = false;
 
-	FixedSpan<obj_idx, FoodSettings::cell_capacity * 9> nearby_food_container;
+	FixedSpan<obj_idx> nearby_food_container{ FoodSettings::cell_max_capacity * 9 };
 
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr);
 
@@ -70,6 +74,9 @@ public:
 	void render_debug(Font* font, bool skeleton_mode, bool show_connections, bool show_bounding_boxes);
 
 	void draw_cell_outlines();
+
+
+	void reproduce_check();
 
 	void nearby_food_information() const;
 	void update_generation();
@@ -117,6 +124,8 @@ public:
 		total_food_eaten = 0;
 		offspring_count = 0;
 		energy = initial_energy;
+
+		time_since_last_reproduced = 0;
 
 		for (Cell& cell : m_cells_)
 		{

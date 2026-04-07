@@ -52,6 +52,7 @@ class Simulation : SimulationSettings, TextSettings
 	bool m_rendering_ = true;
 	bool hide_panels = false;
 	bool open_extinction_window = false;
+	bool tracking = false;
 
 	bool m_tick_frame = false;
 	bool m_tick_frame_time = false;
@@ -98,6 +99,8 @@ private:
 	void manage_frame_rate();
 
 	void imgui_debug_panel(Cell* selected_cell, Protozoa* selected_protozoa);
+
+	void imgui_spatial_grid_panel();
 
 	// events 
 	void handle_events();
