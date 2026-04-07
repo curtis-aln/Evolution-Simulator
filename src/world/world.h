@@ -3,7 +3,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "../Protozoa/Protozoa.h"
-#include "../food_manager.h"
+#include "../Food/food_manager.h"
 #include "../settings.h"
 
 #include "ProtozoaManager.h"

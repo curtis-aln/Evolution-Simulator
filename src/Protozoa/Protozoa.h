@@ -7,7 +7,7 @@
 
 
 #include "../Utils/o_vector.hpp"
-#include "../food_manager.h"
+#include "../Food/food_manager.h"
 #include "genetics/GenomeManager.h"
 
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs

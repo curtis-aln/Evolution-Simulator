@@ -1,7 +1,7 @@
 #include "../Protozoa.h"
 #include "../../Utils/random.h"
 
-#include "../../food_manager.h"
+#include "../../Food/food_manager.h"
 
 inline static constexpr  size_t cell_positions_container_reserve = 30;
 inline static constexpr  size_t food_positions_container_reserve = 30;

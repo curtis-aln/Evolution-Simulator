@@ -1,6 +1,6 @@
 #include "../Protozoa.h"
 
-#include "../../food_manager.h"
+#include "../../Food/food_manager.h"
 #include "../genetics/CellGenome.h"
 
 #include <vector>

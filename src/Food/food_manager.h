@@ -1,0 +1,58 @@
+#pragma once
+
+#include <SFML/Graphics.hpp>
+#include "Food.h"
+#include "../Utils/Graphics/CircleBatchRenderer.h"
+#include "../Utils/o_vector.hpp"
+#include "../Utils/Graphics/Circle.h"
+#include "../Utils/random.h"
+#include "../settings.h"
+#include "../Utils/Graphics/SFML_Grid.h"
+#include "../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
+
+
+class FoodManager : FoodSettings
+{
+    Circle* world_bounds_ = nullptr;
+
+    CircleBatchRenderer food_renderer;
+    o_vector<Food> food_vector{ max_food };
+
+    std::vector<sf::Vector2f> food_positions;
+    std::vector<sf::Color>    food_colors;
+
+public:
+    const float           bounds_radius = world_bounds_->radius;
+    const sf::FloatRect   world_rect_bounds = { {0, 0}, {bounds_radius * 2, bounds_radius * 2} };
+
+    SimpleSpatialGrid spatial_hash_grid{ cells_x, cells_y, cell_max_capacity, bounds_radius * 2, bounds_radius * 2 };
+    SFML_Grid         food_grid_renderer;
+
+    int frames = 0;
+
+public:
+    FoodManager(sf::RenderWindow* window, Circle* world_circular_bounds);
+
+    int    get_size()               const;
+    void   update();
+    void   render();
+    void   remove_food(int food_id);
+    Food* at(int idx);
+    void   draw_food_grid();
+
+private:
+    void  init_food();
+    void  update_food();
+    void  update_food_nutrients(Food* food);
+    void  vibrate_food(Food* food);
+    void  bound_food_to_world(Food* food);
+    void  check_food_death(Food* food);
+    void  update_hash_grid();
+
+    void  spawn_food();
+    void  spawn_food_improved();
+    bool  reproduce_food(Food* food);
+    float calculate_spawn_chance();
+    bool  can_food_reproduce(Food* food);
+    bool  food_container_full();
+};

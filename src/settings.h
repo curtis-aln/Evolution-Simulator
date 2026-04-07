@@ -99,8 +99,8 @@ struct FoodSettings
 	inline static constexpr size_t cell_max_capacity = 20;
 	inline static constexpr size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
 
-	static constexpr unsigned max_food = 20'000;
-	static constexpr unsigned initial_food = 2'000;
+	static constexpr unsigned max_food = 30'000;
+	static constexpr unsigned initial_food = 16'000;
 	inline static constexpr float food_radius = 30.f;
 	inline static constexpr float friction = 0.965f;
 
@@ -116,5 +116,13 @@ struct FoodSettings
 
 	inline static float spawn_proportionality_constant = 0.015f; // range between [0.001, 0.01]
 	inline static float food_spawn_distance = food_radius * 2.f;
-	inline static size_t reproductive_cooldown = 200.f;
+	inline static size_t reproductive_cooldown = 150.f;
+	inline static size_t reproductive_threshold = 300.f; // how old a food has to be before it can reproduce
+
+	inline static float initial_nutrients = 5;
+	inline static float final_nuterients = 30;
+	inline static size_t nutrient_development_time = 200;
+
+	inline static float death_age = 2000.f;
+	inline static float death_age_chance = 0.01; // every frame past its death age gives it this chance of dying
 };
