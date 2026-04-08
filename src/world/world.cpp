@@ -19,6 +19,9 @@ World::World(sf::RenderWindow* window)
 	position_data_.resize(maximum_cells);
 
 	collision_resolutions.resize(maximum_cells);
+
+	inner_circle_renderer_.init(CellGenome::radius, maximum_cells);
+	outer_circle_renderer_.init(CellGenome::radius + GraphicalSettings::cell_outline_thickness, maximum_cells);
 }
 
 
@@ -59,12 +62,12 @@ void World::render(Font* font)
 
 void World::render_protozoa(Font* font)
 {
-	outer_circle_renderer_.init_texture(outer_color_data_, CellGenome::radius + GraphicalSettings::cell_outline_thickness, entity_count);
+	outer_circle_renderer_.update_colors(outer_color_data_, entity_count);
 	outer_circle_renderer_.render(position_data_, entity_count);
 
 	if (!simple_mode)
 	{
-		inner_circle_renderer_.init_texture(inner_color_data_, CellGenome::radius, entity_count);
+		inner_circle_renderer_.update_colors(inner_color_data_, entity_count);
 		inner_circle_renderer_.render(position_data_, entity_count);
 	}
 

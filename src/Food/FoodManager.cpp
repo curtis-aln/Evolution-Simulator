@@ -10,6 +10,7 @@ FoodManager::FoodManager(sf::RenderWindow* window, Circle* world_circular_bounds
 	food_positions.resize(max_food, {});
 	food_colors.resize(max_food, {});
 
+	food_renderer.init(food_radius, max_food);
 }
 
 void FoodManager::update()
@@ -36,7 +37,7 @@ void FoodManager::render()
 		idx++;
 	}
 
-	food_renderer.init_texture(food_colors, food_radius, idx);
+	food_renderer.update_colors(food_colors, idx);
 	food_renderer.render(food_positions, idx);
 }
 
