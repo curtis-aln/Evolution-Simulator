@@ -117,6 +117,8 @@ protected:
 		{
 			protozoa->resolve_collisions(collision_resolutions, idx);
 		}
+
+		
 		
 		std::vector<int> reproduce_indexes{};
 		reproduce_indexes.reserve(max_protozoa);

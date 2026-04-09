@@ -36,6 +36,8 @@ class World : public ProtozoaManager
 	std::vector<float> radius_data_{};
 	std::vector<float> inner_radius{};
 
+	std::vector<Cell*> cell_pointers_{};
+
 	int entity_count = 0; // how many cells are currently in the world
 	
 
@@ -76,6 +78,7 @@ public:
 
 	// for the simple spatial grid, we need a temporary array to store nearby cell ids
 	std::array<int, cell_max_capacity * 9> nearby_ids = {};
+	FixedSpan<obj_idx> nearby_food { FoodSettings::cell_max_capacity * 9 };
 
 	float min_speed = 0;
 	float delta_min_speed = 0.0;
@@ -99,6 +102,7 @@ public:
 
 	// updating functions
 	void update();
+	void resolve_collisions();
 	SimpleSpatialGrid* get_spatial_grid();
 	SimpleSpatialGrid* get_food_spatial_grid();
 	FoodManager* get_food_manager();
@@ -114,7 +118,7 @@ public:
 
 private:
 	// update functions
-	void update_grid_cell(const int grid_cell_id);
+	void update_cells_in_grid_cell(const int grid_cell_id);
 	void update_protozoa_cell(int protozoa_cell_index, int neighbours_size);
 	void update_nearby_container(int& neighbours_size, int32_t neighbour_index_x, int32_t neighbour_index_y);
 	
@@ -126,5 +130,9 @@ private:
 	
 	// initialization functions
 	void init_organisms();
+
+	void resolve_food_interactions();
+
+	void resolve_food_grid_cell(const int cell_id);
 
 };

@@ -5,6 +5,7 @@
 #include "genetics/CellGenome.h"
 #include "../Utils/utility.h"
 #include "../Utils/Graphics/Circle.h"
+#include "../Food/food_manager.h"
 
 // Each organism consists of cells which work together via springs
 // Each cell has their own radius and friction coefficient, as well as cosmetic factors such as color
@@ -17,6 +18,8 @@ struct Cell : public CellGenome
 
 	float sinwave_current_friction_ = 0.f;
 	size_t time_since_last_ate = 0;
+
+	float nutrients_eaten = 0.f; // The amount of nutrients this cell in particular has eaten
 
 
 	sf::Vector2f position_{};
@@ -34,6 +37,35 @@ struct Cell : public CellGenome
 		generation = 0;
 		sinwave_current_friction_ = 0.f;
 		time_since_last_ate = 0.f;
+		nutrients_eaten = 0.f;
+	}
+
+	void eat(Food* food)
+	{
+		nutrients_eaten += food->nutrients;
+		time_since_last_ate = 0;
+	}
+
+	void handle_nearby_food(FixedSpan<obj_idx>& nearby_food_container, FoodManager& food_manager)
+	{
+		for (int i = 0; i < nearby_food_container.count; ++i)
+		{
+			Food* food = food_manager.at(nearby_food_container[i]);
+			sf::Vector2f food_pos = food->position;
+			const float distance_sq = (food_pos - position_).lengthSquared();
+			const float rad = radius + FoodSettings::food_radius;
+
+			if (distance_sq > rad * rad)
+				continue;
+			
+			// let the cell eat the food
+			eat(food);
+			food_manager.remove_food(food->id);
+			
+			// removing the food from the nearby container to prevent multiple cells from eating the same food in one frame
+			nearby_food_container.remove(i);
+			--i;
+		}
 	}
 
 

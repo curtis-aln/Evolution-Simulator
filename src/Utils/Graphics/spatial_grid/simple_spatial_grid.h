@@ -92,13 +92,17 @@ public:
 
 	size_t get_total_cells() const { return CellsX * CellsY; }
 
-
+	// This fuction returns 9 cell contents, the cell the position is in and the 8 cells surrounding it, which is used for collision detection
 	void find(const float x, const float y, FixedSpan<obj_idx>* const container)
 	{
-		container->count = 0;
-		const auto cell_x = static_cast<int>(x / cell_width);
-		const auto cell_y = static_cast<int>(y / cell_height);
+		find_from_index(hash(x, y), container);
+	}
 
+	void find_from_index(const cell_idx index, FixedSpan<obj_idx>* const container)
+	{
+		container->count = 0;
+		const int cell_x = index % CellsX;
+		const int cell_y = index / CellsX;
 		// for each grid cell sorrounding the cell, including the cell
 		for (int nx = cell_x - 1; nx <= cell_x + 1; ++nx)
 		{
@@ -107,14 +111,12 @@ public:
 				// if this cell lies outside of the grid, we skip it
 				if (nx < 0 || ny < 0 || nx >= static_cast<int>(CellsX) || ny >= static_cast<int>(CellsY))
 					continue;
-
 				// 2d -> 2d index conversion
-				const cell_idx index = ny * CellsX + nx;
-
+				const cell_idx neighbour_index = ny * CellsX + nx;
 				// fetching the number of objects in this cell, which is the number of objects we need to add to the container
-				const uint8_t  count = cell_capacities[index];
+				const uint8_t count = cell_capacities[neighbour_index];
 				for (uint8_t i = 0; i < count; ++i) // Potential Optimization here
-					container->add(grid[index][i]);
+					container->add(grid[neighbour_index][i]);
 			}
 		}
 	}

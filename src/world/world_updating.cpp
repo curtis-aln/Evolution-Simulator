@@ -13,105 +13,19 @@ void World::update()
 	if (track_statistics)
 		update_statistics();
 
-	if (toggle_collisions)
-	{
-		// iterating over each grid cell, we update as per the cell instead of as per the particle
-		for (int cell_id = 0; cell_id < cells_x * cells_y; ++cell_id)
-		{
-			update_grid_cell(cell_id);
-		}
-	}
-
 	// if our selected protozoa has died we can no longer track it
 	if (selected_protozoa_ != nullptr && !selected_protozoa_->is_alive())
 	{
 		selected_protozoa_ = nullptr;
 	}
 
+	resolve_collisions();
+
 	food_manager_.update();
+	resolve_food_interactions();
 	update_all_protozoa(food_manager_, debug_mode, min_speed, track_statistics);
 	
-}
-
-
-void World::update_grid_cell(const int grid_cell_id)
-{
-	// if the grid cell is empty, dont bother
-	if (spatial_hash_grid_.cell_capacities[grid_cell_id] == 0)
-		return;
-
-	int neighbours_size = 0;
-
-	const int cell_index_x = grid_cell_id % cells_x;
-	const int cell_index_y = grid_cell_id / cells_x;
-
-	// Current cell
-	update_nearby_container(neighbours_size, cell_index_x, cell_index_y);
-	// Right
-	update_nearby_container(neighbours_size, cell_index_x + 1, cell_index_y);
-	// Bottom-left
-	update_nearby_container(neighbours_size, cell_index_x - 1, cell_index_y + 1);
-	// Bottom
-	update_nearby_container(neighbours_size, cell_index_x, cell_index_y + 1);
-	// Bottom-right
-	update_nearby_container(neighbours_size, cell_index_x + 1, cell_index_y + 1);
-
-	const auto& cell_contents = spatial_hash_grid_.grid[grid_cell_id];
-	const uint8_t cell_size = spatial_hash_grid_.cell_capacities[grid_cell_id];
-
-	for (uint8_t idx = 0; idx < cell_size; ++idx)
-	{
-		update_protozoa_cell(cell_contents[idx], neighbours_size);
-	}
-}
-
-void World::update_protozoa_cell(const int protozoa_cell_index, const int neighbours_size)
-{
-	sf::Vector2f position_a = position_data_[protozoa_cell_index];
-
-	for (uint32_t i{ 0 }; i < neighbours_size; ++i)
-	{
-		const sf::Vector2f position_b = position_data_[nearby_ids[i]];
-
-		const float dist_sq = (position_a - position_b).lengthSquared();
-		const float local_diam = radius_data_[protozoa_cell_index] + radius_data_[nearby_ids[i]];
-
-		if (dist_sq > local_diam * local_diam)
-			continue;
-
-		// Cells are not the same & they are intersecting
-		const float dist = std::sqrt(dist_sq);
-		if (dist == 0.0f) // Prevent division by zero
-			continue;
-
-		// Compute the overlap
-		float overlap = local_diam - dist;
-
-		// Compute the collision normal
-		sf::Vector2f collisionNormal = (position_a - position_b) / dist;
-
-		// Move the cells apart
-		collision_resolutions[protozoa_cell_index] = collisionNormal * (overlap * 0.5f);
-		collision_resolutions[nearby_ids[i]] = -collisionNormal * (overlap * 0.5f);
-	}
-}
-
-void World::update_nearby_container(int& neighbours_size,
-    int32_t neighbour_index_x, int32_t neighbour_index_y)
-{
-    // Out of bounds check, no wrapping needed
-    if (neighbour_index_x < 0 || neighbour_index_x >= cells_x ||
-        neighbour_index_y < 0 || neighbour_index_y >= cells_y)
-        return;
-
-    const uint32_t neighbour_index = neighbour_index_y * cells_x + neighbour_index_x;
-    const auto& contents = spatial_hash_grid_.grid[neighbour_index];
-    const uint8_t size = spatial_hash_grid_.cell_capacities[neighbour_index];
-
-    for (uint8_t idx = 0; idx < size; ++idx)
-    {
-        nearby_ids[neighbours_size++] = contents[idx];
-    }
+	
 }
 
 
@@ -129,6 +43,7 @@ void World::update_position_container()
 			inner_color_data_[idx] = cell.cell_inner_color;
 			position_data_[idx] = cell.position_;
 			radius_data_[idx] = cell.radius;
+			cell_pointers_[idx] = &cell;
 
 			spatial_hash_grid_.add_object(cell.position_.x, cell.position_.y, idx);
 			idx++;

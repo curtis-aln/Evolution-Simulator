@@ -43,7 +43,7 @@ file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
   "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-add_executable(ProjectARIA ${APP_SOURCES} "src/Utils/UI/CrashLogger.h" "src/simulation/imgui/imgui_handling.cpp" "src/Protozoa/genetics/CellGenome.h"  "src/Protozoa/extension/mutations.cpp" "src/Utils/Graphics/spatial_grid/spatial_grid_renderer.h" "src/Food/food.h" "src/Food/FoodManager_spawn.cpp" "src/simulation/imgui/imgui_population.cpp" "src/simulation/imgui/population_history.h")
+add_executable(ProjectARIA ${APP_SOURCES} "src/Utils/UI/CrashLogger.h" "src/simulation/imgui/imgui_handling.cpp" "src/Protozoa/genetics/CellGenome.h"  "src/Protozoa/extension/mutations.cpp" "src/Utils/Graphics/spatial_grid/spatial_grid_renderer.h" "src/Food/food.h" "src/Food/FoodManager_spawn.cpp" "src/simulation/imgui/imgui_population.cpp" "src/simulation/imgui/population_history.h" "src/world/collision_resolution.cpp" "src/world/food_resolution.cpp")
 
 target_link_libraries(ProjectARIA PRIVATE
   SFML::Graphics

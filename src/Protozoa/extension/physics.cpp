@@ -36,7 +36,7 @@ void Protozoa::update(FoodManager& food_manager, const bool debug, const float m
 
 	update_cells();
 
-	handle_food(food_manager, debug);
+	//handle_food(food_manager, debug);
 	reproduce_check();
 
 	++frames_alive;

@@ -24,7 +24,7 @@ struct PopulationSample
 };
 struct PopulationHistory
 {
-    static constexpr size_t k_max_samples = 16384;
+    static constexpr size_t k_max_samples = 160384;
     static constexpr int    k_spike_threshold = 20;
 
     std::vector<float> time = {};

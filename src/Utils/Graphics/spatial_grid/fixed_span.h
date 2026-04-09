@@ -43,4 +43,11 @@ struct FixedSpan
 
     // Resets the count without deallocating — existing data is simply overwritten on next add
     void clear() { count = 0; }
+
+    // O(1) removal — swaps target with last element then decrements count.
+// Does not preserve order, which is fine for an unordered query result.
+    void remove(uint8_t index)
+    {
+        buffer[index] = buffer[--count];
+    }
 };

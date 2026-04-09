@@ -2,7 +2,7 @@
 ##### ImGUI TODO
 - time elapsed in hours minutes seconds
 - add infant mortality stat
-- statistic showing total alive entities
+[Done] statistic showing total alive entities
 - Death notifications: optional toast notification when a tagged organism dies, with cause of death (starvation, age, etc.
 - Clone: duplicate an organism exactly, spawn the copy nearby
 - Genome editor: directly tweak a selected organism's trait values via sliders, bypassing mutation. Great for controlled experiments
@@ -23,6 +23,10 @@
 - Add a "total" for the protozoa, food line graph
 - Reset Simulation Button with controls for world size, initial protozoa count, food spawn rate, and mutation rate/range
 - add all settings to a json file and have the program read from it on starrtup, then add a "save settings" button to write the current settings back to the file. 
+- line graph for average lifetime
+- line graph for mutation rate and range
+- line graph for average offspring
+
 
 -----------------------------------------------------------------------
 
@@ -52,3 +56,7 @@
 - create a cell body class
 - each protozoa stores cell_positions_nearby and food positions for debugging, just have it once in the protozoa manager
 - when springs are created through create cell or create spring, give them random properties
+
+
+
+1000 frames in 17 seconds

@@ -19,6 +19,7 @@ World::World(sf::RenderWindow* window)
 	radius_data_.resize(maximum_cells);
 	inner_radius.resize(maximum_cells);
 	distribution.reserve(maximum_cells);
+	cell_pointers_.resize(maximum_cells);
 
 	collision_resolutions.resize(maximum_cells);
 
