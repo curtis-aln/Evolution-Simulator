@@ -18,6 +18,7 @@ World::World(sf::RenderWindow* window)
 	position_data_.resize(maximum_cells);
 	radius_data_.resize(maximum_cells);
 	inner_radius.resize(maximum_cells);
+	distribution.reserve(maximum_cells);
 
 	collision_resolutions.resize(maximum_cells);
 
@@ -165,4 +166,21 @@ void World::keyboardEvents(const sf::Keyboard::Key& event_key_code)
 		break;
 
 	}
+}
+
+
+const std::vector<float>& World::get_generation_distribution()
+{
+	distribution.clear();
+	int idx = 0;
+	for (Protozoa* protozoa : all_protozoa_)
+	{
+		for (Cell& cell : protozoa->get_cells())
+		{
+			distribution.push_back(cell.generation);
+
+		}
+	}
+
+	return distribution;
 }

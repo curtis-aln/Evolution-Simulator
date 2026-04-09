@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "../settings.h"
 #include "../world/world.h"
+#include "imgui/population_history.h"
 
 #include "../Utils/time.h"
 #include "../Utils/fps_manager.h"
@@ -47,6 +48,7 @@ class Simulation : SimulationSettings, TextSettings
 	unsigned m_ticks_ = 0;
 
 	World m_world_{};
+	PopulationHistory m_history_;
 
 	// user controlled variables
 	bool m_rendering_ = true;

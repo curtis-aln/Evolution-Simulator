@@ -57,6 +57,8 @@ class World : public ProtozoaManager
 	// thread pool for parallel processing of the update loop
 	tp::ThreadPool thread_pool_;
 
+	std::vector<float> distribution{};
+
 	
 
 public:
@@ -107,6 +109,8 @@ public:
 
 	bool handle_mouse_click(sf::Vector2f mouse_position);
 	void keyboardEvents(const sf::Keyboard::Key& event_key_code);
+
+	const std::vector<float>& get_generation_distribution();
 
 private:
 	// update functions

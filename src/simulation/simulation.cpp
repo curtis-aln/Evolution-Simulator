@@ -102,6 +102,10 @@ void Simulation::update_line_graphs()
 	++m_ticks_;
 	m_total_time_elapsed_ += static_cast<float>(m_delta_time_.get_delta());
 
+	const size_t protozoa_count = m_world_.get_protozoa_count();
+	const size_t food_count = m_world_.get_food_count();
+	m_history_.push(m_total_time_elapsed_, protozoa_count, food_count, m_world_.average_generation_);
+
 	if (m_ticks_ % line_x_axis_increments != 0)
 		return;
 	
