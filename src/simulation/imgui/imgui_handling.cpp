@@ -1,4 +1,4 @@
-#include "simulation.h"
+#include "../simulation.h"
 
 void Simulation::init_imGUI()
 {
@@ -19,8 +19,6 @@ void Simulation::init_imGUI()
     style.Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0, 0, 0, 0.7f);
     style.Colors[ImGuiCol_PopupBg] = ImVec4(0.1f, 0.1f, 0.1f, 1.0f);
 
-    // in init_imGUI, after ImGui::SFML::Init
-    constexpr float ui_scale_percent = 250.f;
     ImGui::GetIO().FontGlobalScale = ui_scale_percent / 100.f;
 }
 
@@ -187,54 +185,6 @@ void Simulation::imgui_tuning_panel()
     ImGui::End();
 }
 
-void Simulation::imgui_population_graph()
-{
-    constexpr ImVec2 panel_pos = { 10.f, 800.f };
-    constexpr ImVec2 panel_size = { 350.f, 160.f };
-    constexpr ImVec2 plot_size = { -1.f, -1.f };
-    constexpr float  scroll_window = 60.f;
-
-    const float x_min = m_total_time_elapsed_ - scroll_window;
-    const float x_max = m_total_time_elapsed_;
-    const float y_max = static_cast<float>(std::max(WorldSettings::max_protozoa, FoodSettings::max_food));
-
-    constexpr ImPlotFlags      plot_flags = ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect | ImPlotFlags_NoMouseText;
-    constexpr ImPlotAxisFlags  x_flags = ImPlotAxisFlags_None;
-    constexpr ImPlotAxisFlags  y_flags = ImPlotAxisFlags_None;
-
-    ImGui::SetNextWindowPos(panel_pos, ImGuiCond_FirstUseEver);
-    ImGui::SetNextWindowSize(panel_size, ImGuiCond_FirstUseEver);
-    ImGui::Begin("Population", nullptr, ImGuiWindowFlags_NoTitleBar);
-
-    // Top stats bar
-    ImGui::Text("Protozoa: %d", m_world_.get_protozoa_count());
-    ImGui::SameLine(0, 20);
-
-    ImGui::Text("Food: %d", m_world_.get_food_count());
-    ImGui::SameLine(0, 20);
-
-    ImGui::Text("Avg Gen: %.2f", m_world_.average_generation_);
-    ImGui::SameLine(0, 20);
-
-    ImGui::Text("Frames: %d", m_ticks_);
-
-    if (ImPlot::BeginPlot("##population", plot_size, plot_flags))
-    {
-        ImPlot::SetupAxes("Time (s)", "Count", x_flags, y_flags);
-        ImPlot::SetupAxisLimits(ImAxis_X1, x_min, x_max, ImGuiCond_Always);
-        ImPlot::SetupAxisLimits(ImAxis_Y1, 0, y_max, ImGuiCond_Once);
-
-        ImPlot::PushColormap(m_plot_colormap_);
-        ImPlot::PlotLine("Protozoa", time_history_.data(), protozoa_history_.data(), static_cast<int>(protozoa_history_.size()));
-        ImPlot::PlotLine("Food", time_history_.data(), food_history_.data(), static_cast<int>(food_history_.size()));
-        ImPlot::PopColormap();
-
-        ImPlot::EndPlot();
-    }
-
-    ImGui::End();
-}
-
 void Simulation::handle_imGUI()
 {
     ImGui::SFML::Update(m_window_, m_delta_time_.get_delta_sfml());
@@ -322,111 +272,6 @@ void Simulation::extinction_popup()
 
 
 
-void Simulation::imgui_debug_panel(Cell* selected_cell, Protozoa* selected_protozoa)
-{
-    if (!selected_cell && !selected_protozoa)
-        return;
-
-    ImGui::Begin("Debug Inspector");
-
-    float full_width = ImGui::GetContentRegionAvail().x;
-    float column_width = full_width * 0.4f;
-
-    // ------------------ CELL ------------------
-    if (selected_cell)
-    {
-        ImGui::SeparatorText("Cell");
-
-        ImGui::Text("ID: %d", selected_cell->id);
-        ImGui::Text("Generation: %d", selected_cell->generation);
-        ImGui::Text("Friction: %.3f", selected_cell->sinwave_current_friction_);
-
-        ImGui::Spacing();
-
-        ImGui::Text("Position: (%.2f, %.2f)", selected_cell->position_.x, selected_cell->position_.y);
-        ImGui::Text("Velocity: (%.2f, %.2f)", selected_cell->velocity_.x, selected_cell->velocity_.y);
-        ImGui::Text("Speed: %.2f", selected_cell->velocity_.length());
-
-        ImGui::Spacing();
-
-        ImGui::Text("Radius: %.2f", selected_cell->radius);
-    }
-
-    // ------------------ PROTOZOA (TWO COLUMNS) ------------------
-    if (selected_protozoa)
-    {
-        ImGui::SeparatorText("Protozoa");
-
-        // LEFT COLUMN
-        ImGui::BeginChild("Protozoa_Left", ImVec2(column_width, 0), false);
-
-        ImGui::Text("ID: %d", selected_protozoa->id);
-        // ImGui::Text("Generation: %d", selected_protozoa->generation); // todo
-        ImGui::Text("Age: %d", selected_protozoa->frames_alive);
-
-        ImGui::Spacing();
-
-        ImGui::Text("Cells: %d", (int)selected_protozoa->get_cells().size());
-        ImGui::Text("Springs: %d", (int)selected_protozoa->m_springs_.size());
-        ImGui::Text("Offspring: %d", selected_protozoa->offspring_count);
-
-        ImGui::Spacing();
-
-        ImGui::Text("Energy: %.2f", selected_protozoa->energy);
-        ImGui::Text("Food: %.2f", selected_protozoa->total_food_eaten);
-		ImGui::Text("Energy lost to springs: %.2f", selected_protozoa->energy_lost_to_springs);
-        ImGui::TextDisabled("Display");
-
-        ImGui::Checkbox("Skeleton", &m_world_.skeleton_mode);
-        ImGui::SameLine(); ImGui::TextDisabled("[K]");
-
-        ImGui::Checkbox("Bounds", &m_world_.show_bounding_boxes);
-        ImGui::SameLine(); ImGui::TextDisabled("[B]");
-
-        ImGui::EndChild();
-
-        ImGui::SameLine();
-
-        // RIGHT COLUMN
-        ImGui::BeginChild("Protozoa_Right", ImVec2(0, 0), false);
-
-        ImGui::TextDisabled("Mutation");
-
-        //ImGui::Text("Range: %.4f", selected_protozoa->mutation_range);
-        //ImGui::Text("Rate: %.4f", selected_protozoa->mutation_rate); // todo
-
-        ImGui::Spacing();
-
-        ImGui::TextDisabled("Transform");
-
-        ImGui::Text("Position: (%.2f, %.2f)",
-            selected_protozoa->get_center().x,
-            selected_protozoa->get_center().y);
-
-        const auto& bounds = selected_protozoa->m_personal_bounds_;
-        ImGui::Text("Bounds: (%.0f, %.0f)",
-            bounds.size.x, bounds.size.y);
-        ImGui::Text("Area: %.0f", bounds.size.x * bounds.size.y);
-
-        ImGui::Text("Velocity: (%.2f, %.2f)",
-            selected_protozoa->velocity.x,
-            selected_protozoa->velocity.y);
-
-        ImGui::Text("Speed: %.1f", selected_protozoa->velocity.length());
-
-        const sf::Vector2f pos = selected_protozoa->get_center();
-        const float dist_to_birth_loc = std::sqrt(std::pow(pos.x - selected_protozoa->birth_location.x, 2) +
-			std::pow(pos.y - selected_protozoa->birth_location.y, 2));
-
-		ImGui::Text("Dist to Birth Loc: %.0f", dist_to_birth_loc);
-
-        ImGui::Spacing();
-
-        ImGui::EndChild();
-    }
-
-    ImGui::End();
-}
 
 void Simulation::imgui_spatial_grid_panel()
 {

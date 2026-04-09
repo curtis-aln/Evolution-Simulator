@@ -51,3 +51,4 @@
 - when a new cell is created it should have very low friction and generally not affect the organism too much, test this
 - create a cell body class
 - each protozoa stores cell_positions_nearby and food positions for debugging, just have it once in the protozoa manager
+- when springs are created through create cell or create spring, give them random properties

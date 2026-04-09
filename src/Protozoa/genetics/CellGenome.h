@@ -2,7 +2,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-#include "../Utils/random.h"
+#include "../../Utils/random.h"
 
 
 
@@ -24,7 +24,10 @@ struct CellGenome
     inline static constexpr float mutation_rate_range = 0.01;
 
     float colour_mutation_range = 0.001f; // chance of color mutating
-    inline static constexpr float radius = 90.f;
+
+	inline static constexpr float radius_mutation_range = 5.f; // how much the radius can mutate per mutation event
+    float radius = Random::rand_range( 30.f, 120.f );
+
     std::uint8_t transparency = 140;
 
     sf::Color cell_outer_color = Random::rand_color();
@@ -45,6 +48,9 @@ struct CellGenome
 
     // vertical shift minimum: -0.5 (graph fully below x axis), maximum: 0.5 (graph fully above x axis), clamping to make sure no vaue escapes [0, 1]
     inline static constexpr float max_vertical_shift = 0.5f;
+
+    inline static constexpr float smallest_radius = 15.f;
+	inline static constexpr float largest_radius = 220.f;
 
     // friction sin-wave parameters, the cell's friction coefficient is determined by a sin wave with these parameters, the input being the internal clock of the protozoa
     float amplitude = 0.3f;

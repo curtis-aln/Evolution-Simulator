@@ -66,14 +66,22 @@ public:
     }
 
     // Call every frame to update positions and draw
-    void render(const std::vector<sf::Vector2f>& positions, int positions_size)
+    void render(const std::vector<sf::Vector2f>& positions,
+        const std::vector<float>& radii,
+        int count)
     {
-        const float r = tex_size * 0.5f;
-        const size_t capped = std::min(static_cast<size_t>(positions_size), static_cast<size_t>(max_circles));
+        const size_t capped = std::min(static_cast<size_t>(count),
+            static_cast<size_t>(max_circles));
 
-        auto write_pos = [&](size_t i, const sf::Vector2f& pos)
+        const float base_r = tex_size * 0.5f;
+
+        auto write_pos = [&](size_t i, const sf::Vector2f& pos, float desired_r)
             {
+                const float scale = desired_r / base_r;
+                const float r = base_r * scale; // effectively desired_r
+
                 const size_t base = i * 6;
+
                 vertex_array[base + 0].position = { pos.x - r, pos.y - r };
                 vertex_array[base + 1].position = { pos.x + r, pos.y - r };
                 vertex_array[base + 2].position = { pos.x + r, pos.y + r };
@@ -83,11 +91,11 @@ public:
             };
 
         for (size_t i = 0; i < capped; ++i)
-            write_pos(i, positions[i]);
+            write_pos(i, positions[i], radii[i]);
 
         const sf::Vector2f offscreen(-1e9f, -1e9f);
         for (size_t i = capped; i < static_cast<size_t>(max_circles); ++i)
-            write_pos(i, offscreen);
+            write_pos(i, offscreen, 0.f);
 
         window_->draw(vertex_array, &texture);
     }

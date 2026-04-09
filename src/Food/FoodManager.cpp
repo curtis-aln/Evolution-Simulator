@@ -1,14 +1,13 @@
 #include "food_manager.h"
 
 FoodManager::FoodManager(sf::RenderWindow* window, Circle* world_circular_bounds)
-	:
-	world_bounds_(world_circular_bounds), food_renderer(window),
-	food_grid_renderer(*window, world_rect_bounds, cells_x, cells_y)
+	: world_bounds_(world_circular_bounds), food_renderer(window), window_(window)
 {
 	init_food();
 
 	food_positions.resize(max_food, {});
 	food_colors.resize(max_food, {});
+	food_radii.resize(max_food, food_radius);
 
 	food_renderer.init(food_radius, max_food);
 }
@@ -38,7 +37,7 @@ void FoodManager::render()
 	}
 
 	food_renderer.update_colors(food_colors, idx);
-	food_renderer.render(food_positions, idx);
+	food_renderer.render(food_positions, food_radii, idx);
 }
 
 // world interacting with the food
@@ -57,9 +56,9 @@ Food* FoodManager::at(const int idx)
 	return food_vector.at(idx);
 }
 
-void FoodManager::draw_food_grid()
+void FoodManager::draw_food_grid(sf::Vector2f mouse_pos)
 {
-	food_grid_renderer.draw();
+	food_grid_renderer.render_grid(*window_, mouse_pos, 1600.f);
 }
 
 int FoodManager::get_size() const

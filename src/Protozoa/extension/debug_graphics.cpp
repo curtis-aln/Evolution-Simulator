@@ -15,6 +15,7 @@ void Protozoa::render_debug(Font* font, const bool skeleton_mode, const bool sho
 	// skeleton mode just hides the cell bodies and leaves only the outlines of the cells
 	if (skeleton_mode)
 	{
+        render_protozoa_springs();
 		draw_cell_outlines();
 	}
 
@@ -158,35 +159,31 @@ void Protozoa::draw_spring_information(Font* font) const
     }
 }
 
-void Protozoa::make_connection(const int cell1_id, const int cell2_id)
-{
-	//const SpringGene& genetics = create_cell_connection(cell1_id, cell2_id);
-	//m_springs_.emplace_back(genetics.connecting_cell_ids, genetics.colors, genetics.rest_length,
-	//	genetics.spring_constant, genetics.damping);
-}
 
-
-bool Protozoa::is_hovered_on(const sf::Vector2f mousePosition, const bool tolerance_check) const
+int Protozoa::check_mouse_press(const sf::Vector2f mousePosition, const bool tolerance_check) const
 {
-    if (tolerance_check)
+	// This function checks if the mouse has selected any cell in the protozoa, if so it returns the id of the cell, otherwise it returns -1
+	if (!m_personal_bounds_.contains(mousePosition)) // If the mouse is outside the protozoa bounds, we can skip checking each cell
+        return -1;
+
+    for (const Cell& cell : m_cells_)
     {
-        // When the mouse hovers over a protozoa, add extra to its boundary to make it easier to click
-        constexpr float bounds_tolerance = 30.f;
-        sf::FloatRect resized_rect = resize_rect(m_personal_bounds_, { -bounds_tolerance , -bounds_tolerance });
-        return resized_rect.contains(mousePosition);
+        const float dist_sq = (cell.position_ - mousePosition).lengthSquared();
+        float tollarance_factor = 1.2f;
+        const float rad = cell.radius * tollarance_factor;
+        if (dist_sq < rad * rad)
+        {
+            return cell.id;
+		}
     }
-    return m_personal_bounds_.contains(mousePosition);
-}
 
-bool Protozoa::check_press(const sf::Vector2f mouse_position)
-{
-	return m_personal_bounds_.contains(mouse_position);
+    return -1;
 }
 
 
 Cell* Protozoa::get_selected_cell(const sf::Vector2f mouse_pos)
 {
-	if (!is_hovered_on(mouse_pos))
+	if (!check_mouse_press(mouse_pos))
 		return nullptr;
 	
 	for (Cell& cell : m_cells_)

@@ -6,7 +6,6 @@
 World::World(sf::RenderWindow* window)
 	: m_window_(window),
 	world_border_renderer_(make_circle(world_circular_bounds_.radius, world_circular_bounds_.center)),
-	cell_grid_renderer(*window, world_rect_bounds_, cells_x, cells_y),
 	thread_pool_(8)
 { 
 	init_organisms();
@@ -17,11 +16,13 @@ World::World(sf::RenderWindow* window)
 	outer_color_data_.resize(maximum_cells);
 	inner_color_data_.resize(maximum_cells);
 	position_data_.resize(maximum_cells);
+	radius_data_.resize(maximum_cells);
+	inner_radius.resize(maximum_cells);
 
 	collision_resolutions.resize(maximum_cells);
 
-	inner_circle_renderer_.init(CellGenome::radius, maximum_cells);
-	outer_circle_renderer_.init(CellGenome::radius + GraphicalSettings::cell_outline_thickness, maximum_cells);
+	inner_circle_renderer_.init(90, maximum_cells);
+	outer_circle_renderer_.init(90 + GraphicalSettings::cell_outline_thickness, maximum_cells);
 }
 
 
@@ -40,17 +41,17 @@ FoodManager* World::get_food_manager()
 	return &food_manager_;
 }	
 
-void World::render(Font* font)
+void World::render(Font* font, sf::Vector2f mouse_pos)
 {
 	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.
 	if (draw_cell_grid)
 	{
-		cell_grid_renderer.draw();
+		cell_grid_renderer.render_grid(*m_window_, mouse_pos, 800.f);
 	}
 
 	if (draw_food_grid)
 	{
-		food_manager_.draw_food_grid();
+		food_manager_.draw_food_grid(mouse_pos);
 	}
 	
 	food_manager_.render();
@@ -63,21 +64,21 @@ void World::render(Font* font)
 void World::render_protozoa(Font* font)
 {
 	outer_circle_renderer_.update_colors(outer_color_data_, entity_count);
-	outer_circle_renderer_.render(position_data_, entity_count);
+	outer_circle_renderer_.render(position_data_, radius_data_, entity_count);
 
 	if (!simple_mode)
 	{
+		int i = 0;
+		for (float& radius : radius_data_)
+			inner_radius[i++] = radius / GraphicalSettings::cell_outline_thickness;
+
 		inner_circle_renderer_.update_colors(inner_color_data_, entity_count);
-		inner_circle_renderer_.render(position_data_, entity_count);
+		inner_circle_renderer_.render(position_data_, inner_radius, entity_count);
 	}
 
-	if (selected_protozoa_ != nullptr)
+	if (selected_protozoa_ != nullptr && debug_mode)
 	{
-		if (debug_mode && !skeleton_mode)
-			selected_protozoa_->render_protozoa_springs();
-
-		if (debug_mode)
-			selected_protozoa_->render_debug(font, skeleton_mode, show_connections, show_bounding_boxes);
+		selected_protozoa_->render_debug(font, skeleton_mode, show_connections, show_bounding_boxes);
 	}
 
 	for (Protozoa* protozoa : all_protozoa_)
@@ -95,7 +96,7 @@ void World::init_organisms()
 	// we only want to start with a certain amount of protozoa so we "remove" some
 	for (int i = initial_protozoa; i < max_protozoa; ++i)
 	{
-		all_protozoa_.at(i)->dead = true;
+		all_protozoa_.at(i)->kill();
 		all_protozoa_.at(i)->soft_reset();
 		all_protozoa_.remove(i);
 	}
@@ -111,7 +112,7 @@ bool World::handle_mouse_click(const sf::Vector2f mouse_position)
 {
 	for (Protozoa* protozoa : all_protozoa_)
 	{
-		if (protozoa->is_hovered_on(mouse_position, true))
+		if (protozoa->check_mouse_press(mouse_position, true) != -1)
 		{
 			selected_protozoa_ = protozoa;
 			return true;

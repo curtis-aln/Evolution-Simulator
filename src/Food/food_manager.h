@@ -9,10 +9,11 @@
 #include "../settings.h"
 #include "../Utils/Graphics/SFML_Grid.h"
 #include "../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
-
+#include "../Utils/Graphics/spatial_grid/spatial_grid_renderer.h"
 
 class FoodManager : FoodSettings
 {
+    sf::RenderWindow* window_;
     Circle* world_bounds_ = nullptr;
 
     CircleBatchRenderer food_renderer;
@@ -20,13 +21,14 @@ class FoodManager : FoodSettings
 
     std::vector<sf::Vector2f> food_positions;
     std::vector<sf::Color>    food_colors;
+    std::vector<float> food_radii;
 
 public:
     const float           bounds_radius = world_bounds_->radius;
     const sf::FloatRect   world_rect_bounds = { {0, 0}, {bounds_radius * 2, bounds_radius * 2} };
 
     SimpleSpatialGrid spatial_hash_grid{ cells_x, cells_y, cell_max_capacity, bounds_radius * 2, bounds_radius * 2 };
-    SFML_Grid         food_grid_renderer;
+    SpatialRenderer    food_grid_renderer{ &spatial_hash_grid };
 
     int frames = 0;
 
@@ -38,7 +40,7 @@ public:
     void   render();
     void   remove_food(int food_id);
     Food* at(int idx);
-    void   draw_food_grid();
+    void   draw_food_grid(sf::Vector2f mouse_pos);
 
 private:
     void  init_food();

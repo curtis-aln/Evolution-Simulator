@@ -58,7 +58,9 @@ void Protozoa::mutate_existing_cells(float mut_rate, float mut_range)
        //cell.remove_cell_chance += rand_sym(mut_range) * chance(mut_rate);
         //cell.add_spring_chance += rand_sym(mut_range) * chance(mut_rate);
         //cell.remove_spring_chance += rand_sym(mut_range) * chance(mut_rate);
-    
+           
+		cell.radius += rand_sym(CellGenome::radius_mutation_range) * chance(mut_rate);
+		cell.radius = std::clamp(cell.radius, CellGenome::smallest_radius, CellGenome::largest_radius);
 
         cell.amplitude = std::clamp(cell.amplitude, -cell.max_amplitude, cell.max_amplitude);
         cell.frequency = std::clamp(cell.frequency, -cell.max_frequency, cell.max_frequency);

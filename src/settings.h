@@ -33,6 +33,8 @@ public:
 
 	static constexpr unsigned line_maximum_data = 200;
 	static constexpr unsigned line_x_axis_increments = 20;
+
+	inline static constexpr float ui_scale_percent = 100.f;
 };
 
 struct GraphicalSettings
@@ -43,7 +45,7 @@ struct GraphicalSettings
 	static constexpr float spring_thickness = 9.f;
 	static constexpr float spring_outline_thickness = 6.f;
 
-	static constexpr float cell_outline_thickness = 30.f;
+	static constexpr float cell_outline_thickness = 1.1f; // relative to the size of the cell
 
 	static constexpr std::uint8_t food_transparency = 200;
 
@@ -61,7 +63,7 @@ struct WorldSettings
 {
 	static constexpr float bounds_radius = 50'000;
 
-	static constexpr unsigned max_protozoa = 15'000;
+	static constexpr unsigned max_protozoa = 25'000;
 	static constexpr unsigned initial_protozoa = 8'000;
 
 	inline static constexpr size_t cells_x = 180;
@@ -80,10 +82,10 @@ struct ProtozoaSettings
 
 	static constexpr float energy_decay_rate = 0.15f; // how quickly energy decays per frame
 
-	inline static constexpr float wander_threshold = CellGenome::radius * 13.f; // if a cell wanders too far away from the protozoa it kills the whole thing
+	inline static constexpr float wander_threshold = 90 * 13.f; // if a cell wanders too far away from the protozoa it kills the whole thing
 
-	inline static constexpr float breaking_length = CellGenome::radius * 6.f;
-	inline static constexpr float maximum_extension = CellGenome::radius * 4.f;
+	inline static constexpr float breaking_length = 90 * 6.f;
+	inline static constexpr float maximum_extension = 90 * 4.f;
 
 	inline static constexpr float spring_work_const = 1.f / 100'000.f; // how we scale the energy cost of springs
 
@@ -99,13 +101,10 @@ struct FoodSettings
 	inline static constexpr size_t cell_max_capacity = 20;
 	inline static constexpr size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
 
-	static constexpr unsigned max_food = 30'000;
+	static constexpr unsigned max_food = 40'000;
 	static constexpr unsigned initial_food = 16'000;
 	inline static constexpr float food_radius = 30.f;
-	inline static constexpr float friction = 0.965f;
-
-	inline static constexpr int food_spawn_amount = 14;
-	inline static constexpr int food_spawn_interval = 2; // frames between spawns
+	inline static constexpr float friction = 0.975f;
 
 	inline static sf::Vector3i food_darkest_color = { 0, 160, 0 };
 	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
@@ -123,6 +122,6 @@ struct FoodSettings
 	inline static float final_nuterients = 30;
 	inline static size_t nutrient_development_time = 200;
 
-	inline static float death_age = 2000.f;
+	inline static float death_age = 700.f;
 	inline static float death_age_chance = 0.01; // every frame past its death age gives it this chance of dying
 };

@@ -126,7 +126,8 @@ void Simulation::render()
 
 	if (m_rendering_)
 	{
-		m_world_.render(&cell_statistic_font);
+		const sf::Vector2f pos = camera_.get_world_mouse_pos();
+		m_world_.render(&cell_statistic_font, pos);
 	}
 
 	if (!hide_panels)

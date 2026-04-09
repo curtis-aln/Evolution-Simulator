@@ -13,6 +13,8 @@
 #include "../Utils/Graphics/Circle.h"
 #include "../Utils/Graphics/CircleBatchRenderer.h"
 #include "../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
+#include "../Utils/Graphics/spatial_grid/spatial_grid_renderer.h"
+
 #include "../Utils/Graphics/SFML_Grid.h"
 
 // The World class manages the entire simulation environment, including protozoa, food, and rendering.
@@ -31,6 +33,9 @@ class World : public ProtozoaManager
 	std::vector<sf::Color> outer_color_data_{};
 	std::vector<sf::Color> inner_color_data_{};
 	std::vector<sf::Vector2f> position_data_{};
+	std::vector<float> radius_data_{};
+	std::vector<float> inner_radius{};
+
 	int entity_count = 0; // how many cells are currently in the world
 	
 
@@ -43,7 +48,7 @@ class World : public ProtozoaManager
 
 	// for our collision detection we use a spatial hash grid to see what cells are nearby others
 	SimpleSpatialGrid spatial_hash_grid_{ cells_x, cells_y, cell_max_capacity, bounds_radius * 2.f, bounds_radius * 2.f };
-	SFML_Grid cell_grid_renderer; // renders the cell spatial hash grid
+	SpatialRenderer cell_grid_renderer{ &spatial_hash_grid_ }; // renders the cell spatial hash grid
 
 
 	// Tracking the number of iterations have passed in this world
@@ -95,7 +100,7 @@ public:
 	SimpleSpatialGrid* get_spatial_grid();
 	SimpleSpatialGrid* get_food_spatial_grid();
 	FoodManager* get_food_manager();
-	void render(Font* font);
+	void render(Font* font, sf::Vector2f mouse_pos);
 
 	// fetch functions
 	int get_food_count() const { return food_manager_.get_size(); }

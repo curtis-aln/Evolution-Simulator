@@ -23,7 +23,7 @@ void World::update()
 	}
 
 	// if our selected protozoa has died we can no longer track it
-	if (selected_protozoa_ != nullptr && selected_protozoa_->dead)
+	if (selected_protozoa_ != nullptr && !selected_protozoa_->is_alive())
 	{
 		selected_protozoa_ = nullptr;
 	}
@@ -74,7 +74,7 @@ void World::update_protozoa_cell(const int protozoa_cell_index, const int neighb
 		const sf::Vector2f position_b = position_data_[nearby_ids[i]];
 
 		const float dist_sq = (position_a - position_b).lengthSquared();
-		const float local_diam = CellGenome::radius * 2.f;
+		const float local_diam = radius_data_[protozoa_cell_index] + radius_data_[nearby_ids[i]];
 
 		if (dist_sq > local_diam * local_diam)
 			continue;
@@ -128,6 +128,7 @@ void World::update_position_container()
 			outer_color_data_[idx] = cell.cell_outer_color;
 			inner_color_data_[idx] = cell.cell_inner_color;
 			position_data_[idx] = cell.position_;
+			radius_data_[idx] = cell.radius;
 
 			spatial_hash_grid_.add_object(cell.position_.x, cell.position_.y, idx);
 			idx++;

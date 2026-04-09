@@ -87,7 +87,7 @@ protected:
 
 		// we dont need to create protozoas for the "first time" during extinction or reset events
 		protozoa.hard_reset();
-		protozoa.m_cells_.emplace_back(0, world_bounds.rand_pos());
+		protozoa.init_one_cell();
 		
 
 
@@ -115,11 +115,7 @@ protected:
 		// resolving collisions
 		for (Protozoa* protozoa : all_protozoa_)
 		{
-			// applying the collision resolution
-			for (Cell& cell : protozoa->m_cells_)
-			{
-				cell.position_ += collision_resolutions[idx++];
-			}
+			protozoa->resolve_collisions(collision_resolutions, idx);
 		}
 		
 		std::vector<int> reproduce_indexes{};
@@ -129,7 +125,7 @@ protected:
 		{
 			protozoa->update(food_manager_, debug_mode, min_speed);
 
-			if (protozoa->dead)
+			if (!protozoa->is_alive())
 			{
 				if (track_statistics)
 					register_death_stat(protozoa->frames_alive);
@@ -137,7 +133,7 @@ protected:
 				continue; // causes indexing issues if the orgasanism is removed before we check for reproduction
 			}
 
-			if (protozoa->reproduce)
+			if (protozoa->should_reproduce())
 			{
 				reproduce_indexes.push_back(protozoa->id);
 			}
@@ -168,25 +164,7 @@ protected:
 	void create_offspring(Protozoa* parent)
 	{
 		Protozoa* offspring = get_unallocated_protozoa();
-		parent->reproduce = false;
-
-		// first we assign the genetic aspects of the offspring to match that of the parents, then reconstruct it
-		offspring->soft_reset();
-		offspring->set_protozoa_attributes(parent);
-
-		// incrementing the generation in all of the cells and springs
-		offspring->update_generation();
-
-		offspring->mutate();
-		offspring->birth_location = parent->get_center();
-
-		// we offset the offspring's position slightly from the parent as if it spawns directly in its parent
-		// it can cause a sudden push on eachovers cells which could result in spring breaking and cell death
-		float parent_bounds_x = parent->get_bounds().size.x;
-		float parent_bounds_y = parent->get_bounds().size.y;
-		float disp_x = Random::rand_range(-parent_bounds_x, parent_bounds_x);
-		float disp_y = Random::rand_range(-parent_bounds_y, parent_bounds_y);
-		offspring->move_center_location_to(parent->get_center() + sf::Vector2f{ disp_x, disp_y });
+		offspring->create_offspring(parent);
 	}
 
 

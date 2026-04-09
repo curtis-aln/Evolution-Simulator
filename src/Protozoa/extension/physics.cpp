@@ -137,3 +137,83 @@ void Protozoa::update_bounding_box()
 	m_personal_bounds_ = { {min_x, min_y}, {width, height} };
 }
 
+void Protozoa::move_center_location_to(const sf::Vector2f new_center)
+{
+	const sf::Vector2f center = get_center();
+	const sf::Vector2f translation = new_center - center;
+	for (Cell& cell : m_cells_)
+	{
+		cell.position_ += translation;
+	}
+	update_bounding_box();
+}
+sf::Vector2f Protozoa::get_center() const
+{
+	return m_personal_bounds_.position + m_personal_bounds_.size / 2.f;
+}
+
+void Protozoa::soft_reset()
+{
+	frames_alive = 0.f;
+	dead = false;
+	reproduce = false;
+
+	stomach = 0;
+	total_food_eaten = 0;
+	offspring_count = 0;
+	energy = initial_energy;
+
+	time_since_last_reproduced = 0;
+
+	for (Cell& cell : m_cells_)
+	{
+		cell.reset();
+	}
+}
+
+void Protozoa::hard_reset()
+{
+	soft_reset();
+
+	// setting the containers back to zero size, for when we are restarting the simulation
+	m_cells_.clear();
+	m_springs_.clear();
+
+	m_personal_bounds_ = { {0.f, 0.f}, {0.f, 0.f } };
+
+	// position and velocity tracking
+	previous_position = { 0, 0 };
+	velocity = { 0, 0 };
+	birth_location = { 0, 0 };
+
+
+	food_positions_nearby.clear();
+	cell_positions_nearby.clear();
+
+	active = true; // for o_vector.h
+}
+
+void Protozoa::set_protozoa_attributes(Protozoa* other)
+{
+	m_cells_ = other->m_cells_;
+	m_springs_ = other->m_springs_;
+
+	update_bounding_box();
+}
+
+void Protozoa::init_one_cell()
+{
+	m_cells_.clear();
+	m_springs_.clear();
+
+	m_cells_.emplace_back(0, m_world_bounds_->rand_pos());
+}
+
+void Protozoa::resolve_collisions(const std::vector<sf::Vector2f>& collision_resolutions, int& idx)
+{
+	for (int cell_idx = 0; cell_idx < m_cells_.size(); ++cell_idx)
+	{
+		Cell& cell = m_cells_[cell_idx];
+		cell.position_ += collision_resolutions[idx++];
+	}
+}

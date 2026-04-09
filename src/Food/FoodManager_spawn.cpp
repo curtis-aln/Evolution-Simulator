@@ -2,26 +2,6 @@
 
 void FoodManager::spawn_food()
 {
-	int size = food_vector.size();
-	if (food_vector.size() > max_food)
-		return;
-
-	if (frames++ % food_spawn_interval != 0)
-		return;
-
-	for (int i = 0; i < food_spawn_amount; ++i)
-	{
-		Food* food = food_vector.add();
-
-		if (food == nullptr)
-			break;
-
-		// spawning the food next to another existing food 
-		sf::Vector2f other_food_pos =
-			food->position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
-		food->age = 0.f;
-		food->color = Random::rand_color(food_darkest_color, food_lightest_color);
-	}
 
 }
 
