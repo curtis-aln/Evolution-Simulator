@@ -23,7 +23,6 @@ Simulation::Simulation() : m_world_(&m_window_)
 	m_window_.setFramerateLimit(frame_rate);
 	m_window_.setVerticalSyncEnabled(vsync);
 
-	init_imGUI();
 
 	// center the view on the world
 	constexpr float rad = WorldSettings::bounds_radius;
@@ -37,6 +36,8 @@ Simulation::Simulation() : m_world_(&m_window_)
 	title_font.set_font_size(title_font_size);
 	regular_font.set_font_size(regular_font_size);
 	cell_statistic_font.set_font_size(cell_statistic_font_size);
+
+	init_imGUI();
 }
 
 
@@ -98,30 +99,27 @@ void Simulation::camera_follow_selected_protozoa()
 }
 
 
+
+
 void Simulation::update_line_graphs()
 {
 	++m_ticks_;
 	m_total_time_elapsed_ += static_cast<float>(m_delta_time_.get_delta());
 
-	const size_t protozoa_count = m_world_.get_protozoa_count();
-	const size_t food_count = m_world_.get_food_count();
-	m_history_.push(m_total_time_elapsed_, protozoa_count, food_count, m_world_.average_generation_);
+	m_history_.push(
+		m_total_time_elapsed_,
+		m_world_.get_protozoa_count(),
+		m_world_.get_food_count(),
+		m_world_.average_generation_);
 
-	if (m_ticks_ % line_x_axis_increments != 0)
-		return;
-	
-	time_history_.push_back(m_total_time_elapsed_);
-	protozoa_history_.push_back(static_cast<float>(m_world_.get_protozoa_count()));
-	food_history_.push_back(static_cast<float>(m_world_.get_food_count()));
-
-	bool graph_full = static_cast<int>(time_history_.size()) > graph_history;
-	if (!graph_full)
-		return;
-
-	time_history_.erase(time_history_.begin());
-	protozoa_history_.erase(protozoa_history_.begin());
-	food_history_.erase(food_history_.begin());
-	
+	m_history_.push_misc(
+		m_world_.average_mutation_rate_,
+		m_world_.average_mutation_range_,
+		m_world_.average_offspring_count_,
+		m_world_.average_lifetime_,
+		m_world_.average_cells_per_protozoa_,
+		m_world_.average_spring_count_,
+		m_world_.average_energy_);
 }
 
 

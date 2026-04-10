@@ -95,6 +95,14 @@ public:
 	float average_mutation_rate_ = 0.f;
 	float average_mutation_range_ = 0.f;
 
+	// new stats — add alongside existing ones
+	int   peak_protozoa_ever_ = 0;
+	int   highest_generation_ever_ = 0;
+	float average_energy_ = 0.f;
+	float average_spring_count_ = 0.f;
+	float genetic_diversity_ = 0.f;
+	float energy_efficiency_ = 0.f;
+
 	
 	
 	

@@ -43,7 +43,7 @@ file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
   "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-add_executable(ProjectARIA ${APP_SOURCES} "src/Utils/UI/CrashLogger.h" "src/simulation/imgui/imgui_handling.cpp" "src/Protozoa/genetics/CellGenome.h"  "src/Protozoa/extension/mutations.cpp" "src/Utils/Graphics/spatial_grid/spatial_grid_renderer.h" "src/Food/food.h" "src/Food/FoodManager_spawn.cpp" "src/simulation/imgui/imgui_population.cpp" "src/simulation/imgui/population_history.h" "src/world/collision_resolution.cpp" "src/world/food_resolution.cpp")
+add_executable(ProjectARIA ${APP_SOURCES})
 
 target_link_libraries(ProjectARIA PRIVATE
   SFML::Graphics
@@ -66,25 +66,20 @@ target_compile_definitions(ProjectARIA PRIVATE
     PROJECT_ROOT="${CMAKE_SOURCE_DIR}"
 )
 
-if(MSVC)
+if (MSVC)
     target_compile_options(ProjectARIA PRIVATE
         /std:c++23preview
-        /Zi
-        /EHa
         /Zc:__cplusplus
-    )
-    target_link_options(ProjectARIA PRIVATE
-        /DEBUG
-    )
-    # Release: keep symbols, enable optimisation
-    target_compile_options(ProjectARIA PRIVATE
-        $<$<CONFIG:Release>:/O2>
-    )
-    target_link_options(ProjectARIA PRIVATE
-        $<$<CONFIG:Release>:/OPT:REF /OPT:ICF>
+        /EHa
+        /FS
+
+        # Debug config
+        $<$<CONFIG:Debug>:/Zi>
+
+        # Release config (lighter debug info)
+        $<$<CONFIG:Release>:/Z7>
     )
 endif()
-
 add_custom_command(TARGET ProjectARIA POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_directory
     "${CMAKE_CURRENT_SOURCE_DIR}/media"

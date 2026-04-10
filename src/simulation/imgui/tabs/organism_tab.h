@@ -1,0 +1,24 @@
+#pragma once
+#include "i_tab.h"
+#include "../../../Protozoa/Protozoa.h"
+#include "../../../Protozoa/genetics/CellGenome.h"
+#include "../../../Protozoa/genetics/SpringGenome.h"
+
+class OrganismTab : public ITab
+{
+public:
+    const char* label() const override { return "Organism"; }
+    void        draw(UIContext& ctx)   override;
+
+private:
+    int m_last_id_ = -1;
+    int m_sel_cell_idx_ = 0;
+    int m_sel_spring_idx_ = 0;
+
+    void draw_no_selection();
+    void draw_overview(Protozoa* p);
+    void draw_cells_tab(Protozoa* p);
+    void draw_springs_tab(Protozoa* p);
+    void draw_tuning_tab(Protozoa* p);
+    void draw_controls_tab(UIContext& ctx, Protozoa* p);
+};

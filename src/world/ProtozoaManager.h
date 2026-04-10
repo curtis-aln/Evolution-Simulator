@@ -4,8 +4,14 @@
 // A Class which handles all protozoa related stuff in the world. updating, collisions, reproduction, etc.
 class ProtozoaManager : protected WorldSettings
 {
-protected:
+public:
 	o_vector<Protozoa> all_protozoa_;
+
+	int   longest_lived_ever_ = 0;
+	int   most_offspring_ever_ = 0;
+	float infant_mortality_rate_ = 0.f;
+	int   total_deaths_ = 0;
+	int   infant_deaths_ = 0;
 
 	
 public:
@@ -76,6 +82,10 @@ public:
 	inline static constexpr int desired_cell_count = 4;
 
 
+	Protozoa* find_protozoa_by_id(int id)
+	{
+		return all_protozoa_.at(id);
+	}	
 
 protected:
 	inline void generate_protozoa(Protozoa& protozoa, Circle& world_bounds, bool emplace_back = true)
@@ -122,9 +132,9 @@ protected:
 			if (!protozoa->is_alive())
 			{
 				if (track_statistics)
-					register_death_stat(protozoa->frames_alive);
+					register_death_stat(protozoa->frames_alive, protozoa->offspring_count > 0);
 				all_protozoa_.remove(protozoa);
-				continue; // causes indexing issues if the orgasanism is removed before we check for reproduction
+				continue;
 			}
 
 			if (protozoa->should_reproduce())
@@ -192,22 +202,24 @@ protected:
 		
 	}
 
-	void register_death_stat(float lifetime)
+	void register_death_stat(float lifetime, bool had_offspring)
 	{
-		// Track lifetime
 		recent_lifetimes_.push_back(lifetime);
 		if (recent_lifetimes_.size() > max_lifetime_samples_)
 			recent_lifetimes_.erase(recent_lifetimes_.begin());
 
-		// Update average lifetime
 		float sum = 0.f;
-		for (float l : recent_lifetimes_)
-			sum += l;
-
+		for (float l : recent_lifetimes_) sum += l;
 		average_lifetime_ = recent_lifetimes_.empty() ? 0.f : sum / recent_lifetimes_.size();
 
-		// Track death rate
 		deaths_this_window_++;
+		++total_deaths_;
+		if (!had_offspring) ++infant_deaths_;
+		infant_mortality_rate_ = total_deaths_ > 0
+			? static_cast<float>(infant_deaths_) / total_deaths_ : 0.f;
+
+		if (static_cast<int>(lifetime) > longest_lived_ever_)
+			longest_lived_ever_ = static_cast<int>(lifetime);
 	}
 
 	void register_birth_stat()

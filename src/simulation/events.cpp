@@ -33,7 +33,6 @@ void Simulation::handle_pause_toggle()
 
 	if (!m_world_.paused)
 	{
-		m_tick_frame = false;
 		m_tick_frame_time = false;
 	}
 }

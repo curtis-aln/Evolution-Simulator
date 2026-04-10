@@ -1,0 +1,87 @@
+#include "tagged_tab.h"
+#include <imgui.h>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <iostream>
+
+void TaggedTab::draw(UIContext& ctx)
+{
+    draw_tag_input(ctx);
+    ImGui::Spacing();
+    draw_list(ctx);
+}
+
+void TaggedTab::draw_tag_input(UIContext& ctx)
+{
+    ImGui::SeparatorText("Tag by ID");
+    static int input_id = 0;
+    ImGui::SetNextItemWidth(100.f);
+    ImGui::InputInt("##tag_in", &input_id);
+    ImGui::SameLine();
+    if (ImGui::Button("Toggle Tag##tagged")) toggle_tag(input_id);
+
+    Protozoa* sel = ctx.world.get_selected_protozoa();
+    if (sel)
+    {
+        ImGui::SameLine(0, 16);
+        if (ImGui::Button(is_tagged(sel->id) ? "Untag selected" : "Tag selected"))
+            toggle_tag(sel->id);
+    }
+}
+
+void TaggedTab::draw_list(UIContext& ctx)
+{
+    if (m_tagged_ids_.empty()) { ImGui::TextDisabled("No organisms tagged."); return; }
+    ImGui::SeparatorText("Tagged organisms");
+
+    std::vector<int> to_remove;
+
+    for (int id : m_tagged_ids_)
+    {
+        Protozoa* p = ctx.world.find_protozoa_by_id(id);
+        ImGui::PushID(id);
+
+        if (p)
+        {
+            const float ef = std::clamp(p->get_energy() / 300.f, 0.f, 1.f);
+            ImGui::Text("ID %-4d", id); ImGui::SameLine(0, 8);
+            ImGui::Text("Age %-6u", p->frames_alive); ImGui::SameLine(0, 8);
+            ImGui::ProgressBar(ef, { 60.f, 8.f }, ""); ImGui::SameLine(0, 8);
+            ImGui::Text("Off %-3d", p->offspring_count); ImGui::SameLine(0, 8);
+            ImGui::Text("Gen %.0f", (float)p->get_cells().empty() ? 0.f : (float)p->get_cells()[0].generation);
+            ImGui::SameLine(0, 8);
+            if (ImGui::SmallButton("Go##tagged"))
+                ctx.world.selected_protozoa_ = p;
+        }
+        else
+        {
+            ImGui::TextDisabled("ID %-4d  [dead/missing]", id);
+            to_remove.push_back(id);
+        }
+
+        ImGui::SameLine();
+        if (ImGui::SmallButton("X##tagged")) to_remove.push_back(id);
+
+        ImGui::PopID();
+    }
+
+    for (int id : to_remove) m_tagged_ids_.erase(id);
+}
+
+void TaggedTab::toggle_tag(int id)
+{
+    if (m_tagged_ids_.count(id)) m_tagged_ids_.erase(id);
+    else                          m_tagged_ids_.insert(id);
+}
+
+bool TaggedTab::is_tagged(int id) const { return m_tagged_ids_.count(id) > 0; }
+
+void TaggedTab::notify_death(int id, const std::string& cause)
+{
+    if (!is_tagged(id)) return;
+    m_toasts_.push("Tagged #" + std::to_string(id) + " died: " + cause,
+        { 1.f, 0.4f, 0.4f, 1.f }, 6.f);
+}
+
+void TaggedTab::draw_toasts(float dt) { m_toasts_.update(dt); m_toasts_.draw(); }

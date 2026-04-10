@@ -116,5 +116,43 @@ void World::update_statistics()
 		deaths_this_window_ = 0;
 		births_this_window_ = 0;
 	}
+
+	// Peak population
+	const int p_count = static_cast<int>(all_protozoa_.size());
+	if (p_count > peak_protozoa_ever_) peak_protozoa_ever_ = p_count;
+
+	// Per-organism aggregates
+	float total_energy = 0.f;
+	float total_springs = 0.f;
+	float sum_amp = 0.f, sum_sq = 0.f;
+	int   cell_div_count = 0;
+
+	for (Protozoa* p : all_protozoa_)
+	{
+		total_energy += p->get_energy();
+		total_springs += static_cast<float>(p->get_springs().size());
+		if (p->offspring_count > most_offspring_ever_)
+			most_offspring_ever_ = p->offspring_count;
+		for (const Cell& c : p->get_cells())
+		{
+			sum_amp += c.amplitude;
+			sum_sq += c.amplitude * c.amplitude;
+			++cell_div_count;
+			if (c.generation > highest_generation_ever_)
+				highest_generation_ever_ = c.generation;
+		}
+	}
+
+	if (protozoa_count > 0)
+	{
+		average_energy_ = total_energy / protozoa_count;
+		average_spring_count_ = total_springs / protozoa_count;
+		energy_efficiency_ = average_energy_ / 300.f; // ratio vs starting energy
+	}
+	if (cell_div_count > 0)
+	{
+		const float mean_amp = sum_amp / cell_div_count;
+		genetic_diversity_ = (sum_sq / cell_div_count) - (mean_amp * mean_amp);
+	}
 }
 
