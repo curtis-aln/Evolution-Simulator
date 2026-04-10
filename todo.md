@@ -28,6 +28,16 @@
 - line graph for average offspring
 
 
+- Merge the Spring and the Cell tab, do this by merging their two "select what spring/cell" together, just have a seperator and below the cell selections haev the springs
+- Compact the overview, and move it to the left of the now merged spring and cells 
+- in the sin wave viewer replace A B C D with the correct names of what they are
+- in  the sin wave viewer place the sliders to change the values on top of eachover instead of in a 2x2 grid
+- add a progress bar thing for stomach. (for reproduction)
+- remove live genome averages
+- ontop of add cell, have "remove cell", "add spring", remove spring,
+- merge tuning and controls
+
+
 -----------------------------------------------------------------------
 
 ##### world TODO
