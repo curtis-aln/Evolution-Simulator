@@ -97,6 +97,11 @@ void Protozoa::update_cells()
 			dead = true;
 			return;
 		}
+
+		energy += cell.nutrients_eaten;
+		cell.nutrients_eaten = 0.f;
+		stomach += cell.food_eaten;
+		cell.food_eaten = 0;
 	}
 }
 
@@ -215,5 +220,6 @@ void Protozoa::resolve_collisions(const std::vector<sf::Vector2f>& collision_res
 	{
 		Cell& cell = m_cells_[cell_idx];
 		cell.position_ += collision_resolutions[idx++];
+		cell.collision_resolution_vector_ = collision_resolutions[idx - 1];
 	}
 }

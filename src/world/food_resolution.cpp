@@ -3,7 +3,7 @@
 
 void World::resolve_food_interactions()
 {
-	for (int cell_id = 0; cell_id < cells_x * cells_y; ++cell_id)
+	for (int cell_id = 0; cell_id < spatial_hash_grid_.CellsX * spatial_hash_grid_.CellsY; ++cell_id)
 	{
 		resolve_food_grid_cell(cell_id);
 	}

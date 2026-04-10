@@ -185,3 +185,12 @@ const std::vector<float>& World::get_generation_distribution()
 
 	return distribution;
 }
+
+
+void World::update_spatial_renderers()
+{
+	
+	cell_grid_renderer.rebuild();
+	
+	food_manager_.update_food_grid_renderer();
+}

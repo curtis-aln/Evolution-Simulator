@@ -20,10 +20,12 @@ void World::update()
 	}
 
 	resolve_collisions();
+	update_cell_collisions();
 
 	food_manager_.update();
 	resolve_food_interactions();
-	update_all_protozoa(food_manager_, debug_mode, min_speed, track_statistics);
+	
+	update_all_protozoa(food_manager_, debug_mode, min_speed, track_statistics, toggle_collisions);
 	
 	
 }
@@ -32,6 +34,9 @@ void World::update()
 void World::update_position_container()
 {
 	spatial_hash_grid_.clear();
+
+	// fill the collision resolution vector with zeroes, we will fill it with new resolutions in the collision detection phase and then apply them to the cells in the update phase
+	std::fill(collision_resolutions.begin(), collision_resolutions.end(), sf::Vector2f{ 0.f, 0.f });
 
 	int idx = 0;
 	for (Protozoa* protozoa : all_protozoa_)
@@ -44,6 +49,9 @@ void World::update_position_container()
 			position_data_[idx] = cell.position_;
 			radius_data_[idx] = cell.radius;
 			cell_pointers_[idx] = &cell;
+			cell.colliding_with_ = cell.position_;
+			cell.collision_resolution_vector_ = { 0.f, 0.f };
+			//c//ell.collision_ids = { -1, -1 };
 
 			spatial_hash_grid_.add_object(cell.position_.x, cell.position_.y, idx);
 			idx++;

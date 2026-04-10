@@ -65,3 +65,9 @@ int FoodManager::get_size() const
 {
 	return food_vector.size();
 }
+
+
+void FoodManager::update_food_grid_renderer()
+{
+	food_grid_renderer.rebuild();
+}

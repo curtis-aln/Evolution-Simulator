@@ -113,14 +113,14 @@ struct FoodSettings
 	inline static constexpr float kFoodVisibilityRampFrames = 90;
 	inline static constexpr float kFoodMaxAlpha = 200;
 
-	inline static float spawn_proportionality_constant = 0.015f; // range between [0.001, 0.01]
+	inline static float spawn_proportionality_constant = 0.025f; // range between [0.001, 0.01]
 	inline static float food_spawn_distance = food_radius * 2.f;
 	inline static size_t reproductive_cooldown = 150.f;
 	inline static size_t reproductive_threshold = 300.f; // how old a food has to be before it can reproduce
 
 	inline static float initial_nutrients = 5;
-	inline static float final_nuterients = 30;
-	inline static size_t nutrient_development_time = 200;
+	inline static float final_nuterients = 60;
+	inline static size_t nutrient_development_time = 400;
 
 	inline static float death_age = 700.f;
 	inline static float death_age_chance = 0.01; // every frame past its death age gives it this chance of dying

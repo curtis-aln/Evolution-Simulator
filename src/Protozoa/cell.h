@@ -20,10 +20,15 @@ struct Cell : public CellGenome
 	size_t time_since_last_ate = 0;
 
 	float nutrients_eaten = 0.f; // The amount of nutrients this cell in particular has eaten
-
+	int food_eaten = 0;
 
 	sf::Vector2f position_{};
 	sf::Vector2f velocity_{};
+
+	// debugging
+	sf::Vector2f collision_resolution_vector_{};
+	sf::Vector2f colliding_with_ = position_;
+	sf::Vector2i collision_ids{ -1, -1 };
 
 
 	Cell(const int _id, const sf::Vector2f position)
@@ -38,12 +43,14 @@ struct Cell : public CellGenome
 		sinwave_current_friction_ = 0.f;
 		time_since_last_ate = 0.f;
 		nutrients_eaten = 0.f;
+		food_eaten = 0;
 	}
 
 	void eat(Food* food)
 	{
 		nutrients_eaten += food->nutrients;
 		time_since_last_ate = 0;
+		++food_eaten;
 	}
 
 	void handle_nearby_food(FixedSpan<obj_idx>& nearby_food_container, FoodManager& food_manager)

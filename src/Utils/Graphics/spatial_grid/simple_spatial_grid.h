@@ -53,6 +53,19 @@ public:
 		cell_height = world_height / static_cast<float>(CellsY);
 	}
 
+	void change_cell_dimsensions(const int new_cells_x, const int new_cells_y)
+	{
+		CellsX = new_cells_x;
+		CellsY = new_cells_y;
+		update_cell_dimensions();
+
+		cell_capacities.resize(CellsX * CellsY, 0);
+
+		grid.resize(CellsX * CellsY, CellArray());
+		for (size_t i = 0; i < CellsX * CellsY; ++i)
+			grid[i].resize(cell_max_capacity, 0);
+	}
+
 	cell_idx inline hash(const float x, const float y) const
 	{
 		// Converting the position to a 2d grid coordinate

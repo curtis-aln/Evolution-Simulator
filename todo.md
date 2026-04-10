@@ -5,12 +5,12 @@
 [Done] statistic showing total alive entities
 - Death notifications: optional toast notification when a tagged organism dies, with cause of death (starvation, age, etc.
 - Clone: duplicate an organism exactly, spawn the copy nearby
-- Genome editor: directly tweak a selected organism's trait values via sliders, bypassing mutation. Great for controlled experiments
+[Done] Genome editor: directly tweak a selected organism's trait values via sliders, bypassing mutation. Great for controlled experiments
 - Organism tagging, ability to tag an organism and it will be outlined and visible, will show up on the tagged organisms screen
-- Add tabs for these IMgui screens because i imagine there will be a lot of them eventually and it will get cluttered, so maybe have one for statistics, one for controls, one for the tagged organisms, etc.
+[Done] Add tabs for these IMgui screens because i imagine there will be a lot of them eventually and it will get cluttered, so maybe have one for statistics, one for controls, one for the tagged organisms, etc.
 - Time-lapse / fast-forward mode — run simulation at 10x-100x with minimal rendering for long-run experiments
 - Ability to make organisms immortal
-- Ability to force organism to reproduce or die
+[Done] Ability to force organism to reproduce or die
 - Force feed: manually inject energy into a selected organism, useful for keeping a favourite alive during experiments
 - Worlds should be able to be saved and loaded
 - add the ability to change the worldsize in real time, regardless of if the spatial hash grid can change with it yet

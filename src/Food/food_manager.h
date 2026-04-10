@@ -36,6 +36,7 @@ public:
     FoodManager(sf::RenderWindow* window, Circle* world_circular_bounds);
 
     int    get_size()               const;
+    void update_food_grid_renderer();
     void   update();
     void   render();
     void   remove_food(int food_id);

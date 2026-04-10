@@ -69,6 +69,15 @@ void Protozoa::nearby_food_information() const
     {
         m_window_->draw(make_line(center, pos, sf::Color::Yellow));
     }
+
+    // drawing lines to each of the cells collision resolutions
+    for (const Cell& cell : m_cells_)
+    {
+        if (cell.collision_resolution_vector_ != sf::Vector2f{ 0, 0 })
+        {
+            m_window_->draw(make_line(cell.position_, cell.colliding_with_, sf::Color::Red));
+        }
+	}
 }
 
 
@@ -119,8 +128,6 @@ void Protozoa::draw_cell_physics(Font* font)
         const auto spacing = font->get_text_size("0").y;
         const sf::Vector2f offset = { 0, spacing };
         font->draw(top_left, "id: " + std::to_string(cell.id), false);
-        font->draw(top_left + offset * 2.f, "friction: " + std::to_string(cell.sinwave_current_friction_), false);
-        font->draw(top_left + offset * 3.f, "gen: " + std::to_string(cell.generation), false);
     }
 }
 
@@ -129,34 +136,7 @@ void Protozoa::draw_cell_physics(Font* font)
 
 void Protozoa::draw_spring_information(Font* font) const
 {
-	// spring information
-    for (const Spring& spring : m_springs_)
-    {
-        const sf::Vector2f& cell_A_pos = m_cells_[spring.cell_A_id].position_;
-        const sf::Vector2f& cell_B_pos = m_cells_[spring.cell_B_id].position_;
 
-		const sf::Vector2f mid_point = (cell_A_pos + cell_B_pos) * 0.5f;
-		const sf::Vector2f upper_quartile = (mid_point + cell_B_pos) * 0.5f;
-		const sf::Vector2f lower_quartile = (cell_A_pos + mid_point) * 0.5f;
-		const sf::Vector2f interquartile_range = upper_quartile - lower_quartile;
-
-        const sf::Vector2f& f1 = spring.direction_A_force;
-        const sf::Vector2f& f2 = spring.direction_B_force;
-
-        std::ostringstream vectorF1;
-        vectorF1 << "force A: (" << denary_to_str(f1.x, 2) << ", " << denary_to_str(f1.y, 2) << ")";
-        std::ostringstream vectorF2;
-        vectorF2 << "force B: (" << denary_to_str(f2.x, 2) << ", " << denary_to_str(f2.y, 2) << ")";
-		std::ostringstream length;
-		length << "length: " << denary_to_str(spring.spring_length, 2);
-		std::ostringstream broken;
-		broken << "broken: " << spring.broken;
-
-        font->draw(lower_quartile, vectorF1.str(), true);
-        font->draw(upper_quartile, vectorF2.str(), true);
-		font->draw(lower_quartile + interquartile_range/3.f, length.str(), true);
-		font->draw(upper_quartile - interquartile_range/2.f, broken.str(), true);
-    }
 }
 
 

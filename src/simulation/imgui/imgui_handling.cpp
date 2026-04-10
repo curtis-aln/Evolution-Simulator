@@ -355,8 +355,9 @@ void Simulation::imgui_spatial_grid_panel()
 
     if (ImGui::Button("Apply"))
     {
-        cell_grid->update_cell_dimensions();
-        food_grid->update_cell_dimensions();
+		cell_grid->change_cell_dimsensions(grid_resolution, grid_resolution);
+		food_grid->change_cell_dimsensions(grid_resolution, grid_resolution);
+		m_world_.update_spatial_renderers();
     }
 
     ImGui::End();

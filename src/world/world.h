@@ -116,6 +116,8 @@ public:
 
 	const std::vector<float>& get_generation_distribution();
 
+	void update_spatial_renderers();
+
 private:
 	// update functions
 	void update_cells_in_grid_cell(const int grid_cell_id);

@@ -6,7 +6,7 @@ void World::resolve_collisions()
 	if (!toggle_collisions)
 		return;
 
-	for (int cell_id = 0; cell_id < cells_x * cells_y; ++cell_id)
+	for (int cell_id = 0; cell_id < spatial_hash_grid_.CellsX * spatial_hash_grid_.CellsY; ++cell_id)
 	{
 		update_cells_in_grid_cell(cell_id);
 	}
@@ -21,8 +21,8 @@ void World::update_cells_in_grid_cell(const int grid_cell_id)
 
 	int neighbours_size = 0;
 
-	const int cell_index_x = grid_cell_id % cells_x;
-	const int cell_index_y = grid_cell_id / cells_x;
+	const int cell_index_x = grid_cell_id % spatial_hash_grid_.CellsX;
+	const int cell_index_y = grid_cell_id / spatial_hash_grid_.CellsX;
 
 	// Current cell
 	update_nearby_container(neighbours_size, cell_index_x, cell_index_y);
@@ -48,11 +48,11 @@ void World::update_cells_in_grid_cell(const int grid_cell_id)
 void World::update_nearby_container(int& neighbours_size, int32_t neighbour_index_x, int32_t neighbour_index_y)
 {
 	// Out of bounds check, no wrapping needed
-	if (neighbour_index_x < 0 || neighbour_index_x >= cells_x ||
-		neighbour_index_y < 0 || neighbour_index_y >= cells_y)
+	if (neighbour_index_x < 0 || neighbour_index_x >= static_cast<int>(spatial_hash_grid_.CellsX) ||
+		neighbour_index_y < 0 || neighbour_index_y >= static_cast<int>(spatial_hash_grid_.CellsY))
 		return;
 
-	const uint32_t neighbour_index = neighbour_index_y * cells_x + neighbour_index_x;
+	const uint32_t neighbour_index = neighbour_index_y * spatial_hash_grid_.CellsX + neighbour_index_x;
 	const auto& contents = spatial_hash_grid_.grid[neighbour_index];
 	const uint8_t size = spatial_hash_grid_.cell_capacities[neighbour_index];
 
@@ -68,6 +68,10 @@ void World::update_protozoa_cell(const int protozoa_cell_index, const int neighb
 
 	for (uint32_t i{ 0 }; i < neighbours_size; ++i)
 	{
+		// check if the cells are the same
+		if (protozoa_cell_index == nearby_ids[i])
+			continue;
+
 		const sf::Vector2f position_b = position_data_[nearby_ids[i]];
 
 		const float dist_sq = (position_a - position_b).lengthSquared();
@@ -90,5 +94,12 @@ void World::update_protozoa_cell(const int protozoa_cell_index, const int neighb
 		// Move the cells apart
 		collision_resolutions[protozoa_cell_index] = collisionNormal * (overlap * 0.5f);
 		collision_resolutions[nearby_ids[i]] = -collisionNormal * (overlap * 0.5f);
+
+		Cell* cell_a = cell_pointers_[protozoa_cell_index];
+		Cell* cell_b = cell_pointers_[nearby_ids[i]];
+		cell_a->colliding_with_ = cell_b->position_;
+		cell_b->colliding_with_ = cell_a->position_;
+		cell_a->collision_ids = { protozoa_cell_index, cell_b->id };
+		cell_b->collision_ids = { protozoa_cell_index, cell_b->id };
 	}
 }

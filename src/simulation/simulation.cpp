@@ -59,7 +59,7 @@ void Simulation::run_simulation()
 
 void Simulation::update_one_frame()
 {
-	handle_imGUI();
+	
 	manage_frame_rate();
 	const sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();
 
@@ -77,6 +77,7 @@ void Simulation::update_one_frame()
 	}
 
 	camera_follow_selected_protozoa();
+	handle_imGUI();
 }
 
 

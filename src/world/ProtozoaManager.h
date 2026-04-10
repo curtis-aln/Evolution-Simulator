@@ -93,7 +93,7 @@ protected:
 
 		for (int i = 0; i < max_evolutionary_iterations; ++i)
 		{
-			protozoa.mutate(true, 0.2f, 0.03f);
+			protozoa.mutate(true, 0.8f, 0.43f);
 
 			// as soon as we reach the criteria passing the desired cell count, the chance of breaking out the loop increases 
 			// gradually until max evolutionary iterations
@@ -109,17 +109,9 @@ protected:
 		protozoa.bound_cells();
 	}
 
-	void update_all_protozoa(FoodManager& food_manager_, bool debug_mode, float min_speed, bool track_statistics)
+	void update_all_protozoa(FoodManager& food_manager_, bool debug_mode, float min_speed, bool track_statistics, bool collisions)
 	{
-		int idx = 0;
-		// resolving collisions
-		for (Protozoa* protozoa : all_protozoa_)
-		{
-			protozoa->resolve_collisions(collision_resolutions, idx);
-		}
 
-		
-		
 		std::vector<int> reproduce_indexes{};
 		reproduce_indexes.reserve(max_protozoa);
 
@@ -147,6 +139,19 @@ protected:
 			if (track_statistics)
 				register_birth_stat();
 		}
+	}
+	
+
+	void update_cell_collisions()
+	{
+		int idx = 0;
+		// resolving collisions
+		
+		for (Protozoa* protozoa : all_protozoa_)
+		{
+			protozoa->resolve_collisions(collision_resolutions, idx);
+		}
+#
 	}
 
 	Protozoa* get_unallocated_protozoa()
