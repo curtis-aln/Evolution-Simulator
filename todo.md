@@ -37,19 +37,21 @@
 [Done] ontop of add cell, have "remove cell", "add spring", remove spring,
 [Done] merge tuning and controls
 - Get remove, add spring, and remove spring working
-- Put them in a 2x2 format
-- make that part a bit thinner and compact it
-- get make immortal working
-- get force reproduce working
-- make the Inject feature work
-- make the clone to nearby work
-- compact the right side more
+[Done] Put them in a 2x2 format
+[Done] make that part a bit thinner and compact it
+[Done] get make immortal working
+[Done] get force reproduce working
+[Done] make the Inject feature work
+[Done] make the clone to nearby work
+[Done] compact the right side more
 - get stomach bar working correctly
 - get time since last reproduced working better, replace with reproduce cooldown
-- give each cell an eat cooldown bar
-- Sync up the line graph with the actual values
-- in spring replace K and D with the actual names
-- make the cell / spring box a tiny bit wider 10%
+[Done] give each cell an eat cooldown bar
+[Done] Sync up the line graph with the actual values
+[Done] in spring replace K and D with the actual names
+[Done] make the cell / spring box a tiny bit wider 10%
+- when cells are immortal their energy shouldnt drop below zero
+- sometimes the sin wave graph goers by too quick, slider to change the amount of cycles displayed
 
 
 -----------------------------------------------------------------------
