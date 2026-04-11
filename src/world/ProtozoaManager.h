@@ -85,7 +85,14 @@ public:
 	Protozoa* find_protozoa_by_id(int id)
 	{
 		return all_protozoa_.at(id);
-	}	
+	}
+
+
+	void create_offspring(Protozoa* parent, bool should_mutate = true)
+	{
+		Protozoa* offspring = get_unallocated_protozoa();
+		offspring->create_offspring(parent, should_mutate);
+	}
 
 protected:
 	inline void generate_protozoa(Protozoa& protozoa, Circle& world_bounds, bool emplace_back = true)
@@ -178,11 +185,7 @@ protected:
 		return offspring;
 	}
 
-	void create_offspring(Protozoa* parent)
-	{
-		Protozoa* offspring = get_unallocated_protozoa();
-		offspring->create_offspring(parent);
-	}
+	
 
 
 	void check_for_extinction_event(Circle& world_bounds)

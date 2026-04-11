@@ -7,7 +7,6 @@
 
 void GraphsTab::draw(UIContext& ctx)
 {
-    ImPlot::CreateContext();
     draw_shared_toolbar(ctx);
 
     if (!ImGui::BeginTabBar("##graph_tabs")) return;

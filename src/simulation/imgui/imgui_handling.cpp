@@ -6,6 +6,8 @@ void Simulation::init_imGUI()
         std::cerr << "[ERROR]: Failed to initialize ImGui-SFML\n";
 
     ImGui::GetIO().FontGlobalScale = ui_scale_percent / 100.f;
+
+    ImPlot::CreateContext();
 }
 
 void Simulation::handle_imGUI()

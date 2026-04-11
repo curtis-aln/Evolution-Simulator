@@ -13,7 +13,6 @@
 // this is the organisms in the simulation, they are made up of cells which all act independently, attached by springs
 // the protozoa class is responsible for connecting the springs and cells
 
-inline static constexpr float initial_energy = 300.f; // energy the protozoa spawn with
 
 
 // The Genome class handles anything that has to do with mutation and genetics
@@ -50,16 +49,19 @@ private:
 	FixedSpan<obj_idx> nearby_food_container{ FoodSettings::cell_max_capacity * 9 };
 
 	unsigned stomach = 0;
-	float energy = initial_energy;
+	float energy = ProtozoaSettings::initial_energy;
 	
 	// calculated params
 	sf::Rect<float> m_personal_bounds_{};
 
 	bool reproduce = false;
 	bool dead = false;
+	
 
 	
 public:
+	bool immortal = false;
+
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr);
 
 	void update(FoodManager& food_manager, bool debug, float min_speed);
@@ -81,7 +83,9 @@ public:
 	bool is_alive() const { return !dead; }
 	bool should_reproduce() const { return reproduce; }
 	float get_energy() const { return energy; }
-	float stomach_capacity() const { return m_cells_.size(); }
+	float stomach_capacity() const { return stomach; }
+	float stomach_reproduce_thresh() const { return m_cells_.size(); }
+	float reproductive_cooldown_calculator() const { return reproductive_cooldown / m_cells_.size(); }
 
 	// information setting
 	void init_one_cell();
@@ -90,13 +94,21 @@ public:
 	void move_center_location_to(const sf::Vector2f new_center);
 	void set_protozoa_attributes(Protozoa* other);	
 	void resolve_collisions(const std::vector<sf::Vector2f>& collision_resolutions, int& idx);
-	void create_offspring(Protozoa* parent);
+	void create_offspring(Protozoa* parent, bool should_mutate = true);
+	void force_reproduce();
+	void inject(const float energy_injected);
 
 	void kill();
 	void bound_cells();
 
 	void soft_reset();
 	void hard_reset();
+
+	void add_spring();
+	void add_cell();
+
+	void remove_cell();
+	void remove_spring();
 
 
 private:
@@ -127,12 +139,6 @@ private:
 	void mutate_existing_cells(float mut_rate = 0.f, float mut_range = 0.f);
 	void mutate_existing_springs(float mut_rate = 0.f, float mut_range = 0.f);
 	bool cell_wander_check(Cell& cell);
-	
-	void add_spring();
-	void add_cell();
-
-	void remove_cell();
-	void remove_spring();
 
 	void check_death_conditions(float min_speed);
 

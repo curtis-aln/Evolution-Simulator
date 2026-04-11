@@ -55,12 +55,12 @@ void Protozoa::check_death_conditions(float min_speed)
 	float sp = min_speed;
 	if (velocity.x * velocity.x + velocity.y * velocity.y < sp * sp)
 	{
-		dead = true;
+		kill();
 	}
 
 	if (energy <= 0)
 	{
-		dead = true;
+		kill();
 	}
 }
 
@@ -79,7 +79,7 @@ void Protozoa::update_springs()
 
 		if (spring.broken)
 		{
-			dead = true;
+			kill();
 			return;
 		}
 	}
@@ -94,7 +94,7 @@ void Protozoa::update_cells()
 
 		if (cell_wander_check(cell))
 		{
-			dead = true;
+			kill();
 			return;
 		}
 
@@ -167,6 +167,7 @@ void Protozoa::soft_reset()
 	total_food_eaten = 0;
 	offspring_count = 0;
 	energy = initial_energy;
+	immortal = false;
 
 	time_since_last_reproduced = 0;
 

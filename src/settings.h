@@ -61,12 +61,12 @@ struct GraphicalSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 50'000;
+	static constexpr float bounds_radius = 20'000;
 
-	static constexpr unsigned max_protozoa = 25'000;
-	static constexpr unsigned initial_protozoa = 8'000;
+	static constexpr unsigned max_protozoa = 5'000;
+	static constexpr unsigned initial_protozoa = 1'000;
 
-	inline static constexpr size_t cells_x = 180;
+	inline static constexpr size_t cells_x = 100;
 	inline static constexpr size_t cells_y = cells_x;
 	inline static constexpr size_t cell_max_capacity = 25;
 
@@ -91,6 +91,9 @@ struct ProtozoaSettings
 
 	inline static size_t reproductive_cooldown = 200.f;
 	inline static size_t digestive_time = 100.f; // per cell
+
+	inline static constexpr float initial_energy = 300.f; // energy the protozoa spawn with
+
 };
 
 
@@ -101,8 +104,8 @@ struct FoodSettings
 	inline static constexpr size_t cell_max_capacity = 20;
 	inline static constexpr size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
 
-	static constexpr unsigned max_food = 40'000;
-	static constexpr unsigned initial_food = 16'000;
+	static constexpr unsigned max_food = 10'000;
+	static constexpr unsigned initial_food = 2'000;
 	inline static constexpr float food_radius = 30.f;
 	inline static constexpr float friction = 0.975f;
 

@@ -28,14 +28,28 @@
 - line graph for average offspring
 
 
-- Merge the Spring and the Cell tab, do this by merging their two "select what spring/cell" together, just have a seperator and below the cell selections haev the springs
-- Compact the overview, and move it to the left of the now merged spring and cells 
-- in the sin wave viewer replace A B C D with the correct names of what they are
-- in  the sin wave viewer place the sliders to change the values on top of eachover instead of in a 2x2 grid
-- add a progress bar thing for stomach. (for reproduction)
-- remove live genome averages
-- ontop of add cell, have "remove cell", "add spring", remove spring,
-- merge tuning and controls
+[Done] Merge the Spring and the Cell tab, do this by merging their two "select what spring/cell" together, just have a seperator and below the cell selections haev the springs
+[Done] Compact the overview, and move it to the left of the now merged spring and cells 
+[Done] in the sin wave viewer replace A B C D with the correct names of what they are
+[Done] in  the sin wave viewer place the sliders to change the values on top of eachover instead of in a 2x2 grid
+[Done] add a progress bar thing for stomach. (for reproduction)
+[Done] remove live genome averages
+[Done] ontop of add cell, have "remove cell", "add spring", remove spring,
+[Done] merge tuning and controls
+- Get remove, add spring, and remove spring working
+- Put them in a 2x2 format
+- make that part a bit thinner and compact it
+- get make immortal working
+- get force reproduce working
+- make the Inject feature work
+- make the clone to nearby work
+- compact the right side more
+- get stomach bar working correctly
+- get time since last reproduced working better, replace with reproduce cooldown
+- give each cell an eat cooldown bar
+- Sync up the line graph with the actual values
+- in spring replace K and D with the actual names
+- make the cell / spring box a tiny bit wider 10%
 
 
 -----------------------------------------------------------------------

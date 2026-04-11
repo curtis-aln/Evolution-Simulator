@@ -13,11 +13,15 @@ void Protozoa::mutate(const bool artificial_add_cell, const float artificial_mut
     mutate_existing_cells(artificial_mutatation_rate, artificial_mutatation_range);
     mutate_existing_springs(artificial_mutatation_rate, artificial_mutatation_range);
 
+	if (std::max(artificial_mutatation_rate, artificial_mutatation_range) == 0.f)
+		return; // probally wants a clone with no mutations, so we skip the rest of the mutation process which adds or removes cells and springs
+
     // Check if we should add or remove a cell based on the genome's mutation logic
     const bool add_cell_ = Random::rand01_float() < CellGenome::add_cell_chance;
     const bool remove_cell_ = Random::rand01_float() < CellGenome::remove_cell_chance;
 	const bool add_spring_ = Random::rand01_float() < CellGenome::add_spring_chance;
 	const bool remove_spring_ = Random::rand01_float() < CellGenome::remove_spring_chance;
+
 
     if (add_cell_ || artificial_add_cell)
         add_cell();

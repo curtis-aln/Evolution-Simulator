@@ -5,8 +5,6 @@
 #include <algorithm>
 #include <cmath>
 
-static constexpr float k_init_energy = 300.f;
-static constexpr float k_repro_cooldown = 600.f;   // frames; adjust to match World constant
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Top-level draw
@@ -25,7 +23,7 @@ void OrganismTab::draw(UIContext& ctx)
     }
 
     // Left column: compact overview (always visible)
-    ImGui::BeginChild("OV_panel", { 170.f, -1.f }, false);
+    ImGui::BeginChild("OV_panel", { 240.f, -1.f }, false);
     draw_overview(p);
     ImGui::EndChild();
 
@@ -60,46 +58,57 @@ void OrganismTab::draw_no_selection()
 // ─────────────────────────────────────────────────────────────────────────────
 void OrganismTab::draw_overview(Protozoa* p)
 {
-    // Identity
+    ImGui::Columns(2, nullptr, false);
+
+    // ---------------- LEFT COLUMN ----------------
     ImGui::TextDisabled("Identity");
     ImGui::Text("ID      %d", p->id);
-    ImGui::Text("Age     %u fr", p->frames_alive);
+    ImGui::Text("Age     %u", p->frames_alive);
     ImGui::Text("Cells   %d", (int)p->get_cells().size());
     ImGui::Text("Springs %d", (int)p->get_springs().size());
     ImGui::Text("Birth (%.0f,%.0f)", p->birth_location.x, p->birth_location.y);
 
-    // Energy
-    ImGui::Spacing(); ImGui::TextDisabled("Energy");
-    const float ef = std::clamp(p->get_energy() / k_init_energy, 0.f, 1.f);
-    ImVec4 ec = ef > 0.5f
-        ? ImVec4{ 2.f * (1.f - ef), 1.f,      0.2f, 1.f }
-    : ImVec4{ 1.f,              2.f * ef,  0.2f, 1.f };
-    char elbl[32]; snprintf(elbl, sizeof(elbl), "%.1f/%.0f", p->get_energy(), k_init_energy);
-    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ec);
-    ImGui::ProgressBar(ef, { -1.f, 10.f }, elbl);
-    ImGui::PopStyleColor();
-    ImGui::Text("Spr cost %.4f", p->energy_lost_to_springs);
+    // ---------------- RIGHT COLUMN ----------------
+    ImGui::NextColumn();
 
-    // Locomotion
-    ImGui::Spacing(); ImGui::TextDisabled("Locomotion");
+    ImGui::TextDisabled("Locomotion");
     ImGui::Text("Speed %.4f", p->velocity.length());
     ImGui::Text("Vel X %.3f", p->velocity.x);
     ImGui::Text("Vel Y %.3f", p->velocity.y);
 
-    // Reproduction / stomach
-    ImGui::Spacing(); ImGui::TextDisabled("Reproduction");
+    ImGui::Spacing();
+    ImGui::TextDisabled("Reproduction");
     ImGui::Text("Offspring  %d", p->offspring_count);
     ImGui::Text("Food eaten %u", p->total_food_eaten);
 
+    ImGui::Columns(1);
+
+    ImGui::Spacing();
+    ImGui::TextDisabled("Energy");
+
+    const float ef = std::clamp(p->get_energy() / ProtozoaSettings::initial_energy, 0.f, 1.f);
+    ImVec4 ec = ef > 0.5f
+        ? ImVec4{ 2.f * (1.f - ef), 1.f, 0.2f, 1.f }
+    : ImVec4{ 1.f, 2.f * ef, 0.2f, 1.f };
+
+    char elbl[32];
+    snprintf(elbl, sizeof(elbl), "%.1f/%.0f", p->get_energy(), ProtozoaSettings::initial_energy);
+
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ec);
+    ImGui::ProgressBar(ef, { -1.f, 10.f }, elbl);
+    ImGui::PopStyleColor();
+
+    ImGui::Text("Spr cost %.4f", p->energy_lost_to_springs);
+
+    const float stomach_f = std::clamp(p->stomach_capacity() / p->stomach_reproduce_thresh(), 0.f, 1.f);
     ImGui::Spacing(); ImGui::TextDisabled("Stomach");
     // Stomach fill = energy progress toward reproduction threshold
-    // Using energy fraction as a proxy; replace with actual repro-energy field if available
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, { 0.35f, 0.75f, 0.35f, 1.f });
     ImGui::ProgressBar(ef, { -1.f, 10.f }, elbl);
     ImGui::PopStyleColor();
 
     ImGui::Spacing(); ImGui::TextDisabled("Repro cooldown");
-    const float rf = std::clamp((float)p->time_since_last_reproduced / k_repro_cooldown, 0.f, 1.f);
+    const float rf = std::clamp((float)p->time_since_last_reproduced / ProtozoaSettings::reproductive_cooldown, 0.f, 1.f);
     char rlbl[24]; snprintf(rlbl, sizeof(rlbl), "%zu fr", p->time_since_last_reproduced);
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, { 0.6f, 0.4f, 0.9f, 1.f });
     ImGui::ProgressBar(rf, { -1.f, 10.f }, rlbl);
@@ -169,13 +178,29 @@ void OrganismTab::draw_cells_springs_tab(Protozoa* p)
 void OrganismTab::draw_cell_detail(Protozoa* p, Cell& c)
 {
     // Stats
-    ImGui::BeginChild("CL_stat", { 172.f, -1.f }, true);
+    ImGui::BeginChild("CL_stat", { 230.f, -1.f }, true);
     ImGui::TextDisabled("Cell %d  Gen %d", c.id, c.generation);
     ImGui::Text("Pos    (%.0f, %.0f)", c.position_.x, c.position_.y);
     ImGui::Text("Speed  %.3f", c.velocity_.length());
     ImGui::Text("Radius %.1f", c.radius);
     ImGui::Text("Ate    %d  (%zu fr ago)", c.food_eaten, c.time_since_last_ate);
     ImGui::Text("Mut R  %.4f  Rng %.4f", c.mutation_rate, c.mutation_range);
+
+    // food eat cooldown
+	float diff = ProtozoaSettings::digestive_time - c.time_since_last_ate;
+     
+    const float ef = std::clamp(diff / ProtozoaSettings::digestive_time, 0.f, 1.f);
+    ImVec4 ec = ef > 0.5f
+        ? ImVec4{ 2.f * (1.f - ef), 1.f, 0.2f, 1.f }
+    : ImVec4{ 1.f, 2.f * ef, 0.2f, 1.f };
+
+    char elbl[32];
+    snprintf(elbl, sizeof(elbl), "%.1f/%.0f", diff, ProtozoaSettings::digestive_time);
+
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ec);
+    ImGui::ProgressBar(ef, { -1.f, 10.f }, elbl);
+    ImGui::PopStyleColor();
+    //--------------------------------------------------------------------
 
     const float fric = c.sinwave_current_friction_;
     ImVec4 fc = { 1.f - fric, fric, 0.2f, 1.f };
@@ -199,10 +224,19 @@ void OrganismTab::draw_cell_detail(Protozoa* p, Cell& c)
     // Sinwave
     ImGui::BeginChild("CL_wave", { -1.f, -1.f }, true);
     ImGui::TextDisabled("Friction Sin Wave  A*sin(B*t+C)+D");
-    static float fric_buf[120];
-    PlotUtils::fill_sinwave(fric_buf, c.amplitude, c.frequency, c.offset, c.vertical_shift, 0.f, 1.f);
-    const int head = (int)(p->frames_alive % 120);
-    PlotUtils::sinwave_graph("##fw", fric_buf, head, 0.f, 1.f, { -1.f, 52.f });
+
+    const int time_period = static_cast<int>(1.f / std::abs(c.frequency));
+    static std::vector<float> fric_buf;
+    fric_buf.resize(time_period);
+
+    PlotUtils::fill_sinwave(fric_buf.data(), time_period, c.amplitude, c.frequency, c.offset, c.vertical_shift, 0.f, 1.f);
+    const int head = (int)(p->frames_alive % time_period);
+    if (head == fric_buf.size())
+    {
+		std::cout << "Head out of bounds: " << head << " >= " << fric_buf.size() << std::endl;
+    }
+    PlotUtils::sinwave_graph("##fw", fric_buf.data(), time_period, head, 0.f, 1.f, { -1.f, 52.f });
+
     ImGui::Text("t=%-3d  friction = %.4f", head, fric_buf[head]);
 
     ImGui::Spacing();
@@ -223,7 +257,7 @@ void OrganismTab::draw_cell_detail(Protozoa* p, Cell& c)
 void OrganismTab::draw_spring_detail(Protozoa* p, Spring& s)
 {
     // Stats
-    ImGui::BeginChild("SL_stat", { 196.f, -1.f }, true);
+    ImGui::BeginChild("SL_stat", { 230.f, -1.f }, true);
     ImGui::TextDisabled("Spring  %d->%d", s.cell_A_id, s.cell_B_id);
     if (s.broken)
     {
@@ -247,18 +281,22 @@ void OrganismTab::draw_spring_detail(Protozoa* p, Spring& s)
     ImGui::PopStyleColor();
 
     ImGui::Spacing(); ImGui::TextDisabled("Physical");
-    ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##sk", &s.spring_const, 0.f, SpringGenome::max_spring_const, "K=%.3f");
-    ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##sd", &s.damping, 0.f, SpringGenome::max_damping, "D=%.3f");
+    ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##sk", &s.spring_const, 0.f, SpringGenome::max_spring_const, "Spring Constant =%.3f");
+    ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##sd", &s.damping, 0.f, SpringGenome::max_damping, "Damping =%.3f");
     ImGui::EndChild(); ImGui::SameLine();
 
     // Sinwave
     ImGui::BeginChild("SL_wave", { -1.f, -1.f }, true);
     ImGui::TextDisabled("Extension Sin Wave  rest-length ratio [0,1]");
-    static float ext_buf[120];
-    PlotUtils::fill_sinwave(ext_buf, s.amplitude, s.frequency, s.offset, s.vertical_shift, 0.f, 1.f);
-    const int head = (int)(p->frames_alive % 120);
-    PlotUtils::sinwave_graph("##sw", ext_buf, head, 0.f, 1.f, { -1.f, 52.f });
-    ImGui::Text("t=%-3d  ratio = %.4f", head, ext_buf[head]);
+    const int time_period = static_cast<int>(1.f / std::abs(s.frequency));
+    static std::vector<float> fric_buf;
+    fric_buf.resize(time_period);
+
+    PlotUtils::fill_sinwave(fric_buf.data(), time_period, s.amplitude, s.frequency, s.offset, s.vertical_shift, 0.f, 1.f);
+    const int head = (int)(p->frames_alive % time_period);
+    PlotUtils::sinwave_graph("##fw", fric_buf.data(), time_period, head, 0.f, 1.f, { -1.f, 52.f });
+
+    ImGui::Text("t=%-3d  friction = %.4f", head, fric_buf[head]);
 
     ImGui::Spacing();
     ImGui::SetNextItemWidth(-1.f);
@@ -280,51 +318,56 @@ void OrganismTab::draw_tuning_controls_tab(UIContext& ctx, Protozoa* p)
     const float half = (ImGui::GetContentRegionAvail().x - 8.f) * 0.5f;
 
     // ── Left column ───────────────────────────────────────────────────────
-    ImGui::BeginChild("TC_left", { half, -1.f }, false);
 
     // Mutation
-    ImGui::BeginChild("TC_mut", { -1.f, 0.f }, true, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginChild("TC_mut", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Mutation");
     static float tun_rate = 0.2f, tun_range = 0.2f;
     ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##tr", &tun_rate, 0.f, 1.f, "rate  = %.3f");
     ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##trng", &tun_range, 0.f, 1.f, "range = %.3f");
     ImGui::Spacing();
     if (ImGui::Button("Apply Mutation", { -1.f, 0.f })) p->mutate(false, tun_rate, tun_range);
-    ImGui::EndChild();
 
     ImGui::Spacing();
 
     // Structure
-    ImGui::BeginChild("TC_struct", { -1.f, 0.f }, true, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Columns(2, nullptr, false);
     ImGui::TextDisabled("Structure");
-    if (ImGui::Button("Add Cell", { -1.f, 0.f })) p->mutate(true, 0.f, 0.f);
-    if (ImGui::Button("Remove Cell", { -1.f, 0.f }))
-    { /* TODO: p->remove_cell(m_sel_cell_idx_) */
+    if (ImGui::Button("Add Cell", { -1.f, 0.f }))
+    {
+        p->mutate(true, 0.f, 0.f);
     }
-    ImGui::Spacing();
+
+    if (ImGui::Button("Remove Cell", { -1.f, 0.f }))
+    { 
+        p->remove_cell();
+    }
+
+    ImGui::NextColumn();
     if (ImGui::Button("Add Spring", { -1.f, 0.f }))
-    { /* TODO: p->add_spring() */
+    {
+		p->add_spring();
     }
     if (ImGui::Button("Remove Spring", { -1.f, 0.f }))
-    { /* TODO: p->remove_spring(m_sel_spring_idx_) */
+    { 
+        p->remove_spring();
     }
+    ImGui::Columns(1);
     ImGui::EndChild();
 
-    ImGui::EndChild(); // TC_left
     ImGui::SameLine();
 
     // ── Right column ──────────────────────────────────────────────────────
     ImGui::BeginChild("TC_right", { -1.f, -1.f }, false);
 
     // Lifecycle
-    ImGui::BeginChild("TC_life", { -1.f, 0.f }, true, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginChild("TC_life", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Lifecycle");
-    static bool immortal = false;
-    ImGui::Checkbox("Immortal (stub)##org", &immortal);
-    ImGui::TextDisabled("  Needs World::set_immortal(id, bool)");
+    ImGui::Checkbox("Immortal##org", &p->immortal);
     ImGui::Spacing();
-    if (ImGui::Button("Force Reproduce (stub)##org", { -1.f, 0.f }))
-    { /* TODO: ctx.world.force_reproduce(p) */
+    if (ImGui::Button("Force Reproduce##org", { -1.f, 0.f }))
+    { 
+        p->force_reproduce();
     }
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.55f, 0.08f, 0.08f, 1.f });
@@ -341,24 +384,25 @@ void OrganismTab::draw_tuning_controls_tab(UIContext& ctx, Protozoa* p)
     ImGui::Spacing();
 
     // Feed
-    ImGui::BeginChild("TC_feed", { -1.f, 0.f }, true, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginChild("TC_feed", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Feed");
     static float feed_energy = 50.f;
     ImGui::SetNextItemWidth(-70.f);
     ImGui::SliderFloat("##feed", &feed_energy, 1.f, 500.f, "%.0f");
     ImGui::SameLine();
     if (ImGui::Button("Inject##org"))
-    { /* TODO: p->add_energy(feed_energy) */
+    { 
+		p->inject(feed_energy);
     }
+
     ImGui::EndChild();
-
-    ImGui::Spacing();
-
+  
     // Clone & File
-    ImGui::BeginChild("TC_clone", { -1.f, 0.f }, true, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginChild("TC_clone", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Clone & File");
-    if (ImGui::Button("Clone nearby (stub)##org", { -1.f, 0.f }))
-    { /* TODO: ctx.world.clone_protozoa(p) */
+    if (ImGui::Button("Clone nearby##org", { -1.f, 0.f }))
+    { 
+        ctx.world.create_offspring(p, false);
     }
     if (ImGui::Button("Save to file (stub)##org", { -1.f, 0.f }))
     { /* TODO: serialize p->genome to disk */
@@ -371,7 +415,7 @@ void OrganismTab::draw_tuning_controls_tab(UIContext& ctx, Protozoa* p)
     ImGui::Spacing();
 
     // Tag
-    ImGui::BeginChild("TC_tag", { -1.f, 0.f }, true, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::BeginChild("TC_tag", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Tag");
     ImGui::TextDisabled("Use the Tagged tab to tag ID %d", p->id);
     ImGui::EndChild();

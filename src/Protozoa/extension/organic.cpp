@@ -21,10 +21,10 @@ void Protozoa::consume(Food* food, FoodManager& food_manager)
 
 void Protozoa::reproduce_check()
 {
-    if (time_since_last_reproduced++ < reproductive_cooldown / m_cells_.size()) // todo
+    if (time_since_last_reproduced++ < reproductive_cooldown_calculator()) // todo
         return;
 
-	if (stomach < m_cells_.size())
+	if (stomach < stomach_reproduce_thresh())
         return;
 
     time_since_last_reproduced = 0.f;
@@ -89,7 +89,7 @@ bool Protozoa::cell_wander_check(Cell& cell)
 	return distance_sq > wander_threshold * wander_threshold;
 }
 
-void Protozoa::create_offspring(Protozoa* parent)
+void Protozoa::create_offspring(Protozoa* parent, bool should_mutate)
 {
     // This protozoa should have been just created by the parent
     parent->reproduce = false;
@@ -101,7 +101,8 @@ void Protozoa::create_offspring(Protozoa* parent)
     // incrementing the generation in all of the cells and springs
     update_generation();
 
-    mutate();
+    if (should_mutate)
+        mutate();
     birth_location = parent->get_center();
 
     // we offset the offspring's position slightly from the parent as if it spawns directly in its parent
@@ -115,5 +116,16 @@ void Protozoa::create_offspring(Protozoa* parent)
 
 void Protozoa::kill()
 {
-    dead = true;
+    if (!immortal)
+        dead = true;
+}
+
+void Protozoa::force_reproduce()
+{
+    reproduce = true;
+}
+
+void Protozoa::inject(const float energy_injected)
+{
+    energy += energy_injected;
 }
