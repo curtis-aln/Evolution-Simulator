@@ -15,6 +15,8 @@
 #include "../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
 #include "../Utils/Graphics/spatial_grid/spatial_grid_renderer.h"
 #include "../Utils/Graphics/SFML_Grid.h"
+#include "../simulation/shared_state.h"
+
 
 class World : public ProtozoaManager
 {
@@ -28,7 +30,6 @@ class World : public ProtozoaManager
     RenderData render_data_;
 
     std::vector<Cell*> cell_pointers_{};
-    int entity_count_ = 0;
 
     CircleBatchRenderer outer_circle_renderer_{ m_window_ };
     CircleBatchRenderer inner_circle_renderer_{ m_window_ };
@@ -77,12 +78,16 @@ public:
     FoodManager* get_food_manager() { return &food_manager_; }
     void               update_spatial_renderers();
 
+    void unload_render_data(SimSnapshot& snapshot);
+
+    void fill_render_data(SimSnapshot& snapshot);
+
     // ── Render data getters — read by renderer from snapshot ─────────────────
     const std::vector<sf::Vector2f>& get_positions()    const { return render_data_.positions; }
     const std::vector<sf::Color>& get_outer_colors() const { return render_data_.outer_colors; }
     const std::vector<sf::Color>& get_inner_colors() const { return render_data_.inner_colors; }
     const std::vector<float>& get_radii()        const { return render_data_.radii; }
-    int                              get_entity_count() const { return entity_count_; }
+    int                              get_entity_count() const { return entity_count; }
     const RenderData& get_render_data()  const { return render_data_; }
 
     // ── Statistics getters — read by ImGui from snapshot ─────────────────────

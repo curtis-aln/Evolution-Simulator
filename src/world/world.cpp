@@ -38,16 +38,16 @@ void World::render(Font* font, sf::Vector2f mouse_pos)
 
 void World::render_protozoa(Font* font)
 {
-    outer_circle_renderer_.update_colors(render_data_.outer_colors, entity_count_);
-    outer_circle_renderer_.render(render_data_.positions, render_data_.radii, entity_count_);
+    outer_circle_renderer_.update_colors(render_data_.outer_colors, entity_count);
+    outer_circle_renderer_.render(render_data_.positions, render_data_.radii, entity_count);
 
     if (!toggles.simple_mode)
     {
-        for (int i = 0; i < entity_count_; ++i)
+        for (int i = 0; i < entity_count; ++i)
             inner_radii_[i] = render_data_.radii[i] / GraphicalSettings::cell_outline_thickness;
 
-        inner_circle_renderer_.update_colors(render_data_.inner_colors, entity_count_);
-        inner_circle_renderer_.render(render_data_.positions, inner_radii_, entity_count_);
+        inner_circle_renderer_.update_colors(render_data_.inner_colors, entity_count);
+        inner_circle_renderer_.render(render_data_.positions, inner_radii_, entity_count);
     }
 
     if (selected_protozoa_ != nullptr && toggles.debug_mode)
@@ -150,4 +150,17 @@ void World::update_spatial_renderers()
 {
     cell_grid_renderer_.rebuild();
     food_manager_.update_food_grid_renderer();
+}
+
+void World::unload_render_data(SimSnapshot& snapshot)
+{
+    // we check if the rendering process has written any new data for us to use, we unload it onto the world before updating it
+    
+}
+
+void World::fill_render_data(SimSnapshot& snapshot)
+{
+    snapshot.render = get_render_data();
+    snapshot.stats = get_statistics();
+    snapshot.toggles = toggles;
 }

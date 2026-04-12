@@ -42,6 +42,7 @@ void Simulation::update_one_frame()
 
     if (m_world_.toggles.m_tick_frame_time)
     {
+        m_world_.unload_render_data(shared_input.buffers[shared_input.get_read_buffer_index()]);
         m_world_.update();
         m_world_.toggles.m_tick_frame_time = false;
     }
@@ -101,6 +102,8 @@ void Simulation::render()
 	update_line_graphs(shared_input.buffers[write_idx]);
     handle_imGUI();
 
+	shared_input.publish_write();
+
     m_window_.clear(GraphicalSettings::window_color);
 
     if (m_world_.toggles.m_rendering_)
@@ -135,12 +138,10 @@ void Simulation::manage_frame_rate()
 void Simulation::fill_render_data(SharedState& shared_state)
 {
     const int    write_idx = shared_state.get_write_buffer_index();
-    SimSnapshot& write_buffer = shared_state.buffers[write_idx];
+    SimSnapshot& snapshot = shared_state.buffers[write_idx];
 
-    write_buffer.render = m_world_.get_render_data();
-    write_buffer.stats = m_world_.get_statistics();
-    write_buffer.toggles = m_world_.toggles;
-    write_buffer.total_time_elapsed = m_total_time_elapsed_;
+	m_world_.fill_render_data(snapshot);
+    snapshot.total_time_elapsed = m_total_time_elapsed_;
 
     shared_state.publish_write();
 }
