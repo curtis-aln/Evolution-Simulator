@@ -15,7 +15,12 @@
 #include <Windows.h>
 #endif
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Window/VideoMode.hpp>
+#include <SFML/Window/Event.hpp>
 
 #ifndef PROJECT_ROOT
 #define PROJECT_ROOT "."

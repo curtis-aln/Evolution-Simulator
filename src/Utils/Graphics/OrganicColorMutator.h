@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "../random.h"
+#include <SFML/Graphics/Color.hpp>
 
 
 // ================================================================

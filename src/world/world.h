@@ -50,7 +50,7 @@ class World : public ProtozoaManager
 
 	// for our collision detection we use a spatial hash grid to see what cells are nearby others
 	SimpleSpatialGrid spatial_hash_grid_{ cells_x, cells_y, cell_max_capacity, bounds_radius * 2.f, bounds_radius * 2.f };
-	SpatialRenderer cell_grid_renderer{ &spatial_hash_grid_ }; // renders the cell spatial hash grid
+	SpatialGridRenderer cell_grid_renderer{ &spatial_hash_grid_ }; // renders the cell spatial hash grid
 
 
 	// Tracking the number of iterations have passed in this world
@@ -78,7 +78,7 @@ public:
 
 	// for the simple spatial grid, we need a temporary array to store nearby cell ids
 	std::array<int, cell_max_capacity * 9> nearby_ids = {};
-	FixedSpan<obj_idx> nearby_food { FoodSettings::cell_max_capacity * 9 };
+	FixedSpan<obj_idx> nearby_food { cell_max_capacity * 9 };
 
 	float min_speed = 0;
 	float delta_min_speed = 0.0;

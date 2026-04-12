@@ -1,87 +1,165 @@
 cmake_minimum_required(VERSION 3.21)
 project(ProjectARIA LANGUAGES CXX)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+# ── Language standard ─────────────────────────────────────────────────────────
+# Tell CMake to use C++23. MSVC will receive /std:c++latest automatically.
+# We set EXTENSIONS OFF to avoid compiler-specific GNU extensions.
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Generates compile_commands.json — useful for clangd / IDE tooling
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# ── Dependencies (FetchContent) ───────────────────────────────────────────────
+# FetchContent downloads and builds dependencies at configure time.
+# Order matters: ImGui must be available before ImGui-SFML and ImPlot,
+# because both need to find imgui headers.
 include(FetchContent)
 
 FetchContent_Declare(SFML
-  GIT_REPOSITORY https://github.com/SFML/SFML.git
-  GIT_TAG 3.0.0
+    GIT_REPOSITORY https://github.com/SFML/SFML.git
+    GIT_TAG        3.0.0
 )
 
 FetchContent_Declare(ImGui
-  GIT_REPOSITORY https://github.com/ocornut/imgui.git
-  GIT_TAG v1.91.1
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG        v1.91.1
 )
 
 FetchContent_Declare(ImGui-SFML
-  GIT_REPOSITORY https://github.com/SFML/imgui-sfml.git
-  GIT_TAG master
+    GIT_REPOSITORY https://github.com/SFML/imgui-sfml.git
+    GIT_TAG        master
 )
 
 FetchContent_Declare(ImPlot
-  GIT_REPOSITORY https://github.com/epezent/implot.git
-  GIT_TAG v0.17  # last stable release, known-good API
+    GIT_REPOSITORY https://github.com/epezent/implot.git
+    GIT_TAG        v0.17
 )
-FetchContent_MakeAvailable(ImPlot)
 
+# Disable SFML fetching its own system deps (freetype etc.) — we want static
 set(SFML_USE_SYSTEM_DEPS OFF CACHE BOOL "" FORCE)
+
+# Suppress a CMake policy warning from older dependency CMakeLists files
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
 
+# Make all deps available in the right order
 FetchContent_MakeAvailable(SFML)
 FetchContent_MakeAvailable(ImGui)
 
+# ImGui-SFML needs to know where imgui source lives before it configures
 set(IMGUI_DIR ${imgui_SOURCE_DIR} CACHE PATH "" FORCE)
-
 FetchContent_MakeAvailable(ImGui-SFML)
 
-file(GLOB_RECURSE APP_SOURCES CONFIGURE_DEPENDS
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-)
+# ImPlot is header+source only — we add its sources manually below
+FetchContent_MakeAvailable(ImPlot)
 
-add_executable(ProjectARIA ${APP_SOURCES})
+# ── Executable sources ────────────────────────────────────────────────────────
+# Listed explicitly (no glob) so CMake always detects added/removed files.
+add_executable(ProjectARIA
+    # ── Entry point
+    src/main.cpp
+    src/pch.cpp
 
-target_link_libraries(ProjectARIA PRIVATE
-  SFML::Graphics
-  SFML::Window
-  SFML::System
-  ImGui-SFML::ImGui-SFML
-)
+    # ── Food system
+    src/Food/FoodManager.cpp
+    src/Food/FoodManager_spawn.cpp
+    src/Food/FoodManager_update.cpp
 
-target_include_directories(ProjectARIA PRIVATE ${implot_SOURCE_DIR})
-target_sources(ProjectARIA PRIVATE
+    # ── Protozoa behaviours (split across extension files)
+    src/Protozoa/extension/debug_graphics.cpp
+    src/Protozoa/extension/mutations.cpp
+    src/Protozoa/extension/organic.cpp
+    src/Protozoa/extension/physics.cpp
+
+    # ── Simulation core
+    src/simulation/events.cpp
+    src/simulation/simulation.cpp
+
+    # ── ImGui control panel + tab implementations
+    src/simulation/imgui/control_panel.cpp
+    src/simulation/imgui/imgui_handling.cpp
+    src/simulation/imgui/helpers/toast_system.cpp
+    src/simulation/imgui/tabs/display_tab.cpp
+    src/simulation/imgui/tabs/graphs_tab.cpp
+    src/simulation/imgui/tabs/grid_tab.cpp
+    src/simulation/imgui/tabs/organism_tab.cpp
+    src/simulation/imgui/tabs/simulation_tab.cpp
+    src/simulation/imgui/tabs/statistics_tab.cpp
+    src/simulation/imgui/tabs/tagged_tab.cpp
+    src/simulation/imgui/tabs/tools_tab.cpp
+
+    # ── Utilities
+    src/Utils/Graphics/spatial_grid/spatial_grid_renderer.cpp
+
+    # ── World / simulation update loop
+    src/world/collision_resolution.cpp
+    src/world/food_resolution.cpp
+    src/world/world.cpp
+    src/world/world_updating.cpp
+
+    # ── ImPlot (header-only library — sources must be compiled as part of our target)
     ${implot_SOURCE_DIR}/implot.cpp
     ${implot_SOURCE_DIR}/implot_items.cpp
 )
 
-if(MSVC)
-    target_link_libraries(ProjectARIA PRIVATE dbghelp)
-endif()
-
-target_compile_definitions(ProjectARIA PRIVATE 
-    PROJECT_ROOT="${CMAKE_SOURCE_DIR}"
+# ── Include directories ───────────────────────────────────────────────────────
+# PRIVATE means these paths are only used when compiling ProjectARIA itself,
+# not exposed to anything that links against it.
+target_include_directories(ProjectARIA PRIVATE
+    src                          # allows #include "settings.h" etc. from anywhere
+    ${implot_SOURCE_DIR}         # allows #include <implot.h>
 )
 
-if (MSVC)
+# ── Linked libraries ──────────────────────────────────────────────────────────
+target_link_libraries(ProjectARIA PRIVATE
+    SFML::Graphics
+    SFML::Window
+    SFML::System
+    ImGui-SFML::ImGui-SFML
+    $<$<CXX_COMPILER_ID:MSVC>:dbghelp>   # MSVC only — stack trace support
+)
+
+# ── Preprocessor definitions ──────────────────────────────────────────────────
+target_compile_definitions(ProjectARIA PRIVATE
+    PROJECT_ROOT="${CMAKE_SOURCE_DIR}"   # lets code reference assets by absolute path
+    IMGUI_DEFINE_MATH_OPERATORS          # required by ImPlot: enables ImVec2 +/-/* operators
+    $<$<BOOL:${SFML_STATIC_LIBRARIES}>:SFML_STATIC>
+)
+
+# ── Precompiled header ────────────────────────────────────────────────────────
+# Speeds up compilation by pre-parsing heavy headers (imgui, STL) once.
+# We skip ImPlot's own .cpp files because they have their own include order
+# and don't expect a forced external PCH injected before their own includes.
+target_precompile_headers(ProjectARIA PRIVATE src/pch.h)
+
+set_source_files_properties(
+    ${implot_SOURCE_DIR}/implot.cpp
+    ${implot_SOURCE_DIR}/implot_items.cpp
+    PROPERTIES SKIP_PRECOMPILE_HEADERS ON
+)
+
+# ── MSVC-specific compiler options ───────────────────────────────────────────
+if(MSVC)
+    # Remove the /EHsc that CMake injects by default before we add our own,
+    # otherwise both /EHsc and /EHa end up on the command line causing D9025.
+    string(REPLACE "/EHsc" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
     target_compile_options(ProjectARIA PRIVATE
-        /std:c++23preview
-        /Zc:__cplusplus
-        /EHa
-        /FS
-
-        # Debug config
-        $<$<CONFIG:Debug>:/Zi>
-
-        # Release config (lighter debug info)
-        $<$<CONFIG:Release>:/Z7>
+        /Zc:__cplusplus      # makes MSVC report the real __cplusplus value, not 199711L
+        /EHa                 # enable SEH exceptions (needed for some SFML/Windows interop)
+        /FS                  # force synchronous PDB writes (required for parallel builds)
+        /W3                  # warning level 3 (reasonable default)
+        $<$<CONFIG:Debug>:/Zi>           # full debug info in Debug builds
+        $<$<CONFIG:RelWithDebInfo>:/Zi>  # also in RelWithDebInfo
+        $<$<CONFIG:Release>:/Z7>         # embed debug info in .obj for Release (no .pdb)
     )
 endif()
+
+# ── Post-build: copy media assets next to the executable ─────────────────────
 add_custom_command(TARGET ProjectARIA POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory
-    "${CMAKE_CURRENT_SOURCE_DIR}/media"
-    "$<TARGET_FILE_DIR:ProjectARIA>/media"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/media"
+        "$<TARGET_FILE_DIR:ProjectARIA>/media"
+    COMMENT "Copying media assets..."
 )

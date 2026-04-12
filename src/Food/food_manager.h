@@ -28,7 +28,7 @@ public:
     const sf::FloatRect   world_rect_bounds = { {0, 0}, {bounds_radius * 2, bounds_radius * 2} };
 
     SimpleSpatialGrid spatial_hash_grid{ cells_x, cells_y, cell_max_capacity, bounds_radius * 2, bounds_radius * 2 };
-    SpatialRenderer    food_grid_renderer{ &spatial_hash_grid };
+    SpatialGridRenderer food_grid_renderer{ &spatial_hash_grid };
 
     int frames = 0;
 

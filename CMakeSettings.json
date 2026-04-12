@@ -8,7 +8,7 @@
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-j 2",
       "ctestCommandArgs": ""
     },
     {
@@ -18,10 +18,9 @@
       "buildRoot": "${projectDir}\\out\\build\\${name}",
       "installRoot": "${projectDir}\\out\\install\\${name}",
       "cmakeCommandArgs": "",
-      "buildCommandArgs": "",
+      "buildCommandArgs": "-j 2",
       "ctestCommandArgs": "",
-      "inheritEnvironments": [ "msvc_x64_x64" ],
-      "variables": []
+      "inheritEnvironments": [ "msvc_x64_x64" ]
     }
   ]
 }

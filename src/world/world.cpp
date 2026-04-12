@@ -48,7 +48,7 @@ void World::render(Font* font, sf::Vector2f mouse_pos)
 	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.
 	if (draw_cell_grid)
 	{
-		cell_grid_renderer.render_grid(*m_window_, mouse_pos, 800.f);
+		cell_grid_renderer.render(*m_window_, mouse_pos, 800.f);
 	}
 
 	if (draw_food_grid)

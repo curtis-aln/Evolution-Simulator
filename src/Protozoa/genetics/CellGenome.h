@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
-#include <SFML/Graphics.hpp>
+
+#include <SFML/Graphics/Color.hpp>
+#include <iostream>
+#include <cstdint>
 
 #include "../../Utils/random.h"
 
@@ -13,19 +16,19 @@ struct CellGenome
     int generation = 0;
 
     // chances of adding or removing a cell per mutation event
-    inline static constexpr float add_cell_chance      = 0.03f;      // chance of cell being added
-    inline static constexpr float remove_cell_chance   = 0.03f;   // chance of cell being removed
-    inline static constexpr float add_spring_chance    = 0.03f;      // chance of cell being added
-    inline static constexpr float remove_spring_chance = 0.03f;   // chance of cell being removed
+    inline static float add_cell_chance      = 0.03f;      // chance of cell being added
+    inline static float remove_cell_chance   = 0.03f;   // chance of cell being removed
+    inline static float add_spring_chance    = 0.03f;      // chance of cell being added
+    inline static float remove_spring_chance = 0.03f;   // chance of cell being removed
 
     float mutation_rate = 0.2f;         // chance of mutation occurring
     float mutation_range = 0.2f;
-    inline static constexpr float mutation_rate_rate = 0.1;     // chance of mutation rate mutating
-    inline static constexpr float mutation_rate_range = 0.01;
+    inline static float mutation_rate_rate = 0.1;     // chance of mutation rate mutating
+    inline static float mutation_rate_range = 0.01;
 
     float colour_mutation_range = 0.001f; // chance of color mutating
 
-	inline static constexpr float radius_mutation_range = 5.f; // how much the radius can mutate per mutation event
+	inline static float radius_mutation_range = 5.f; // how much the radius can mutate per mutation event
     float radius = Random::rand_range( 30.f, 120.f );
 
     std::uint8_t transparency = 140;
@@ -38,19 +41,19 @@ struct CellGenome
     
 	
     // max amplitude of [-2, 2], the friction value gets clamped anyway so this determines how fast it reaches from one limit to the other
-    inline static constexpr float max_amplitude = 2.f;
+    inline static float max_amplitude = 2.f;
 
     // // 1 second is 30 frames, so they should only be able to complete one oscillation per second (+- 1/30)
-    inline static constexpr float max_frequency = 1.f / 30.f;
+    inline static float max_frequency = 1.f / 30.f;
 
     // offset has a range of +- pi rad, then it loops
-    inline static constexpr float max_offset = pi;
+    inline static float max_offset = pi;
 
     // vertical shift minimum: -0.5 (graph fully below x axis), maximum: 0.5 (graph fully above x axis), clamping to make sure no vaue escapes [0, 1]
-    inline static constexpr float max_vertical_shift = 0.5f;
+    inline static float max_vertical_shift = 0.5f;
 
-    inline static constexpr float smallest_radius = 15.f;
-	inline static constexpr float largest_radius = 220.f;
+    inline static float smallest_radius = 15.f;
+	inline static float largest_radius = 220.f;
 
     // friction sin-wave parameters, the cell's friction coefficient is determined by a sin wave with these parameters, the input being the internal clock of the protozoa
     float amplitude = 0.3f;

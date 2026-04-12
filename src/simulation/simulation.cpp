@@ -25,7 +25,7 @@ Simulation::Simulation() : m_world_(&m_window_)
 
 
 	// center the view on the world
-	constexpr float rad = WorldSettings::bounds_radius;
+	float rad = WorldSettings::bounds_radius;
 	camera_.m_view_.setCenter({ rad, rad });
 	camera_.update_window_view();
 

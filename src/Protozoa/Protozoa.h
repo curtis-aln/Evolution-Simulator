@@ -1,5 +1,8 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/System/Vector2.hpp>
+
 #include "../settings.h"
 #include "../Utils/Graphics/Circle.h"
 #include "cell.h"
@@ -46,7 +49,8 @@ private:
 	std::vector<Spring> m_springs_{};	
 
 	// reproduction related parameters
-	FixedSpan<obj_idx> nearby_food_container{ FoodSettings::cell_max_capacity * 9 };
+	FixedSpan<obj_idx> nearby_food_container{
+	static_cast<std::uint8_t>(FoodSettings::cell_max_capacity * 9)};
 
 	unsigned stomach = 0;
 	float energy = ProtozoaSettings::initial_energy;

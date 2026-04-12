@@ -1,5 +1,8 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <cmath>
+#include <algorithm>
+
 #include "../settings.h"
 #include "cell.h"
 #include "genetics/SpringGenome.h"

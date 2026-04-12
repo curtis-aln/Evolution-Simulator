@@ -61,38 +61,38 @@ struct GraphicalSettings
 
 struct WorldSettings
 {
-	static constexpr float bounds_radius = 20'000;
+	inline static float bounds_radius = 100'000;
 
-	static constexpr unsigned max_protozoa = 5'000;
-	static constexpr unsigned initial_protozoa = 1'000;
+	inline static unsigned max_protozoa = 50'000;
+	inline static unsigned initial_protozoa = 30'000;
 
-	inline static constexpr size_t cells_x = 100;
+	inline static constexpr size_t cells_x = 200;
 	inline static constexpr size_t cells_y = cells_x;
-	inline static constexpr size_t cell_max_capacity = 25;
+	inline static constexpr std::uint8_t cell_max_capacity = 25;
 
-	inline static constexpr float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
-	inline static constexpr float max_speed = 30;
+	inline static float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
+	inline static float max_speed = 30;
 };
 
 struct ProtozoaSettings
 {
-	static constexpr int max_cells = 15;
+	inline static int max_cells = 15;
 
-	static constexpr float spawn_radius = 100.f;
+	inline static float spawn_radius = 100.f;
 
-	static constexpr float energy_decay_rate = 0.15f; // how quickly energy decays per frame
+	inline static float energy_decay_rate = 0.15f; // how quickly energy decays per frame
 
-	inline static constexpr float wander_threshold = 90 * 13.f; // if a cell wanders too far away from the protozoa it kills the whole thing
+	inline static float wander_threshold = 90 * 13.f; // if a cell wanders too far away from the protozoa it kills the whole thing
 
-	inline static constexpr float breaking_length = 90 * 6.f;
-	inline static constexpr float maximum_extension = 90 * 4.f;
+	inline static float breaking_length = 90 * 6.f;
+	inline static float maximum_extension = 90 * 4.f;
 
-	inline static constexpr float spring_work_const = 1.f / 100'000.f; // how we scale the energy cost of springs
+	inline static float spring_work_const = 1.f / 100'000.f; // how we scale the energy cost of springs
 
 	inline static size_t reproductive_cooldown = 200.f;
 	inline static size_t digestive_time = 100.f; // per cell
 
-	inline static constexpr float initial_energy = 300.f; // energy the protozoa spawn with
+	inline static float initial_energy = 300.f; // energy the protozoa spawn with
 
 };
 
@@ -101,22 +101,22 @@ struct FoodSettings
 {
 	inline static constexpr size_t cells_x = WorldSettings::cells_x;
 	inline static constexpr size_t cells_y = WorldSettings::cells_y;
-	inline static constexpr size_t cell_max_capacity = 20;
-	inline static constexpr size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
+	inline static int cell_max_capacity = 20;
+	inline static size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
 
-	static constexpr unsigned max_food = 10'000;
-	static constexpr unsigned initial_food = 2'000;
-	inline static constexpr float food_radius = 30.f;
-	inline static constexpr float friction = 0.975f;
+	static constexpr unsigned max_food = 70'000;
+	static constexpr unsigned initial_food = 60'000;
+	inline static float food_radius = 30.f;
+	inline static float friction = 0.985f;
 
 	inline static sf::Vector3i food_darkest_color = { 0, 160, 0 };
 	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
-	inline static float vibration_strength = 5.f;
+	inline static float vibration_strength = 7.5f;
 
-	inline static constexpr float kFoodVisibilityRampFrames = 90;
-	inline static constexpr float kFoodMaxAlpha = 200;
+	inline static float kFoodVisibilityRampFrames = 90;
+	inline static float kFoodMaxAlpha = 200;
 
-	inline static float spawn_proportionality_constant = 0.025f; // range between [0.001, 0.01]
+	inline static float spawn_proportionality_constant = 0.045f; // range between [0.001, 0.01]
 	inline static float food_spawn_distance = food_radius * 2.f;
 	inline static size_t reproductive_cooldown = 150.f;
 	inline static size_t reproductive_threshold = 300.f; // how old a food has to be before it can reproduce

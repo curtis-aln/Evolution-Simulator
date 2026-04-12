@@ -1,6 +1,9 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <cmath>
+#include <algorithm>
 
 #include "genetics/CellGenome.h"
 #include "../Utils/utility.h"
