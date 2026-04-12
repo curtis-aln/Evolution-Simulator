@@ -5,7 +5,7 @@ class ToolsTab : public ITab
 {
 public:
     const char* label() const override { return "Tools"; }
-    void        draw(UIContext& ctx)   override;
+    void        draw(SimSnapshot& snapshot)   override;
 
 private:
     bool  m_blackhole_ = false;
@@ -17,6 +17,6 @@ private:
     float m_mut_range_ = 0.3f;
 
     void draw_blackhole();
-    void draw_spawn(UIContext& ctx);
-    void draw_clear(UIContext& ctx);
+    void draw_spawn(SimSnapshot& snapshot);
+    void draw_clear(SimSnapshot& snapshot);
 };

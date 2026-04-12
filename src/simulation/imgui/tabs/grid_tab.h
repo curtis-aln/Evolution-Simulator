@@ -6,9 +6,9 @@ class GridTab : public ITab
 {
 public:
     const char* label() const override { return "Grid"; }
-    void        draw(UIContext& ctx)   override;
+    void        draw(SimSnapshot& snapshot)   override;
 
 private:
-    void draw_grid_info(const char* label, SimpleSpatialGrid& grid, bool tracking);
-    void draw_tuning(UIContext& ctx);
+    //void draw_tuning(SimSnapshot& snapshot);
+    void draw_grid_info(const char* label, SpatialGridData& grid, bool tracking);
 };

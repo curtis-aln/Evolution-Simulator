@@ -47,7 +47,7 @@ struct CellGenome
     inline static float max_frequency = 1.f / 30.f;
 
     // offset has a range of +- pi rad, then it loops
-    inline static float max_offset = pi;
+    inline static float max_offset = 3.14159f;
 
     // vertical shift minimum: -0.5 (graph fully below x axis), maximum: 0.5 (graph fully above x axis), clamping to make sure no vaue escapes [0, 1]
     inline static float max_vertical_shift = 0.5f;

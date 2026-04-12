@@ -3,7 +3,7 @@
 #include "../helpers/plot_utils.h"
 #include <imgui.h>
 
-void StatisticsTab::draw(UIContext& ctx)
+void StatisticsTab::draw(SimSnapshot& snapshot)
 {
     // ── 5 equal-width panels side by side ─────────────────────────────────────
     const float total = ImGui::GetContentRegionAvail().x;
@@ -15,9 +15,9 @@ void StatisticsTab::draw(UIContext& ctx)
     ImGui::BeginChild("ST_perf", { cw, ch }, true);
     ImGui::TextDisabled("Performance");
     ImGui::Separator();
-    StatRow::draw("FPS", "%.1f", ctx.fps);
-    StatRow::draw("Frame", "%u", ctx.ticks);
-    StatRow::draw("Elapsed", "%s", PlotUtils::format_time(ctx.total_time_elapsed).c_str());
+    StatRow::draw("FPS", "%.1f", snapshot.stats.fps);
+    StatRow::draw("Frame", "%u", snapshot.iterations_);
+    StatRow::draw("Elapsed", "%s", PlotUtils::format_time(snapshot.total_time_elapsed).c_str());
     ImGui::EndChild();
     ImGui::SameLine();
 
@@ -25,14 +25,14 @@ void StatisticsTab::draw(UIContext& ctx)
     ImGui::BeginChild("ST_pop", { cw, ch }, true);
     ImGui::TextDisabled("Population");
     ImGui::Separator();
-    const int  p = ctx.world.get_protozoa_count();
-    const int  f = ctx.world.get_food_count();
+	const int  p = snapshot.stats.protozoa_count;
+    const int  f = snapshot.stats.food_count;
     const bool risk = p <= 10;
     StatRow::draw("Protozoa", "%d", p);
     StatRow::draw("Food", "%d", f);
     StatRow::draw("Total", "%d", p + f);
     StatRow::draw_warn("Ext. risk", risk, "%s", risk ? "YES" : "no");
-    StatRow::draw("Peak ever", "%d", ctx.world.peak_protozoa_ever_);
+    StatRow::draw("Peak ever", "%d", snapshot.stats.peak_protozoa_ever);
     ImGui::EndChild();
     ImGui::SameLine();
 
@@ -40,11 +40,11 @@ void StatisticsTab::draw(UIContext& ctx)
     ImGui::BeginChild("ST_vit", { cw, ch }, true);
     ImGui::TextDisabled("Vitals");
     ImGui::Separator();
-    StatRow::draw("Avg lifetime", "%.1f fr", ctx.world.average_lifetime_);
-    StatRow::draw("Longest ever", "%d fr", ctx.world.longest_lived_ever_);
-    StatRow::draw("Births /100f", "%.1f", ctx.world.births_per_hundered_frames_);
-    StatRow::draw("Deaths /100f", "%.1f", ctx.world.deaths_per_hundered_frames_);
-    StatRow::draw("Infant mortality", "%.1f%%", ctx.world.infant_mortality_rate_ * 100.f);
+    StatRow::draw("Avg lifetime", "%.1f fr", snapshot.stats.average_lifetime);
+    StatRow::draw("Longest ever", "%d fr", snapshot.stats.longest_lived_ever);
+    StatRow::draw("Births /100f", "%.1f", snapshot.stats.births_per_hundered_frames);
+    StatRow::draw("Deaths /100f", "%.1f", snapshot.stats.deaths_per_hundered_frames);
+    StatRow::draw("Infant mortality", "%.1f%%", snapshot.stats.infant_mortality_rate * 100.f);
     ImGui::EndChild();
     ImGui::SameLine();
 
@@ -52,13 +52,13 @@ void StatisticsTab::draw(UIContext& ctx)
     ImGui::BeginChild("ST_gen", { cw, ch }, true);
     ImGui::TextDisabled("Genetics");
     ImGui::Separator();
-    StatRow::draw("Avg generation", "%.2f", ctx.world.average_generation_);
-    StatRow::draw("Highest gen ever", "%d", ctx.world.highest_generation_ever_);
-    StatRow::draw("Most offspring", "%d", ctx.world.most_offspring_ever_);
-    StatRow::draw("Frames / gen", "%.0f", ctx.world.frames_per_generation_);
-    StatRow::draw("Avg mut rate", "%.4f", ctx.world.average_mutation_rate_);
-    StatRow::draw("Avg mut range", "%.4f", ctx.world.average_mutation_range_);
-    StatRow::draw("Diversity", "%.4f", ctx.world.genetic_diversity_);
+    StatRow::draw("Avg generation", "%.2f", snapshot.stats.average_generation);
+    StatRow::draw("Highest gen ever", "%d", snapshot.stats.highest_generation_ever);
+    StatRow::draw("Most offspring", "%d", snapshot.stats.most_offspring_ever);
+    StatRow::draw("Frames / gen", "%.0f", snapshot.stats.frames_per_generation);
+    StatRow::draw("Avg mut rate", "%.4f", snapshot.stats.average_mutation_rate);
+    StatRow::draw("Avg mut range", "%.4f", snapshot.stats.average_mutation_range);
+    StatRow::draw("Diversity", "%.4f", snapshot.stats.genetic_diversity);
     ImGui::EndChild();
     ImGui::SameLine();
 
@@ -66,11 +66,11 @@ void StatisticsTab::draw(UIContext& ctx)
     ImGui::BeginChild("ST_morph", { -1.f, ch }, true);
     ImGui::TextDisabled("Morphology");
     ImGui::Separator();
-    StatRow::draw("Avg cells", "%.2f", ctx.world.average_cells_per_protozoa_);
-    StatRow::draw("Avg springs", "%.2f", ctx.world.average_spring_count_);
-    StatRow::draw("Avg offspring", "%.2f", ctx.world.average_offspring_count_);
-    StatRow::draw("Avg energy", "%.1f", ctx.world.average_energy_);
-    StatRow::draw("Energy ratio", "%.3f", ctx.world.energy_efficiency_);
+    StatRow::draw("Avg cells", "%.2f", snapshot.stats.average_cells_per_protozoa);
+    StatRow::draw("Avg springs", "%.2f", snapshot.stats.average_spring_count);
+    StatRow::draw("Avg offspring", "%.2f", snapshot.stats.average_offspring_count);
+    StatRow::draw("Avg energy", "%.1f", snapshot.stats.average_energy);
+    StatRow::draw("Energy ratio", "%.3f", snapshot.stats.energy_efficiency);
     ImGui::EndChild();
 
     // ── Bottom button (full width) ─────────────────────────────────────────────

@@ -4,13 +4,13 @@
 
 void World::update()
 {
-	min_speed += delta_min_speed;
+	toggles.min_speed += toggles.delta_min_speed;
 	check_for_extinction_event(world_circular_bounds_);
 
 	iterations_++;
 	update_position_container();
 
-	if (track_statistics)
+	if (toggles.track_statistics)
 		update_statistics();
 
 	// if our selected protozoa has died we can no longer track it
@@ -25,7 +25,7 @@ void World::update()
 	food_manager_.update();
 	resolve_food_interactions();
 	
-	update_all_protozoa(food_manager_, debug_mode, min_speed, track_statistics, toggle_collisions);
+	update_all_protozoa(food_manager_, toggles.debug_mode, toggles.min_speed, toggles.track_statistics, toggles.toggle_collisions);
 	
 	
 }
@@ -44,10 +44,10 @@ void World::update_position_container()
 		for (Cell& cell : protozoa->get_cells())
 		{
 			cell.bound(world_circular_bounds_);
-			outer_color_data_[idx] = cell.cell_outer_color;
-			inner_color_data_[idx] = cell.cell_inner_color;
-			position_data_[idx] = cell.position_;
-			radius_data_[idx] = cell.radius;
+			render_data_.outer_colors[idx] = cell.cell_outer_color;
+			render_data_.inner_colors[idx] = cell.cell_inner_color;
+			render_data_.positions[idx] = cell.position_;
+			render_data_.radii[idx] = cell.radius;
 			cell_pointers_[idx] = &cell;
 			cell.colliding_with_ = cell.position_;
 			cell.collision_resolution_vector_ = { 0.f, 0.f };
@@ -64,26 +64,26 @@ void World::update_position_container()
 
 void World::update_statistics()
 {
-	++frames_since_last_gen_change;
+	++statistics_.frames_since_last_gen_change;
 
-	average_generation_ = get_average_generation();
+	statistics_.average_generation = get_average_generation();
 
-	if (int(tracked_generation_) != int(average_generation_))
+	if (int(tracked_generation_) != int(statistics_.average_generation))
 	{
-		frames_per_generation_ = (tracked_generation_ != 0.f)
-			? (iterations_ - frames_since_last_gen_change) : iterations_;
-		frames_since_last_gen_change = 0;
-		tracked_generation_ = average_generation_;
+		statistics_.frames_per_generation = (tracked_generation_ != 0.f)
+			? (iterations_ - statistics_.frames_since_last_gen_change) : iterations_;
+		statistics_.frames_since_last_gen_change = 0;
+		tracked_generation_ = statistics_.average_generation;
 	}
 
 	float protozoa_count = static_cast<float>(all_protozoa_.size());
 	if (protozoa_count == 0)
 		return;
 
-	average_cells_per_protozoa_ = 0.f;
-	average_offspring_count_ = 0.f;
-	average_mutation_rate_ = 0.f;
-	average_mutation_range_ = 0.f;
+	statistics_.average_cells_per_protozoa = 0.f;
+	statistics_.average_offspring_count = 0.f;
+	statistics_.average_mutation_rate = 0.f;
+	statistics_.average_mutation_range = 0.f;
 
 	// Calculating averages for cells per protozoa, offspring count, mutation rate, and mutation range across all protozoa
 	int cell_count = 0;
@@ -91,20 +91,19 @@ void World::update_statistics()
 	{
 		for (Cell& cell : protozoa->get_cells())
 		{
-			average_mutation_rate_ += cell.mutation_rate;
-			average_mutation_range_ += cell.mutation_range;
+			statistics_.average_mutation_rate += cell.mutation_rate;
+			statistics_.average_mutation_range += cell.mutation_range;
 
 			cell_count++;
 		}
-		average_cells_per_protozoa_ += protozoa->get_cells().size();
-		average_offspring_count_ += protozoa->offspring_count;
+		statistics_.average_cells_per_protozoa += protozoa->get_cells().size();
+		statistics_.average_offspring_count += protozoa->offspring_count;
 	}
 
-	average_cells_per_protozoa_ /= protozoa_count;
-	average_offspring_count_ /= protozoa_count;
-
-	average_mutation_rate_ /= cell_count;
-	average_mutation_range_ /= cell_count;
+	statistics_.average_cells_per_protozoa /= protozoa_count;
+	statistics_.average_offspring_count /= protozoa_count;
+	statistics_.average_mutation_rate /= cell_count;
+	statistics_.average_mutation_range /= cell_count;
 
 	// Updating death and birth rates per hundred frames
 	if (iterations_ % survival_rate_window_size_ == 0)
@@ -119,7 +118,7 @@ void World::update_statistics()
 
 	// Peak population
 	const int p_count = static_cast<int>(all_protozoa_.size());
-	if (p_count > peak_protozoa_ever_) peak_protozoa_ever_ = p_count;
+	if (p_count > statistics_.peak_protozoa_ever) statistics_.peak_protozoa_ever = p_count;
 
 	// Per-organism aggregates
 	float total_energy = 0.f;
@@ -138,21 +137,21 @@ void World::update_statistics()
 			sum_amp += c.amplitude;
 			sum_sq += c.amplitude * c.amplitude;
 			++cell_div_count;
-			if (c.generation > highest_generation_ever_)
-				highest_generation_ever_ = c.generation;
+			if (c.generation > statistics_.highest_generation_ever)
+				statistics_.highest_generation_ever = c.generation;
 		}
 	}
 
 	if (protozoa_count > 0)
 	{
-		average_energy_ = total_energy / protozoa_count;
-		average_spring_count_ = total_springs / protozoa_count;
-		energy_efficiency_ = average_energy_ / 300.f; // ratio vs starting energy
+		statistics_.average_energy = total_energy / protozoa_count;
+		statistics_.average_spring_count = total_springs / protozoa_count;
+		statistics_.energy_efficiency = statistics_.average_energy / 300.f; // ratio vs starting energy
 	}
 	if (cell_div_count > 0)
 	{
 		const float mean_amp = sum_amp / cell_div_count;
-		genetic_diversity_ = (sum_sq / cell_div_count) - (mean_amp * mean_amp);
+		statistics_.genetic_diversity = (sum_sq / cell_div_count) - (mean_amp * mean_amp);
 	}
 }
 

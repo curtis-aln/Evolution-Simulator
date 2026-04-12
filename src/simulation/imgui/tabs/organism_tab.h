@@ -8,7 +8,7 @@ class OrganismTab : public ITab
 {
 public:
     const char* label() const override { return "Organism"; }
-    void        draw(UIContext& ctx)   override;
+    void        draw(SimSnapshot& snapshot)   override;
 
 private:
     int  m_last_id_ = -1;
@@ -18,9 +18,9 @@ private:
     int  m_wave_cycles_ = 1;   // number of full periods shown in the sinwave graph
 
     void draw_no_selection();
-    void draw_overview(Protozoa* p);
-    void draw_cells_springs_tab(Protozoa* p);
-    void draw_cell_detail(Protozoa* p, Cell& c);
-    void draw_spring_detail(Protozoa* p, Spring& s);
-    void draw_tuning_controls_tab(UIContext& ctx, Protozoa* p);
+    void draw_overview(Protozoa& p);
+    void draw_cells_springs_tab(Protozoa& p);
+    void draw_cell_detail(Protozoa&, Cell& c);
+    void draw_spring_detail(Protozoa&, Spring& s);
+    void draw_tuning_controls_tab(SimSnapshot& snapshot);
 };

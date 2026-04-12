@@ -1,11 +1,12 @@
 #pragma once
 #include "i_tab.h"
+#include "../population_history.h"
 
 class DisplayTab : public ITab
 {
 public:
     const char* label() const override { return "Display"; }
-    void        draw(UIContext& ctx)   override;
+    void        draw(SimSnapshot& snapshot) override;
 
 private:
     int   m_camera_lock_ = 0;

@@ -24,7 +24,7 @@ ControlPanel::ControlPanel()
     m_tabs_.push_back(std::make_unique<DisplayTab>());
 }
 
-void ControlPanel::draw(UIContext& ctx, float dt)
+void ControlPanel::draw(SimSnapshot& snapshot, float dt)
 {
     m_tagged_tab_->draw_toasts(dt);
 
@@ -38,7 +38,7 @@ void ControlPanel::draw(UIContext& ctx, float dt)
         for (auto& tab : m_tabs_)
             if (ImGui::BeginTabItem(tab->label()))
             {
-                tab->draw(ctx);
+                tab->draw(snapshot);
                 ImGui::EndTabItem();
             }
         ImGui::EndTabBar();

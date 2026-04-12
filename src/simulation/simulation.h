@@ -13,6 +13,8 @@
 #include <imgui-SFML.h>
 #include <implot.h>
 
+#include "shared_state.h"
+
 class Simulation : SimulationSettings, TextSettings
 {
     static sf::VideoMode getAdjustedVideoMode()
@@ -41,16 +43,16 @@ class Simulation : SimulationSettings, TextSettings
     PopulationHistory m_history_;
     ControlPanel    m_control_panel_;
 
-    bool  m_rendering_ = true;
-    bool  hide_panels = false;
-    bool  open_extinction_window = false;
     bool  tracking = false;
-    bool  m_tick_frame_time = false;
+    
     bool  mouse_pressed_event = false;
     bool  running = true;
     float fps_ = 0.f;
 
     ImPlotColormap m_plot_colormap_{};
+
+    SharedState shared_output{};
+    SharedState shared_input{};
 
 public:
     Simulation();
@@ -60,11 +62,13 @@ private:
     void init_imGUI();
     void update_one_frame();
     void camera_follow_selected_protozoa();
-    void update_line_graphs();
+    void update_line_graphs(SimSnapshot& snapshot);
     void handle_imGUI();
     void extinction_popup();
     void render();
     void manage_frame_rate();
+
+    void fill_render_data(SharedState& shared_state);
 
     // events
     void handle_events();

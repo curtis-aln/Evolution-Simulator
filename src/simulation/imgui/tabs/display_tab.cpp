@@ -1,18 +1,12 @@
 #include "display_tab.h"
 #include <imgui.h>
 
-void DisplayTab::draw(UIContext& ctx)
+void DisplayTab::draw(SimSnapshot& snapshot)
 {
-    // ── 3 panels: Rendering | Debug Overlays | UI + Camera ────────────────────
     const float total = ImGui::GetContentRegionAvail().x;
     const float sp = ImGui::GetStyle().ItemSpacing.x;
     const float cw = (total - sp * 2.f) / 3.f;
     const float ch = -1.f;
-
-    // ── Rendering ─────────────────────────────────────────────────────────────
-    ImGui::BeginChild("DISP_rend", { cw, ch }, true);
-    ImGui::TextDisabled("Rendering");
-    ImGui::Separator();
 
     auto kb = [](const char* shortcut)
         {
@@ -20,12 +14,17 @@ void DisplayTab::draw(UIContext& ctx)
             ImGui::TextDisabled("[%s]", shortcut);
         };
 
-    ImGui::Checkbox("Enable Rendering", &ctx.rendering);               kb("R");
-    ImGui::Checkbox("Simple Mode", &ctx.world.simple_mode);       kb("S");
-    ImGui::Checkbox("Debug Mode", &ctx.world.debug_mode);        kb("D");
-    ImGui::Checkbox("Cell Grid", &ctx.world.draw_cell_grid);    kb("G");
-    ImGui::Checkbox("Food Grid", &ctx.world.draw_food_grid);    kb("F");
-    ImGui::Checkbox("Track Statistics", &ctx.world.track_statistics);  kb("T");
+    // ── Rendering ─────────────────────────────────────────────────────────────
+    ImGui::BeginChild("DISP_rend", { cw, ch }, true);
+    ImGui::TextDisabled("Rendering");
+    ImGui::Separator();
+
+    ImGui::Checkbox("Enable Rendering", &snapshot.toggles.m_rendering_);                       kb("R");
+    ImGui::Checkbox("Simple Mode", &snapshot.toggles.simple_mode);             kb("S");
+    ImGui::Checkbox("Debug Mode", &snapshot.toggles.debug_mode);              kb("D");
+    ImGui::Checkbox("Cell Grid", &snapshot.toggles.draw_cell_grid);          kb("G");
+    ImGui::Checkbox("Food Grid", &snapshot.toggles.draw_food_grid);          kb("F");
+    ImGui::Checkbox("Track Statistics", &snapshot.toggles.track_statistics);        kb("T");
 
     ImGui::EndChild();
     ImGui::SameLine();
@@ -35,10 +34,10 @@ void DisplayTab::draw(UIContext& ctx)
     ImGui::TextDisabled("Debug Overlays  (debug mode only)");
     ImGui::Separator();
 
-    ImGui::Checkbox("Show Connections", &ctx.world.show_connections);    kb("C");
-    ImGui::Checkbox("Skeleton Mode", &ctx.world.skeleton_mode);       kb("K");
-    ImGui::Checkbox("Bounding Boxes", &ctx.world.show_bounding_boxes); kb("B");
-    ImGui::Checkbox("Toggle Collisions", &ctx.world.toggle_collisions);   kb("C");
+    ImGui::Checkbox("Show Connections", &snapshot.toggles.show_connections);        kb("C");
+    ImGui::Checkbox("Skeleton Mode", &snapshot.toggles.skeleton_mode);           kb("K");
+    ImGui::Checkbox("Bounding Boxes", &snapshot.toggles.show_bounding_boxes);     kb("B");
+    ImGui::Checkbox("Toggle Collisions", &snapshot.toggles.toggle_collisions);       kb("C");
 
     ImGui::EndChild();
     ImGui::SameLine();
@@ -48,7 +47,7 @@ void DisplayTab::draw(UIContext& ctx)
     ImGui::TextDisabled("UI");
     ImGui::Separator();
 
-    ImGui::Checkbox("Hide Panels", &ctx.hide_panels);  kb("Q");
+    ImGui::Checkbox("Hide Panels", &snapshot.toggles.hide_panels);  kb("Q");
 
     ImGui::SetNextItemWidth(-1.f);
     if (ImGui::SliderFloat("##uiscale", &m_ui_scale_, 50.f, 200.f, "UI Scale %.0f%%"))

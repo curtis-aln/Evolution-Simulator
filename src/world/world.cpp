@@ -4,193 +4,150 @@
 #include "../protozoa/genetics/CellGenome.h"
 
 World::World(sf::RenderWindow* window)
-	: m_window_(window),
-	world_border_renderer_(make_circle(world_circular_bounds_.radius, world_circular_bounds_.center)),
-	thread_pool_(8)
-{ 
-	init_organisms();
-
-	const size_t maximum_cells = max_protozoa * ProtozoaSettings::max_cells;
-
-	// reserving nessesary data
-	outer_color_data_.resize(maximum_cells);
-	inner_color_data_.resize(maximum_cells);
-	position_data_.resize(maximum_cells);
-	radius_data_.resize(maximum_cells);
-	inner_radius.resize(maximum_cells);
-	distribution.reserve(maximum_cells);
-	cell_pointers_.resize(maximum_cells);
-
-	collision_resolutions.resize(maximum_cells);
-
-	inner_circle_renderer_.init(90, maximum_cells);
-	outer_circle_renderer_.init(90 + GraphicalSettings::cell_outline_thickness, maximum_cells);
-}
-
-
-SimpleSpatialGrid* World::get_spatial_grid()
+    : m_window_(window),
+    world_border_renderer_(make_circle(world_circular_bounds_.radius, world_circular_bounds_.center)),
+    thread_pool_(8)
 {
-	return &spatial_hash_grid_;
-}
+    init_organisms();
 
-SimpleSpatialGrid* World::get_food_spatial_grid()
-{
-	return &food_manager_.spatial_hash_grid;
-}
+    const size_t maximum_cells = max_protozoa * ProtozoaSettings::max_cells;
 
-FoodManager* World::get_food_manager()
-{
-	return &food_manager_;
-}	
+    render_data_.reserve(static_cast<int>(maximum_cells));
+    distribution_.reserve(maximum_cells);
+    cell_pointers_.resize(maximum_cells);
+    inner_radii_.resize(maximum_cells);
+    collision_resolutions.resize(maximum_cells);
+
+    inner_circle_renderer_.init(90, maximum_cells);
+    outer_circle_renderer_.init(90 + GraphicalSettings::cell_outline_thickness, maximum_cells);
+}
 
 void World::render(Font* font, sf::Vector2f mouse_pos)
 {
-	// In order to render such a large amount of organisms, we use vertex arrays, first we need to fetch the data from all protozoa.
-	if (draw_cell_grid)
-	{
-		cell_grid_renderer.render(*m_window_, mouse_pos, 800.f);
-	}
+    if (toggles.draw_cell_grid)
+        cell_grid_renderer_.render(*m_window_, mouse_pos, 800.f);
 
-	if (draw_food_grid)
-	{
-		food_manager_.draw_food_grid(mouse_pos);
-	}
-	
-	food_manager_.render();
-	render_protozoa(font);
+    if (toggles.draw_food_grid)
+        food_manager_.draw_food_grid(mouse_pos);
 
-	// drawing the world bounds
-	m_window_->draw(world_border_renderer_);
+    food_manager_.render();
+    render_protozoa(font);
+
+    m_window_->draw(world_border_renderer_);
 }
 
 void World::render_protozoa(Font* font)
 {
-	outer_circle_renderer_.update_colors(outer_color_data_, entity_count);
-	outer_circle_renderer_.render(position_data_, radius_data_, entity_count);
+    outer_circle_renderer_.update_colors(render_data_.outer_colors, entity_count_);
+    outer_circle_renderer_.render(render_data_.positions, render_data_.radii, entity_count_);
 
-	if (!simple_mode)
-	{
-		int i = 0;
-		for (float& radius : radius_data_)
-			inner_radius[i++] = radius / GraphicalSettings::cell_outline_thickness;
+    if (!toggles.simple_mode)
+    {
+        for (int i = 0; i < entity_count_; ++i)
+            inner_radii_[i] = render_data_.radii[i] / GraphicalSettings::cell_outline_thickness;
 
-		inner_circle_renderer_.update_colors(inner_color_data_, entity_count);
-		inner_circle_renderer_.render(position_data_, inner_radius, entity_count);
-	}
+        inner_circle_renderer_.update_colors(render_data_.inner_colors, entity_count_);
+        inner_circle_renderer_.render(render_data_.positions, inner_radii_, entity_count_);
+    }
 
-	if (selected_protozoa_ != nullptr && debug_mode)
-	{
-		selected_protozoa_->render_debug(font, skeleton_mode, show_connections, show_bounding_boxes);
-	}
+    if (selected_protozoa_ != nullptr && toggles.debug_mode)
+    {
+        selected_protozoa_->render_debug(font, toggles.skeleton_mode,
+            toggles.show_connections,
+            toggles.show_bounding_boxes);
+    }
 
-	for (Protozoa* protozoa : all_protozoa_)
-		protozoa->cell_positions_nearby.clear();
+    for (Protozoa* protozoa : all_protozoa_)
+        protozoa->cell_positions_nearby.clear();
 }
-
 
 void World::init_organisms()
 {
-	// emplace creates all the actual objects of the protozoa
-	for (int i = 0; i < max_protozoa; ++i)
-	{
-		all_protozoa_.emplace({ i, &world_circular_bounds_, m_window_ });
-	}
-	// we only want to start with a certain amount of protozoa so we "remove" some
-	for (int i = initial_protozoa; i < max_protozoa; ++i)
-	{
-		all_protozoa_.at(i)->kill();
-		all_protozoa_.at(i)->soft_reset();
-		all_protozoa_.remove(i);
-	}
+    for (int i = 0; i < max_protozoa; ++i)
+        all_protozoa_.emplace({ i, &world_circular_bounds_, m_window_ });
 
-	// now we grow all of these protozoa
-	for (Protozoa* protozoa : all_protozoa_)
-	{
-		generate_protozoa(*protozoa, world_circular_bounds_);
-	}
+    for (int i = initial_protozoa; i < max_protozoa; ++i)
+    {
+        all_protozoa_.at(i)->kill();
+        all_protozoa_.at(i)->soft_reset();
+        all_protozoa_.remove(i);
+    }
+
+    for (Protozoa* protozoa : all_protozoa_)
+        generate_protozoa(*protozoa, world_circular_bounds_);
 }
 
 bool World::handle_mouse_click(const sf::Vector2f mouse_position)
 {
-	for (Protozoa* protozoa : all_protozoa_)
-	{
-		if (protozoa->check_mouse_press(mouse_position, true) != -1)
-		{
-			selected_protozoa_ = protozoa;
-			return true;
-		}
-	}
-	return false;
+    for (Protozoa* protozoa : all_protozoa_)
+    {
+        if (protozoa->check_mouse_press(mouse_position, true) != -1)
+        {
+            selected_protozoa_ = protozoa;
+            return true;
+        }
+    }
+    return false;
 }
 
 void World::keyboardEvents(const sf::Keyboard::Key& event_key_code)
 {
-	// SFML 3.x uses scoped enums: sf::Keyboard::Key::G instead of sf::Keyboard::G
-	switch (event_key_code)
-	{
-	case sf::Keyboard::Key::G:      
-		draw_cell_grid = not draw_cell_grid; 
-		break;
+    switch (event_key_code)
+    {
+    case sf::Keyboard::Key::G:
+        toggles.draw_cell_grid = !toggles.draw_cell_grid;
+        break;
 
-	case sf::Keyboard::Key::C:
-		if (debug_mode)
-			show_connections = not show_connections;
-		else
-			toggle_collisions = not toggle_collisions;
-		break;
+    case sf::Keyboard::Key::C:
+        if (toggles.debug_mode)
+            toggles.show_connections = !toggles.show_connections;
+        else
+            toggles.toggle_collisions = !toggles.toggle_collisions;
+        break;
 
-	case sf::Keyboard::Key::F:      
-		draw_food_grid = not draw_food_grid; 
-		break;
+    case sf::Keyboard::Key::F:
+        toggles.draw_food_grid = !toggles.draw_food_grid;
+        break;
 
-	case sf::Keyboard::Key::S:      
-		simple_mode = not simple_mode; 
-		break;
+    case sf::Keyboard::Key::S:
+        toggles.simple_mode = !toggles.simple_mode;
+        break;
 
-	case sf::Keyboard::Key::D:
-		debug_mode = not debug_mode;
-		break;
+    case sf::Keyboard::Key::D:
+        toggles.debug_mode = !toggles.debug_mode;
+        break;
 
-	case sf::Keyboard::Key::T:      track_statistics = !track_statistics; break;
+    case sf::Keyboard::Key::T:
+        toggles.track_statistics = !toggles.track_statistics;
+        break;
 
-	case sf::Keyboard::Key::K:
-		if (debug_mode)
-			skeleton_mode = not skeleton_mode; 
-		break;
+    case sf::Keyboard::Key::K:
+        if (toggles.debug_mode)
+            toggles.skeleton_mode = !toggles.skeleton_mode;
+        break;
 
-	case sf::Keyboard::Key::B:
-		if (debug_mode)
-			show_bounding_boxes = not show_bounding_boxes; 
-		break;
+    case sf::Keyboard::Key::B:
+        if (toggles.debug_mode)
+            toggles.show_bounding_boxes = !toggles.show_bounding_boxes;
+        break;
 
-	default:
-		break;
-
-	}
+    default:
+        break;
+    }
 }
-
 
 const std::vector<float>& World::get_generation_distribution()
 {
-	distribution.clear();
-	int idx = 0;
-	for (Protozoa* protozoa : all_protozoa_)
-	{
-		for (Cell& cell : protozoa->get_cells())
-		{
-			distribution.push_back(cell.generation);
+    distribution_.clear();
+    for (Protozoa* protozoa : all_protozoa_)
+        for (const Cell& cell : protozoa->get_cells())
+            distribution_.push_back(static_cast<float>(cell.generation));
 
-		}
-	}
-
-	return distribution;
+    return distribution_;
 }
-
 
 void World::update_spatial_renderers()
 {
-	
-	cell_grid_renderer.rebuild();
-	
-	food_manager_.update_food_grid_renderer();
+    cell_grid_renderer_.rebuild();
+    food_manager_.update_food_grid_renderer();
 }

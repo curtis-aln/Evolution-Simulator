@@ -1,16 +1,17 @@
 #pragma once
-#include "ui_context.h"
 #include "tabs/i_tab.h"
 #include "tabs/tagged_tab.h"
 #include <vector>
 #include <memory>
+#include "../shared_state.h"
+
 
 class ControlPanel
 {
 public:
     ControlPanel();
 
-    void draw(UIContext& ctx, float dt);
+    void draw(SimSnapshot& snapshot, float dt);
 
     TaggedTab* get_tagged_tab() { return m_tagged_tab_; }
 

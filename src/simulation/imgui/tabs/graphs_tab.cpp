@@ -9,8 +9,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 //  BandCache
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::BandCache::refresh(const PopulationHistory& h,
-    bool need_protozoa, bool need_food)
+void GraphsTab::BandCache::refresh(const PopulationHistory& h, bool need_protozoa, bool need_food)
 {
     if (h.size() == valid_for_n) return;
     valid_for_n = h.size();
@@ -48,15 +47,15 @@ bool GraphsTab::visible_range(const std::vector<float>& times,
 // ─────────────────────────────────────────────────────────────────────────────
 //  Top-level
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw(UIContext& ctx)
+void GraphsTab::draw(SimSnapshot& snapshot)
 {
-    draw_shared_toolbar(ctx);
-
+	PopulationHistory& history = snapshot.history;
+    draw_shared_toolbar(snapshot);
     if (!ImGui::BeginTabBar("##graph_tabs")) return;
 
-    if (ImGui::BeginTabItem("Population")) { draw_population_tab(ctx);  ImGui::EndTabItem(); }
-    if (ImGui::BeginTabItem("Generations")) { draw_generations_tab(ctx); ImGui::EndTabItem(); }
-    if (ImGui::BeginTabItem("Misc")) { draw_misc_tab(ctx);        ImGui::EndTabItem(); }
+    if (ImGui::BeginTabItem("Population")) { draw_population_tab(snapshot);  ImGui::EndTabItem(); }
+    if (ImGui::BeginTabItem("Generations")) { draw_generations_tab(snapshot); ImGui::EndTabItem(); }
+    if (ImGui::BeginTabItem("Misc")) { draw_misc_tab(snapshot);        ImGui::EndTabItem(); }
 
     ImGui::EndTabBar();
 }
@@ -64,9 +63,10 @@ void GraphsTab::draw(UIContext& ctx)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Shared toolbar
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_shared_toolbar(UIContext& ctx)
+void GraphsTab::draw_shared_toolbar(SimSnapshot& snapshot)
 {
-    const float live_x = ctx.total_time_elapsed;
+	PopulationHistory& history = snapshot.history;
+    const float live_x = snapshot.iterations_;
 
     ImGui::SetNextItemWidth(160.f);
     ImGui::SliderFloat("Window (s)##g", &m_scroll_window_, 10.f, 600.f, "%.0fs");
@@ -78,7 +78,7 @@ void GraphsTab::draw_shared_toolbar(UIContext& ctx)
         if (ImGui::Button("Stop recording"))
         {
             m_recording_ = false;
-            ctx.history.add_manual_event(live_x, "record end");
+            history.add_manual_event(live_x, "record end");
         }
         ImGui::PopStyleColor();
     }
@@ -86,31 +86,32 @@ void GraphsTab::draw_shared_toolbar(UIContext& ctx)
     {
         m_recording_ = true;
         m_record_start_ = live_x;
-        ctx.history.add_manual_event(live_x, "record start", { 0.4f, 0.8f, 1.f, 1.f });
+        history.add_manual_event(live_x, "record start", { 0.4f, 0.8f, 1.f, 1.f });
     }
 
     ImGui::SameLine(0, 16);
     if (ImGui::Button("Export CSV"))
-        ctx.history.export_csv("population_export.csv");
+        history.export_csv("population_export.csv");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Population tab
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_population_tab(UIContext& ctx)
+void GraphsTab::draw_population_tab(SimSnapshot& snapshot)
 {
+	PopulationHistory& history = snapshot.history;
     ImGui::Checkbox("Protozoa", &m_show_protozoa_); ImGui::SameLine(0, 12);
     ImGui::Checkbox("Food", &m_show_food_);     ImGui::SameLine(0, 12);
     ImGui::Checkbox("Total", &m_show_total_);    ImGui::SameLine(0, 12);
     ImGui::Checkbox("Bands", &m_show_bands_);
 
-    const float live_x = ctx.total_time_elapsed;
+    const float live_x = snapshot.iterations_;
     const float x_max = m_hover_paused_ ? m_paused_x_max_ : live_x;
     const float x_min = x_max - m_scroll_window_;
 
     // Only recompute bands when sample count actually changes.
     if (m_show_bands_)
-        m_band_cache_.refresh(ctx.history, m_show_protozoa_, m_show_food_);
+        m_band_cache_.refresh(history, m_show_protozoa_, m_show_food_);
 
     constexpr ImPlotFlags     pf = ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect | ImPlotFlags_NoMouseText;
     constexpr ImPlotAxisFlags yf = ImPlotAxisFlags_AutoFit;
@@ -120,12 +121,12 @@ void GraphsTab::draw_population_tab(UIContext& ctx)
     ImPlot::SetupAxes("Time (s)", "Count", ImPlotAxisFlags_None, yf);
     ImPlot::SetupAxisLimits(ImAxis_X1, x_min, x_max, ImGuiCond_Always);
 
-    const int n = static_cast<int>(ctx.history.size());
+    const int n = static_cast<int>(history.size());
     if (n > 0)
     {
-        const float* t = ctx.history.time.data();
+        const float* t = history.time.data();
 
-        if (m_show_bands_ && m_band_cache_.valid_for_n == ctx.history.size())
+        if (m_show_bands_ && m_band_cache_.valid_for_n == history.size())
         {
             if (m_show_protozoa_ && !m_band_cache_.plo.empty())
             {
@@ -144,17 +145,17 @@ void GraphsTab::draw_population_tab(UIContext& ctx)
         if (m_show_protozoa_)
         {
             ImPlot::SetNextLineStyle({ 0.3f, 0.6f, 1.f, 1.f });
-            ImPlot::PlotLine("Protozoa", t, ctx.history.protozoa.data(), n);
+            ImPlot::PlotLine("Protozoa", t, history.protozoa.data(), n);
         }
         if (m_show_food_)
         {
             ImPlot::SetNextLineStyle({ 0.3f, 1.f, 0.4f, 1.f });
-            ImPlot::PlotLine("Food", t, ctx.history.food.data(), n);
+            ImPlot::PlotLine("Food", t, history.food.data(), n);
         }
         if (m_show_total_)
         {
             ImPlot::SetNextLineStyle({ 0.65f, 0.65f, 0.65f, 1.f });
-            ImPlot::PlotLine("Total", t, ctx.history.total.data(), n);
+            ImPlot::PlotLine("Total", t, history.total.data(), n);
         }
 
         // Extinction threshold line
@@ -169,11 +170,11 @@ void GraphsTab::draw_population_tab(UIContext& ctx)
         // blow up the Y axis when hover-paused on historical low-count periods.
         float y_top = 0.f;
         for (int i = 0; i < n; ++i)
-            if (ctx.history.time[i] >= x_min && ctx.history.time[i] <= x_max)
-                y_top = std::max(y_top, ctx.history.total[i]);
+            if (history.time[i] >= x_min && history.time[i] <= x_max)
+                y_top = std::max(y_top, history.total[i]);
         y_top = std::max(y_top, 10.f); // never shorter than the extinction line
 
-        draw_event_markers(ctx, x_min, x_max, y_top);
+        draw_event_markers(snapshot, x_min, x_max, y_top);
         if (m_recording_ && m_record_start_ >= x_min)
             draw_record_region(x_max, y_top);
     }
@@ -192,9 +193,10 @@ void GraphsTab::draw_population_tab(UIContext& ctx)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Event markers
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_event_markers(UIContext& ctx, float x_min, float x_max, float y_top)
+void GraphsTab::draw_event_markers(SimSnapshot& snapshot, float x_min, float x_max, float y_top)
 {
-    for (const auto& ev : ctx.history.events)
+    PopulationHistory& history = snapshot.history;
+    for (const auto& ev : history.events)
     {
         if (ev.time < x_min || ev.time > x_max) continue;
         ImPlot::SetNextLineStyle(ev.color);
@@ -226,9 +228,9 @@ void GraphsTab::draw_record_region(float x_max, float y_top)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Generations tab
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_generations_tab(UIContext& ctx)
+void GraphsTab::draw_generations_tab(SimSnapshot& snapshot)
 {
-    const auto& gen_data = ctx.world.get_generation_distribution();
+    const auto& gen_data = snapshot.stats.gen_data;
 
     constexpr ImPlotFlags hf = ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect | ImPlotFlags_NoMouseText;
     const float           plot_h = ImGui::GetContentRegionAvail().y
@@ -266,8 +268,9 @@ void GraphsTab::draw_generations_tab(UIContext& ctx)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Misc tab
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_misc_tab(UIContext& ctx)
+void GraphsTab::draw_misc_tab(SimSnapshot& snapshot)
 {
+    PopulationHistory& history = snapshot.history;
     // Series toggle row
     ImGui::Checkbox("Mut Rate", &m_show_mut_rate_);    ImGui::SameLine(0, 10);
     ImGui::Checkbox("Mut Range", &m_show_mut_range_);   ImGui::SameLine(0, 10);
@@ -284,18 +287,18 @@ void GraphsTab::draw_misc_tab(UIContext& ctx)
     ImGui::TextDisabled("(or double-click plot)");
 
     // Guard: need matching time and misc series
-    const MiscSeries& ms = ctx.history.misc;
-    const int         n = static_cast<int>(std::min(ctx.history.time.size(), ms.size()));
+    const MiscSeries& ms = history.misc;
+    const int         n = static_cast<int>(std::min(history.time.size(), ms.size()));
     if (n == 0)
     {
         ImGui::TextDisabled("No misc data — enable Track Stats and wait.");
         return;
     }
 
-    const float live_x = ctx.total_time_elapsed;
+    const float live_x = snapshot.iterations_;
     const float x_max = m_hover_paused_ ? m_paused_x_max_ : live_x;
     const float x_min = x_max - m_scroll_window_;
-    const float* t = ctx.history.time.data();
+    const float* t = history.time.data();
 
     // Determine which axes are actually in use this frame.
     const bool any_y1 = m_show_mut_rate_ || m_show_mut_range_;
@@ -313,7 +316,7 @@ void GraphsTab::draw_misc_tab(UIContext& ctx)
                 if (!s) continue; // safety
 
                 float slo, shi;
-                if (visible_range(ctx.history.time, *s, x_min, x_max, slo, shi))
+                if (visible_range(history.time, *s, x_min, x_max, slo, shi))
                 {
                     lo = std::min(lo, slo);
                     hi = std::max(hi, shi);

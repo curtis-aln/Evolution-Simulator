@@ -29,11 +29,11 @@ void Simulation::handle_mouse_release()
 
 void Simulation::handle_pause_toggle()
 {
-	m_world_.paused = !m_world_.paused;
+	m_world_.toggles.paused = !m_world_.toggles.paused;
 
-	if (!m_world_.paused)
+	if (!m_world_.toggles.paused)
 	{
-		m_tick_frame_time = false;
+		m_world_.toggles.m_tick_frame_time = false;
 	}
 }
 
@@ -43,11 +43,11 @@ void Simulation::handle_keyboard_events(const sf::Keyboard::Key& event_key_code)
 	{
 	case sf::Keyboard::Key::Escape: running = false;              break;
 	case sf::Keyboard::Key::Space:  handle_pause_toggle();        break;
-	case sf::Keyboard::Key::R:      m_rendering_ = !m_rendering_; break;
-	case sf::Keyboard::Key::Q:      hide_panels = !hide_panels; break;
+	case sf::Keyboard::Key::R:      m_world_.toggles.m_rendering_ = !m_world_.toggles.m_rendering_; break;
+	case sf::Keyboard::Key::Q:      m_world_.toggles.hide_panels = !m_world_.toggles.hide_panels; break;
 	case sf::Keyboard::Key::O:      
-		m_tick_frame_time = true;     
-		m_world_.paused = true;
+		m_world_.toggles.m_tick_frame_time = true;
+		m_world_.toggles.paused = true;
 		break;
 	default: break;
 	}

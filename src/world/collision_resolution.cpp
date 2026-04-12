@@ -3,7 +3,7 @@
 
 void World::resolve_collisions()
 {
-	if (!toggle_collisions)
+	if (!toggles.toggle_collisions)
 		return;
 
 	for (int cell_id = 0; cell_id < spatial_hash_grid_.CellsX * spatial_hash_grid_.CellsY; ++cell_id)
@@ -56,6 +56,7 @@ void World::update_nearby_container(int& neighbours_size, int32_t neighbour_inde
 	const auto& contents = spatial_hash_grid_.grid[neighbour_index];
 	const uint8_t size = spatial_hash_grid_.cell_capacities[neighbour_index];
 
+
 	for (uint8_t idx = 0; idx < size; ++idx)
 	{
 		nearby_ids[neighbours_size++] = contents[idx];
@@ -64,7 +65,7 @@ void World::update_nearby_container(int& neighbours_size, int32_t neighbour_inde
 
 void World::update_protozoa_cell(const int protozoa_cell_index, const int neighbours_size)
 {
-	sf::Vector2f position_a = position_data_[protozoa_cell_index];
+	sf::Vector2f position_a = render_data_.positions[protozoa_cell_index];
 
 	for (uint32_t i{ 0 }; i < neighbours_size; ++i)
 	{
@@ -72,10 +73,10 @@ void World::update_protozoa_cell(const int protozoa_cell_index, const int neighb
 		if (protozoa_cell_index == nearby_ids[i])
 			continue;
 
-		const sf::Vector2f position_b = position_data_[nearby_ids[i]];
+		const sf::Vector2f position_b = render_data_.positions[nearby_ids[i]];
 
 		const float dist_sq = (position_a - position_b).lengthSquared();
-		const float local_diam = radius_data_[protozoa_cell_index] + radius_data_[nearby_ids[i]];
+		const float local_diam = render_data_.radii[protozoa_cell_index] + render_data_.radii[nearby_ids[i]];
 
 		if (dist_sq > local_diam * local_diam)
 			continue;

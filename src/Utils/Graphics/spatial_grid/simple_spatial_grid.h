@@ -133,4 +133,31 @@ public:
 			}
 		}
 	}
+
+	void track_stats(int& total, int& max_in, int& full, int& empty, int& inv)
+	{
+		for (size_t i = 0; i < get_total_cells(); ++i)
+		{
+			const int c = static_cast<int>(cell_capacities[i]);
+			total += c;
+			if (c == 0)                                         ++empty;
+			if (c >= static_cast<int>(cell_max_capacity)) ++full;
+			if (c > max_in)                                     max_in = c;
+		}
+
+		const size_t tc = get_total_cells();
+		inv = tc > 0 ? 1.f / static_cast<float>(tc) : 0.f;
+
+		ImGui::Spacing();
+		ImGui::Text("Objects  %d", total);
+		ImGui::Text("Avg/cell %.2f", tc > 0 ? static_cast<float>(total) * inv : 0.f);
+		ImGui::Text("Max cell %d  (%.0f%%)", max_in,
+			cell_max_capacity > 0 ? max_in * 100.f / static_cast<float>(cell_max_capacity) : 0.f);
+		ImGui::Text("Full     %d  (%.1f%%)", full, full * 100.f * inv);
+		ImGui::Text("Empty    %d  (%.1f%%)", empty, empty * 100.f * inv);
+
+		if (full > 0)
+			ImGui::TextColored({ 1.f, 0.4f, 0.4f, 1.f },
+				"[!] %d at cap — objects may drop", full);
+	}
 };

@@ -109,7 +109,7 @@ add_executable(ProjectARIA
     # ── ImPlot (header-only library — sources must be compiled as part of our target)
     ${implot_SOURCE_DIR}/implot.cpp
     ${implot_SOURCE_DIR}/implot_items.cpp
- "src/settings.cpp")
+ "src/settings.cpp" "src/world/world_state.h" "src/simulation/shared_state.h")
 
 # ── Include directories ───────────────────────────────────────────────────────
 # PRIVATE means these paths are only used when compiling ProjectARIA itself,

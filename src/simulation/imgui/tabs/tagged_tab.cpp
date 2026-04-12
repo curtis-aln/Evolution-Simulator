@@ -5,14 +5,14 @@
 #include <algorithm>
 #include <iostream>
 
-void TaggedTab::draw(UIContext& ctx)
+void TaggedTab::draw(SimSnapshot& snapshot)
 {
-    draw_tag_input(ctx);
+    draw_tag_input(snapshot);
     ImGui::Spacing();
-    draw_list(ctx);
+    draw_list(snapshot);
 }
 
-void TaggedTab::draw_tag_input(UIContext& ctx)
+void TaggedTab::draw_tag_input(SimSnapshot& snapshot)
 {
     ImGui::SeparatorText("Tag by ID");
     static int input_id = 0;
@@ -21,16 +21,16 @@ void TaggedTab::draw_tag_input(UIContext& ctx)
     ImGui::SameLine();
     if (ImGui::Button("Toggle Tag##tagged")) toggle_tag(input_id);
 
-    Protozoa* sel = ctx.world.get_selected_protozoa();
-    if (sel)
+	Protozoa& sel = snapshot.protozoa;
+    if (snapshot.selected_a_protozoa)
     {
         ImGui::SameLine(0, 16);
-        if (ImGui::Button(is_tagged(sel->id) ? "Untag selected" : "Tag selected"))
-            toggle_tag(sel->id);
+        if (ImGui::Button(is_tagged(sel.id) ? "Untag selected" : "Tag selected"))
+            toggle_tag(sel.id);
     }
 }
 
-void TaggedTab::draw_list(UIContext& ctx)
+void TaggedTab::draw_list(SimSnapshot& snapshot)
 {
     if (m_tagged_ids_.empty()) { ImGui::TextDisabled("No organisms tagged."); return; }
     ImGui::SeparatorText("Tagged organisms");
@@ -39,7 +39,7 @@ void TaggedTab::draw_list(UIContext& ctx)
 
     for (int id : m_tagged_ids_)
     {
-        Protozoa* p = ctx.world.find_protozoa_by_id(id);
+        Protozoa* p = snapshot.selected_a_protozoa && snapshot.protozoa.id == id ? &snapshot.protozoa : nullptr;
         ImGui::PushID(id);
 
         if (p)
@@ -51,8 +51,8 @@ void TaggedTab::draw_list(UIContext& ctx)
             ImGui::Text("Off %-3d", p->offspring_count); ImGui::SameLine(0, 8);
             ImGui::Text("Gen %.0f", (float)p->get_cells().empty() ? 0.f : (float)p->get_cells()[0].generation);
             ImGui::SameLine(0, 8);
-            if (ImGui::SmallButton("Go##tagged"))
-                ctx.world.selected_protozoa_ = p;
+            //if (ImGui::SmallButton("Go##tagged"))
+            //    snapshot.protozoa = *p; todo
         }
         else
         {

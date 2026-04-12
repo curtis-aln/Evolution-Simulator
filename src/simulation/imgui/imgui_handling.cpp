@@ -14,29 +14,15 @@ void Simulation::handle_imGUI()
 {
     ImGui::SFML::Update(m_window_, m_delta_time_.get_delta_sfml());
 
-    UIContext ctx
-    {
-        .world = m_world_,
-        .history = m_history_,
-        .total_time_elapsed = m_total_time_elapsed_,
-        .ticks = m_ticks_,
-        .fps = fps_,
-        .rendering = m_rendering_,
-        .hide_panels = hide_panels,
-        .open_extinction_window = open_extinction_window,
-        .tick_frame_time = m_tick_frame_time,
-        .running = running,
-        .tracking = tracking,
-        .plot_colormap = m_plot_colormap_,
-    };
-
     const float dt = static_cast<float>(m_delta_time_.get_delta());
-    m_control_panel_.draw(ctx, dt);
 
-    if (open_extinction_window)
+	SimSnapshot& snapshot = shared_input.buffers[shared_input.get_write_buffer_index()];
+    m_control_panel_.draw(snapshot, dt);
+
+    if (snapshot.toggles.open_extinction_window)
     {
         ImGui::OpenPopup("New Simulation");
-        open_extinction_window = false;
+        snapshot.toggles.open_extinction_window = false;
     }
 }
 

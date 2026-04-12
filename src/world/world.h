@@ -5,8 +5,8 @@
 #include "../Protozoa/Protozoa.h"
 #include "../Food/food_manager.h"
 #include "../settings.h"
-
 #include "ProtozoaManager.h"
+#include "world_state.h"
 
 #include "../Utils/thread_pool.h"
 #include "../Utils/o_vector.hpp"
@@ -14,135 +14,100 @@
 #include "../Utils/Graphics/CircleBatchRenderer.h"
 #include "../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
 #include "../Utils/Graphics/spatial_grid/spatial_grid_renderer.h"
-
 #include "../Utils/Graphics/SFML_Grid.h"
 
-// The World class manages the entire simulation environment, including protozoa, food, and rendering.
-// It handles updates, collisions, reproduction, and rendering of all entities within the worl.
 class World : public ProtozoaManager
 {
-	// render window is created in the simulation class and passed down here
-	sf::RenderWindow* m_window_ = nullptr;
+    sf::RenderWindow* m_window_ = nullptr;
 
-	// the world is circular to avoid protozoa getting stuck in corners. We also have a rectangular bounds for the spatial hash grid
-	Circle world_circular_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
-	sf::FloatRect world_rect_bounds_{ {0.f, 0.f}, {bounds_radius * 2.f, bounds_radius * 2.f } };
-	sf::VertexArray world_border_renderer_{};
+    Circle        world_circular_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
+    sf::FloatRect world_rect_bounds_{ {0.f, 0.f}, {bounds_radius * 2.f, bounds_radius * 2.f} };
+    sf::VertexArray world_border_renderer_{};
 
-	// We use these Object of Arrays approach to efficiently render large numbers of protozoa cells.
-	std::vector<sf::Color> outer_color_data_{};
-	std::vector<sf::Color> inner_color_data_{};
-	std::vector<sf::Vector2f> position_data_{};
-	std::vector<float> radius_data_{};
-	std::vector<float> inner_radius{};
+    // Render data — written each update tick, read by the renderer.
+    RenderData render_data_;
 
-	std::vector<Cell*> cell_pointers_{};
+    std::vector<Cell*> cell_pointers_{};
+    int entity_count_ = 0;
 
-	int entity_count = 0; // how many cells are currently in the world
-	
+    CircleBatchRenderer outer_circle_renderer_{ m_window_ };
+    CircleBatchRenderer inner_circle_renderer_{ m_window_ };
+    std::vector<float>  inner_radii_{};
 
-	// Each Cell is drawn with a simple outer and inner circle, we use batch rendering to draw all cells efficiently.
-	CircleBatchRenderer outer_circle_renderer_{ m_window_ };
-	CircleBatchRenderer inner_circle_renderer_{ m_window_ };
+    FoodManager        food_manager_{ m_window_, &world_circular_bounds_ };
+    SimpleSpatialGrid  spatial_hash_grid_{ cells_x, cells_y, cell_max_capacity,
+                                           bounds_radius * 2.f, bounds_radius * 2.f };
+    SpatialGridRenderer cell_grid_renderer_{ &spatial_hash_grid_ };
 
-	// This handles all food related tasks like spawning, rendering, and updating food items.
-	FoodManager food_manager_{ m_window_, &world_circular_bounds_ };
+    int iterations_ = 0;
+    tp::ThreadPool thread_pool_;
+    std::vector<float> distribution_{};
 
-	// for our collision detection we use a spatial hash grid to see what cells are nearby others
-	SimpleSpatialGrid spatial_hash_grid_{ cells_x, cells_y, cell_max_capacity, bounds_radius * 2.f, bounds_radius * 2.f };
-	SpatialGridRenderer cell_grid_renderer{ &spatial_hash_grid_ }; // renders the cell spatial hash grid
+    std::array<int, cell_max_capacity * 9> nearby_ids = {};
+    FixedSpan<obj_idx> nearby_food{ cell_max_capacity * 9 };
 
+    // Statistics accumulated each tick by the update thread.
+    WorldStatistics statistics_{};
 
-	// Tracking the number of iterations have passed in this world
-	int iterations_ = 0;
-
-	// thread pool for parallel processing of the update loop
-	tp::ThreadPool thread_pool_;
-
-	std::vector<float> distribution{};
-
-	
+    // Generation tracking (internal — summarised into statistics_)
+    float tracked_generation_ = 0.f;
+    float frames_since_last_gen_change_ = 0.f;
 
 public:
-	// Keyboard toggles for various modes
-	bool simple_mode = false;        // only render outer circles of cells
-	bool debug_mode = false;         // lets the user see information on any selected cell
-	bool skeleton_mode = false;      // only render springs between cells
-	bool paused = false;             // pauses the simulation update loop
-	bool draw_cell_grid = false;     // renders the spatial hash grid for cell collision detection
-	bool draw_food_grid = false;     // renders the spatial hash grid for food items
-	bool toggle_collisions = true;   // enables or disables cell collision handling
-	bool show_connections = true;    // shows spring connections between cells
-	bool show_bounding_boxes = true; // shows bounding boxes around protozoa
-	bool track_statistics = true;
+    // ── Toggles — written by ImGui (main thread), read by update thread ──────
+    // Safe to read/write without locking while the threads are not simultaneously
+    // accessing them; copy into SharedState before handing to the update thread.
+    WorldToggles toggles;
 
-	// for the simple spatial grid, we need a temporary array to store nearby cell ids
-	std::array<int, cell_max_capacity * 9> nearby_ids = {};
-	FixedSpan<obj_idx> nearby_food { cell_max_capacity * 9 };
+    int entity_count = 0;
 
-	float min_speed = 0;
-	float delta_min_speed = 0.0;
+public:
+    explicit World(sf::RenderWindow* window = nullptr);
 
-	// statistics
-	float average_generation_ = 0.f; // The average generation of all protozoa
+    // ── Update ───────────────────────────────────────────────────────────────
+    void update();
+    void resolve_collisions();
 
-	float frames_per_generation_ = -1.f; // The amount of frames it takes for a new generation to be born, negative values represent undefined
-	float tracked_generation_ = 0.f; // The generation we are currently tracking, used to calculate frames_per_generation_
-	float frames_since_last_gen_change = 0.f; // The time when the tracked generation was born, used to calculate frames_per_generation_
+    // ── Render ───────────────────────────────────────────────────────────────
+    void render(Font* font, sf::Vector2f mouse_pos);
 
-	float average_cells_per_protozoa_ = 0.f;
-	float average_offspring_count_ = 0.f;
-	float average_mutation_rate_ = 0.f;
-	float average_mutation_range_ = 0.f;
+    // ── Accessors — spatial grids / food ─────────────────────────────────────
+    SimpleSpatialGrid* get_spatial_grid() { return &spatial_hash_grid_; }
+    SimpleSpatialGrid* get_food_spatial_grid() { return &food_manager_.spatial_hash_grid; }
+    FoodManager* get_food_manager() { return &food_manager_; }
+    void               update_spatial_renderers();
 
-	// new stats — add alongside existing ones
-	int   peak_protozoa_ever_ = 0;
-	int   highest_generation_ever_ = 0;
-	float average_energy_ = 0.f;
-	float average_spring_count_ = 0.f;
-	float genetic_diversity_ = 0.f;
-	float energy_efficiency_ = 0.f;
+    // ── Render data getters — read by renderer from snapshot ─────────────────
+    const std::vector<sf::Vector2f>& get_positions()    const { return render_data_.positions; }
+    const std::vector<sf::Color>& get_outer_colors() const { return render_data_.outer_colors; }
+    const std::vector<sf::Color>& get_inner_colors() const { return render_data_.inner_colors; }
+    const std::vector<float>& get_radii()        const { return render_data_.radii; }
+    int                              get_entity_count() const { return entity_count_; }
+    const RenderData& get_render_data()  const { return render_data_; }
 
-	
-	
-	
-	World(sf::RenderWindow* window = nullptr);
+    // ── Statistics getters — read by ImGui from snapshot ─────────────────────
+    const WorldStatistics& get_statistics()  const { return statistics_; }
+    int   get_protozoa_count()               const { return statistics_.protozoa_count; }
+    int   get_food_count()                   const { return food_manager_.get_size(); }
+    float get_average_generation()           const { return statistics_.average_generation; }
 
-	// updating functions
-	void update();
-	void resolve_collisions();
-	SimpleSpatialGrid* get_spatial_grid();
-	SimpleSpatialGrid* get_food_spatial_grid();
-	FoodManager* get_food_manager();
-	void render(Font* font, sf::Vector2f mouse_pos);
+    // ── Selection ─────────────────────────────────────────────────────────────
+    bool handle_mouse_click(sf::Vector2f mouse_position);
+    void keyboardEvents(const sf::Keyboard::Key& event_key_code);
 
-	// fetch functions
-	int get_food_count() const { return food_manager_.get_size(); }
-
-	bool handle_mouse_click(sf::Vector2f mouse_position);
-	void keyboardEvents(const sf::Keyboard::Key& event_key_code);
-
-	const std::vector<float>& get_generation_distribution();
-
-	void update_spatial_renderers();
+    // ── Generation distribution (for histogram) ───────────────────────────────
+    const std::vector<float>& get_generation_distribution();
 
 private:
-	// update functions
-	void update_cells_in_grid_cell(const int grid_cell_id);
-	void update_protozoa_cell(int protozoa_cell_index, int neighbours_size);
-	void update_nearby_container(int& neighbours_size, int32_t neighbour_index_x, int32_t neighbour_index_y);
-	
-	void update_position_container();
-	void update_statistics();
+    void update_cells_in_grid_cell(int grid_cell_id);
+    void update_protozoa_cell(int protozoa_cell_index, int neighbours_size);
+    void update_nearby_container(int& neighbours_size, int32_t nx, int32_t ny);
 
-	// rendering functions
-	void render_protozoa(Font* font);
-	
-	// initialization functions
-	void init_organisms();
+    void update_position_container();
+    void update_statistics();
 
-	void resolve_food_interactions();
-
-	void resolve_food_grid_cell(const int cell_id);
-
+    void render_protozoa(Font* font);
+    void init_organisms();
+    void resolve_food_interactions();
+    void resolve_food_grid_cell(int cell_id);
 };

@@ -6,7 +6,7 @@ class GraphsTab : public ITab
 {
 public:
     const char* label() const override { return "Graphs"; }
-    void        draw(UIContext& ctx)   override;
+    void        draw(SimSnapshot& snapshot)   override;
 
 private:
     // ── Shared toolbar state ──────────────────────────────────────────────
@@ -49,12 +49,12 @@ private:
     bool m_refit_misc_ = false;
 
     // ── Private draw helpers ──────────────────────────────────────────────
-    void draw_shared_toolbar(UIContext& ctx);
-    void draw_population_tab(UIContext& ctx);
-    void draw_event_markers(UIContext& ctx, float x_min, float x_max, float y_top);
+    void draw_shared_toolbar(SimSnapshot& snapshot);
+    void draw_population_tab(SimSnapshot& snapshot);
+    void draw_event_markers(SimSnapshot& snapshot, float x_min, float x_max, float y_top);
     void draw_record_region(float x_max, float y_top);
-    void draw_generations_tab(UIContext& ctx);
-    void draw_misc_tab(UIContext& ctx);
+    void draw_generations_tab(SimSnapshot& snapshot);
+    void draw_misc_tab(SimSnapshot& snapshot);
 
     // Compute the [min, max] of `data` for entries whose matching time falls
     // within [x_min, x_max].  Returns false if no visible data exists.

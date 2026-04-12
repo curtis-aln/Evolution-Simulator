@@ -46,14 +46,14 @@ static void colored_progress(float fraction, ImVec4 color,
 // ─────────────────────────────────────────────────────────────────────────────
 //  Top-level draw
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw(UIContext& ctx)
+void OrganismTab::draw(SimSnapshot& snapshot)
 {
-    Protozoa* p = ctx.world.get_selected_protozoa();
-    if (!p) { draw_no_selection(); return; }
+    Protozoa& p = snapshot.protozoa;
+    if (!snapshot.selected_a_protozoa) { draw_no_selection(); return; }
 
-    if (p->id != m_last_id_)
+    if (p.id != m_last_id_)
     {
-        m_last_id_ = p->id;
+        m_last_id_ = p.id;
         m_sel_cell_idx_ = 0;
         m_sel_spring_idx_ = 0;
         m_sel_is_spring_ = false;
@@ -70,7 +70,7 @@ void OrganismTab::draw(UIContext& ctx)
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 6.f, 2.f });
     if (ImGui::BeginTabItem("Cells & Springs")) { draw_cells_springs_tab(p);        ImGui::EndTabItem(); }
-    if (ImGui::BeginTabItem("Tuning & Controls")) { draw_tuning_controls_tab(ctx, p); ImGui::EndTabItem(); }
+    if (ImGui::BeginTabItem("Tuning & Controls")) { draw_tuning_controls_tab(snapshot); ImGui::EndTabItem(); }
     ImGui::PopStyleVar();
 
     ImGui::EndTabBar();
@@ -91,45 +91,44 @@ void OrganismTab::draw_no_selection()
 // ─────────────────────────────────────────────────────────────────────────────
 //  Overview panel
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw_overview(Protozoa* p)
+void OrganismTab::draw_overview(Protozoa& p)
 {
     // ── Identity / Locomotion side-by-side ───────────────────────────────
     ImGui::Columns(2, nullptr, false);
 
     ImGui::TextDisabled("Identity");
-    ImGui::Text("ID      %d", p->id);
-    ImGui::Text("Age     %u", p->frames_alive);
-    ImGui::Text("Cells   %d", (int)p->get_cells().size());
-    ImGui::Text("Springs %d", (int)p->get_springs().size());
-    ImGui::Text("Birth (%.0f,%.0f)", p->birth_location.x, p->birth_location.y);
-
+    ImGui::Text("ID      %d", p.id);
+    ImGui::Text("Age     %u", p.frames_alive);
+    ImGui::Text("Cells   %d", (int)p.get_cells().size());
+    ImGui::Text("Springs %d", (int)p.get_springs().size());
+    ImGui::Text("Birth (%.0f,%.0f)", p.birth_location.x, p.birth_location.y);
     ImGui::NextColumn();
 
     ImGui::TextDisabled("Locomotion");
-    ImGui::Text("Speed %.4f", p->velocity.length());
-    ImGui::Text("Vel X %.3f", p->velocity.x);
-    ImGui::Text("Vel Y %.3f", p->velocity.y);
+    ImGui::Text("Speed %.4f", p.velocity.length());
+    ImGui::Text("Vel X %.3f", p.velocity.x);
+    ImGui::Text("Vel Y %.3f", p.velocity.y);
     ImGui::Spacing();
     ImGui::TextDisabled("Offspring");
-    ImGui::Text("Count %d", p->offspring_count);
-    ImGui::Text("Food  %u", p->total_food_eaten);
+    ImGui::Text("Count %d", p.offspring_count);
+    ImGui::Text("Food  %u", p.total_food_eaten);
 
     ImGui::Columns(1);
     ImGui::Spacing();
 
     // ── Energy ───────────────────────────────────────────────────────────
     ImGui::TextDisabled("Energy");
-    const float energy_f = std::clamp(p->get_energy() / ProtozoaSettings::initial_energy, 0.f, 1.f);
+    const float energy_f = std::clamp(p.get_energy() / ProtozoaSettings::initial_energy, 0.f, 1.f);
     char energy_lbl[32];
-    snprintf(energy_lbl, sizeof(energy_lbl), "%.1f / %.0f", p->get_energy(), ProtozoaSettings::initial_energy);
+    snprintf(energy_lbl, sizeof(energy_lbl), "%.1f / %.0f", p.get_energy(), ProtozoaSettings::initial_energy);
     colored_progress(energy_f, fraction_color(energy_f), energy_lbl);
-    ImGui::Text("Spr cost %.4f", p->energy_lost_to_springs);
+    ImGui::Text("Spr cost %.4f", p.energy_lost_to_springs);
 
     // ── Stomach (discrete food count toward reproduction threshold) ───────
     ImGui::Spacing();
     ImGui::TextDisabled("Stomach");
-    const int   food_held = p->stomach_capacity();
-    const int   food_thresh = p->stomach_reproduce_thresh();
+    const int   food_held = p.stomach_capacity();
+    const int   food_thresh = p.stomach_reproduce_thresh();
     const float stomach_f = std::clamp((float)food_held / (float)food_thresh, 0.f, 1.f);
     char stomach_lbl[24];
     snprintf(stomach_lbl, sizeof(stomach_lbl), "%d / %d", food_held, food_thresh);
@@ -139,7 +138,7 @@ void OrganismTab::draw_overview(Protozoa* p)
     ImGui::Spacing();
     ImGui::TextDisabled("Repro cooldown");
     const float cooldown = static_cast<float>(ProtozoaSettings::reproductive_cooldown);
-    const float elapsed = static_cast<float>(p->time_since_last_reproduced);
+    const float elapsed = static_cast<float>(p.time_since_last_reproduced);
     const float remaining_f = std::clamp(1.f - elapsed / cooldown, 0.f, 1.f);
     char repro_lbl[24];
     snprintf(repro_lbl, sizeof(repro_lbl), "%.0f fr left", remaining_f * cooldown);
@@ -150,10 +149,10 @@ void OrganismTab::draw_overview(Protozoa* p)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Cells & Springs tab
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw_cells_springs_tab(Protozoa* p)
+void OrganismTab::draw_cells_springs_tab(Protozoa& p)
 {
-    auto& cells = p->get_cells();
-    auto& springs = p->get_springs();
+    auto& cells = p.get_cells();
+    auto& springs = p.get_springs();
 
     if (cells.empty() && springs.empty()) { ImGui::TextDisabled("No cells or springs."); return; }
 
@@ -213,12 +212,11 @@ void OrganismTab::draw_cells_springs_tab(Protozoa* p)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Cell detail (stats + sinwave)
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw_cell_detail(Protozoa* p, Cell& c)
+void OrganismTab::draw_cell_detail(Protozoa& p, Cell& c)
 {
     const int period = safe_time_period(c.frequency);
     const int display_size = std::min(m_wave_cycles_ * period, k_max_wave_buf);
-    const int head = static_cast<int>(p->frames_alive % display_size);
-
+    const int head = static_cast<int>(p.frames_alive % display_size);
     float wave_min, wave_max;
     wave_range(c.amplitude, c.vertical_shift, 0.f, 1.f, wave_min, wave_max);
 
@@ -304,12 +302,11 @@ void OrganismTab::draw_cell_detail(Protozoa* p, Cell& c)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Spring detail (stats + sinwave)
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw_spring_detail(Protozoa* p, Spring& s)
+void OrganismTab::draw_spring_detail(Protozoa& p, Spring& s)
 {
     const int period = safe_time_period(s.frequency);
     const int display_size = std::min(m_wave_cycles_ * period, k_max_wave_buf);
-    const int head = static_cast<int>(p->frames_alive % display_size);
-
+    const int head = static_cast<int>(p.frames_alive % display_size);
     float ext_min, ext_max;
     wave_range(s.amplitude, s.vertical_shift, 0.f, 1.f, ext_min, ext_max);
 
@@ -385,8 +382,9 @@ void OrganismTab::draw_spring_detail(Protozoa* p, Spring& s)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Tuning & Controls tab
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw_tuning_controls_tab(UIContext& ctx, Protozoa* p)
+void OrganismTab::draw_tuning_controls_tab(SimSnapshot& snapshot)
 {
+	Protozoa& p = snapshot.protozoa;
     const float half = (ImGui::GetContentRegionAvail().x - 8.f) * 0.5f;
 
     // ── Left: mutation, structure, feed ──────────────────────────────────
@@ -398,15 +396,15 @@ void OrganismTab::draw_tuning_controls_tab(UIContext& ctx, Protozoa* p)
     ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##tr", &tun_rate, 0.f, 1.f, "rate  = %.3f");
     ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##trng", &tun_range, 0.f, 1.f, "range = %.3f");
     ImGui::Spacing();
-    if (ImGui::Button("Apply Mutation", { -1.f, 0.f })) p->mutate(false, tun_rate, tun_range);
+    if (ImGui::Button("Apply Mutation", { -1.f, 0.f })) p.mutate(false, tun_rate, tun_range);
     ImGui::Spacing();
     ImGui::TextDisabled("Structure");
     ImGui::Columns(2, nullptr, false);
-    if (ImGui::Button("Add Cell", { -1.f, 0.f })) p->mutate(true, 0.f, 0.f);
-    if (ImGui::Button("Remove Cell", { -1.f, 0.f })) p->remove_cell();
+    if (ImGui::Button("Add Cell", { -1.f, 0.f })) p.mutate(true, 0.f, 0.f);
+    if (ImGui::Button("Remove Cell", { -1.f, 0.f })) p.remove_cell();
     ImGui::NextColumn();
-    if (ImGui::Button("Add Spring", { -1.f, 0.f })) p->add_spring();
-    if (ImGui::Button("Remove Spring", { -1.f, 0.f })) p->remove_spring();
+    if (ImGui::Button("Add Spring", { -1.f, 0.f })) p.add_spring();
+    if (ImGui::Button("Remove Spring", { -1.f, 0.f })) p.remove_spring();
     ImGui::Columns(1);
     ImGui::EndChild();
 
@@ -419,7 +417,7 @@ void OrganismTab::draw_tuning_controls_tab(UIContext& ctx, Protozoa* p)
     ImGui::SetNextItemWidth(-70.f);
     ImGui::SliderFloat("##feed", &feed_energy, 1.f, 500.f, "%.0f energy");
     ImGui::SameLine();
-    if (ImGui::Button("Inject##org")) p->inject(feed_energy);
+    if (ImGui::Button("Inject##org")) p.inject(feed_energy);
     ImGui::EndChild();
 
     ImGui::EndChild(); // TC_left
@@ -430,17 +428,17 @@ void OrganismTab::draw_tuning_controls_tab(UIContext& ctx, Protozoa* p)
 
     ImGui::BeginChild("TC_life", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Lifecycle");
-    ImGui::Checkbox("Immortal##org", &p->immortal);
+    ImGui::Checkbox("Immortal##org", &p.immortal);
     ImGui::Spacing();
-    if (ImGui::Button("Force Reproduce##org", { -1.f, 0.f })) p->force_reproduce();
+    if (ImGui::Button("Force Reproduce##org", { -1.f, 0.f })) p.force_reproduce();
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.55f, 0.08f, 0.08f, 1.f });
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.75f, 0.15f, 0.15f, 1.f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 1.00f, 0.25f, 0.25f, 1.f });
     if (ConfirmButton::draw("Force Die##org", { -1.f, 0.f }))
     {
-        p->kill();
-        ctx.world.deselect_protozoa();
+        p.kill();
+		snapshot.selected_a_protozoa = false;
     }
     ImGui::PopStyleColor(3);
     ImGui::EndChild();
@@ -449,7 +447,7 @@ void OrganismTab::draw_tuning_controls_tab(UIContext& ctx, Protozoa* p)
 
     ImGui::BeginChild("TC_clone", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Clone & File");
-    if (ImGui::Button("Clone nearby##org", { -1.f, 0.f })) ctx.world.create_offspring(p, false);
+	if (ImGui::Button("Clone nearby##org", { -1.f, 0.f })) snapshot.clone = true;
     if (ImGui::Button("Save to file (stub)##org", { -1.f, 0.f })) {}
     if (ImGui::Button("Load & spawn from file (stub)##org", { -1.f, 0.f })) {}
     ImGui::EndChild();
@@ -458,7 +456,7 @@ void OrganismTab::draw_tuning_controls_tab(UIContext& ctx, Protozoa* p)
 
     ImGui::BeginChild("TC_tag", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Tag");
-    ImGui::TextDisabled("Use the Tagged tab to tag ID %d", p->id);
+    ImGui::TextDisabled("Use the Tagged tab to tag ID %d", p.id);
     ImGui::EndChild();
 
     ImGui::EndChild(); // TC_right
