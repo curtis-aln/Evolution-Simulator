@@ -1,16 +1,16 @@
 ==================== CRASH REPORT ====================
-Time     : 2026-04-06 20:40:06.7549871
-Uptime   : 0h 0m 47s
-Type     : Unknown exception
-Message  : No details available.
+Time     : 2026-04-12 17:36:26.9347965
+Uptime   : 0h 0m 3s
+Type     : std::exception
+Message  : bad allocation
 
 --- Build Info ---
-Compiled: Apr  6 2026 21:33:45  |  C++202302  |  MSVC 1950
+Compiled: Apr 12 2026 18:36:05  |  C++202400  |  MSVC 1950
 
 --- Stack Trace ---
 --- Your Code (most recent call first) ---
   (none found — ensure /Zi and /DEBUG flags are set in CMake)
 
-  (8 system/runtime frames omitted)
+  (11 system/runtime frames omitted)
 
 =======================================================

@@ -4,18 +4,9 @@
 #include <cstdint>
 #include "Protozoa/genetics/CellGenome.h"
 
-struct TextSettings
-{
-	// locations for the fonts
-	inline static const std::string bold_font_location = "media/fonts/Roboto-Bold.ttf";
-	inline static const std::string regular_font_location = "media/fonts/Roboto-Regular.ttf";
+#include <toml++/toml.hpp>
 
-	// Universal font sizes - only these many fonts should be created
-	static constexpr unsigned title_font_size = 30;
-	static constexpr unsigned regular_font_size = 20;
-	static constexpr unsigned cell_statistic_font_size = 15;
 
-};
 
 
 struct SimulationSettings
@@ -61,26 +52,26 @@ struct GraphicalSettings
 
 struct WorldSettings
 {
-	inline static float bounds_radius = 100'000;
+	inline static float bounds_radius;
 
-	inline static unsigned max_protozoa = 50'000;
-	inline static unsigned initial_protozoa = 30'000;
+	inline static unsigned max_protozoa;
+	inline static unsigned initial_protozoa;
 
 	inline static constexpr size_t cells_x = 200;
 	inline static constexpr size_t cells_y = cells_x;
 	inline static constexpr std::uint8_t cell_max_capacity = 25;
 
-	inline static float border_repulsion_magnitude = 0.001f; // how strong it is repelled from the border
-	inline static float max_speed = 30;
+	inline static float border_repulsion_magnitude; // how strong it is repelled from the border
+	inline static float max_speed;
 };
 
 struct ProtozoaSettings
 {
-	inline static int max_cells = 15;
+	inline static int max_cells;
 
-	inline static float spawn_radius = 100.f;
+	inline static float spawn_radius;
 
-	inline static float energy_decay_rate = 0.15f; // how quickly energy decays per frame
+	inline static float energy_decay_rate; // how quickly energy decays per frame
 
 	inline static float wander_threshold = 90 * 13.f; // if a cell wanders too far away from the protozoa it kills the whole thing
 
@@ -89,10 +80,10 @@ struct ProtozoaSettings
 
 	inline static float spring_work_const = 1.f / 100'000.f; // how we scale the energy cost of springs
 
-	inline static size_t reproductive_cooldown = 200.f;
+	inline static size_t reproductive_cooldown;
 	inline static size_t digestive_time = 100.f; // per cell
 
-	inline static float initial_energy = 300.f; // energy the protozoa spawn with
+	inline static float initial_energy; // energy the protozoa spawn with
 
 };
 
@@ -106,8 +97,8 @@ struct FoodSettings
 
 	static constexpr unsigned max_food = 70'000;
 	static constexpr unsigned initial_food = 60'000;
-	inline static float food_radius = 30.f;
-	inline static float friction = 0.985f;
+	inline static float food_radius;
+	inline static float friction;
 
 	inline static sf::Vector3i food_darkest_color = { 0, 160, 0 };
 	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
@@ -118,13 +109,28 @@ struct FoodSettings
 
 	inline static float spawn_proportionality_constant = 0.045f; // range between [0.001, 0.01]
 	inline static float food_spawn_distance = food_radius * 2.f;
-	inline static size_t reproductive_cooldown = 150.f;
+	inline static size_t reproductive_cooldown;
 	inline static size_t reproductive_threshold = 300.f; // how old a food has to be before it can reproduce
 
 	inline static float initial_nutrients = 5;
 	inline static float final_nuterients = 60;
 	inline static size_t nutrient_development_time = 400;
 
-	inline static float death_age = 700.f;
+	inline static float death_age;
 	inline static float death_age_chance = 0.01; // every frame past its death age gives it this chance of dying
+};
+
+void load_settings(const std::string& path);
+
+struct TextSettings
+{
+	// locations for the fonts
+	inline static const std::string bold_font_location = "media/fonts/Roboto-Bold.ttf";
+	inline static const std::string regular_font_location = "media/fonts/Roboto-Regular.ttf";
+
+	// Universal font sizes - only these many fonts should be created
+	static constexpr unsigned title_font_size = 30;
+	static constexpr unsigned regular_font_size = 20;
+	static constexpr unsigned cell_statistic_font_size = 15;
+
 };

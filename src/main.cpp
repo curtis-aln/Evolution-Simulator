@@ -1,9 +1,11 @@
 #include "simulation/simulation.h"
 #include "Utils/UI/CrashLogger.h"
+#include "settings.h"
 
 int main()
 {
-    Random::set_seed(2);
+	load_settings("media/aria_settings.toml");
+
     CrashLogger::set_exception_translator(); 
 
     try

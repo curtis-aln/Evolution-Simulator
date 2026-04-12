@@ -83,6 +83,17 @@
 - each protozoa stores cell_positions_nearby and food positions for debugging, just have it once in the protozoa manager
 - when springs are created through create cell or create spring, give them random properties
 
+before multithreading
+rendering: 7fps
+not rendering: 15fps
+
+after multithreading
 
 
-1000 frames in 17 seconds
+
+
+
+
+[How multithreading works]
+The Update Thread runs as fast as it can, after every iteration it sends data to a temp container
+The render therad runs as fast as it can (usually slower than the update thread) and when it finishes rendering if fetches the data from the temp container to render the next frame

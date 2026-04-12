@@ -37,6 +37,12 @@ FetchContent_Declare(ImPlot
     GIT_TAG        v0.17
 )
 
+FetchContent_Declare(tomlplusplus
+    GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+    GIT_TAG        v3.4.0
+)
+
+
 # Disable SFML fetching its own system deps (freetype etc.) — we want static
 set(SFML_USE_SYSTEM_DEPS OFF CACHE BOOL "" FORCE)
 
@@ -46,6 +52,7 @@ set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
 # Make all deps available in the right order
 FetchContent_MakeAvailable(SFML)
 FetchContent_MakeAvailable(ImGui)
+FetchContent_MakeAvailable(tomlplusplus)
 
 # ImGui-SFML needs to know where imgui source lives before it configures
 set(IMGUI_DIR ${imgui_SOURCE_DIR} CACHE PATH "" FORCE)
@@ -91,6 +98,7 @@ add_executable(ProjectARIA
 
     # ── Utilities
     src/Utils/Graphics/spatial_grid/spatial_grid_renderer.cpp
+    src/settings.cpp
 
     # ── World / simulation update loop
     src/world/collision_resolution.cpp
@@ -101,7 +109,7 @@ add_executable(ProjectARIA
     # ── ImPlot (header-only library — sources must be compiled as part of our target)
     ${implot_SOURCE_DIR}/implot.cpp
     ${implot_SOURCE_DIR}/implot_items.cpp
-)
+ "src/settings.cpp")
 
 # ── Include directories ───────────────────────────────────────────────────────
 # PRIVATE means these paths are only used when compiling ProjectARIA itself,
@@ -119,6 +127,9 @@ target_link_libraries(ProjectARIA PRIVATE
     ImGui-SFML::ImGui-SFML
     $<$<CXX_COMPILER_ID:MSVC>:dbghelp>   # MSVC only — stack trace support
 )
+
+target_link_libraries(ProjectARIA PRIVATE tomlplusplus::tomlplusplus)
+
 
 # ── Preprocessor definitions ──────────────────────────────────────────────────
 target_compile_definitions(ProjectARIA PRIVATE
