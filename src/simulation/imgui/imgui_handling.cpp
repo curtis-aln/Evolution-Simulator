@@ -10,21 +10,24 @@ void Simulation::init_imGUI()
     ImPlot::CreateContext();
 }
 
-void Simulation::handle_imGUI()
+
+void Simulation::handle_imGUI(const SimSnapshot& snap)
 {
     ImGui::SFML::Update(m_window_, m_delta_time_.get_delta_sfml());
-
     const float dt = static_cast<float>(m_delta_time_.get_delta());
 
-	SimSnapshot& snapshot = shared_input.buffers[shared_input.get_write_buffer_index()];
-    m_control_panel_.draw(snapshot, dt);
+    WorldToggles toggles_copy = snap.toggles;
+    ImGuiContext ctx{ toggles_copy, m_cmd_mutex, m_commands };
 
-    if (snapshot.toggles.open_extinction_window)
-    {
+    m_control_panel_.draw(snap, ctx, dt);
+
+    if (std::memcmp(&toggles_copy, &snap.toggles, sizeof(WorldToggles)) != 0)
+        ctx.push({ CommandType::SetToggles, toggles_copy });
+
+    if (toggles_copy.open_extinction_window)
         ImGui::OpenPopup("New Simulation");
-        snapshot.toggles.open_extinction_window = false;
-    }
 }
+
 
 void Simulation::extinction_popup()
 {

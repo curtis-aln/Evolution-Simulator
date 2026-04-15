@@ -179,18 +179,3 @@ Cell* Protozoa::get_selected_cell(const sf::Vector2f mouse_pos)
 	return nullptr;
 }
 
-std::vector<Cell>& Protozoa::get_cells()
-{
-	return m_cells_;
-}
-
-
-void Protozoa::set_render_window(sf::RenderWindow* window)
-{
-	m_window_ = window;
-}
-
-void Protozoa::set_bounds(Circle* bounds)
-{
-	m_world_bounds_ = bounds;
-}

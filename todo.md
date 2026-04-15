@@ -76,6 +76,20 @@
 - std::cout debug prints in production code - Add a constexpr bool DEBUG_LOGGING = false flag in settings and gate all std::cout behind it, or use a proper logger.
 - 
 -----------------------------------------------------------------------
+#### Multithreading todo
+Protozoa and total count
+avg lifetime
+longest ever
+births and deaths / 100 frames
+frame and elapsed
+graphs dont work
+selected protozoa doesnt work
+track grid doesnt work
+rendering display doesnt work
+
+
+-----------------------------------------------------------------------
+
 
 ##### Protozoa TODO
 - when a new cell is created it should have very low friction and generally not affect the organism too much, test this
@@ -97,3 +111,17 @@ after multithreading
 [How multithreading works]
 The Update Thread runs as fast as it can, after every iteration it sends data to a temp container
 The render therad runs as fast as it can (usually slower than the update thread) and when it finishes rendering if fetches the data from the temp container to render the next frame
+
+[The Tripple Buffer]
+At any moment, each buffer is playing one of three roles:
+
+Being written — the update thread is currently filling this with new simulation data
+Ready — fully written, waiting to be picked up by the renderer
+Being read — the render thread is currently drawing from this
+
+
+Mutex stands for Mutual Exclusion. It's essentially a key to a locked room.
+The rule is simple:
+
+Only the thread holding the key can enter the room (access the shared data)
+Every other thread wanting in must wait outside until the key is returned

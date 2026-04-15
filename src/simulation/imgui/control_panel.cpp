@@ -24,10 +24,10 @@ ControlPanel::ControlPanel()
     m_tabs_.push_back(std::make_unique<DisplayTab>());
 }
 
-void ControlPanel::draw(SimSnapshot& snapshot, float dt)
+
+void ControlPanel::draw(const SimSnapshot& snap, ImGuiContext& ctx, float dt)
 {
     m_tagged_tab_->draw_toasts(dt);
-
     ImGui::SetNextWindowPos({ 10.f, 10.f }, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({ 520.f, 640.f }, ImGuiCond_FirstUseEver);
 
@@ -36,13 +36,12 @@ void ControlPanel::draw(SimSnapshot& snapshot, float dt)
     if (ImGui::BeginTabBar("##ctrl_tabs"))
     {
         for (auto& tab : m_tabs_)
+        {
             if (ImGui::BeginTabItem(tab->label()))
             {
-                tab->draw(snapshot);
+                tab->draw(snap, ctx);
                 ImGui::EndTabItem();
             }
-        ImGui::EndTabBar();
+        }
     }
-
-    ImGui::End();
 }

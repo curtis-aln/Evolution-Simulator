@@ -158,9 +158,18 @@ void World::unload_render_data(SimSnapshot& snapshot)
     
 }
 
-void World::fill_render_data(SimSnapshot& snapshot)
+void World::fill_snapshot(SimSnapshot& snapshot)
 {
     snapshot.render = get_render_data();
     snapshot.stats = get_statistics();
     snapshot.toggles = toggles;
+	snapshot.stats.protozoa_count = get_protozoa_count();
+	snapshot.stats.food_count = get_food_count();
+	snapshot.stats.average_generation = get_average_generation();
+
+    if (selected_protozoa_ != nullptr)
+    {
+        snapshot.protozoa = *selected_protozoa_;
+		snapshot.selected_a_protozoa = true;
+    }
 }

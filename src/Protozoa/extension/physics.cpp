@@ -224,3 +224,60 @@ void Protozoa::resolve_collisions(const std::vector<sf::Vector2f>& collision_res
 		cell.collision_resolution_vector_ = collision_resolutions[idx - 1];
 	}
 }
+
+
+void Protozoa::copy_protozoa_data(Protozoa& dst, const Protozoa& src)
+{
+	// identity / stats
+	dst.id = src.id;
+	dst.active = src.active;
+	dst.time_since_last_reproduced = src.time_since_last_reproduced;
+	dst.birth_location = src.birth_location;
+	dst.energy_lost_to_springs = src.energy_lost_to_springs;
+	dst.offspring_count = src.offspring_count;
+	dst.frames_alive = src.frames_alive;
+	dst.total_food_eaten = src.total_food_eaten;
+	dst.previous_position = src.previous_position;
+	dst.velocity = src.velocity;
+	dst.immortal = src.immortal;
+	dst.food_positions_nearby = src.food_positions_nearby;
+	dst.cell_positions_nearby = src.cell_positions_nearby;
+	
+	dst.m_window_ = src.m_window_;
+	dst.m_world_bounds_ = src.m_world_bounds_;
+
+	// genome / components
+	dst.m_cells_ = src.m_cells_;
+	dst.m_springs_ = src.m_springs_;
+
+	// internal state
+	dst.stomach = src.stomach;
+	dst.energy = src.energy;
+	dst.reproduce = src.reproduce;
+	dst.dead = src.dead;
+
+	dst.m_personal_bounds_ = src.m_personal_bounds_;
+
+	// NOTE: m_window_ and m_world_bounds_ are intentionally NOT copied.
+	// Each protozoa holds a pointer to the world's resources, which are
+	// assigned once at construction and must not change.
+}
+
+
+Protozoa::Protozoa(const Protozoa& other)
+	: ProtozoaSettings(),
+	GenomeManager(&m_cells_, &m_springs_),
+	m_window_(other.m_window_),
+	m_world_bounds_(other.m_world_bounds_),
+	nearby_food_container(static_cast<uint8_t>(FoodSettings::cell_max_capacity * 9))
+{
+	copy_protozoa_data(*this, other);
+}
+
+Protozoa& Protozoa::operator=(const Protozoa& other)
+{
+	if (this == &other) return *this;
+	copy_protozoa_data(*this, other);
+	// pointers stay as-is — don't adopt another protozoa's window/bounds
+	return *this;
+}

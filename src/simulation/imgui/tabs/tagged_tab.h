@@ -8,7 +8,7 @@ class TaggedTab : public ITab
 {
 public:
     const char* label() const override { return "Tagged"; }
-    void        draw(SimSnapshot& snapshot) override;
+    void        draw(const SimSnapshot& snap, ImGuiContext& ctx) override;
 
     void toggle_tag(int id);
     bool is_tagged(int id) const;
@@ -19,6 +19,6 @@ private:
     std::unordered_set<int> m_tagged_ids_;
     ToastSystem             m_toasts_;
 
-    void draw_tag_input(SimSnapshot& snapshot);
-    void draw_list(SimSnapshot& snapshot);
+    void draw_tag_input(const SimSnapshot& snapshot);
+    void draw_list(const SimSnapshot& snapshot);
 };

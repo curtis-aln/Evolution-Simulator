@@ -68,6 +68,11 @@ public:
 
 	Protozoa(int id_ = 0, Circle* world_bounds = nullptr, sf::RenderWindow* window = nullptr);
 
+	Protozoa(const Protozoa& other);
+	Protozoa& operator=(const Protozoa& other);
+
+	static void copy_protozoa_data(Protozoa& dst, const Protozoa& src);
+
 	void update(FoodManager& food_manager, bool debug, float min_speed);
 	
 	void mutate(const bool artificial_add_cell = false, const float artificial_mutatation_rate = 0.f, const float artificial_mutatation_range = 0.f);
@@ -80,8 +85,12 @@ public:
 
 	// information fetching
 	Cell* get_selected_cell(sf::Vector2f mouse_pos);
-	std::vector<Cell>& get_cells();
+
+	std::vector<Cell>& get_cells() { return m_cells_; }
+	const std::vector<Cell>& get_cells() const { return m_cells_; }
 	std::vector<Spring>& get_springs() { return m_springs_; }
+	const std::vector<Spring>& get_springs() const { return m_springs_; }
+
 	sf::Rect<float> get_bounds() const { return m_personal_bounds_; }
 	sf::Vector2f get_center() const;
 	bool is_alive() const { return !dead; }
@@ -90,11 +99,15 @@ public:
 	float stomach_capacity() const { return stomach; }
 	float stomach_reproduce_thresh() const { return m_cells_.size(); }
 	float reproductive_cooldown_calculator() const { return reproductive_cooldown / m_cells_.size(); }
+	int get_cell_count() const { return (int)m_cells_.size(); }
+	int get_spring_count() const { return (int)m_springs_.size(); }
+
+	
+	void set_render_window(sf::RenderWindow* window){m_window_ = window;}
+	void set_bounds(Circle* bounds){m_world_bounds_ = bounds;}
 
 	// information setting
 	void init_one_cell();
-	void set_render_window(sf::RenderWindow* window);
-	void set_bounds(Circle* bounds);
 	void move_center_location_to(const sf::Vector2f new_center);
 	void set_protozoa_attributes(Protozoa* other);	
 	void resolve_collisions(const std::vector<sf::Vector2f>& collision_resolutions, int& idx);

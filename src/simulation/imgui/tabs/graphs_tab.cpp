@@ -47,15 +47,15 @@ bool GraphsTab::visible_range(const std::vector<float>& times,
 // ─────────────────────────────────────────────────────────────────────────────
 //  Top-level
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw(SimSnapshot& snapshot)
+void GraphsTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
-	PopulationHistory& history = snapshot.history;
-    draw_shared_toolbar(snapshot);
+	const PopulationHistory& history = snap.history;
+    draw_shared_toolbar(snap);
     if (!ImGui::BeginTabBar("##graph_tabs")) return;
 
-    if (ImGui::BeginTabItem("Population")) { draw_population_tab(snapshot);  ImGui::EndTabItem(); }
-    if (ImGui::BeginTabItem("Generations")) { draw_generations_tab(snapshot); ImGui::EndTabItem(); }
-    if (ImGui::BeginTabItem("Misc")) { draw_misc_tab(snapshot);        ImGui::EndTabItem(); }
+    if (ImGui::BeginTabItem("Population")) { draw_population_tab(snap);  ImGui::EndTabItem(); }
+    if (ImGui::BeginTabItem("Generations")) { draw_generations_tab(snap); ImGui::EndTabItem(); }
+    if (ImGui::BeginTabItem("Misc")) { draw_misc_tab(snap);        ImGui::EndTabItem(); }
 
     ImGui::EndTabBar();
 }
@@ -63,10 +63,10 @@ void GraphsTab::draw(SimSnapshot& snapshot)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Shared toolbar
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_shared_toolbar(SimSnapshot& snapshot)
+void GraphsTab::draw_shared_toolbar(const SimSnapshot& snap)
 {
-	PopulationHistory& history = snapshot.history;
-    const float live_x = snapshot.iterations_;
+	const PopulationHistory& history = snap.history;
+    const float live_x = snap.iterations_;
 
     ImGui::SetNextItemWidth(160.f);
     ImGui::SliderFloat("Window (s)##g", &m_scroll_window_, 10.f, 600.f, "%.0fs");
@@ -78,7 +78,7 @@ void GraphsTab::draw_shared_toolbar(SimSnapshot& snapshot)
         if (ImGui::Button("Stop recording"))
         {
             m_recording_ = false;
-            history.add_manual_event(live_x, "record end");
+            //history.add_manual_event(live_x, "record end"); todo
         }
         ImGui::PopStyleColor();
     }
@@ -86,7 +86,7 @@ void GraphsTab::draw_shared_toolbar(SimSnapshot& snapshot)
     {
         m_recording_ = true;
         m_record_start_ = live_x;
-        history.add_manual_event(live_x, "record start", { 0.4f, 0.8f, 1.f, 1.f });
+        //history.add_manual_event(live_x, "record start", { 0.4f, 0.8f, 1.f, 1.f }); todo
     }
 
     ImGui::SameLine(0, 16);
@@ -97,15 +97,15 @@ void GraphsTab::draw_shared_toolbar(SimSnapshot& snapshot)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Population tab
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_population_tab(SimSnapshot& snapshot)
+void GraphsTab::draw_population_tab(const SimSnapshot& snap)
 {
-	PopulationHistory& history = snapshot.history;
+	const PopulationHistory& history = snap.history;
     ImGui::Checkbox("Protozoa", &m_show_protozoa_); ImGui::SameLine(0, 12);
     ImGui::Checkbox("Food", &m_show_food_);     ImGui::SameLine(0, 12);
     ImGui::Checkbox("Total", &m_show_total_);    ImGui::SameLine(0, 12);
     ImGui::Checkbox("Bands", &m_show_bands_);
 
-    const float live_x = snapshot.iterations_;
+    const float live_x = snap.iterations_;
     const float x_max = m_hover_paused_ ? m_paused_x_max_ : live_x;
     const float x_min = x_max - m_scroll_window_;
 
@@ -174,7 +174,7 @@ void GraphsTab::draw_population_tab(SimSnapshot& snapshot)
                 y_top = std::max(y_top, history.total[i]);
         y_top = std::max(y_top, 10.f); // never shorter than the extinction line
 
-        draw_event_markers(snapshot, x_min, x_max, y_top);
+        draw_event_markers(snap, x_min, x_max, y_top);
         if (m_recording_ && m_record_start_ >= x_min)
             draw_record_region(x_max, y_top);
     }
@@ -193,9 +193,9 @@ void GraphsTab::draw_population_tab(SimSnapshot& snapshot)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Event markers
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_event_markers(SimSnapshot& snapshot, float x_min, float x_max, float y_top)
+void GraphsTab::draw_event_markers(const SimSnapshot& snap, float x_min, float x_max, float y_top)
 {
-    PopulationHistory& history = snapshot.history;
+    const PopulationHistory& history = snap.history;
     for (const auto& ev : history.events)
     {
         if (ev.time < x_min || ev.time > x_max) continue;
@@ -228,9 +228,9 @@ void GraphsTab::draw_record_region(float x_max, float y_top)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Generations tab
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_generations_tab(SimSnapshot& snapshot)
+void GraphsTab::draw_generations_tab(const SimSnapshot& snap)
 {
-    const auto& gen_data = snapshot.stats.gen_data;
+    const auto& gen_data = snap.stats.gen_data;
 
     constexpr ImPlotFlags hf = ImPlotFlags_NoMenus | ImPlotFlags_NoBoxSelect | ImPlotFlags_NoMouseText;
     const float           plot_h = ImGui::GetContentRegionAvail().y
@@ -268,9 +268,9 @@ void GraphsTab::draw_generations_tab(SimSnapshot& snapshot)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Misc tab
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_misc_tab(SimSnapshot& snapshot)
+void GraphsTab::draw_misc_tab(const SimSnapshot& snap)
 {
-    PopulationHistory& history = snapshot.history;
+    const PopulationHistory& history = snap.history;
     // Series toggle row
     ImGui::Checkbox("Mut Rate", &m_show_mut_rate_);    ImGui::SameLine(0, 10);
     ImGui::Checkbox("Mut Range", &m_show_mut_range_);   ImGui::SameLine(0, 10);
@@ -295,7 +295,7 @@ void GraphsTab::draw_misc_tab(SimSnapshot& snapshot)
         return;
     }
 
-    const float live_x = snapshot.iterations_;
+    const float live_x = snap.iterations_;
     const float x_max = m_hover_paused_ ? m_paused_x_max_ : live_x;
     const float x_min = x_max - m_scroll_window_;
     const float* t = history.time.data();

@@ -13,7 +13,14 @@
 #include <imgui-SFML.h>
 #include <implot.h>
 
-#include "shared_state.h"
+#include "sim_snapshot.h"
+#include "triple_buffer.h"
+#include "sim_command.h"
+#include <mutex>
+#include <queue>
+
+
+
 
 class Simulation : SimulationSettings, TextSettings
 {
@@ -51,8 +58,13 @@ class Simulation : SimulationSettings, TextSettings
 
     ImPlotColormap m_plot_colormap_{};
 
-    SharedState shared_output{};
-    SharedState shared_input{};
+    // Multithreading
+	TripleBuffer<SimSnapshot> m_sim_buffer_{}; // sim -> render (lock-free)
+
+    // render → sim  (low frequency, mutex protected)
+    std::mutex             m_cmd_mutex{};
+    std::queue<SimCommand> m_commands{};
+
 
 public:
     Simulation();
@@ -62,13 +74,13 @@ private:
     void init_imGUI();
     void update_one_frame();
     void camera_follow_selected_protozoa();
-    void update_line_graphs(SimSnapshot& snapshot);
-    void handle_imGUI();
+    void update_line_graphs(const SimSnapshot& snapshot);
+    void handle_imGUI(const SimSnapshot & snapshot);
     void extinction_popup();
     void render();
     void manage_frame_rate();
-
-    void fill_render_data(SharedState& shared_state);
+    void fill_snapshot(SimSnapshot& snapshot);
+    void update_world();
 
     // events
     void handle_events();

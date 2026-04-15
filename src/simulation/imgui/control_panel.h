@@ -3,7 +3,7 @@
 #include "tabs/tagged_tab.h"
 #include <vector>
 #include <memory>
-#include "../shared_state.h"
+#include "../sim_snapshot.h"
 
 
 class ControlPanel
@@ -11,7 +11,7 @@ class ControlPanel
 public:
     ControlPanel();
 
-    void draw(SimSnapshot& snapshot, float dt);
+    void draw(const SimSnapshot& snap, ImGuiContext& ctx, float dt);
 
     TaggedTab* get_tagged_tab() { return m_tagged_tab_; }
 

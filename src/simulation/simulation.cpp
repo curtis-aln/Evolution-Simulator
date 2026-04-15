@@ -42,18 +42,54 @@ void Simulation::update_one_frame()
 
     if (m_world_.toggles.m_tick_frame_time)
     {
-        m_world_.unload_render_data(shared_input.buffers[shared_input.get_read_buffer_index()]);
-        m_world_.update();
+        update_world();
         m_world_.toggles.m_tick_frame_time = false;
     }
     else if (!m_world_.toggles.paused)
     {
-        m_world_.update();
-        fill_render_data(shared_output);            
+        update_world();
+                    
     }
 
     camera_follow_selected_protozoa();
     
+}
+
+void Simulation::update_world()
+{
+    // Apply any commands ImGui pushed since last tick
+    {
+        std::lock_guard<std::mutex> lock(m_cmd_mutex);
+        while (!m_commands.empty())
+        {
+            const SimCommand& cmd = m_commands.front();
+            switch (cmd.type)
+            {
+            case CommandType::SetToggles:
+                m_world_.toggles = cmd.toggles;
+                break;
+
+            //case CommandType::CloneProtozoa:
+                // hook up your clone logic here in stage 2
+            //    break;
+
+            case CommandType::ResetSimulation:
+                // hook up your reset logic here in stage 2
+                break;
+            }
+            m_commands.pop();
+        }
+    } // mutex released here
+
+    // Tick the simulation
+    m_world_.update();
+    
+    // Package results into the triple buffer
+    SimSnapshot& snap = m_sim_buffer_.get_write_buffer();
+    m_world_.fill_snapshot(snap);
+    m_sim_buffer_.publish();
+
+
 }
 
 void Simulation::camera_follow_selected_protozoa()
@@ -70,7 +106,7 @@ void Simulation::camera_follow_selected_protozoa()
     camera_.update_window_view();
 }
 
-void Simulation::update_line_graphs(SimSnapshot& snapshot)
+void Simulation::update_line_graphs(const SimSnapshot& snapshot)
 {
     ++m_ticks_;
     m_total_time_elapsed_ += static_cast<float>(m_delta_time_.get_delta());
@@ -93,16 +129,13 @@ void Simulation::update_line_graphs(SimSnapshot& snapshot)
 
 void Simulation::render()
 {
-	const int read_idx = shared_output.get_read_buffer_index();
-    const int write_idx = shared_input.get_write_buffer_index();
+    // Always grab the freshest completed simulation frame
+    const SimSnapshot& snap = m_sim_buffer_.begin_read();
 
-    // moving the world render data calculated by the update into the shared input so it can get modified by Imgui
-	shared_input.buffers[write_idx].render = shared_output.buffers[read_idx].render;
+    update_line_graphs(snap);
+    handle_imGUI(snap);
 
-	update_line_graphs(shared_input.buffers[write_idx]);
-    handle_imGUI();
-
-	shared_input.publish_write();
+    m_sim_buffer_.end_read();
 
     m_window_.clear(GraphicalSettings::window_color);
 
@@ -112,10 +145,7 @@ void Simulation::render()
         m_world_.render(&cell_statistic_font, pos);
     }
 
-    // ImGui must always be rendered — suppressing Render() corrupts the context.
-    // Hide panels by simply not building any ImGui windows in handle_imGUI().
     ImGui::SFML::Render(m_window_);
-
     m_window_.display();
 }
 
@@ -135,13 +165,10 @@ void Simulation::manage_frame_rate()
     m_window_.setTitle(title.str());
 }
 
-void Simulation::fill_render_data(SharedState& shared_state)
+void Simulation::fill_snapshot(SimSnapshot& snapshot)
 {
-    const int    write_idx = shared_state.get_write_buffer_index();
-    SimSnapshot& snapshot = shared_state.buffers[write_idx];
-
-	m_world_.fill_render_data(snapshot);
+	m_world_.fill_snapshot(snapshot);
     snapshot.total_time_elapsed = m_total_time_elapsed_;
-
-    shared_state.publish_write();
+	snapshot.stats.fps = fps_;
+  
 }

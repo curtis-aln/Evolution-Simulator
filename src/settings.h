@@ -57,7 +57,7 @@ struct WorldSettings
 	inline static unsigned max_protozoa;
 	inline static unsigned initial_protozoa;
 
-	inline static constexpr size_t cells_x = 200;
+	inline static constexpr size_t cells_x = 100;
 	inline static constexpr size_t cells_y = cells_x;
 	inline static constexpr std::uint8_t cell_max_capacity = 25;
 
@@ -95,8 +95,8 @@ struct FoodSettings
 	inline static int cell_max_capacity = 20;
 	inline static size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
 
-	static constexpr unsigned max_food = 14'000;
-	static constexpr unsigned initial_food = 6'000;
+	static constexpr unsigned max_food = 6'000;
+	static constexpr unsigned initial_food = 2'000;
 	inline static float food_radius;
 	inline static float friction;
 

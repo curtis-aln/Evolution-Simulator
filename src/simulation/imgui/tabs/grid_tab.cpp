@@ -1,7 +1,7 @@
 #include "grid_tab.h"
 #include <imgui.h>
 
-void GridTab::draw(SimSnapshot& snapshot)
+void GridTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
     const float total = ImGui::GetContentRegionAvail().x;
     const float sp = ImGui::GetStyle().ItemSpacing.x;
@@ -11,13 +11,13 @@ void GridTab::draw(SimSnapshot& snapshot)
 
     // ── Protozoa Grid ─────────────────────────────────────────────────────────
     ImGui::BeginChild("GR_cell", { cw, ch }, true);
-    draw_grid_info("Protozoa Grid", snapshot.cell_grid, snapshot.toggles.track_spatial_grids);
+    //draw_grid_info("Protozoa Grid", snap.cell_grid, snap.toggles.track_spatial_grids); todo
     ImGui::EndChild();
     ImGui::SameLine();
 
     // ── Food Grid ─────────────────────────────────────────────────────────────
     ImGui::BeginChild("GR_food", { cw, ch }, true);
-    draw_grid_info("Food Grid", snapshot.food_grid, snapshot.toggles.track_spatial_grids);
+    //draw_grid_info("Food Grid", snap.food_grid, snap.toggles.track_spatial_grids); todo
     ImGui::EndChild();
     ImGui::SameLine();
 
@@ -26,11 +26,11 @@ void GridTab::draw(SimSnapshot& snapshot)
     ImGui::TextDisabled("Tuning");
     ImGui::Separator();
 
-    ImGui::Checkbox("Track occupancy", &snapshot.toggles.track_spatial_grids);
+    //ImGui::Checkbox("Track occupancy", &snap.toggles.track_spatial_grids);
     ImGui::SameLine(); ImGui::TextDisabled("(costs perf)");
 
     ImGui::Spacing();
-    static int res = static_cast<int>(snapshot.cell_grid.cells_x);
+    static int res = static_cast<int>(snap.cell_grid.cells_x);
     ImGui::SetNextItemWidth(-1.f);
     ImGui::SliderInt("##gridres", &res, 10, 500, "Resolution %d x %d");
 

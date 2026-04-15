@@ -31,6 +31,7 @@ struct SimSnapshot
     WorldToggles toggles;
     WorldStatistics stats;
     RenderData render;
+
     SpatialGridData food_grid;
     SpatialGridData cell_grid;
     PopulationHistory history;
@@ -38,31 +39,4 @@ struct SimSnapshot
     bool selected_a_protozoa = false;
     bool clone = false;
     Protozoa protozoa;
-};
-
-struct SharedState
-{
-    SimSnapshot       buffers[2];
-    std::atomic<int>  latest_written{ 0 };  // index of the last fully written buffer
-
-    // Called by the update thread to know which buffer to write into.
-    // Always the buffer that the render thread is NOT currently reading.
-    int get_write_buffer_index() const
-    {
-        return 1 - latest_written.load(std::memory_order_relaxed);
-    }
-
-    // Called by the render thread to know which buffer to read from.
-    // Always the last fully written buffer.
-    int get_read_buffer_index() const
-    {
-        return latest_written.load(std::memory_order_acquire);
-    }
-
-    // Called by the update thread after it finishes writing.
-    // Flips latest_written so the render thread picks up the new data.
-    void publish_write()
-    {
-        latest_written.store(get_write_buffer_index(), std::memory_order_release);
-    }
 };

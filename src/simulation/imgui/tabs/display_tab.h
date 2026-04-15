@@ -6,7 +6,7 @@ class DisplayTab : public ITab
 {
 public:
     const char* label() const override { return "Display"; }
-    void        draw(SimSnapshot& snapshot) override;
+    void        draw(const SimSnapshot& snap, ImGuiContext& ctx) override;
 
 private:
     int   m_camera_lock_ = 0;

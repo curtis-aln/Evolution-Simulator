@@ -1,7 +1,7 @@
 #include "display_tab.h"
 #include <imgui.h>
 
-void DisplayTab::draw(SimSnapshot& snapshot)
+void DisplayTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
     const float total = ImGui::GetContentRegionAvail().x;
     const float sp = ImGui::GetStyle().ItemSpacing.x;
@@ -18,13 +18,14 @@ void DisplayTab::draw(SimSnapshot& snapshot)
     ImGui::BeginChild("DISP_rend", { cw, ch }, true);
     ImGui::TextDisabled("Rendering");
     ImGui::Separator();
-
-    ImGui::Checkbox("Enable Rendering", &snapshot.toggles.m_rendering_);                       kb("R");
-    ImGui::Checkbox("Simple Mode", &snapshot.toggles.simple_mode);             kb("S");
-    ImGui::Checkbox("Debug Mode", &snapshot.toggles.debug_mode);              kb("D");
-    ImGui::Checkbox("Cell Grid", &snapshot.toggles.draw_cell_grid);          kb("G");
-    ImGui::Checkbox("Food Grid", &snapshot.toggles.draw_food_grid);          kb("F");
-    ImGui::Checkbox("Track Statistics", &snapshot.toggles.track_statistics);        kb("T");
+    
+    // Todo
+    //ImGui::Checkbox("Enable Rendering", &snap.toggles.m_rendering_);                       kb("R");
+    //ImGui::Checkbox("Simple Mode", &snap.toggles.simple_mode);             kb("S");
+    //ImGui::Checkbox("Debug Mode", &snap.toggles.debug_mode);              kb("D");
+    //ImGui::Checkbox("Cell Grid", &snap.toggles.draw_cell_grid);          kb("G");
+    //ImGui::Checkbox("Food Grid", &snap.toggles.draw_food_grid);          kb("F");
+    //ImGui::Checkbox("Track Statistics", &snap.toggles.track_statistics);        kb("T");
 
     ImGui::EndChild();
     ImGui::SameLine();
@@ -34,10 +35,11 @@ void DisplayTab::draw(SimSnapshot& snapshot)
     ImGui::TextDisabled("Debug Overlays  (debug mode only)");
     ImGui::Separator();
 
-    ImGui::Checkbox("Show Connections", &snapshot.toggles.show_connections);        kb("C");
-    ImGui::Checkbox("Skeleton Mode", &snapshot.toggles.skeleton_mode);           kb("K");
-    ImGui::Checkbox("Bounding Boxes", &snapshot.toggles.show_bounding_boxes);     kb("B");
-    ImGui::Checkbox("Toggle Collisions", &snapshot.toggles.toggle_collisions);       kb("C");
+    // Todo
+    //ImGui::Checkbox("Show Connections", &snap.toggles.show_connections);        kb("C");
+    //ImGui::Checkbox("Skeleton Mode", &snap.toggles.skeleton_mode);           kb("K");
+    //ImGui::Checkbox("Bounding Boxes", &snap.toggles.show_bounding_boxes);     kb("B");
+    //ImGui::Checkbox("Toggle Collisions", &snap.toggles.toggle_collisions);       kb("C");
 
     ImGui::EndChild();
     ImGui::SameLine();
@@ -47,7 +49,8 @@ void DisplayTab::draw(SimSnapshot& snapshot)
     ImGui::TextDisabled("UI");
     ImGui::Separator();
 
-    ImGui::Checkbox("Hide Panels", &snapshot.toggles.hide_panels);  kb("Q");
+    // todo
+    //ImGui::Checkbox("Hide Panels", &snap.toggles.hide_panels);  kb("Q");
 
     ImGui::SetNextItemWidth(-1.f);
     if (ImGui::SliderFloat("##uiscale", &m_ui_scale_, 50.f, 200.f, "UI Scale %.0f%%"))

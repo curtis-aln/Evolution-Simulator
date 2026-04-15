@@ -3,7 +3,7 @@
 #include "../helpers/confirm_button.h"
 #include <imgui.h>
 
-void SimulationTab::draw(SimSnapshot& snapshot)
+void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
     // ── 4 panels: Playback | Fast Forward | World Settings | Save/Load + Keybinds
     const float total = ImGui::GetContentRegionAvail().x;
@@ -16,18 +16,18 @@ void SimulationTab::draw(SimSnapshot& snapshot)
     ImGui::TextDisabled("Playback");
     ImGui::Separator();
 
-    ImGui::Text("Time:  %s", PlotUtils::format_time(snapshot.total_time_elapsed).c_str());
-    ImGui::Text("Frame: %u", snapshot.iterations_);
+    ImGui::Text("Time:  %s", PlotUtils::format_time(snap.total_time_elapsed).c_str());
+    ImGui::Text("Frame: %u", snap.iterations_);
     ImGui::Spacing();
 
     const float bw = (ImGui::GetContentRegionAvail().x - sp) * 0.5f;
-    if (ImGui::Button(snapshot.toggles.paused ? "Resume [Spc]" : "Pause  [Spc]", { bw, 0.f }))
-        snapshot.toggles.paused = !snapshot.toggles.paused;
+    //if (ImGui::Button(snap.toggles.paused ? "Resume [Spc]" : "Pause  [Spc]", { bw, 0.f }))
+    //    snap.toggles.paused = !snap.toggles.paused; todo
     ImGui::SameLine();
     if (ImGui::Button("Step [O]", { -1.f, 0.f }))
     {
-        snapshot.toggles.m_tick_frame_time = true;
-        snapshot.toggles.paused = true;
+        //snap.toggles.m_tick_frame_time = true;
+        //snap.toggles.paused = true; todo
     }
 
     ImGui::Spacing();
@@ -35,8 +35,8 @@ void SimulationTab::draw(SimSnapshot& snapshot)
     ImGui::SliderFloat("##speed", &m_speed_, 0.1f, 10.f, "Speed %.1fx");
 
     ImGui::Spacing();
-    if (ImGui::Button("Reset Simulation", { -1.f, 0.f }))
-        snapshot.toggles.open_extinction_window = true;
+    //if (ImGui::Button("Reset Simulation", { -1.f, 0.f }))
+    //    snap.toggles.open_extinction_window = true; todo
 
     ImGui::Separator();
     ImGui::TextDisabled("Fast Forward");
@@ -73,12 +73,12 @@ void SimulationTab::draw(SimSnapshot& snapshot)
     ImGui::Separator();
 
     ImGui::SetNextItemWidth(-1.f);
-    ImGui::SliderFloat("##minsp", &snapshot.toggles.min_speed, 0.f, 135.f, "Min Speed %.1f");
+    //ImGui::SliderFloat("##minsp", &snap.toggles.min_speed, 0.f, 135.f, "Min Speed %.1f");
 
-    float ds = snapshot.toggles.delta_min_speed * 1000.f;
+    float ds = snap.toggles.delta_min_speed * 1000.f;
     ImGui::SetNextItemWidth(-1.f);
-    if (ImGui::SliderFloat("##dsp", &ds, 0.2f, 2.f, "Delta Spd %.3f"))
-        snapshot.toggles.delta_min_speed = ds / 1000.f;
+    //if (ImGui::SliderFloat("##dsp", &ds, 0.2f, 2.f, "Delta Spd %.3f"))
+    //    snap.toggles.delta_min_speed = ds / 1000.f; todo
 
     static float world_radius = WorldSettings::bounds_radius;
     ImGui::SetNextItemWidth(-1.f);

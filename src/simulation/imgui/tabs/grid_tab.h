@@ -6,7 +6,7 @@ class GridTab : public ITab
 {
 public:
     const char* label() const override { return "Grid"; }
-    void        draw(SimSnapshot& snapshot)   override;
+    void        draw(const SimSnapshot& snap, ImGuiContext& ctx)   override;
 
 private:
     //void draw_tuning(SimSnapshot& snapshot);

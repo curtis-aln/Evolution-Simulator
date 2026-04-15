@@ -5,7 +5,7 @@ class SimulationTab : public ITab
 {
 public:
     const char* label() const override { return "Simulation"; }
-    void        draw(SimSnapshot& snapshot)   override;
+    void        draw(const SimSnapshot& snap, ImGuiContext& ctx)   override;
 
 private:
     enum class FFCondition { Duration, Population, Generation };

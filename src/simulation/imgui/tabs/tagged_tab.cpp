@@ -5,14 +5,14 @@
 #include <algorithm>
 #include <iostream>
 
-void TaggedTab::draw(SimSnapshot& snapshot)
+void TaggedTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
-    draw_tag_input(snapshot);
+    //draw_tag_input(snapshot);
     ImGui::Spacing();
-    draw_list(snapshot);
+    draw_list(snap);
 }
 
-void TaggedTab::draw_tag_input(SimSnapshot& snapshot)
+void TaggedTab::draw_tag_input(const SimSnapshot& snapshot)
 {
     ImGui::SeparatorText("Tag by ID");
     static int input_id = 0;
@@ -21,16 +21,16 @@ void TaggedTab::draw_tag_input(SimSnapshot& snapshot)
     ImGui::SameLine();
     if (ImGui::Button("Toggle Tag##tagged")) toggle_tag(input_id);
 
-	Protozoa& sel = snapshot.protozoa;
+	//Protozoa& sel = snapshot.protozoa; todo
     if (snapshot.selected_a_protozoa)
     {
         ImGui::SameLine(0, 16);
-        if (ImGui::Button(is_tagged(sel.id) ? "Untag selected" : "Tag selected"))
-            toggle_tag(sel.id);
+        //if (ImGui::Button(is_tagged(sel.id) ? "Untag selected" : "Tag selected"))
+        //    toggle_tag(sel.id); todo
     }
 }
 
-void TaggedTab::draw_list(SimSnapshot& snapshot)
+void TaggedTab::draw_list(const SimSnapshot& snapshot)
 {
     if (m_tagged_ids_.empty()) { ImGui::TextDisabled("No organisms tagged."); return; }
     ImGui::SeparatorText("Tagged organisms");
@@ -39,10 +39,10 @@ void TaggedTab::draw_list(SimSnapshot& snapshot)
 
     for (int id : m_tagged_ids_)
     {
-        Protozoa* p = snapshot.selected_a_protozoa && snapshot.protozoa.id == id ? &snapshot.protozoa : nullptr;
+        const Protozoa* p = snapshot.selected_a_protozoa && snapshot.protozoa.id == id ? &snapshot.protozoa : nullptr;
         ImGui::PushID(id);
 
-        if (p)
+        if (snapshot.selected_a_protozoa)
         {
             const float ef = std::clamp(p->get_energy() / 300.f, 0.f, 1.f);
             ImGui::Text("ID %-4d", id); ImGui::SameLine(0, 8);

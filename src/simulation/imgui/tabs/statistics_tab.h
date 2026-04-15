@@ -5,5 +5,5 @@ class StatisticsTab : public ITab
 {
 public:
     const char* label() const override { return "Statistics"; }
-    void        draw(SimSnapshot& snapshot)   override;
+    void        draw(const SimSnapshot& snap, ImGuiContext& ctx)   override;
 };

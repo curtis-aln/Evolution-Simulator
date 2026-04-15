@@ -3,13 +3,13 @@
 #include <imgui.h>
 #include <algorithm>
 
-void ToolsTab::draw(SimSnapshot& snapshot)
+void ToolsTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
     draw_blackhole();
     ImGui::Spacing();
-    draw_spawn(snapshot);
+    draw_spawn(snap);
     ImGui::Spacing();
-    draw_clear(snapshot);
+    draw_clear(snap);
 }
 
 void ToolsTab::draw_blackhole()
@@ -25,7 +25,7 @@ void ToolsTab::draw_blackhole()
     ImGui::TextDisabled("TODO: World::apply_gravity_well(pos, strength, radius)");
 }
 
-void ToolsTab::draw_spawn(SimSnapshot& snapshot)
+void ToolsTab::draw_spawn(const SimSnapshot& snapshot)
 {
     ImGui::SeparatorText("Spawn");
     ImGui::SetNextItemWidth(80.f); ImGui::InputInt("Count##sp", &m_spawn_n_);
@@ -52,7 +52,7 @@ void ToolsTab::draw_spawn(SimSnapshot& snapshot)
     }
 }
 
-void ToolsTab::draw_clear(SimSnapshot& snapshot)
+void ToolsTab::draw_clear(const SimSnapshot& snapshot)
 {
     ImGui::SeparatorText("Clear");
     if (ConfirmButton::draw("Clear all food##tools", { -1.f, 0.f }))
