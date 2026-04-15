@@ -63,6 +63,8 @@ struct WorldSettings
 
 	inline static float border_repulsion_magnitude; // how strong it is repelled from the border
 	inline static float max_speed;
+
+	inline static bool auto_reset_on_extinction = false;
 };
 
 struct ProtozoaSettings
@@ -95,20 +97,20 @@ struct FoodSettings
 	inline static int cell_max_capacity = 20;
 	inline static size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
 
-	static constexpr unsigned max_food = 6'000;
-	static constexpr unsigned initial_food = 2'000;
+	static constexpr unsigned max_food = 20'000;
+	static constexpr unsigned initial_food = 5;
 	inline static float food_radius;
 	inline static float friction;
 
 	inline static sf::Vector3i food_darkest_color = { 0, 160, 0 };
 	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
-	inline static float vibration_strength = 7.5f;
+	inline static float vibration_strength = 3.0f;
 
 	inline static float kFoodVisibilityRampFrames = 90;
 	inline static float kFoodMaxAlpha = 200;
 
-	inline static float spawn_proportionality_constant = 0.045f; // range between [0.001, 0.01]
-	inline static float food_spawn_distance = food_radius * 2.f;
+	inline static float spawn_proportionality_constant = 0.085f; // range between [0.001, 0.01]
+	inline static float food_spawn_distance = 200.0f;
 	inline static size_t reproductive_cooldown;
 	inline static size_t reproductive_threshold = 300.f; // how old a food has to be before it can reproduce
 

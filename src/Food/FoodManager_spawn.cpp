@@ -54,9 +54,15 @@ bool FoodManager::reproduce_food(Food* food)
 	// spawning the food next to another existing food 
 	sf::Vector2f other_food_pos = food->position;
 
-	new_food->position = Random::rand_pos_in_circle(other_food_pos, food_radius * food_spawn_distance);
+	new_food->position = Random::rand_pos_in_circle(other_food_pos, food_spawn_distance);
 	new_food->age = 0.f;
 	new_food->color = Random::rand_color(food_darkest_color, food_lightest_color);
+
+	// small chance of it spawning with a high velocity
+	float food_launch_strength = 288.f;
+	float food_launch_chance = 0.05f;
+	if (Random::rand01_float() < food_launch_chance)
+		new_food->velocity = Random::rand_pos_in_circle(sf::Vector2f{0.f, 0.f}, food_launch_strength);
 
 	food->time_since_last_reproduced = 0;
 	return false;

@@ -1,72 +1,107 @@
 #pragma once
 #include <iostream>
+#include <cstdint>
 
 #include <SFML/Graphics/Color.hpp>
-#include <iostream>
-#include <cstdint>
 
 #include "../../Utils/random.h"
 
 
-
-struct CellGenome
+struct Range
 {
-    // The creation genes are genes used when a protozoa is created from scratch, such as starting up the sim or following an extinction event
-    // they are roughly tuned but evolution will be the ultimate decider of what good genes are, so they don't need to be perfect.
+    float min, max;
+    float clamp(float v) const { return std::clamp(v, min, max); }
+};
+
+
+static struct GeneticConstraints
+{
+    inline static Range radius = { 15.f,        220.f };
+    inline static float radius_step = 5.f;
+
+    inline static Range amplitude = { -2.f,        2.f };
+    inline static Range frequency = { -1.f / 30.f, 1.f / 30.f };
+    inline static Range offset = { -3.14159f,   3.14159f };
+    inline static Range vertical_shift = { -0.5f,       0.5f };
+};
+
+
+static struct HardConstants
+{
+    inline static float add_cell_chance = 0.03f;
+    inline static float remove_cell_chance = 0.03f;
+    inline static float add_spring_chance = 0.03f;
+    inline static float remove_spring_chance = 0.03f;
+
+    inline static std::uint8_t transparency = 140;
+
+    inline static float mutation_rate_rate = 0.1f;
+    inline static float mutation_rate_range = 0.01f;
+    inline static float colour_mutation_range = 0.001f;
+};
+
+
+struct CellGenome : HardConstants
+{
     int generation = 0;
 
-    // chances of adding or removing a cell per mutation event
-    inline static float add_cell_chance      = 0.03f;      // chance of cell being added
-    inline static float remove_cell_chance   = 0.03f;   // chance of cell being removed
-    inline static float add_spring_chance    = 0.03f;      // chance of cell being added
-    inline static float remove_spring_chance = 0.03f;   // chance of cell being removed
-
-    float mutation_rate = 0.2f;         // chance of mutation occurring
+    float mutation_rate = 0.2f;
     float mutation_range = 0.2f;
-    inline static float mutation_rate_rate = 0.1;     // chance of mutation rate mutating
-    inline static float mutation_rate_range = 0.01;
 
-    float colour_mutation_range = 0.001f; // chance of color mutating
-
-	inline static float radius_mutation_range = 5.f; // how much the radius can mutate per mutation event
-    float radius = Random::rand_range( 30.f, 120.f );
-
-    std::uint8_t transparency = 140;
+    float radius = 90.f;
 
     sf::Color cell_outer_color = Random::rand_color();
-	sf::Color cell_inner_color = Random::rand_color();
+    sf::Color cell_inner_color = Random::rand_color();
 
-    // limits
-    
-    
-	
-    // max amplitude of [-2, 2], the friction value gets clamped anyway so this determines how fast it reaches from one limit to the other
-    inline static float max_amplitude = 2.f;
-
-    // // 1 second is 30 frames, so they should only be able to complete one oscillation per second (+- 1/30)
-    inline static float max_frequency = 1.f / 30.f;
-
-    // offset has a range of +- pi rad, then it loops
-    inline static float max_offset = 3.14159f;
-
-    // vertical shift minimum: -0.5 (graph fully below x axis), maximum: 0.5 (graph fully above x axis), clamping to make sure no vaue escapes [0, 1]
-    inline static float max_vertical_shift = 0.5f;
-
-    inline static float smallest_radius = 15.f;
-	inline static float largest_radius = 220.f;
-
-    // friction sin-wave parameters, the cell's friction coefficient is determined by a sin wave with these parameters, the input being the internal clock of the protozoa
     float amplitude = 0.3f;
-    float frequency = 1 / 120.f;
+    float frequency = 1.f / 120.f;
     float offset = 0.f;
     float vertical_shift = 0.5f;
 
-    
-
-
     CellGenome()
     {
-		cell_outer_color.a = transparency;
-		cell_inner_color.a = transparency;
+        cell_outer_color.a = transparency;
+        cell_inner_color.a = transparency;
+    }
+
+    void Randomize(const float deviation)
+    {
+        auto mutate = [&](float val, Range limits) -> float {
+            return limits.clamp(val + Random::rand_range(limits.min, limits.max) * deviation);};
+
+        mutation_rate = Random::rand_range(0.f, 0.3f);
+        mutation_range = Random::rand_range(0.f, 0.3f);
+
+        radius = mutate(radius, GeneticConstraints::radius);
+        amplitude = mutate(amplitude, GeneticConstraints::amplitude);
+        frequency = mutate(frequency, GeneticConstraints::frequency);
+        offset = mutate(offset, GeneticConstraints::offset); 
+        vertical_shift = mutate(vertical_shift, GeneticConstraints::vertical_shift);
+
+        cell_outer_color = Random::rand_color();
+        cell_inner_color = Random::rand_color();
+    }
+
+    void mutate(float mutation_rate_ = 0.f, float mutation_range_ = 0.f)
+    {
+        // if the mutation rate and range are undefined we use are own
+		mutation_rate_ = mutation_rate_ > 0.f ? mutation_rate_ : mutation_rate;
+		mutation_range_ = mutation_range_ > 0.f ? mutation_range_ : mutation_range;
+
+        auto maybe_mutate = [&](float val, Range limits) -> float {
+            if (Random::rand_range(0.f, 1.f) < mutation_rate_) return val;
+            return limits.clamp(val + Random::rand_range(-mutation_range_, mutation_range_));
+            };
+
+        radius = maybe_mutate(radius, GeneticConstraints::radius);
+        amplitude = maybe_mutate(amplitude, GeneticConstraints::amplitude);
+        frequency = maybe_mutate(frequency, GeneticConstraints::frequency);
+        offset = maybe_mutate(offset, GeneticConstraints::offset);
+        vertical_shift = maybe_mutate(vertical_shift, GeneticConstraints::vertical_shift);
+
+        auto chance = [](float rate) { return Random::rand01_float() < rate; };
+        auto rand_sym = [](float range) { return Random::rand_range(-range, range); };
+        mutation_rate += rand_sym(mutation_rate_range) * chance(mutation_rate_rate);
+        mutation_range += rand_sym(mutation_rate_range) * chance(mutation_rate_rate);
     }
 };

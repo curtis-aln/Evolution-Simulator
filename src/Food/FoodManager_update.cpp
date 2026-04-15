@@ -2,7 +2,7 @@
 
 void FoodManager::vibrate_food(Food* food)
 {
-	food->velocity = Random::rand_vector(-vibration_strength, vibration_strength);
+	food->velocity += Random::rand_vector(-vibration_strength, vibration_strength);
 }
 
 void FoodManager::update_food()
@@ -11,7 +11,11 @@ void FoodManager::update_food()
 	{
 		food->time_since_last_reproduced++;
 		food->age++;
-		vibrate_food(food);
+
+		const float vibrate_freq = 0.1f;
+
+		if (Random::rand01_float() < vibrate_freq)
+			vibrate_food(food);
 
 		food->velocity *= friction;
 		food->position += food->velocity;

@@ -2,7 +2,7 @@
 [world]
 bounds_radius            = 20000.0
 max_protozoa             = 5000
-initial_protozoa         = 1000
+initial_protozoa         = 10
 border_repulsion_magnitude = 0.001
 max_speed                = 30.0
 
@@ -24,13 +24,13 @@ initial_energy           = 300.0
 cell_max_capacity        = 20
 update_freq              = 4
 food_radius              = 30.0
-friction                 = 0.985
-vibration_strength       = 7.5
+friction                 = 0.915
+vibration_strength       = 3.0
 food_visibility_ramp_frames = 90.0
 food_max_alpha           = 200.0
 spawn_proportionality_constant = 0.045
-food_spawn_distance      = 60.0     # food_radius * 2
-reproductive_cooldown    = 150
+food_spawn_distance      = 200.0 
+reproductive_cooldown    = 220
 reproductive_threshold   = 300
 initial_nutrients        = 5.0
 final_nutrients          = 60.0

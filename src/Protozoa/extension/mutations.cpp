@@ -38,38 +38,14 @@ void Protozoa::mutate(const bool artificial_add_cell, const float artificial_mut
 
 void Protozoa::mutate_existing_cells(float mut_rate, float mut_range)
 {
-    auto chance = [](float rate) { return Random::rand01_float() < rate; };
-    auto rand_sym = [](float range) { return Random::rand_range(-range, range); };
 
     for (Cell& cell : m_cells_)
     {
-        // if the defualt mr is zero we set it t othe cells mr
-        mut_rate = (mut_rate == 0.f) ? cell.mutation_rate : mut_rate;
-        mut_range = (mut_range == 0.f) ? cell.mutation_range : mut_range;
-
-        cell.amplitude += rand_sym(mut_range) * chance(mut_rate);
-        cell.frequency += rand_sym(mut_range) * chance(mut_rate);
-        cell.offset += rand_sym(mut_range) * chance(mut_rate);
-        cell.vertical_shift += rand_sym(mut_range) * chance(mut_rate);
-
-        cell.mutation_rate += rand_sym(cell.mutation_rate_range) * chance(cell.mutation_rate_rate);
-        cell.mutation_range += rand_sym(cell.mutation_rate_range) * chance(cell.mutation_rate_rate);
+        cell.mutate(mut_rate, mut_range);
 
         cell.cell_inner_color = mutate_color(cell.cell_inner_color, cell.colour_mutation_range);
         cell.cell_outer_color = mutate_color(cell.cell_outer_color, cell.colour_mutation_range);
 
-		//cell.add_cell_chance += rand_sym(mut_range) * chance(mut_rate);
-       //cell.remove_cell_chance += rand_sym(mut_range) * chance(mut_rate);
-        //cell.add_spring_chance += rand_sym(mut_range) * chance(mut_rate);
-        //cell.remove_spring_chance += rand_sym(mut_range) * chance(mut_rate);
-           
-		cell.radius += rand_sym(CellGenome::radius_mutation_range) * chance(mut_rate);
-		cell.radius = std::clamp(cell.radius, CellGenome::smallest_radius, CellGenome::largest_radius);
-
-        cell.amplitude = std::clamp(cell.amplitude, -cell.max_amplitude, cell.max_amplitude);
-        cell.frequency = std::clamp(cell.frequency, -cell.max_frequency, cell.max_frequency);
-        cell.offset = std::clamp(cell.offset, -cell.max_offset, cell.max_offset);
-        cell.vertical_shift = std::clamp(cell.vertical_shift, -cell.max_vertical_shift, cell.max_vertical_shift);
     }
 }
 

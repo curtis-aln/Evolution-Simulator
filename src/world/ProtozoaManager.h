@@ -190,7 +190,8 @@ protected:
 
 	void check_for_extinction_event(Circle& world_bounds)
 	{
-		if (all_protozoa_.size() > 0)
+		// if protozoas are still alivee or if auto reset on extinction is disabled, we dont need to do anything
+		if (all_protozoa_.size() > 0 || !auto_reset_on_extinction)
 			return;
 
 		std::cout << "Extinction event occurred, respawning initial protozoa...\n";

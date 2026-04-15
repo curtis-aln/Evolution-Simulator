@@ -286,8 +286,8 @@ void OrganismTab::draw_cell_detail(const Protozoa& p, const Cell& c)
     ImGui::Spacing();
     ImGui::SetNextItemWidth(-1.f);
     float fake_value = 0.f; // todo
-    ImGui::SliderFloat("##rad_c", &fake_value,
-        CellGenome::smallest_radius, CellGenome::largest_radius, "R = %.1f");
+    //ImGui::SliderFloat("##rad_c", &fake_value,
+    //    CellGenome::smallest_radius, CellGenome::largest_radius, "R = %.1f");
 
     ImGui::EndChild();
     ImGui::SameLine();
@@ -309,13 +309,13 @@ void OrganismTab::draw_cell_detail(const Protozoa& p, const Cell& c)
 
     ImGui::Spacing();
     ImGui::SetNextItemWidth(-1.f); // todo
-    ImGui::SliderFloat("##cA", &fake_value, -CellGenome::max_amplitude, CellGenome::max_amplitude, "Amplitude = %.3f");
+    //ImGui::SliderFloat("##cA", &fake_value, -CellGenome::max_amplitude, CellGenome::max_amplitude, "Amplitude = %.3f");
     ImGui::SetNextItemWidth(-1.f);
-    ImGui::SliderFloat("##cB", &fake_value, -CellGenome::max_frequency, CellGenome::max_frequency, "Frequency = %.5f");
+    //ImGui::SliderFloat("##cB", &fake_value, -CellGenome::max_frequency, CellGenome::max_frequency, "Frequency = %.5f");
     ImGui::SetNextItemWidth(-1.f);
-    ImGui::SliderFloat("##cC", &fake_value, -CellGenome::max_offset, CellGenome::max_offset, "Phase     = %.3f");
+    //ImGui::SliderFloat("##cC", &fake_value, -CellGenome::max_offset, CellGenome::max_offset, "Phase     = %.3f");
     ImGui::SetNextItemWidth(-1.f);
-    ImGui::SliderFloat("##cD", &fake_value, -CellGenome::max_vertical_shift, CellGenome::max_vertical_shift, "Shift     = %.3f");
+    //ImGui::SliderFloat("##cD", &fake_value, -CellGenome::max_vertical_shift, CellGenome::max_vertical_shift, "Shift     = %.3f"); todo
 
     ImGui::EndChild();
 }
