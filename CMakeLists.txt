@@ -15,32 +15,47 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # FetchContent downloads and builds dependencies at configure time.
 # Order matters: ImGui must be available before ImGui-SFML and ImPlot,
 # because both need to find imgui headers.
+
 include(FetchContent)
 
 FetchContent_Declare(SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG        3.0.0
-)
+    GIT_TAG 3.0.1
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM)
+FetchContent_MakeAvailable(SFML)
 
 FetchContent_Declare(ImGui
-    GIT_REPOSITORY https://github.com/ocornut/imgui.git
-    GIT_TAG        v1.91.1
-)
+    GIT_REPOSITORY https://github.com/ocornut/imgui
+    GIT_TAG v1.91.1
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM)
+FetchContent_MakeAvailable(ImGui)
+FetchContent_GetProperties(ImGui SOURCE_DIR IMGUI_DIR)
+set(IMGUI_SFML_FIND_SFML OFF)
 
 FetchContent_Declare(ImGui-SFML
-    GIT_REPOSITORY https://github.com/SFML/imgui-sfml.git
-    GIT_TAG        master
-)
+    GIT_REPOSITORY https://github.com/SFML/imgui-sfml
+    GIT_TAG v3.0
+    GIT_SHALLOW ON
+    EXCLUDE_FROM_ALL
+    SYSTEM)
+FetchContent_MakeAvailable(ImGui-SFML)
+
 
 FetchContent_Declare(ImPlot
     GIT_REPOSITORY https://github.com/epezent/implot.git
     GIT_TAG        v0.17
 )
+FetchContent_MakeAvailable(ImPlot)
 
 FetchContent_Declare(tomlplusplus
     GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
     GIT_TAG        v3.4.0
 )
+FetchContent_MakeAvailable(tomlplusplus)
 
 
 # Disable SFML fetching its own system deps (freetype etc.) — we want static
@@ -49,17 +64,11 @@ set(SFML_USE_SYSTEM_DEPS OFF CACHE BOOL "" FORCE)
 # Suppress a CMake policy warning from older dependency CMakeLists files
 set(CMAKE_POLICY_VERSION_MINIMUM 3.5 CACHE STRING "" FORCE)
 
-# Make all deps available in the right order
-FetchContent_MakeAvailable(SFML)
-FetchContent_MakeAvailable(ImGui)
-FetchContent_MakeAvailable(tomlplusplus)
-
 # ImGui-SFML needs to know where imgui source lives before it configures
 set(IMGUI_DIR ${imgui_SOURCE_DIR} CACHE PATH "" FORCE)
-FetchContent_MakeAvailable(ImGui-SFML)
 
-# ImPlot is header+source only — we add its sources manually below
-FetchContent_MakeAvailable(ImPlot)
+
+
 
 # ── Executable sources ────────────────────────────────────────────────────────
 # Listed explicitly (no glob) so CMake always detects added/removed files.
