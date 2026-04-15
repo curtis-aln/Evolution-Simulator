@@ -6,8 +6,8 @@ struct SpringGenome
 {
     float mutation_rate = 0.2f;         // chance of mutation occurring
     float mutation_range = 0.2f;
-    inline static constexpr float mutation_rate_rate = 0.1;     // chance of mutation rate mutating
-    inline static constexpr float mutation_rate_range = 0.01;
+    inline static constexpr float mutation_rate_rate = 0.1f;     // chance of mutation rate mutating
+    inline static constexpr float mutation_rate_range = 0.01f;
 
 
     int generation = 0;

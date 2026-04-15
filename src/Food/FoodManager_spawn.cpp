@@ -55,7 +55,7 @@ bool FoodManager::reproduce_food(Food* food)
 	sf::Vector2f other_food_pos = food->position;
 
 	new_food->position = Random::rand_pos_in_circle(other_food_pos, food_spawn_distance);
-	new_food->age = 0.f;
+	new_food->age = 0;
 	new_food->color = Random::rand_color(food_darkest_color, food_lightest_color);
 
 	// small chance of it spawning with a high velocity

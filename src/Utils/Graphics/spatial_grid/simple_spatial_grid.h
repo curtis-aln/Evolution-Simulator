@@ -14,9 +14,9 @@ using obj_idx = uint32_t;
 
 struct SimpleSpatialGrid
 {
-	size_t CellsX = 0;
-	size_t CellsY = 0;
-	size_t cell_max_capacity = 0;
+	uint32_t CellsX = 0;
+	uint32_t CellsY = 0;
+	uint32_t cell_max_capacity = 0;
 
 	float cell_width = 0;
 	float cell_height = 0;
@@ -30,7 +30,7 @@ struct SimpleSpatialGrid
 
 
 public:
-	explicit SimpleSpatialGrid(size_t Cells_X, size_t Cells_Y, int cellCapacity, float worldWidth, float worldHeight)
+	explicit SimpleSpatialGrid(uint32_t Cells_X, uint32_t Cells_Y, int cellCapacity, float worldWidth, float worldHeight)
 		: CellsX(Cells_X), CellsY(Cells_Y), cell_max_capacity(cellCapacity), world_width(worldWidth), world_height(worldHeight)
 	{
 		// creating the cell sizes grid
@@ -97,7 +97,7 @@ public:
 	void clear()
 	{
 		// every cells capacity is set to zero allowing them to be overwritten
-		for (int idx = 0; idx < CellsX * CellsY; ++idx)
+		for (uint32_t idx = 0; idx < CellsX * CellsY; ++idx)
 		{
 			cell_capacities[idx] = 0;
 		}
@@ -114,15 +114,15 @@ public:
 	void find_from_index(const cell_idx index, FixedSpan<obj_idx>* const container)
 	{
 		container->count = 0;
-		const int cell_x = index % CellsX;
-		const int cell_y = index / CellsX;
+		const uint32_t cell_x = index % CellsX;
+		const uint32_t cell_y = index / CellsX;
 		// for each grid cell sorrounding the cell, including the cell
-		for (int nx = cell_x - 1; nx <= cell_x + 1; ++nx)
+		for (uint32_t nx = cell_x - 1; nx <= cell_x + 1; ++nx)
 		{
-			for (int ny = cell_y - 1; ny <= cell_y + 1; ++ny)
+			for (uint32_t ny = cell_y - 1; ny <= cell_y + 1; ++ny)
 			{
 				// if this cell lies outside of the grid, we skip it
-				if (nx < 0 || ny < 0 || nx >= static_cast<int>(CellsX) || ny >= static_cast<int>(CellsY))
+				if (nx < 0 || ny < 0 || nx >= CellsX || ny >=CellsY)
 					continue;
 				// 2d -> 2d index conversion
 				const cell_idx neighbour_index = ny * CellsX + nx;
@@ -145,8 +145,8 @@ public:
 			if (c > max_in)                                     max_in = c;
 		}
 
-		const size_t tc = get_total_cells();
-		inv = tc > 0 ? 1.f / static_cast<float>(tc) : 0.f;
+		const auto tc = static_cast<float>(get_total_cells());
+		inv = tc > 0.f ? 1.f / tc : 0.f;
 
 		ImGui::Spacing();
 		ImGui::Text("Objects  %d", total);

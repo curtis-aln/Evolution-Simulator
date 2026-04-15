@@ -7,7 +7,7 @@
 
 // Forward declarations — avoids pulling in all of SFML/Graphics.hpp
 namespace sf { class RenderWindow; }
-class SimpleSpatialGrid;
+struct SimpleSpatialGrid;
 
 // ─── Settings ────────────────────────────────────────────────────────────────
 namespace GridRendererSettings

@@ -196,7 +196,7 @@ protected:
 
 		std::cout << "Extinction event occurred, respawning initial protozoa...\n";
 
-		for (int i = 0; i < initial_protozoa; ++i)
+		for (unsigned i = 0; i < initial_protozoa; ++i)
 		{
 			Protozoa* protozoa = all_protozoa_.add();
 			generate_protozoa(*protozoa, world_bounds, false);

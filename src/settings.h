@@ -83,7 +83,7 @@ struct ProtozoaSettings
 	inline static float spring_work_const = 1.f / 100'000.f; // how we scale the energy cost of springs
 
 	inline static size_t reproductive_cooldown;
-	inline static size_t digestive_time = 100.f; // per cell
+	inline static float digestive_time = 100.f; // per cell
 
 	inline static float initial_energy; // energy the protozoa spawn with
 
@@ -112,14 +112,14 @@ struct FoodSettings
 	inline static float spawn_proportionality_constant = 0.085f; // range between [0.001, 0.01]
 	inline static float food_spawn_distance = 200.0f;
 	inline static size_t reproductive_cooldown;
-	inline static size_t reproductive_threshold = 300.f; // how old a food has to be before it can reproduce
+	inline static float reproductive_threshold = 300.f; // how old a food has to be before it can reproduce
 
 	inline static float initial_nutrients = 5;
 	inline static float final_nuterients = 60;
 	inline static size_t nutrient_development_time = 400;
 
 	inline static float death_age;
-	inline static float death_age_chance = 0.01; // every frame past its death age gives it this chance of dying
+	inline static float death_age_chance = 0.01f; // every frame past its death age gives it this chance of dying
 };
 
 void load_settings(const std::string& path);

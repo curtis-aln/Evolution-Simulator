@@ -44,7 +44,7 @@ struct Cell : public CellGenome
 	{
 		generation = 0;
 		sinwave_current_friction_ = 0.f;
-		time_since_last_ate = 0.f;
+		time_since_last_ate = 0;
 		nutrients_eaten = 0.f;
 		food_eaten = 0;
 	}

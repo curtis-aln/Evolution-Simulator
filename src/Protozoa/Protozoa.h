@@ -96,9 +96,9 @@ public:
 	bool is_alive() const { return !dead; }
 	bool should_reproduce() const { return reproduce; }
 	float get_energy() const { return energy; }
-	float stomach_capacity() const { return stomach; }
-	float stomach_reproduce_thresh() const { return m_cells_.size(); }
-	float reproductive_cooldown_calculator() const { return reproductive_cooldown / m_cells_.size(); }
+	unsigned stomach_capacity() const { return stomach; }
+	size_t stomach_reproduce_thresh() const { return m_cells_.size(); }
+	size_t reproductive_cooldown_calculator() const { return reproductive_cooldown / m_cells_.size(); }
 	int get_cell_count() const { return (int)m_cells_.size(); }
 	int get_spring_count() const { return (int)m_springs_.size(); }
 

@@ -14,7 +14,7 @@ struct Range
 };
 
 
-static struct GeneticConstraints
+struct GeneticConstraints
 {
     inline static Range radius = { 15.f,        220.f };
     inline static float radius_step = 5.f;
@@ -26,7 +26,7 @@ static struct GeneticConstraints
 };
 
 
-static struct HardConstants
+struct HardConstants
 {
     inline static float add_cell_chance = 0.03f;
     inline static float remove_cell_chance = 0.03f;
