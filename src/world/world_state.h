@@ -64,6 +64,8 @@ struct WorldStatistics
     float frames_since_last_gen_change = 0.f;
 
     float fps = 0.f;
+    int iterations_ = 0;
+    float m_total_time_elapsed_ = 0.f;
 
     std::vector<float> gen_data{};
 };

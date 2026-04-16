@@ -66,7 +66,7 @@ void GraphsTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 void GraphsTab::draw_shared_toolbar(const SimSnapshot& snap)
 {
 	const PopulationHistory& history = snap.history;
-    const float live_x = snap.stats.iterations_;
+    const float live_x = snap.iterations_;
 
     ImGui::SetNextItemWidth(160.f);
     ImGui::SliderFloat("Window (s)##g", &m_scroll_window_, 10.f, 600.f, "%.0fs");
@@ -105,7 +105,7 @@ void GraphsTab::draw_population_tab(const SimSnapshot& snap)
     ImGui::Checkbox("Total", &m_show_total_);    ImGui::SameLine(0, 12);
     ImGui::Checkbox("Bands", &m_show_bands_);
 
-    const float live_x = snap.stats.iterations_;
+    const float live_x = snap.iterations_;
     const float x_max = m_hover_paused_ ? m_paused_x_max_ : live_x;
     const float x_min = x_max - m_scroll_window_;
 
@@ -295,7 +295,7 @@ void GraphsTab::draw_misc_tab(const SimSnapshot& snap)
         return;
     }
 
-    const float live_x = snap.stats.iterations_;
+    const float live_x = snap.iterations_;
     const float x_max = m_hover_paused_ ? m_paused_x_max_ : live_x;
     const float x_min = x_max - m_scroll_window_;
     const float* t = history.time.data();

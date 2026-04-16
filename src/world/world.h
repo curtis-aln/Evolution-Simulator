@@ -14,7 +14,6 @@
 #include "../Utils/Graphics/CircleBatchRenderer.h"
 #include "../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
 #include "../Utils/Graphics/spatial_grid/spatial_grid_renderer.h"
-#include "../Utils/Graphics/SFML_Grid.h"
 #include "../simulation/sim_snapshot.h"
 
 
@@ -40,7 +39,6 @@ class World : public ProtozoaManager
                                            bounds_radius * 2.f, bounds_radius * 2.f };
     SpatialGridRenderer cell_grid_renderer_{ &spatial_hash_grid_ };
 
-    int iterations_ = 0;
     tp::ThreadPool thread_pool_;
     std::vector<float> distribution_{};
 
@@ -80,7 +78,7 @@ public:
 
     void unload_render_data(SimSnapshot& snapshot);
 
-    void fill_snapshot(SimSnapshot& snapshot);
+    void fill_snapshot(SimSnapshot& snapshot) const;
 
     // ── Render data getters — read by renderer from snapshot ─────────────────
     const std::vector<sf::Vector2f>& get_positions()    const { return render_data_.positions; }

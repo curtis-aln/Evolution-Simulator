@@ -22,6 +22,12 @@ struct SimSnapshot
     std::vector<sf::Color>    food_colors;
     std::vector<float>        food_radii;
 
+    // graph data
+    float total_time_elapsed = 0.f;
+
+    int iterations_ = 0;
+    float    m_total_time_elapsed_ = 0.f;
+
     WorldToggles toggles;
     WorldStatistics stats;
     RenderData render;
@@ -31,5 +37,6 @@ struct SimSnapshot
     PopulationHistory history;
 
     bool selected_a_protozoa = false;
+    bool clone = false;
     Protozoa protozoa;
 };

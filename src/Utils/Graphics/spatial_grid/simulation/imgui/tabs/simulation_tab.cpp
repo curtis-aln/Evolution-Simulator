@@ -16,8 +16,8 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::TextDisabled("Playback");
     ImGui::Separator();
 
-    ImGui::Text("Time:  %s", PlotUtils::format_time(snap.stats.m_total_time_elapsed_).c_str());
-    ImGui::Text("Frame: %u", snap.stats.iterations_);
+    ImGui::Text("Time:  %s", PlotUtils::format_time(snap.total_time_elapsed).c_str());
+    ImGui::Text("Frame: %u", snap.iterations_);
     ImGui::Spacing();
 
     const float bw = (ImGui::GetContentRegionAvail().x - sp) * 0.5f;

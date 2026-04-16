@@ -159,7 +159,7 @@ protected:
 	}
 	
 
-	void update_cell_collisions()
+	void update_cell_collisions() const
 	{
 		int idx = 0;
 		// resolving collisions

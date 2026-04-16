@@ -7,7 +7,7 @@ void World::update()
 	toggles.min_speed += toggles.delta_min_speed;
 	check_for_extinction_event(world_circular_bounds_);
 
-	iterations_++;
+	statistics_.iterations_++;
 	update_position_container();
 
 	if (toggles.track_statistics)
@@ -71,7 +71,7 @@ void World::update_statistics()
 	if (int(tracked_generation_) != int(statistics_.average_generation))
 	{
 		statistics_.frames_per_generation = (tracked_generation_ != 0.f)
-			? (iterations_ - statistics_.frames_since_last_gen_change) : iterations_;
+			? (statistics_.iterations_ - statistics_.frames_since_last_gen_change) : statistics_.iterations_;
 		statistics_.frames_since_last_gen_change = 0;
 		tracked_generation_ = statistics_.average_generation;
 	}
@@ -106,7 +106,7 @@ void World::update_statistics()
 	statistics_.average_mutation_range /= cell_count;
 
 	// Updating death and birth rates per hundred frames
-	if (iterations_ % survival_rate_window_size_ == 0)
+	if (statistics_.iterations_ % survival_rate_window_size_ == 0)
 	{
 		deaths_per_hundered_frames_ = static_cast<float>(deaths_this_window_);
 		births_per_hundered_frames_ = static_cast<float>(births_this_window_);

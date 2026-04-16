@@ -31,9 +31,9 @@ void ControlPanel::draw(const SimSnapshot& snap, ImGuiContext& ctx, float dt)
     ImGui::SetNextWindowPos({ 10.f, 10.f }, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({ 520.f, 640.f }, ImGuiCond_FirstUseEver);
 
-	ImGui::Begin("ARIA Control Panel", nullptr, ImGuiWindowFlags_NoNav);
+    ImGui::Begin("ARIA Control Panel", nullptr, ImGuiWindowFlags_NoNav);
 
-	if (ImGui::BeginTabBar("##ctrl_tabs"))
+    if (ImGui::BeginTabBar("##ctrl_tabs"))
     {
         for (auto& tab : m_tabs_)
         {
@@ -43,8 +43,5 @@ void ControlPanel::draw(const SimSnapshot& snap, ImGuiContext& ctx, float dt)
                 ImGui::EndTabItem();
             }
         }
-        ImGui::EndTabBar();
     }
-
-    ImGui::End();
 }

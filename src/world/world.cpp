@@ -158,7 +158,7 @@ void World::unload_render_data(SimSnapshot& snapshot)
     
 }
 
-void World::fill_snapshot(SimSnapshot& snapshot)
+void World::fill_snapshot(SimSnapshot& snapshot) const
 {
     snapshot.render = get_render_data();
     snapshot.stats = get_statistics();

@@ -410,6 +410,8 @@ void OrganismTab::draw_tuning_controls_tab(const SimSnapshot& snap)
     const float half = (ImGui::GetContentRegionAvail().x - 8.f) * 0.5f;
 
     // ── Left: mutation, structure, feed ──────────────────────────────────
+    ImGui::BeginChild("TC_left", { half, -1.f }, false);
+
     ImGui::BeginChild("TC_mut", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Mutation");
     static float tun_rate = 0.2f, tun_range = 0.2f;

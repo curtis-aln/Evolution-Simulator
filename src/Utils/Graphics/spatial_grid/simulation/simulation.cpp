@@ -59,8 +59,7 @@ void Simulation::update_world()
 {
     // Apply any commands ImGui pushed since last tick
     {
-		// lock the command queue while we process it, but release it before ticking the simulation
-        std::lock_guard lock(m_cmd_mutex);
+        std::lock_guard<std::mutex> lock(m_cmd_mutex);
         while (!m_commands.empty())
         {
             const SimCommand& cmd = m_commands.front();
@@ -87,12 +86,7 @@ void Simulation::update_world()
     
     // Package results into the triple buffer
     SimSnapshot& snap = m_sim_buffer_.get_write_buffer();
-
-    // Filling the snapshot with information
     m_world_.fill_snapshot(snap);
-	snap.stats.fps = fps_;
-
-
     m_sim_buffer_.publish();
 
 
@@ -174,7 +168,7 @@ void Simulation::manage_frame_rate()
 void Simulation::fill_snapshot(SimSnapshot& snapshot)
 {
 	m_world_.fill_snapshot(snapshot);
-    snapshot.stats.m_total_time_elapsed_ = m_total_time_elapsed_;
+    snapshot.total_time_elapsed = m_total_time_elapsed_;
 	snapshot.stats.fps = fps_;
   
 }

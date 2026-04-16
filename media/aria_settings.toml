@@ -2,7 +2,7 @@
 [world]
 bounds_radius            = 20000.0
 max_protozoa             = 5000
-initial_protozoa         = 10
+initial_protozoa         = 1000
 border_repulsion_magnitude = 0.001
 max_speed                = 30.0
 
