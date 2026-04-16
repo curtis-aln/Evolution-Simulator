@@ -5,9 +5,7 @@
 #include "../Utils/Graphics/CircleBatchRenderer.h"
 #include "../Utils/o_vector.hpp"
 #include "../Utils/Graphics/Circle.h"
-#include "../Utils/random.h"
 #include "../settings.h"
-#include "../Utils/Graphics/SFML_Grid.h"
 #include "../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
 #include "../Utils/Graphics/spatial_grid/spatial_grid_renderer.h"
 

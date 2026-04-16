@@ -1,10 +1,10 @@
 #include "../Protozoa.h"
 
-#include "../../Food/food_manager.h"
 #include "../genetics/CellGenome.h"
 
 #include <vector>
-#include <unordered_set>
+
+#include "Utils/Graphics/OrganicColorMutator.h"
 
 
 void Protozoa::mutate(const bool artificial_add_cell, const float artificial_mutatation_rate, const float artificial_mutatation_range)

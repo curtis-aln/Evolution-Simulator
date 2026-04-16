@@ -4,7 +4,6 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Vertex.hpp>
 #include <iostream>
-#include <cmath>
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Construction

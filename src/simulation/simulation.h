@@ -1,5 +1,4 @@
 #pragma once
-#include <SFML/Graphics.hpp>
 #include "../settings.h"
 #include "../world/world.h"
 #include "imgui/population_history.h"
@@ -9,7 +8,6 @@
 #include "../Utils/fps_manager.h"
 #include "../Utils/UI/Camera.hpp"
 
-#include <imgui.h>
 #include <imgui-SFML.h>
 #include <implot.h>
 

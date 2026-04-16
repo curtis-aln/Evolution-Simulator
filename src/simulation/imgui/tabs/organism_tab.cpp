@@ -3,7 +3,6 @@
 #include "../helpers/confirm_button.h"
 #include <imgui.h>
 #include <algorithm>
-#include <cmath>
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Internal helpers

@@ -3,7 +3,6 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <iostream>
 
 void TaggedTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {

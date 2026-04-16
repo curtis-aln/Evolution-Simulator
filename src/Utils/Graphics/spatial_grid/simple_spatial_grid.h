@@ -1,8 +1,6 @@
 #pragma once
 
 #include <cstdint>
-#include <iostream>
-#include <array>
 
 #include "fixed_span.h"
 

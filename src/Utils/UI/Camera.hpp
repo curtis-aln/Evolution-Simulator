@@ -3,7 +3,6 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <cmath>
 
 
 class Camera

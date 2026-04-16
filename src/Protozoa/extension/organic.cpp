@@ -3,7 +3,6 @@
 #include "../genetics/CellGenome.h"
 
 #include <vector>
-#include <unordered_set>
 
 
 void Protozoa::record_nearby_food(Food* food)

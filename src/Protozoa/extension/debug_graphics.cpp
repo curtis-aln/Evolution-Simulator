@@ -1,6 +1,6 @@
 #include "../Protozoa.h"
 #include "../../settings.h"
-#include "../../Utils/utility.h"
+#include "../../Utils/utility_SFML.h"
 
 void Protozoa::render_protozoa_springs()
 {

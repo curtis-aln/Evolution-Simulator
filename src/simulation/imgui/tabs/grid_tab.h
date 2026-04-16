@@ -1,6 +1,5 @@
 #pragma once
 #include "i_tab.h"
-#include "../../../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
 
 class GridTab : public ITab
 {

@@ -1,17 +1,10 @@
 #pragma once
 
-#include "../../Utils/Random.h"
-#include  "../../Utils/Graphics/OrganicColorMutator.h"
-
 #include "../cell.h"
 #include "../spring.h"
 
 
-#include <SFML/Graphics/Color.hpp>
 #include <vector>
-#include <utility>
-#include <cmath>
-#include <algorithm>
 
 
 class GenomeManager

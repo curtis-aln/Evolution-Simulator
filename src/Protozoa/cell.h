@@ -6,7 +6,6 @@
 #include <algorithm>
 
 #include "genetics/CellGenome.h"
-#include "../Utils/utility.h"
 #include "../Utils/Graphics/Circle.h"
 #include "../Food/food_manager.h"
 

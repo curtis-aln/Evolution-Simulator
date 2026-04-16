@@ -1,12 +1,7 @@
 #pragma once
-#include "Utils/utility_SFML.h"
 #include "Utils/Graphics/font_renderer.hpp"
 #include <cstdint>
 #include "Protozoa/genetics/CellGenome.h"
-
-#include <toml++/toml.hpp>
-
-
 
 
 struct SimulationSettings

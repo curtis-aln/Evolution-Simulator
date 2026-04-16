@@ -1,6 +1,5 @@
 #pragma once
 #include <imgui.h>
-#include <cmath>
 #include <algorithm>
 #include <string>
 

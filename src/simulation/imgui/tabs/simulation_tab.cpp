@@ -1,6 +1,5 @@
 #include "simulation_tab.h"
 #include "../helpers/plot_utils.h"
-#include "../helpers/confirm_button.h"
 #include <imgui.h>
 
 void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)

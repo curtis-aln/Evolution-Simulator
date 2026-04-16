@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Protozoa/cell.h"
-#include "../Protozoa/spring.h"
 #include "../world/world_state.h"
 #include "../Protozoa/Protozoa.h"
 #include "imgui/population_history.h"

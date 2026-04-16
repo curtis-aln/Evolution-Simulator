@@ -9,7 +9,6 @@
 #include "spring.h"
 
 
-#include "../Utils/o_vector.hpp"
 #include "../Food/food_manager.h"
 #include "genetics/GenomeManager.h"
 

@@ -1,8 +1,6 @@
 #pragma once
 #include "i_tab.h"
 #include "../../../Protozoa/Protozoa.h"
-#include "../../../Protozoa/genetics/CellGenome.h"
-#include "../../../Protozoa/genetics/SpringGenome.h"
 
 class OrganismTab : public ITab
 {
