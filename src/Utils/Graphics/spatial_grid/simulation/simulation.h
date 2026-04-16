@@ -75,7 +75,7 @@ private:
     void update_one_frame();
     void camera_follow_selected_protozoa();
     void update_line_graphs(const SimSnapshot& snapshot);
-    void handle_imGUI(const SimSnapshot & snapshot);
+    void handle_imGUI(const SimSnapshot & snapshot, float dt);
     void extinction_popup();
     void render();
     void manage_frame_rate();

@@ -115,10 +115,12 @@ void Simulation::camera_follow_selected_protozoa()
 void Simulation::update_line_graphs(const SimSnapshot& snapshot)
 {
     ++m_ticks_;
-    m_total_time_elapsed_ += static_cast<float>(m_delta_time_.get_delta());
+
+    if (snapshot.stats.iterations_ % 40 != 0)
+        return;
 
     m_history_.push(
-        m_total_time_elapsed_,
+        snapshot.stats.iterations_,
         snapshot.stats.protozoa_count,
         snapshot.stats.food_count,
         snapshot.stats.average_generation);
@@ -137,9 +139,11 @@ void Simulation::render()
 {
     // Always grab the freshest completed simulation frame
     const SimSnapshot& snap = m_sim_buffer_.begin_read();
+    float dt = static_cast<float>(m_delta_time_.get_delta());
+    m_total_time_elapsed_ += dt;
 
     update_line_graphs(snap);
-    handle_imGUI(snap);
+    handle_imGUI(snap, dt);
 
     m_sim_buffer_.end_read();
 

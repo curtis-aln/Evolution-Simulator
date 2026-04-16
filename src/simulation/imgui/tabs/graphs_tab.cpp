@@ -49,7 +49,6 @@ bool GraphsTab::visible_range(const std::vector<float>& times,
 // ─────────────────────────────────────────────────────────────────────────────
 void GraphsTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
-	const PopulationHistory& history = snap.history;
     draw_shared_toolbar(snap);
     if (!ImGui::BeginTabBar("##graph_tabs")) return;
 

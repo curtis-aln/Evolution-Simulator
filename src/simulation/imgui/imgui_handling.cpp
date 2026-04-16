@@ -11,10 +11,10 @@ void Simulation::init_imGUI()
 }
 
 
-void Simulation::handle_imGUI(const SimSnapshot& snap)
+void Simulation::handle_imGUI(const SimSnapshot& snap, float dt)
 {
-    ImGui::SFML::Update(m_window_, m_delta_time_.get_delta_sfml());
-    const float dt = static_cast<float>(m_delta_time_.get_delta());
+    sf::Time delta_time = sf::seconds(static_cast<float>(dt));
+    ImGui::SFML::Update(m_window_, delta_time);
 
     WorldToggles toggles_copy = snap.toggles;
     ImGuiContext ctx{ toggles_copy, m_cmd_mutex, m_commands };

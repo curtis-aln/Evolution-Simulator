@@ -51,7 +51,7 @@ public:
 		return all_protozoa_.size();
 	}
 
-	float get_average_generation() const
+	float calculate_average_generation() const
 	{
 		if (all_protozoa_.size() == 0) 
 			return 0.f;
