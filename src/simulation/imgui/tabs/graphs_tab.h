@@ -10,7 +10,7 @@ public:
 
 private:
     // ── Shared toolbar state ──────────────────────────────────────────────
-    float m_scroll_window_ = 60.f;
+    float m_scroll_window_ = 160.f;
     bool  m_recording_ = false;
     float m_record_start_ = 0.f;
 

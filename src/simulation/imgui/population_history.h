@@ -55,10 +55,10 @@ struct PopulationHistory
 {
     // Capacity before eviction triggers.  Eviction drops k_evict_chunk at once
     // so the amortised cost per push is O(1) rather than O(n).
-    static constexpr size_t k_max_samples = 8192;
+    static constexpr size_t k_max_samples = 38192;
     static constexpr size_t k_evict_chunk = 512;
     static constexpr int    k_spike_delta = 20;   // protozoa Δ that creates an event
-    static constexpr float  k_event_cooldown = 5.f; // minimum seconds between auto-events
+    static constexpr float  k_event_cooldown = 50.f; // minimum seconds between auto-events
 
     std::vector<float> time = {};
     std::vector<float> protozoa = {};

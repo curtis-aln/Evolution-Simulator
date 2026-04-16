@@ -44,7 +44,6 @@ class Simulation : SimulationSettings, TextSettings
 
     StopWatch m_delta_time_{};
     float    m_total_time_elapsed_ = 0.f;
-    unsigned m_ticks_ = 0;
 
     World           m_world_{};
     PopulationHistory m_history_;

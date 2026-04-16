@@ -92,6 +92,7 @@ void Simulation::update_world()
     m_world_.fill_snapshot(snap);
 	snap.stats.fps = fps_;
 	snap.stats.m_total_time_elapsed_ = m_total_time_elapsed_;
+    snap.history = m_history_;
     
     m_sim_buffer_.publish();
 
@@ -114,11 +115,6 @@ void Simulation::camera_follow_selected_protozoa()
 
 void Simulation::update_line_graphs(const SimSnapshot& snapshot)
 {
-    ++m_ticks_;
-
-    if (snapshot.stats.iterations_ % 40 != 0)
-        return;
-
     m_history_.push(
         snapshot.stats.iterations_,
         snapshot.stats.protozoa_count,

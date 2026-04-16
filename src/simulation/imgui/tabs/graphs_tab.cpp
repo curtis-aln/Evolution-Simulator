@@ -67,8 +67,8 @@ void GraphsTab::draw_shared_toolbar(const SimSnapshot& snap)
 	const PopulationHistory& history = snap.history;
     const float live_x = snap.stats.iterations_;
 
-    ImGui::SetNextItemWidth(160.f);
-    ImGui::SliderFloat("Window (s)##g", &m_scroll_window_, 10.f, 600.f, "%.0fs");
+    ImGui::SetNextItemWidth(300.f);
+    ImGui::SliderFloat("Window (s)##g", &m_scroll_window_, 150.f, 4500.f, "%.0fs");
     ImGui::SameLine(0, 16);
 
     if (m_recording_)
@@ -356,7 +356,7 @@ void GraphsTab::draw_misc_tab(const SimSnapshot& snap)
     // Set up only the axes that have active series, using per-axis ranges.
     const ImGuiCond fit_cond = m_refit_misc_ ? ImGuiCond_Always : ImGuiCond_Once;
 
-    ImPlot::SetupAxes("Time (s)",
+    ImPlot::SetupAxes("Frames",
         any_y1 ? "Rate [0, 1]" : nullptr,
         ImPlotAxisFlags_None,
         any_y1 ? ImPlotAxisFlags_None : ImPlotAxisFlags_NoDecorations);
