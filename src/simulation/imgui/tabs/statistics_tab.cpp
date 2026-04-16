@@ -41,7 +41,7 @@ void StatisticsTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::TextDisabled("Vitals");
     ImGui::Separator();
     StatRow::draw("Avg lifetime", "%.1f fr", snap.stats.average_lifetime);
-    StatRow::draw("Longest ever", "%d fr", snap.stats.longest_lived_ever);
+    StatRow::draw("Longest Lifetime", "%d fr", snap.stats.longest_lived_ever);
     StatRow::draw("Births /100f", "%.1f", snap.stats.births_per_hundered_frames);
     StatRow::draw("Deaths /100f", "%.1f", snap.stats.deaths_per_hundered_frames);
     StatRow::draw("Infant mortality", "%.1f%%", snap.stats.infant_mortality_rate * 100.f);

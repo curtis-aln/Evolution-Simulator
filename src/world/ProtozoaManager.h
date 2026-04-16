@@ -1,4 +1,6 @@
 #pragma once
+#include <algorithm>
+
 #include "../Protozoa/Protozoa.h"
 
 // A Class which handles all protozoa related stuff in the world. updating, collisions, reproduction, etc.
@@ -19,8 +21,6 @@ public:
 	Protozoa* selected_protozoa_ = nullptr;
 
 	float average_lifetime_ = 0.f; // the average lifetime of the 500 most recent protozoa deaths
-	float deaths_per_hundered_frames_ = 0.f; // the amount of protozoa that have died per hundred frames, used to track the death rate of the population
-	float births_per_hundered_frames_ = 0.f; // the amount of protozoa that have been born per hundred frames, used to track the birth rate of the population
 
 	std::vector<float> recent_lifetimes_ = {}; // a vector storing the lifetimes of the 500 most recent protozoa deaths, used to calculate average_lifetime_
 
@@ -222,8 +222,7 @@ protected:
 		infant_mortality_rate_ = total_deaths_ > 0
 			? static_cast<float>(infant_deaths_) / total_deaths_ : 0.f;
 
-		if (static_cast<int>(lifetime) > longest_lived_ever_)
-			longest_lived_ever_ = static_cast<int>(lifetime);
+		longest_lived_ever_ = std::max(static_cast<int>(lifetime), longest_lived_ever_);
 	}
 
 	void register_birth_stat()

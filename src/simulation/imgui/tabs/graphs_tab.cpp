@@ -9,7 +9,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 //  BandCache
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::BandCache::refresh(const PopulationHistory& h, bool need_protozoa, bool need_food)
+void GraphsTab::BandCache::refresh(const PopulationHistory& h, const bool need_protozoa, const bool need_food)
 {
     if (h.size() == valid_for_n) return;
     valid_for_n = h.size();
@@ -23,7 +23,7 @@ void GraphsTab::BandCache::refresh(const PopulationHistory& h, bool need_protozo
 // ─────────────────────────────────────────────────────────────────────────────
 bool GraphsTab::visible_range(const std::vector<float>& times,
     const std::vector<float>& data,
-    float x_min, float x_max,
+    const float x_min, const float x_max,
     float& out_lo, float& out_hi)
 {
     out_lo = FLT_MAX;
@@ -193,7 +193,7 @@ void GraphsTab::draw_population_tab(const SimSnapshot& snap)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Event markers
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_event_markers(const SimSnapshot& snap, float x_min, float x_max, float y_top)
+void GraphsTab::draw_event_markers(const SimSnapshot& snap, const float x_min, const float x_max, const float y_top)
 {
     const PopulationHistory& history = snap.history;
     for (const auto& ev : history.events)
@@ -216,7 +216,7 @@ void GraphsTab::draw_event_markers(const SimSnapshot& snap, float x_min, float x
 // ─────────────────────────────────────────────────────────────────────────────
 //  Record region shading
 // ─────────────────────────────────────────────────────────────────────────────
-void GraphsTab::draw_record_region(float x_max, float y_top)
+void GraphsTab::draw_record_region(const float x_max, const float y_top)
 {
     ImPlot::SetNextFillStyle({ 0.4f, 0.8f, 1.f, 1.f }, 0.07f);
     const float rx[2] = { m_record_start_, x_max };
@@ -375,13 +375,13 @@ void GraphsTab::draw_misc_tab(const SimSnapshot& snap)
     m_refit_misc_ = false;
 
     // Helpers to plot on the correct axis.
-    auto plot_y1 = [&](const char* name, const float* data, ImVec4 col)
+    auto plot_y1 = [&](const char* name, const float* data, const ImVec4 col)
         {
             ImPlot::SetAxes(ImAxis_X1, ImAxis_Y1);
             ImPlot::SetNextLineStyle(col);
             ImPlot::PlotLine(name, t, data, n);
         };
-    auto plot_y2 = [&](const char* name, const float* data, ImVec4 col)
+    auto plot_y2 = [&](const char* name, const float* data, const ImVec4 col)
         {
             ImPlot::SetAxes(ImAxis_X1, ImAxis_Y2);
             ImPlot::SetNextLineStyle(col);

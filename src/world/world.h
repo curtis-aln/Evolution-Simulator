@@ -90,7 +90,7 @@ public:
 
     // ── Statistics getters — read by ImGui from snapshot ─────────────────────
     const WorldStatistics& get_statistics()  const { return statistics_; }
-    int   get_protozoa_count()               const { return statistics_.protozoa_count; }
+    int   get_protozoa_count()               const { return all_protozoa_.size(); }
     int   get_food_count()                   const { return food_manager_.get_size(); }
     float get_average_generation()           const { return statistics_.average_generation; }
 

@@ -69,19 +69,19 @@ void TaggedTab::draw_list(const SimSnapshot& snapshot)
     for (int id : to_remove) m_tagged_ids_.erase(id);
 }
 
-void TaggedTab::toggle_tag(int id)
+void TaggedTab::toggle_tag(const int id)
 {
     if (m_tagged_ids_.count(id)) m_tagged_ids_.erase(id);
     else                          m_tagged_ids_.insert(id);
 }
 
-bool TaggedTab::is_tagged(int id) const { return m_tagged_ids_.count(id) > 0; }
+bool TaggedTab::is_tagged(const int id) const { return m_tagged_ids_.count(id) > 0; }
 
-void TaggedTab::notify_death(int id, const std::string& cause)
+void TaggedTab::notify_death(const int id, const std::string& cause)
 {
     if (!is_tagged(id)) return;
     m_toasts_.push("Tagged #" + std::to_string(id) + " died: " + cause,
         { 1.f, 0.4f, 0.4f, 1.f }, 6.f);
 }
 
-void TaggedTab::draw_toasts(float dt) { m_toasts_.update(dt); m_toasts_.draw(); }
+void TaggedTab::draw_toasts(const float dt) { m_toasts_.update(dt); m_toasts_.draw(); }

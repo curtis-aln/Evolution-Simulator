@@ -13,7 +13,7 @@
 static constexpr int k_max_wave_buf = 2048;
 
 // Safe period in frames for a given frequency.
-static int safe_time_period(float frequency)
+static int safe_time_period(const float frequency)
 {
     if (std::abs(frequency) < 1e-6f) return 120;
     return std::clamp(static_cast<int>(1.f / std::abs(frequency)), 1, k_max_wave_buf);
@@ -21,7 +21,7 @@ static int safe_time_period(float frequency)
 
 // Analytical min/max of A*sin(...)+D clamped to [lo, hi].
 // sin ranges over [-1, 1] so the wave spans [D-|A|, D+|A|].
-static void wave_range(float A, float D, float lo, float hi,
+static void wave_range(const float A, const float D, const float lo, const float hi,
     float& out_min, float& out_max)
 {
     out_min = std::clamp(D - std::abs(A), lo, hi);
@@ -29,14 +29,14 @@ static void wave_range(float A, float D, float lo, float hi,
 }
 
 // Green-to-red gradient: green at f=1, red at f=0.
-static ImVec4 fraction_color(float f)
+static ImVec4 fraction_color(const float f)
 {
     return f > 0.5f ? ImVec4{ 2.f * (1.f - f), 1.f, 0.2f, 1.f }
     : ImVec4{ 1.f, 2.f * f,     0.2f, 1.f };
 }
 
-static void colored_progress(float fraction, ImVec4 color,
-    const char* label, ImVec2 size = { -1.f, 10.f })
+static void colored_progress(const float fraction, const ImVec4 color,
+    const char* label, const ImVec2 size = { -1.f, 10.f })
 {
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
     ImGui::ProgressBar(fraction, size, label);

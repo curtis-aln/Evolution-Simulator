@@ -56,8 +56,8 @@ struct WorldStatistics
 
 	float births_per_hundered_frames = 0.f;
 	float deaths_per_hundered_frames = 0.f;
-    	float infant_mortality_rate = 0.f;
-		float longest_lived_ever = 0.f;
+	float infant_mortality_rate = 0.f;
+	float longest_lived_ever = 0.f;
 
     float frames_per_generation = -1.f; // negative = undefined
     float tracked_generation = 0.f;

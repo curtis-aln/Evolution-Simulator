@@ -45,7 +45,7 @@ void GridTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::EndChild();
 }
 
-void GridTab::draw_grid_info(const char* label, SpatialGridData& grid, bool tracking)
+void GridTab::draw_grid_info(const char* label, SpatialGridData& grid, const bool tracking)
 {
     ImGui::TextDisabled("%s", label);
     ImGui::Separator();

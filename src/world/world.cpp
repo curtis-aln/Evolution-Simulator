@@ -166,6 +166,8 @@ void World::fill_snapshot(SimSnapshot& snapshot) const
 	snapshot.stats.protozoa_count = get_protozoa_count();
 	snapshot.stats.food_count = get_food_count();
 	snapshot.stats.average_generation = get_average_generation();
+    snapshot.stats.average_lifetime = average_lifetime_;
+    snapshot.stats.longest_lived_ever = longest_lived_ever_;
 
     if (selected_protozoa_ != nullptr)
     {

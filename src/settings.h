@@ -98,7 +98,7 @@ struct FoodSettings
 	inline static size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
 
 	static constexpr unsigned max_food = 20'000;
-	static constexpr unsigned initial_food = 5;
+	static constexpr unsigned initial_food = 500;
 	inline static float food_radius;
 	inline static float friction;
 

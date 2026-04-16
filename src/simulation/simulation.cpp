@@ -91,8 +91,8 @@ void Simulation::update_world()
     // Filling the snapshot with information
     m_world_.fill_snapshot(snap);
 	snap.stats.fps = fps_;
-
-
+	snap.stats.m_total_time_elapsed_ = m_total_time_elapsed_;
+    
     m_sim_buffer_.publish();
 
 

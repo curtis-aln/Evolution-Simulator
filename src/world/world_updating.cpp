@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "world.h"
 
 
@@ -108,8 +110,8 @@ void World::update_statistics()
 	// Updating death and birth rates per hundred frames
 	if (statistics_.iterations_ % survival_rate_window_size_ == 0)
 	{
-		deaths_per_hundered_frames_ = static_cast<float>(deaths_this_window_);
-		births_per_hundered_frames_ = static_cast<float>(births_this_window_);
+		statistics_.deaths_per_hundered_frames = static_cast<float>(deaths_this_window_);
+		statistics_.births_per_hundered_frames = static_cast<float>(births_this_window_);
 
 		// Reset window
 		deaths_this_window_ = 0;
@@ -118,7 +120,7 @@ void World::update_statistics()
 
 	// Peak population
 	const int p_count = static_cast<int>(all_protozoa_.size());
-	if (p_count > statistics_.peak_protozoa_ever) statistics_.peak_protozoa_ever = p_count;
+	statistics_.peak_protozoa_ever = std::max(p_count, statistics_.peak_protozoa_ever);
 
 	// Per-organism aggregates
 	float total_energy = 0.f;
@@ -130,15 +132,13 @@ void World::update_statistics()
 	{
 		total_energy += p->get_energy();
 		total_springs += static_cast<float>(p->get_springs().size());
-		if (p->offspring_count > most_offspring_ever_)
-			most_offspring_ever_ = p->offspring_count;
+		most_offspring_ever_ = std::max(p->offspring_count, most_offspring_ever_);
 		for (const Cell& c : p->get_cells())
 		{
 			sum_amp += c.amplitude;
 			sum_sq += c.amplitude * c.amplitude;
 			++cell_div_count;
-			if (c.generation > statistics_.highest_generation_ever)
-				statistics_.highest_generation_ever = c.generation;
+			statistics_.highest_generation_ever = std::max(c.generation, statistics_.highest_generation_ever);
 		}
 	}
 
