@@ -6,9 +6,9 @@
 
 void TaggedTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
-    //draw_tag_input(snapshot);
+    draw_tag_input(snap);
     ImGui::Spacing();
-    draw_list(snap);
+    draw_list(ctx, snap);
 }
 
 void TaggedTab::draw_tag_input(const SimSnapshot& snapshot)
@@ -20,16 +20,16 @@ void TaggedTab::draw_tag_input(const SimSnapshot& snapshot)
     ImGui::SameLine();
     if (ImGui::Button("Toggle Tag##tagged")) toggle_tag(input_id);
 
-	//Protozoa& sel = snapshot.protozoa; todo
+	const Protozoa& sel = snapshot.protozoa;
     if (snapshot.selected_a_protozoa)
     {
         ImGui::SameLine(0, 16);
-        //if (ImGui::Button(is_tagged(sel.id) ? "Untag selected" : "Tag selected"))
-        //    toggle_tag(sel.id); todo
+        if (ImGui::Button(is_tagged(sel.id) ? "Untag selected" : "Tag selected"))
+            toggle_tag(sel.id);
     }
 }
 
-void TaggedTab::draw_list(const SimSnapshot& snapshot)
+void TaggedTab::draw_list(ImGuiContext& ctx, const SimSnapshot& snapshot)
 {
     if (m_tagged_ids_.empty()) { ImGui::TextDisabled("No organisms tagged."); return; }
     ImGui::SeparatorText("Tagged organisms");
@@ -50,8 +50,12 @@ void TaggedTab::draw_list(const SimSnapshot& snapshot)
             ImGui::Text("Off %-3d", p->offspring_count); ImGui::SameLine(0, 8);
             ImGui::Text("Gen %.0f", (float)p->get_cells().empty() ? 0.f : (float)p->get_cells()[0].generation);
             ImGui::SameLine(0, 8);
-            //if (ImGui::SmallButton("Go##tagged"))
-            //    snapshot.protozoa = *p; todo
+            if (ImGui::SmallButton("Go##tagged"))
+            {
+                SimCommand cmd{ CommandType::NavToProtozoa };
+				cmd.int_val = id;
+                ctx.push(cmd);
+            }
         }
         else
         {

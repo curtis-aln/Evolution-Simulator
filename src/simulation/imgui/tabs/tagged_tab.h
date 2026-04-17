@@ -20,5 +20,5 @@ private:
     ToastSystem             m_toasts_;
 
     void draw_tag_input(const SimSnapshot& snapshot);
-    void draw_list(const SimSnapshot& snapshot);
+    void draw_list(ImGuiContext& ctx, const SimSnapshot& snapshot);
 };

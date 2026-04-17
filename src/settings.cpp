@@ -60,8 +60,8 @@ static void load_food_settings(toml::table& tbl)
     FoodSettings::food_spawn_distance = tbl["food"]["food_spawn_distance"].value_or(50.f);
     FoodSettings::spawn_proportionality_constant = tbl["food"]["spawn_proportionality_constant"].value_or(0.005f);
     FoodSettings::death_age_chance = tbl["food"]["death_age_chance"].value_or(0.01f);
-    FoodSettings::kFoodVisibilityRampFrames = tbl["food"]["kFoodVisibilityRampFrames"].value_or(100.f);
-    FoodSettings::kFoodMaxAlpha = tbl["food"]["kFoodMaxAlpha"].value_or(0.8f);
+    FoodSettings::kFoodVisibilityRampFrames = tbl["food"]["food_visibility_ramp_frames"].value_or(100.f);
+    FoodSettings::kFoodMaxAlpha = tbl["food"]["food_max_alpha"].value_or(0.8f);
     FoodSettings::vibration_strength = tbl["food"]["vibration_strength"].value_or(0.5f);
     FoodSettings::update_freq = tbl["food"]["update_freq"].value_or(5u);
     FoodSettings::initial_food = tbl["food"]["initial_food"].value_or(10000u);

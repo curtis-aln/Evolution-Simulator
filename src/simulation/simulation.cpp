@@ -158,6 +158,13 @@ void Simulation::update_world()
 					m_world_.create_offspring(selected_protozoa, false);
                 }
                 break;
+
+            case CommandType::ResetSimulation:
+                break; // todo
+
+            case CommandType::NavToProtozoa:
+                m_world_.selected_protozoa_ = m_world_.all_protozoa_.at(cmd.int_val);
+
             }
             m_commands.pop();
         }

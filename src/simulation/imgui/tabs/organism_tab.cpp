@@ -420,113 +420,91 @@ void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const Protozoa& p, const
 // ─────────────────────────────────────────────────────────────────────────────
 void OrganismTab::draw_tuning_controls_tab(ImGuiContext& ctx, const SimSnapshot& snap)
 {
-	const Protozoa& p = snap.protozoa;
-    const float half = (ImGui::GetContentRegionAvail().x - 8.f) * 0.5f;
+    const Protozoa& p = snap.protozoa;
+    const float sp = ImGui::GetStyle().ItemSpacing.x;
+    const float total = ImGui::GetContentRegionAvail().x;
+    const float cw = (total - sp * 2.f) / 3.f;
+    const float ch = -1.f;
 
-    // ── Left: mutation, structure, feed ──────────────────────────────────
-    ImGui::BeginChild("TC_mut", { -1.f, 0.f }, true);
+    // ── Column 1: Mutation & Structure ───────────────────────────────────
+    ImGui::BeginChild("TC_mut", { cw, ch }, true);
     ImGui::TextDisabled("Mutation");
+    ImGui::Separator();
     static float tun_rate = 0.2f, tun_range = 0.2f;
-    ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##tr", &tun_rate, 0.f, 1.f, "rate  = %.3f");
-    ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##trng", &tun_range, 0.f, 1.f, "range = %.3f");
+    ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##tr", &tun_rate, 0.f, 1.f, "Rate  = %.3f");
+    ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##trng", &tun_range, 0.f, 1.f, "Range = %.3f");
     ImGui::Spacing();
-
     if (ImGui::Button("Apply Mutation", { -1.f, 0.f }))
     {
-        SimCommand cmd{CommandType::MutateProtozoa};
+        SimCommand cmd{ CommandType::MutateProtozoa };
         cmd.mutate = { tun_rate, tun_range };
         ctx.push(cmd);
     }
 
     ImGui::Spacing();
     ImGui::TextDisabled("Structure");
+    ImGui::Separator();
     ImGui::Columns(2, nullptr, false);
-    if (ImGui::Button("Add Cell", { -1.f, 0.f })) 
-       ctx.push({CommandType::AddCell});
-
-    if (ImGui::Button("Remove Cell", { -1.f, 0.f })) 
-        ctx.push({CommandType::RemoveCell});
-
+    if (ImGui::Button("Add Cell", { -1.f, 0.f })) ctx.push({ CommandType::AddCell });
+    if (ImGui::Button("Remove Cell", { -1.f, 0.f })) ctx.push({ CommandType::RemoveCell });
     ImGui::NextColumn();
-    if (ImGui::Button("Add Spring", { -1.f, 0.f })) 
-		ctx.push({ CommandType::AddSpring });
-
-    if (ImGui::Button("Remove Spring", { -1.f, 0.f })) 
-        ctx.push({ CommandType::RemoveSpring });
-
+    if (ImGui::Button("Add Spring", { -1.f, 0.f })) ctx.push({ CommandType::AddSpring });
+    if (ImGui::Button("Remove Spring", { -1.f, 0.f })) ctx.push({ CommandType::RemoveSpring });
     ImGui::Columns(1);
-    ImGui::EndChild();
 
     ImGui::Spacing();
-
-    // Feed lives in the left column so it's always visible without scrolling
-    ImGui::BeginChild("TC_feed", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Feed");
+    ImGui::Separator();
     static float feed_energy = 50.f;
     ImGui::SetNextItemWidth(-70.f);
     ImGui::SliderFloat("##feed", &feed_energy, 1.f, 500.f, "%.0f energy");
     ImGui::SameLine();
-    if (ImGui::Button("Inject##org")) 
+    if (ImGui::Button("Inject##org"))
     {
-        SimCommand cmd{CommandType::InjectProtozoa};
+        SimCommand cmd{ CommandType::InjectProtozoa };
         cmd.float_val = feed_energy;
         ctx.push(cmd);
     }
     ImGui::EndChild();
-
-    ImGui::EndChild(); // TC_left
     ImGui::SameLine();
 
-    // ── Right: lifecycle, clone/file, tag ────────────────────────────────
-    ImGui::BeginChild("TC_right", { -1.f, -1.f }, false);
-
-    ImGui::BeginChild("TC_life", { -1.f, 0.f }, true);
+    // ── Column 2: Lifecycle ───────────────────────────────────────────────
+    ImGui::BeginChild("TC_life", { cw, ch }, true);
     ImGui::TextDisabled("Lifecycle");
+    ImGui::Separator();
 
-	bool immortal = p.immortal;
+    bool immortal = p.immortal;
     if (ImGui::Checkbox("Immortal##org", &immortal))
     {
-        SimCommand cmd{CommandType::MakeImmortal};
+        SimCommand cmd{ CommandType::MakeImmortal };
         cmd.bool_val = immortal;
         ctx.push(cmd);
     }
     ImGui::Spacing();
-
-    if (ImGui::Button("Force Reproduce##org", { -1.f, 0.f })) 
-    {
-        SimCommand cmd{CommandType::ForceReproduce};
-        ctx.push(cmd);
-    }
+    if (ImGui::Button("Force Reproduce##org", { -1.f, 0.f }))
+        ctx.push({ CommandType::ForceReproduce });
 
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.55f, 0.08f, 0.08f, 1.f });
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.75f, 0.15f, 0.15f, 1.f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 1.00f, 0.25f, 0.25f, 1.f });
     if (ConfirmButton::draw("Force Die##org", { -1.f, 0.f }))
-    {
-		ctx.push({ CommandType::KillProtozoa });
-    }
+        ctx.push({ CommandType::KillProtozoa });
     ImGui::PopStyleColor(3);
     ImGui::EndChild();
+    ImGui::SameLine();
 
-    ImGui::Spacing();
-
-    ImGui::BeginChild("TC_clone", { -1.f, 0.f }, true);
+    // ── Column 3: Clone, File & Tag ───────────────────────────────────────
+    ImGui::BeginChild("TC_clone", { -1.f, ch }, true);
     ImGui::TextDisabled("Clone & File");
-
-	if (ImGui::Button("Clone nearby##org", { -1.f, 0.f })) 
-        ctx.push({ CommandType::CloneProtozoa });
-
+    ImGui::Separator();
+    if (ImGui::Button("Clone nearby##org", { -1.f, 0.f })) ctx.push({ CommandType::CloneProtozoa });
     if (ImGui::Button("Save to file (stub)##org", { -1.f, 0.f })) {}
     if (ImGui::Button("Load & spawn from file (stub)##org", { -1.f, 0.f })) {}
-    ImGui::EndChild();
 
     ImGui::Spacing();
-
-    ImGui::BeginChild("TC_tag", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Tag");
+    ImGui::Separator();
     ImGui::TextDisabled("Use the Tagged tab to tag ID %d", p.id);
     ImGui::EndChild();
-
-    ImGui::EndChild(); // TC_right
 }

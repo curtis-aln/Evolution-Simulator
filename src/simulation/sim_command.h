@@ -13,6 +13,7 @@ enum class CommandType
     ResetSimulation,        // open extinction popup confirmed
     ClearAllFood,
     ClearAllProtozoa,
+    NavToProtozoa,
 
     // ── Spawn ─────────────────────────────────────────────────────────────
     SpawnRandom,            // spawn N random organisms
