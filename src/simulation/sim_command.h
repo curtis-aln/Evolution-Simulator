@@ -34,6 +34,7 @@ struct SpawnParams
     float mut_range = 0.3f;
 };
 
+
 struct SimCommand
 {
     CommandType  type;

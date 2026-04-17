@@ -97,6 +97,8 @@ void Protozoa::add_cell()
     Cell child = parent;
     child.id = m_cells_.size();
     child.position_ = position;
+    child.amplitude = 0.1f;
+    child.vertical_shift = 0.5f;
     m_cells_.push_back(child);
 
     // creating a spring connection to that cell

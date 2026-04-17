@@ -74,6 +74,7 @@
 - Add ambient music with mild bubble sound effects
 - Simulation should start more zoomed out
 - std::cout debug prints in production code - Add a constexpr bool DEBUG_LOGGING = false flag in settings and gate all std::cout behind it, or use a proper logger.
+- orginize settings files
 - 
 -----------------------------------------------------------------------
 #### Multithreading todo

@@ -27,7 +27,7 @@ void FoodManager::update_food()
 	}
 }
 
-void FoodManager::bound_food_to_world(Food* food)
+void FoodManager::bound_food_to_world(Food* food) const
 {
 	const float dist_sq = (food->position - world_bounds_->center).lengthSquared();
 
@@ -41,7 +41,7 @@ void FoodManager::bound_food_to_world(Food* food)
 	food->position = world_bounds_->center + normal * max_dist;
 }
 
-void FoodManager::check_food_death(Food* food)
+void FoodManager::check_food_death(const Food* food)
 {
 	if (food->age < death_age)
 		return;
@@ -53,13 +53,13 @@ void FoodManager::check_food_death(Food* food)
 
 void FoodManager::update_food_nutrients(Food* food)
 {
-	const float increment = (final_nuterients - initial_nutrients) / nutrient_development_time;
-	if (food->nutrients > final_nuterients)
+	
+	if (food->nutrients > final_nutrients)
 		return;
 
+	const float increment = (final_nutrients - initial_nutrients) / nutrient_development_time;
 	food->nutrients += increment;
-	if (food->nutrients > final_nuterients)
-		food->nutrients = final_nuterients;
+
 
 }
 

@@ -5,7 +5,7 @@ inline static constexpr float lerp_factor = 0.04f;
 
 Simulation::Simulation() : m_world_(&m_window_)
 {
-    m_window_.setFramerateLimit(frame_rate);
+    m_window_.setFramerateLimit(max_fps);
     m_window_.setVerticalSyncEnabled(vsync);
 
     const float rad = WorldSettings::bounds_radius;

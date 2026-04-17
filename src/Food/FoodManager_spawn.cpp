@@ -5,12 +5,12 @@ void FoodManager::spawn_food()
 
 }
 
-bool FoodManager::food_container_full()
+bool FoodManager::food_container_full() const
 {
 	return food_vector.size() >= max_food;
 }
 
-bool FoodManager::can_food_reproduce(Food* food)
+bool FoodManager::can_food_reproduce(const Food* food)
 {
 	if (food->time_since_last_reproduced < reproductive_cooldown)
 		return false;
@@ -19,7 +19,7 @@ bool FoodManager::can_food_reproduce(Food* food)
 	return true;
 }
 
-float FoodManager::calculate_spawn_chance()
+float FoodManager::calculate_spawn_chance() const
 {
 	float spawn_chance = 1.f - static_cast<float>(food_vector.size()) / static_cast<float>(max_food);
 	return std::clamp(spawn_chance * spawn_proportionality_constant, 0.f, 1.f);
@@ -38,9 +38,7 @@ void FoodManager::spawn_food_improved()
 		if (Random::rand01_float() > calculate_spawn_chance())
 			continue;
 
-		bool reached_max_food = reproduce_food(food);
-
-		if (reached_max_food)
+		if (reproduce_food(food))
 			break;
 	}
 }

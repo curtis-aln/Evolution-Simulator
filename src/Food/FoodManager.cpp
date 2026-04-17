@@ -56,7 +56,7 @@ Food* FoodManager::at(const int idx)
 	return food_vector.at(idx);
 }
 
-void FoodManager::draw_food_grid(sf::Vector2f mouse_pos)
+void FoodManager::draw_food_grid(sf::Vector2f mouse_pos) const
 {
 	food_grid_renderer.render(*window_, mouse_pos, 1600.f);
 }

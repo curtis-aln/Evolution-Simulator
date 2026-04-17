@@ -11,10 +11,10 @@ max_speed                = 30.0
 max_cells                = 15
 spawn_radius             = 100.0
 energy_decay_rate        = 0.15
-wander_threshold         = 1170.0   # 90 * 13
-breaking_length          = 540.0    # 90 * 6
-maximum_extension        = 360.0    # 90 * 4
-spring_work_const        = 0.00001  # 1 / 100000
+wander_threshold         = 600.0   
+breaking_length          = 540.0   
+maximum_extension        = 360.0    
+spring_work_const        = 0.00001
 reproductive_cooldown    = 200
 digestive_time           = 100
 initial_energy           = 300.0
@@ -22,19 +22,31 @@ initial_energy           = 300.0
 # ── Food ──────────────────────────────────────────────────────────────────────
 [food]
 cell_max_capacity        = 20
-update_freq              = 4
+update_freq = 4
+max_food = 40000
+initial_food = 10000
+
+# --- physics ---
 food_radius              = 30.0
 friction                 = 0.915
 vibration_strength       = 3.0
+
+# --- Color ---
 food_visibility_ramp_frames = 90.0
 food_max_alpha           = 200.0
+
+# --- Birth ---
 spawn_proportionality_constant = 0.045
 food_spawn_distance      = 200.0 
 reproductive_cooldown    = 220
 reproductive_threshold   = 300
+
+# --- Nutrients ---
 initial_nutrients        = 5.0
 final_nutrients          = 60.0
 nutrient_development_time = 400
+
+# --- Death ---
 death_age                = 700.0
 death_age_chance         = 0.01
 
@@ -48,4 +60,6 @@ food_transparency        = 200
 # ── Simulation ────────────────────────────────────────────────────────────────
 [simulation]
 vsync                    = false
+full_screen              = false
 ui_scale_percent         = 100.0
+max_fps                  = 0

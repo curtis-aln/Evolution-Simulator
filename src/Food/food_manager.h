@@ -39,21 +39,21 @@ public:
     void   render();
     void   remove_food(int food_id);
     Food* at(int idx);
-    void   draw_food_grid(sf::Vector2f mouse_pos);
+    void   draw_food_grid(sf::Vector2f mouse_pos) const;
 
 private:
     void  init_food();
     void  update_food();
-    void  update_food_nutrients(Food* food);
-    void  vibrate_food(Food* food);
-    void  bound_food_to_world(Food* food);
-    void  check_food_death(Food* food);
+    static void  update_food_nutrients(Food* food);
+    static void  vibrate_food(Food* food);
+    void  bound_food_to_world(Food* food) const;
+    void  check_food_death(const Food* food);
     void  update_hash_grid();
 
-    void  spawn_food();
+    static void  spawn_food();
     void  spawn_food_improved();
     bool  reproduce_food(Food* food);
-    float calculate_spawn_chance();
-    bool  can_food_reproduce(Food* food);
-    bool  food_container_full();
+    float calculate_spawn_chance() const;
+    static bool  can_food_reproduce(const Food* food);
+    bool  food_container_full() const;
 };

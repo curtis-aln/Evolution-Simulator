@@ -3,24 +3,22 @@
 #include <cstdint>
 #include "Protozoa/genetics/CellGenome.h"
 
+void load_settings(const std::string& path);
+
 
 struct SimulationSettings
 {
-
-public:
 	inline static constexpr int frame_smoothing = 30;
-	inline static constexpr bool full_screen = false;  // Change this value to toggle fullscreen mode
 	inline static constexpr double resize_shrinkage = 0.95;
-
 	inline static const std::string simulation_name = "Project A.R.I.A";
-	static constexpr bool vsync = false;
 
-	static constexpr unsigned frame_rate = 0;
+	inline static bool full_screen;
 
-	static constexpr unsigned line_maximum_data = 200;
-	static constexpr unsigned line_x_axis_increments = 20;
+	inline static bool vsync;
 
-	inline static constexpr float ui_scale_percent = 100.f;
+	inline static unsigned max_fps;
+
+	inline static float ui_scale_percent;
 };
 
 struct GraphicalSettings
@@ -28,19 +26,19 @@ struct GraphicalSettings
 	inline static const sf::Color window_color = { 0, 0, 0 };
 
 
-	static constexpr float spring_thickness = 9.f;
-	static constexpr float spring_outline_thickness = 6.f;
+	inline static float spring_thickness;
+	inline static float spring_outline_thickness;
 
-	static constexpr float cell_outline_thickness = 1.1f; // relative to the size of the cell
+	inline static float cell_outline_thickness; // relative to the size of the cell
 
-	static constexpr std::uint8_t food_transparency = 200;
+	inline static std::uint8_t food_transparency;
 
 	inline static const std::vector<sf::Color> food_fill_colors = {
-		{200, 30, 30, food_transparency}
+		{200, 30, 30}
 	};
 
 	inline static const std::vector<sf::Color> food_outline_colors = {
-		{250, 60, 60, food_transparency}
+		{250, 60, 60}
 	};
 };
 
@@ -70,15 +68,16 @@ struct ProtozoaSettings
 
 	inline static float energy_decay_rate; // how quickly energy decays per frame
 
-	inline static float wander_threshold = 90 * 13.f; // if a cell wanders too far away from the protozoa it kills the whole thing
+	inline static float wander_threshold; // if a cell wanders too far away from the protozoa it kills the whole thing
 
-	inline static float breaking_length = 90 * 6.f;
-	inline static float maximum_extension = 90 * 4.f;
+	inline static float breaking_length;
+	inline static float maximum_extension;
 
-	inline static float spring_work_const = 1.f / 100'000.f; // how we scale the energy cost of springs
+	inline static float spring_work_const; // how we scale the energy cost of springs
 
+	inline static size_t cell_max_capacity;
 	inline static size_t reproductive_cooldown;
-	inline static float digestive_time = 100.f; // per cell
+	inline static float digestive_time; // per cell
 
 	inline static float initial_energy; // energy the protozoa spawn with
 
@@ -87,37 +86,36 @@ struct ProtozoaSettings
 
 struct FoodSettings
 {
-	inline static constexpr size_t cells_x = WorldSettings::cells_x;
-	inline static constexpr size_t cells_y = WorldSettings::cells_y;
-	inline static int cell_max_capacity = 20;
-	inline static size_t update_freq = 4; // food do not move that often so they dont have to be updated in the grid every frame
+	inline static uint32_t cells_x = WorldSettings::cells_x;
+	inline static uint32_t cells_y = WorldSettings::cells_y;
+	inline static int cell_max_capacity;
+	inline static size_t update_freq; // food do not move that often so they dont have to be updated in the grid every frame
 
-	static constexpr unsigned max_food = 20'000;
-	static constexpr unsigned initial_food = 500;
+	inline static unsigned max_food;
+	inline static unsigned initial_food;
 	inline static float food_radius;
 	inline static float friction;
 
 	inline static sf::Vector3i food_darkest_color = { 0, 160, 0 };
 	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
-	inline static float vibration_strength = 3.0f;
+	inline static float vibration_strength;
 
-	inline static float kFoodVisibilityRampFrames = 90;
-	inline static float kFoodMaxAlpha = 200;
+	inline static float kFoodVisibilityRampFrames;
+	inline static float kFoodMaxAlpha;
 
-	inline static float spawn_proportionality_constant = 0.085f; // range between [0.001, 0.01]
-	inline static float food_spawn_distance = 200.0f;
+	inline static float spawn_proportionality_constant; // range between [0.001, 0.01]
+	inline static float food_spawn_distance;
 	inline static size_t reproductive_cooldown;
-	inline static float reproductive_threshold = 300.f; // how old a food has to be before it can reproduce
+	inline static float reproductive_threshold; // how old a food has to be before it can reproduce
 
-	inline static float initial_nutrients = 5;
-	inline static float final_nuterients = 60;
-	inline static size_t nutrient_development_time = 400;
+	inline static float initial_nutrients;
+	inline static float final_nutrients;
+	inline static size_t nutrient_development_time;
 
 	inline static float death_age;
-	inline static float death_age_chance = 0.01f; // every frame past its death age gives it this chance of dying
+	inline static float death_age_chance; // every frame past its death age gives it this chance of dying
 };
 
-void load_settings(const std::string& path);
 
 struct TextSettings
 {
