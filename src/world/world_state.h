@@ -96,9 +96,9 @@ struct RenderData
 
 struct SpatialGridData
 {
-	int cells_x;
-	int cells_y;
-	int cell_max_capacity;
+	uint32_t cells_x;
+	uint32_t cells_y;
+	uint32_t cell_max_capacity;
 	float world_width;
 	float world_height;
 

@@ -24,10 +24,10 @@ void GridTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     // ── Tuning ────────────────────────────────────────────────────────────────
     ImGui::BeginChild("GR_tune", { -1.f, ch }, true);
     ImGui::TextDisabled("Tuning");
-    ImGui::Separator();
+    ImGui::Separator(); 
 
-    //ImGui::Checkbox("Track occupancy", &snap.toggles.track_spatial_grids);
-    ImGui::SameLine(); ImGui::TextDisabled("(costs perf)");
+    toggle(snap, ctx, "Track occupancy", &WorldToggles::track_spatial_grids);
+     ImGui::SameLine(); ImGui::TextDisabled("(costs perf)");
 
     ImGui::Spacing();
     static int res = static_cast<int>(snap.cell_grid.cells_x);
@@ -35,11 +35,17 @@ void GridTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::SliderInt("##gridres", &res, 10, 500, "Resolution %d x %d");
 
     ImGui::Spacing();
-    if (ImGui::Button("Apply##grid", { -1.f, 0.f }))
+    if (ImGui::Button("Apply Cell Grid ##grid", { -1.f, 0.f }))
     {
-        //cg->change_cell_dimsensions(res, res); todo
-        ///fg->change_cell_dimsensions(res, res);
-        //state.world.update_spatial_renderers();
+        SimCommand cmd{ CommandType::SetCellGridResolution };
+        cmd.int_val = res;
+        ctx.push(cmd);
+    }
+    if (ImGui::Button("Apply Food Grid ##grid", { -1.f, 0.f }))
+    {
+        SimCommand cmd{ CommandType::SetFoodGridResolution };
+		cmd.int_val = res;
+        ctx.push(cmd);
     }
 
     ImGui::EndChild();

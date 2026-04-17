@@ -96,6 +96,16 @@ void Simulation::update_world()
                 if (selected_protozoa)
                     selected_protozoa->get_cells()[cmd.cell_spring_idx].offset = cmd.float_val;
                 break;
+
+            case CommandType::SetCellGridResolution:
+				m_world_.get_spatial_grid()->change_cell_dimsensions(cmd.int_val, cmd.int_val);
+                m_world_.update_spatial_renderers();
+				break;
+
+            case CommandType::SetFoodGridResolution:
+				m_world_.get_food_spatial_grid()->change_cell_dimsensions(cmd.int_val, cmd.int_val);
+                m_world_.update_spatial_renderers();
+				break;
             }
             m_commands.pop();
         }

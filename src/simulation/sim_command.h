@@ -19,7 +19,8 @@ enum class CommandType
     SpawnFromFile,          // stub
 
     // ── Grid ──────────────────────────────────────────────────────────────
-    SetGridResolution,      // apply new cell grid resolution
+    SetCellGridResolution,      // apply new cell grid resolution
+    SetFoodGridResolution,
 
     // ── World values (not in WorldToggles) ───────────────────────────────
     SetSimulationSpeed,     // the speed multiplier slider

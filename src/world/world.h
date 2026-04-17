@@ -78,8 +78,10 @@ public:
     void               update_spatial_renderers();
 
     void unload_render_data(SimSnapshot& snapshot);
+    static SpatialGridData get_grid_data(SimpleSpatialGrid* grid);
+    void advanced_grid_data(SimpleSpatialGrid* grid, SpatialGridData& data);
 
-    void fill_snapshot(SimSnapshot& snapshot) const;
+    void fill_snapshot(SimSnapshot& snapshot);
 
     // ── Render data getters — read by renderer from snapshot ─────────────────
     const std::vector<sf::Vector2f>& get_positions()    const { return render_data_.positions; }

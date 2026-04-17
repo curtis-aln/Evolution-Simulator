@@ -158,7 +158,40 @@ void World::unload_render_data(SimSnapshot& snapshot)
     
 }
 
-void World::fill_snapshot(SimSnapshot& snapshot) const
+SpatialGridData World::get_grid_data(SimpleSpatialGrid* grid)
+{
+	return SpatialGridData{
+		grid->CellsX,
+		grid->CellsY,
+		grid->cell_max_capacity,
+		grid->world_width,
+		grid->world_height,
+		grid->cell_width,
+		grid->cell_height,
+	};
+}
+
+void World::advanced_grid_data(SimpleSpatialGrid* grid, SpatialGridData& data)
+{
+	data.total = 0;
+	data.max_in = 0;
+	data.full = 0;
+	data.empty = 0;
+	for (size_t i = 0; i < grid->get_total_cells(); ++i)
+	{
+		const uint8_t cell_capacity = grid->cell_capacities[i];
+		data.total += cell_capacity;
+		if (cell_capacity > data.max_in)
+			data.max_in = cell_capacity;
+		if (cell_capacity == grid->cell_max_capacity)
+			data.full++;
+		if (cell_capacity == 0)
+			data.empty++;
+	}
+	data.inv = data.total > 0 ? 1.f / static_cast<float>(data.total) : 0.f;
+}
+
+void World::fill_snapshot(SimSnapshot& snapshot)
 {
     snapshot.render = get_render_data();
     snapshot.stats = get_statistics();
@@ -169,9 +202,19 @@ void World::fill_snapshot(SimSnapshot& snapshot) const
     snapshot.stats.average_lifetime = average_lifetime_;
     snapshot.stats.longest_lived_ever = longest_lived_ever_;
 
+
     if (selected_protozoa_ != nullptr)
     {
         snapshot.protozoa = *selected_protozoa_;
 		snapshot.selected_a_protozoa = true;
     }
+
+    snapshot.food_grid = get_grid_data(get_food_spatial_grid());
+    snapshot.cell_grid = get_grid_data(get_spatial_grid());
+
+	if (toggles.track_spatial_grids)
+	{
+		advanced_grid_data(get_food_spatial_grid(), snapshot.food_grid);
+        advanced_grid_data(get_spatial_grid(), snapshot.cell_grid);
+	}
 }
