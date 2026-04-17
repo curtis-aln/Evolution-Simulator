@@ -28,7 +28,7 @@ struct SimpleSpatialGrid
 
 
 public:
-	explicit SimpleSpatialGrid(uint32_t Cells_X, uint32_t Cells_Y, int cellCapacity, float worldWidth, float worldHeight)
+	explicit SimpleSpatialGrid(uint32_t Cells_X, uint32_t Cells_Y, uint32_t cellCapacity, float worldWidth, float worldHeight)
 		: CellsX(Cells_X), CellsY(Cells_Y), cell_max_capacity(cellCapacity), world_width(worldWidth), world_height(worldHeight)
 	{
 		// creating the cell sizes grid

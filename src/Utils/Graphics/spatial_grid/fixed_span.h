@@ -10,7 +10,7 @@ struct FixedSpan
     uint8_t count = 0;
     uint8_t max_size = 0;
 
-    explicit FixedSpan(uint8_t max_elements)
+	FixedSpan(uint8_t max_elements)
         : buffer(std::make_unique<T[]>(max_elements))
         , max_size(max_elements)
     {}

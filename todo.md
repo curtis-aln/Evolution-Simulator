@@ -26,6 +26,7 @@
 - line graph for average lifetime
 - line graph for mutation rate and range
 - line graph for average offspring
+- Track collision resolutions per frame
 
 
 [Done] Merge the Spring and the Cell tab, do this by merging their two "select what spring/cell" together, just have a seperator and below the cell selections haev the springs

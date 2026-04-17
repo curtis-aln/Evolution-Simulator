@@ -19,12 +19,14 @@ void load_settings(const std::string& path)
 	GraphicalSettings::cell_outline_thickness = tbl["graphical"]["cell_outline_thickness"].value_or(1.f);
 	GraphicalSettings::food_transparency = tbl["graphical"]["food_transparency"].value_or(128u);
 
-
     WorldSettings::bounds_radius = tbl["world"]["bounds_radius"].value_or(100000.f);
     WorldSettings::max_protozoa = tbl["world"]["max_protozoa"].value_or(50000u);
     WorldSettings::initial_protozoa = tbl["world"]["initial_protozoa"].value_or(30000u);
     WorldSettings::border_repulsion_magnitude = tbl["world"]["border_repulsion_magnitude"].value_or(0.001f);
     WorldSettings::max_speed = tbl["world"]["max_speed"].value_or(30.f);
+	WorldSettings::cells_x = tbl["world"]["cells_x"].value_or(100u);
+	WorldSettings::cells_y = tbl["world"]["cells_y"].value_or(100u);
+	WorldSettings::cell_max_capacity = tbl["world"]["cell_max_capacity"].value_or(10u);
 
     ProtozoaSettings::max_cells = tbl["protozoa"]["max_cells"].value_or(15);
     ProtozoaSettings::spawn_radius = tbl["protozoa"]["spawn_radius"].value_or(100.f);
@@ -56,4 +58,6 @@ void load_settings(const std::string& path)
     FoodSettings::initial_food = tbl["food"]["initial_food"].value_or(10000u);
     FoodSettings::max_food = tbl["food"]["max_food"].value_or(20000u);
 	FoodSettings::cell_max_capacity = tbl["food"]["cell_max_capacity"].value_or(10u);
+	FoodSettings::cells_x = tbl["food"]["cells_x"].value_or(100u);
+	FoodSettings::cells_y = tbl["food"]["cells_y"].value_or(100u);
 }

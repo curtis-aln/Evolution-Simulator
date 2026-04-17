@@ -5,6 +5,9 @@ max_protozoa             = 25000
 initial_protozoa         = 1000
 border_repulsion_magnitude = 0.001
 max_speed                = 30.0
+cells_x = 100
+cells_y = 100
+cell_max_capacity = 25
 
 # ── Protozoa ──────────────────────────────────────────────────────────────────
 [protozoa]
@@ -21,10 +24,14 @@ initial_energy           = 300.0
 
 # ── Food ──────────────────────────────────────────────────────────────────────
 [food]
-cell_max_capacity        = 20
-update_freq = 4
 max_food = 40000
 initial_food = 10000
+
+# --- spatial grid ---
+cells_x = 100
+cells_y = 100
+cell_max_capacity        = 20
+update_freq = 4
 
 # --- physics ---
 food_radius              = 30.0

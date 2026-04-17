@@ -42,8 +42,9 @@ class World : public ProtozoaManager
     tp::ThreadPool thread_pool_;
     std::vector<float> distribution_{};
 
-    std::array<int, cell_max_capacity * 9> nearby_ids = {};
-    FixedSpan<obj_idx> nearby_food{ cell_max_capacity * 9 };
+    uint8_t max_capacity_area = cell_max_capacity * 9;
+    FixedSpan<uint32_t> nearby_ids = { max_capacity_area };
+    FixedSpan<obj_idx> nearby_food{ max_capacity_area };
 
     // Statistics accumulated each tick by the update thread.
     WorldStatistics statistics_{};
@@ -103,8 +104,8 @@ public:
 
 private:
     void update_cells_in_grid_cell(int grid_cell_id);
-    void update_protozoa_cell(int protozoa_cell_index, int neighbours_size);
-    void update_nearby_container(int& neighbours_size, int32_t nx, int32_t ny);
+    void update_protozoa_cell(int protozoa_cell_index);
+    void update_nearby_container(int32_t neighbour_index_x, int32_t neighbour_index_y);
 
     void update_position_container();
     void update_statistics();
