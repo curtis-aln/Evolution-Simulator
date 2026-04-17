@@ -11,13 +11,13 @@ void GridTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
     // ── Protozoa Grid ─────────────────────────────────────────────────────────
     ImGui::BeginChild("GR_cell", { cw, ch }, true);
-    //draw_grid_info("Protozoa Grid", snap.cell_grid, snap.toggles.track_spatial_grids); todo
+    draw_grid_info("Protozoa Grid", snap.cell_grid, snap.toggles.track_spatial_grids);
     ImGui::EndChild();
     ImGui::SameLine();
 
     // ── Food Grid ─────────────────────────────────────────────────────────────
     ImGui::BeginChild("GR_food", { cw, ch }, true);
-    //draw_grid_info("Food Grid", snap.food_grid, snap.toggles.track_spatial_grids); todo
+    draw_grid_info("Food Grid", snap.food_grid, snap.toggles.track_spatial_grids);
     ImGui::EndChild();
     ImGui::SameLine();
 
@@ -45,7 +45,7 @@ void GridTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::EndChild();
 }
 
-void GridTab::draw_grid_info(const char* label, SpatialGridData& grid, const bool tracking)
+void GridTab::draw_grid_info(const char* label, const SpatialGridData& grid, const bool tracking)
 {
     ImGui::TextDisabled("%s", label);
     ImGui::Separator();

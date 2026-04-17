@@ -1,5 +1,6 @@
 #include "display_tab.h"
 #include <imgui.h>
+#include "../../sim_command.h"
 
 void DisplayTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
@@ -8,24 +9,17 @@ void DisplayTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     const float cw = (total - sp * 2.f) / 3.f;
     const float ch = -1.f;
 
-    auto kb = [](const char* shortcut)
-        {
-            ImGui::SameLine();
-            ImGui::TextDisabled("[%s]", shortcut);
-        };
-
     // ── Rendering ─────────────────────────────────────────────────────────────
     ImGui::BeginChild("DISP_rend", { cw, ch }, true);
     ImGui::TextDisabled("Rendering");
     ImGui::Separator();
     
-    // Todo
-    //ImGui::Checkbox("Enable Rendering", &snap.toggles.m_rendering_);                       kb("R");
-    //ImGui::Checkbox("Simple Mode", &snap.toggles.simple_mode);             kb("S");
-    //ImGui::Checkbox("Debug Mode", &snap.toggles.debug_mode);              kb("D");
-    //ImGui::Checkbox("Cell Grid", &snap.toggles.draw_cell_grid);          kb("G");
-    //ImGui::Checkbox("Food Grid", &snap.toggles.draw_food_grid);          kb("F");
-    //ImGui::Checkbox("Track Statistics", &snap.toggles.track_statistics);        kb("T");
+    toggle(snap, ctx, "Enable Rendering", &WorldToggles::m_rendering_, "R");
+    toggle(snap, ctx, "Simple Mode", &WorldToggles::simple_mode, "S");
+    toggle(snap, ctx, "Debug Mode", &WorldToggles::debug_mode, "D");
+    toggle(snap, ctx, "Cell Grid", &WorldToggles::draw_cell_grid, "G");
+    toggle(snap, ctx, "Food Grid", &WorldToggles::draw_food_grid, "F");
+    toggle(snap, ctx, "Track Statistics", &WorldToggles::track_statistics, "T");
 
     ImGui::EndChild();
     ImGui::SameLine();
@@ -35,11 +29,10 @@ void DisplayTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::TextDisabled("Debug Overlays  (debug mode only)");
     ImGui::Separator();
 
-    // Todo
-    //ImGui::Checkbox("Show Connections", &snap.toggles.show_connections);        kb("C");
-    //ImGui::Checkbox("Skeleton Mode", &snap.toggles.skeleton_mode);           kb("K");
-    //ImGui::Checkbox("Bounding Boxes", &snap.toggles.show_bounding_boxes);     kb("B");
-    //ImGui::Checkbox("Toggle Collisions", &snap.toggles.toggle_collisions);       kb("C");
+	toggle(snap, ctx, "Show Connections", &WorldToggles::show_connections, "C");
+	toggle(snap, ctx, "Skeleton Mode", &WorldToggles::skeleton_mode, "K");
+	toggle(snap, ctx, "Bounding Boxes", &WorldToggles::show_bounding_boxes, "B");
+	toggle(snap, ctx, "Toggle Collisions", &WorldToggles::toggle_collisions, "C");
 
     ImGui::EndChild();
     ImGui::SameLine();
@@ -49,8 +42,7 @@ void DisplayTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::TextDisabled("UI");
     ImGui::Separator();
 
-    // todo
-    //ImGui::Checkbox("Hide Panels", &snap.toggles.hide_panels);  kb("Q");
+	toggle(snap, ctx, "Hide Panels", &WorldToggles::hide_panels, "Q");
 
     ImGui::SetNextItemWidth(-1.f);
     if (ImGui::SliderFloat("##uiscale", &m_ui_scale_, 50.f, 200.f, "UI Scale %.0f%%"))

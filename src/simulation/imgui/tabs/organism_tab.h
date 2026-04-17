@@ -17,8 +17,8 @@ private:
 
     void draw_no_selection();
     void draw_overview(const Protozoa& p);
-    void draw_cells_springs_tab(const Protozoa& p);
-    void draw_cell_detail(const Protozoa&, const Cell& c);
-    void draw_spring_detail(const Protozoa&, const Spring& s);
+    void draw_cells_springs_tab(ImGuiContext& ctx, const Protozoa& p);
+    void draw_cell_detail(ImGuiContext& ctx, const Protozoa&, const Cell& c);
+    void draw_spring_detail(ImGuiContext& ctx, const Protozoa&, const Spring& s);
     void draw_tuning_controls_tab(const SimSnapshot& snap);
 };

@@ -24,6 +24,13 @@ enum class CommandType
     // ── World values (not in WorldToggles) ───────────────────────────────
     SetSimulationSpeed,     // the speed multiplier slider
     SetWorldRadius,         // world resize stub
+
+	// ── Cell-specific (payload identifies cell and new values) ─────────────
+    SetRadius,
+	SetAmplitude,
+	SetFrequency,
+	SetOffset,
+    SetVerticalShift
 };
 
 struct SpawnParams
@@ -35,17 +42,20 @@ struct SpawnParams
 };
 
 
+// Only one of these is meaningful per command — think of it like a union but without the hassle
 struct SimCommand
 {
-    CommandType  type;
+	CommandType  type; // identifies which of the following fields to read
+    
 
-    // Only one of these is meaningful per command — 
-    // think of it like a union but without the hassle
     WorldToggles toggles{};     // for SetToggles
     SpawnParams  spawn{};       // for SpawnRandom
-    float        float_val = 0; // for SetSimulationSpeed, SetWorldRadius
-    int          int_val = 0; // for SetGridResolution
+
+    float        float_val = 0;
+    int          int_val = 0;
+    int          cell_spring_idx = 0;
 };
+
 
 struct ImGuiContext
 {
@@ -58,5 +68,17 @@ struct ImGuiContext
     {
         std::lock_guard<std::mutex> lock(cmd_mutex);
         commands.push(std::move(cmd));
+    }
+
+    void test()
+    {
+        // adding a random simcommand to the imgui context to test it
+		SimCommand cmd;
+		cmd.type = CommandType::SpawnRandom;
+		cmd.spawn.count = 5;
+		cmd.spawn.mutate = true;
+		cmd.spawn.mut_rate = 0.5f;
+		cmd.spawn.mut_range = 0.5f;
+		push(cmd);
     }
 };

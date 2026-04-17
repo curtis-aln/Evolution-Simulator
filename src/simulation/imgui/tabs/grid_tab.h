@@ -9,5 +9,5 @@ public:
 
 private:
     //void draw_tuning(SimSnapshot& snapshot);
-    void draw_grid_info(const char* label, SpatialGridData& grid, bool tracking);
+    void draw_grid_info(const char* label, const SpatialGridData& grid, bool tracking);
 };

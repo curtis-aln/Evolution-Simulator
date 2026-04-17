@@ -61,6 +61,8 @@ void Simulation::update_world()
     {
 		// lock the command queue while we process it, but release it before ticking the simulation
         std::lock_guard lock(m_cmd_mutex);
+		Protozoa* selected_protozoa = m_world_.get_selected_protozoa();
+
         while (!m_commands.empty())
         {
             const SimCommand& cmd = m_commands.front();
@@ -70,12 +72,29 @@ void Simulation::update_world()
                 m_world_.toggles = cmd.toggles;
                 break;
 
-            //case CommandType::CloneProtozoa:
-                // hook up your clone logic here in stage 2
-            //    break;
+            case CommandType::SetRadius:
+                if (selected_protozoa)
+                    selected_protozoa->get_cells()[cmd.cell_spring_idx].radius = cmd.float_val;
+                break;
 
-            case CommandType::ResetSimulation:
-                // hook up your reset logic here in stage 2
+			case CommandType::SetAmplitude:
+				if (selected_protozoa)
+					selected_protozoa->get_cells()[cmd.cell_spring_idx].amplitude = cmd.float_val;
+				break;
+
+            case CommandType::SetFrequency:
+				if (selected_protozoa)
+					selected_protozoa->get_cells()[cmd.cell_spring_idx].frequency = cmd.float_val;
+				break;
+
+            case CommandType::SetVerticalShift:
+                if (selected_protozoa)
+                    selected_protozoa->get_cells()[cmd.cell_spring_idx].vertical_shift = cmd.float_val;
+                break;
+
+            case CommandType::SetOffset:
+                if (selected_protozoa)
+                    selected_protozoa->get_cells()[cmd.cell_spring_idx].offset = cmd.float_val;
                 break;
             }
             m_commands.pop();

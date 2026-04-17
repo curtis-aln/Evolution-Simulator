@@ -5,12 +5,6 @@
 #include "../Protozoa/Protozoa.h"
 #include "imgui/population_history.h"
 
-// [Threaded] Update()
-// [Threaded] ImGUI rendered statistics and render data are written into a SimSnapshot struct managed by SharedState
-// [Main Thread] This data is then read and copied into another SimSnapshot inside the SharedInput class
-// [Main Thread] This copied data is then used for rendering and passed through ImGui, modifying its data
-// [Threaded] At the start of the next Update(), it checks if the main thread has published a new snapshot, and if so, it copies the data into the world.
-
 struct SimSnapshot
 {
     std::vector<sf::Vector2f> cell_positions;

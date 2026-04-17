@@ -1,16 +1,12 @@
 ----------------------------------------------------------------------
 ##### ImGUI TODO
-- time elapsed in hours minutes seconds
+[Done] time elapsed in hours minutes seconds
 - add infant mortality stat
-[Done] statistic showing total alive entities
 - Death notifications: optional toast notification when a tagged organism dies, with cause of death (starvation, age, etc.
 - Clone: duplicate an organism exactly, spawn the copy nearby
-[Done] Genome editor: directly tweak a selected organism's trait values via sliders, bypassing mutation. Great for controlled experiments
 - Organism tagging, ability to tag an organism and it will be outlined and visible, will show up on the tagged organisms screen
-[Done] Add tabs for these IMgui screens because i imagine there will be a lot of them eventually and it will get cluttered, so maybe have one for statistics, one for controls, one for the tagged organisms, etc.
 - Time-lapse / fast-forward mode — run simulation at 10x-100x with minimal rendering for long-run experiments
 - Ability to make organisms immortal
-[Done] Ability to force organism to reproduce or die
 - Force feed: manually inject energy into a selected organism, useful for keeping a favourite alive during experiments
 - Worlds should be able to be saved and loaded
 - add the ability to change the worldsize in real time, regardless of if the spatial hash grid can change with it yet
@@ -27,103 +23,56 @@
 - line graph for mutation rate and range
 - line graph for average offspring
 - Track collision resolutions per frame
-
-
-[Done] Merge the Spring and the Cell tab, do this by merging their two "select what spring/cell" together, just have a seperator and below the cell selections haev the springs
-[Done] Compact the overview, and move it to the left of the now merged spring and cells 
-[Done] in the sin wave viewer replace A B C D with the correct names of what they are
-[Done] in  the sin wave viewer place the sliders to change the values on top of eachover instead of in a 2x2 grid
-[Done] add a progress bar thing for stomach. (for reproduction)
-[Done] remove live genome averages
-[Done] ontop of add cell, have "remove cell", "add spring", remove spring,
-[Done] merge tuning and controls
 - Get remove, add spring, and remove spring working
-[Done] Put them in a 2x2 format
-[Done] make that part a bit thinner and compact it
-[Done] get make immortal working
-[Done] get force reproduce working
-[Done] make the Inject feature work
-[Done] make the clone to nearby work
-[Done] compact the right side more
 - get stomach bar working correctly
 - get time since last reproduced working better, replace with reproduce cooldown
-[Done] give each cell an eat cooldown bar
-[Done] Sync up the line graph with the actual values
-[Done] in spring replace K and D with the actual names
-[Done] make the cell / spring box a tiny bit wider 10%
 - when cells are immortal their energy shouldnt drop below zero
 - sometimes the sin wave graph goers by too quick, slider to change the amount of cycles displayed
-
 
 -----------------------------------------------------------------------
 
 ##### world TODO
-- Organisms usually span accross more than one cell, so you cant use their centre to determine where to look for food
 - spatial hash grid should dynamically change density as the population changes, and should be able to change size too
 - Add radiation zones which mutates an organism based on their proximity to the center of the zone, the closer they are the higher the mutation rate and range, but also the higher the energy cost for existing in that zone
 - Add black holes which can pull in protozoa and food, but not kill them, just make them orbit until they get pulled out by another protozoa or food item
   can be modified by the user. if the gravitational pull is negative it becomes a white hole which pushes things away instead of pulling them in
 - Add a layered background like you saw in that video
 - major optimization, the same way that cells interact with cells through the batched grid calculation method, should be used for cells with food
-- a foods saturation or brightness should be preportional to how close it is to being able to reproduce
 
 -----------------------------------------------------------------------
 
 ##### Simulation TODO
 - if zoomed too far out you cant select on protozoa
-- figure out how to put rendering and updating on seperate threads
 - Add ambient music with mild bubble sound effects
-- Simulation should start more zoomed out
 - std::cout debug prints in production code - Add a constexpr bool DEBUG_LOGGING = false flag in settings and gate all std::cout behind it, or use a proper logger.
 - orginize settings files
-- 
+
 -----------------------------------------------------------------------
+
+##### Rendering TODO
+- Simulation should start more zoomed out
+- a foods saturation or brightness should be preportional to how close it is to being able to reproduce
+- When designing the cells, The outer and inner layers should be roughly the same color, the inside should be very transparent and the outside a lot less
+
+
+
+-----------------------------------------------------------------------
+
 #### Multithreading todo
-Protozoa and total count
-avg lifetime
-longest ever
-births and deaths / 100 frames
-frame and elapsed
-graphs dont work
-selected protozoa doesnt work
-track grid doesnt work
-rendering display doesnt work
-
+- Get the seperate thread architecture fully working
+- Check with previous version to see if there are any performance degradations
+- Get the Rendering and Updating Working on Seperate Threads
+- Separate the update thread into Several other worker threads
+- BenchMark the performance with my old laptop
+Multithreadding GUI:
+- Tickbox to activate the debugger 
+- Slider to adjust the number of worker threads on Updating
+- Histogram or bar graph showing the load and memory usage of each thread
 
 -----------------------------------------------------------------------
-
 
 ##### Protozoa TODO
 - when a new cell is created it should have very low friction and generally not affect the organism too much, test this
 - create a cell body class
 - each protozoa stores cell_positions_nearby and food positions for debugging, just have it once in the protozoa manager
 - when springs are created through create cell or create spring, give them random properties
-
-before multithreading
-rendering: 7fps
-not rendering: 15fps
-
-after multithreading
-
-
-
-
-
-
-[How multithreading works]
-The Update Thread runs as fast as it can, after every iteration it sends data to a temp container
-The render therad runs as fast as it can (usually slower than the update thread) and when it finishes rendering if fetches the data from the temp container to render the next frame
-
-[The Tripple Buffer]
-At any moment, each buffer is playing one of three roles:
-
-Being written — the update thread is currently filling this with new simulation data
-Ready — fully written, waiting to be picked up by the renderer
-Being read — the render thread is currently drawing from this
-
-
-Mutex stands for Mutual Exclusion. It's essentially a key to a locked room.
-The rule is simple:
-
-Only the thread holding the key can enter the room (access the shared data)
-Every other thread wanting in must wait outside until the key is returned

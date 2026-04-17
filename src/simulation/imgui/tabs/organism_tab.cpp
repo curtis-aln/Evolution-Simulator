@@ -68,7 +68,7 @@ void OrganismTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     if (!ImGui::BeginTabBar("##org_tabs")) { ImGui::EndChild(); return; }
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 6.f, 2.f });
-    if (ImGui::BeginTabItem("Cells & Springs")) { draw_cells_springs_tab(p);        ImGui::EndTabItem(); }
+    if (ImGui::BeginTabItem("Cells & Springs")) { draw_cells_springs_tab(ctx, p);        ImGui::EndTabItem(); }
     if (ImGui::BeginTabItem("Tuning & Controls")) { draw_tuning_controls_tab(snap); ImGui::EndTabItem(); }
     ImGui::PopStyleVar();
 
@@ -148,7 +148,7 @@ void OrganismTab::draw_overview(const Protozoa& p)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Cells & Springs tab
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw_cells_springs_tab(const Protozoa& p)
+void OrganismTab::draw_cells_springs_tab(ImGuiContext& ctx, const Protozoa& p)
 {
     // fetching cell and spring container information
     int cell_count = p.get_cell_count();
@@ -223,16 +223,30 @@ void OrganismTab::draw_cells_springs_tab(const Protozoa& p)
     ImGui::SameLine();
 
     if (!m_sel_is_spring_ && !cells.empty())
-        draw_cell_detail(p, cells[m_sel_cell_idx_]);
+        draw_cell_detail(ctx, p, cells[m_sel_cell_idx_]);
     else if (m_sel_is_spring_ && !springs.empty())
-        draw_spring_detail(p, springs[m_sel_spring_idx_]);
+        draw_spring_detail(ctx, p, springs[m_sel_spring_idx_]);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 //  Cell detail (stats + sinwave)
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw_cell_detail(const Protozoa& p, const Cell& c)
+void OrganismTab::draw_cell_detail(ImGuiContext& ctx, const Protozoa& p, const Cell& c)
 {
+    auto slider_float_cmd = [&](const char* label, float current, float min, float max,
+        const char* fmt, CommandType type)
+        {
+            float val = current;
+            if (ImGui::SliderFloat(label, &val, min, max, fmt))
+            {
+                SimCommand cmd;
+                cmd.type = type;
+                cmd.float_val = val;
+				cmd.cell_spring_idx = c.id;
+                ctx.push(cmd);
+            }
+        };
+
     const int period = safe_time_period(c.frequency);
     const int display_size = std::min(m_wave_cycles_ * period, k_max_wave_buf);
     const int head = static_cast<int>(p.frames_alive % display_size);
@@ -284,9 +298,10 @@ void OrganismTab::draw_cell_detail(const Protozoa& p, const Cell& c)
     ImGui::ColorButton("##cin", ic, 0, { 26.f, 13.f }); ImGui::SameLine(); ImGui::Text("In");
     ImGui::Spacing();
     ImGui::SetNextItemWidth(-1.f);
-    float fake_value = 0.f; // todo
-    //ImGui::SliderFloat("##rad_c", &fake_value,
-    //    CellGenome::smallest_radius, CellGenome::largest_radius, "R = %.1f");
+    
+    slider_float_cmd("##rad_c", c.radius,
+        GeneticConstraints::radius.min, GeneticConstraints::radius.max,
+        "R = %.1f", CommandType::SetRadius);
 
     ImGui::EndChild();
     ImGui::SameLine();
@@ -307,14 +322,14 @@ void OrganismTab::draw_cell_detail(const Protozoa& p, const Cell& c)
     ImGui::SliderInt("##cycles_c", &m_wave_cycles_, 1, 8, "Display cycles = %d");
 
     ImGui::Spacing();
-    ImGui::SetNextItemWidth(-1.f); // todo
-    //ImGui::SliderFloat("##cA", &fake_value, -CellGenome::max_amplitude, CellGenome::max_amplitude, "Amplitude = %.3f");
     ImGui::SetNextItemWidth(-1.f);
-    //ImGui::SliderFloat("##cB", &fake_value, -CellGenome::max_frequency, CellGenome::max_frequency, "Frequency = %.5f");
+    slider_float_cmd("##cA", c.amplitude, GeneticConstraints::amplitude.min, GeneticConstraints::amplitude.max, "Amplitude = %.3f", CommandType::SetAmplitude);
     ImGui::SetNextItemWidth(-1.f);
-    //ImGui::SliderFloat("##cC", &fake_value, -CellGenome::max_offset, CellGenome::max_offset, "Phase     = %.3f");
+	slider_float_cmd("##cB", c.frequency, GeneticConstraints::frequency.min, GeneticConstraints::frequency.max, "Frequency = %.5f", CommandType::SetFrequency);
     ImGui::SetNextItemWidth(-1.f);
-    //ImGui::SliderFloat("##cD", &fake_value, -CellGenome::max_vertical_shift, CellGenome::max_vertical_shift, "Shift     = %.3f"); todo
+	slider_float_cmd("##cC", c.offset, GeneticConstraints::offset.min, GeneticConstraints::offset.max, "Phase     = %.3f", CommandType::SetOffset);
+    ImGui::SetNextItemWidth(-1.f);
+	slider_float_cmd("##cD", c.vertical_shift, GeneticConstraints::vertical_shift.min, GeneticConstraints::vertical_shift.max, "Shift     = %.3f", CommandType::SetVerticalShift);
 
     ImGui::EndChild();
 }
@@ -322,7 +337,7 @@ void OrganismTab::draw_cell_detail(const Protozoa& p, const Cell& c)
 // ─────────────────────────────────────────────────────────────────────────────
 //  Spring detail (stats + sinwave)
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw_spring_detail(const Protozoa& p, const Spring& s)
+void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const Protozoa& p, const Spring& s)
 {
     const int period = safe_time_period(s.frequency);
     const int display_size = std::min(m_wave_cycles_ * period, k_max_wave_buf);
