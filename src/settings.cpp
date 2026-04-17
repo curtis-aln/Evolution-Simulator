@@ -3,31 +3,37 @@
 
 #include "Protozoa/Protozoa.h"
 
-void load_settings(const std::string& path)
+
+static void load_simulation_settings(toml::table& tbl)
 {
-    std::string full_path = std::string(PROJECT_ROOT) + "/" + path;
+    SimulationSettings::full_screen = tbl["simulation"]["full_screen"].value_or(false);
+    SimulationSettings::vsync = tbl["simulation"]["vsync"].value_or(true);
+    SimulationSettings::max_fps = tbl["simulation"]["max_fps"].value_or(60u);
+    SimulationSettings::ui_scale_percent = tbl["simulation"]["ui_scale_percent"].value_or(100.f);
+}
 
-    toml::table tbl = toml::parse_file(path);
+static void load_graphical_settings(toml::table& tbl)
+{
+    GraphicalSettings::spring_outline_thickness = tbl["graphical"]["spring_outline_thickness"].value_or(0.5f);
+    GraphicalSettings::spring_thickness = tbl["graphical"]["spring_thickness"].value_or(1.f);
+    GraphicalSettings::cell_outline_thickness = tbl["graphical"]["cell_outline_thickness"].value_or(1.f);
+    GraphicalSettings::food_transparency = tbl["graphical"]["food_transparency"].value_or(128u);
+}
 
-	SimulationSettings::full_screen = tbl["simulation"]["full_screen"].value_or(false);
-	SimulationSettings::vsync = tbl["simulation"]["vsync"].value_or(true);
-	SimulationSettings::max_fps = tbl["simulation"]["max_fps"].value_or(60u);
-	SimulationSettings::ui_scale_percent = tbl["simulation"]["ui_scale_percent"].value_or(100.f);
-
-	GraphicalSettings::spring_outline_thickness = tbl["graphical"]["spring_outline_thickness"].value_or(0.5f);
-	GraphicalSettings::spring_thickness = tbl["graphical"]["spring_thickness"].value_or(1.f);
-	GraphicalSettings::cell_outline_thickness = tbl["graphical"]["cell_outline_thickness"].value_or(1.f);
-	GraphicalSettings::food_transparency = tbl["graphical"]["food_transparency"].value_or(128u);
-
+static void load_world_settings(toml::table& tbl)
+{
     WorldSettings::bounds_radius = tbl["world"]["bounds_radius"].value_or(100000.f);
     WorldSettings::max_protozoa = tbl["world"]["max_protozoa"].value_or(50000u);
     WorldSettings::initial_protozoa = tbl["world"]["initial_protozoa"].value_or(30000u);
     WorldSettings::border_repulsion_magnitude = tbl["world"]["border_repulsion_magnitude"].value_or(0.001f);
     WorldSettings::max_speed = tbl["world"]["max_speed"].value_or(30.f);
-	WorldSettings::cells_x = tbl["world"]["cells_x"].value_or(100u);
-	WorldSettings::cells_y = tbl["world"]["cells_y"].value_or(100u);
-	WorldSettings::cell_max_capacity = tbl["world"]["cell_max_capacity"].value_or(10u);
+    WorldSettings::cells_x = tbl["world"]["cells_x"].value_or(100u);
+    WorldSettings::cells_y = tbl["world"]["cells_y"].value_or(100u);
+    WorldSettings::cell_max_capacity = tbl["world"]["cell_max_capacity"].value_or(10u);
+}
 
+static void load_protozoa_settings(toml::table& tbl)
+{
     ProtozoaSettings::max_cells = tbl["protozoa"]["max_cells"].value_or(15);
     ProtozoaSettings::spawn_radius = tbl["protozoa"]["spawn_radius"].value_or(100.f);
     ProtozoaSettings::energy_decay_rate = tbl["protozoa"]["energy_decay_rate"].value_or(0.15f);
@@ -38,8 +44,11 @@ void load_settings(const std::string& path)
     ProtozoaSettings::breaking_length = tbl["protozoa"]["breaking_length"].value_or(90 * 6.f);
     ProtozoaSettings::maximum_extension = tbl["protozoa"]["maximum_extension"].value_or(90 * 4.f);
     ProtozoaSettings::digestive_time = tbl["protozoa"]["digestive_time"].value_or(100.f);
-	ProtozoaSettings::cell_max_capacity = tbl["protozoa"]["cell_max_capacity"].value_or(10u);
+    ProtozoaSettings::cell_max_capacity = tbl["protozoa"]["cell_max_capacity"].value_or(10u);
+}
 
+static void load_food_settings(toml::table& tbl)
+{
     FoodSettings::food_radius = tbl["food"]["food_radius"].value_or(30.f);
     FoodSettings::friction = tbl["food"]["friction"].value_or(0.985f);
     FoodSettings::death_age = tbl["food"]["death_age"].value_or(700.f);
@@ -60,4 +69,17 @@ void load_settings(const std::string& path)
 	FoodSettings::cell_max_capacity = tbl["food"]["cell_max_capacity"].value_or(10u);
 	FoodSettings::cells_x = tbl["food"]["cells_x"].value_or(100u);
 	FoodSettings::cells_y = tbl["food"]["cells_y"].value_or(100u);
+}
+
+
+void load_settings(const std::string& path)
+{
+    std::string full_path = std::string(PROJECT_ROOT) + "/" + path;
+
+    toml::table tbl = toml::parse_file(path);
+    load_simulation_settings(tbl);
+    load_graphical_settings(tbl);
+    load_world_settings(tbl);
+    load_protozoa_settings(tbl);
+    load_food_settings(tbl);
 }
