@@ -69,7 +69,7 @@ void OrganismTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, { 6.f, 2.f });
     if (ImGui::BeginTabItem("Cells & Springs")) { draw_cells_springs_tab(ctx, p);        ImGui::EndTabItem(); }
-    if (ImGui::BeginTabItem("Tuning & Controls")) { draw_tuning_controls_tab(snap); ImGui::EndTabItem(); }
+    if (ImGui::BeginTabItem("Tuning & Controls")) { draw_tuning_controls_tab(ctx, snap); ImGui::EndTabItem(); }
     ImGui::PopStyleVar();
 
     ImGui::EndTabBar();
@@ -418,7 +418,7 @@ void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const Protozoa& p, const
 // ─────────────────────────────────────────────────────────────────────────────
 //  Tuning & Controls tab
 // ─────────────────────────────────────────────────────────────────────────────
-void OrganismTab::draw_tuning_controls_tab(const SimSnapshot& snap)
+void OrganismTab::draw_tuning_controls_tab(ImGuiContext& ctx, const SimSnapshot& snap)
 {
 	const Protozoa& p = snap.protozoa;
     const float half = (ImGui::GetContentRegionAvail().x - 8.f) * 0.5f;
@@ -430,15 +430,30 @@ void OrganismTab::draw_tuning_controls_tab(const SimSnapshot& snap)
     ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##tr", &tun_rate, 0.f, 1.f, "rate  = %.3f");
     ImGui::SetNextItemWidth(-1.f); ImGui::SliderFloat("##trng", &tun_range, 0.f, 1.f, "range = %.3f");
     ImGui::Spacing();
-    //if (ImGui::Button("Apply Mutation", { -1.f, 0.f })) p.mutate(false, tun_rate, tun_range);
+
+    if (ImGui::Button("Apply Mutation", { -1.f, 0.f }))
+    {
+        SimCommand cmd{CommandType::MutateProtozoa};
+        cmd.mutate = { tun_rate, tun_range };
+        ctx.push(cmd);
+    }
+
     ImGui::Spacing();
     ImGui::TextDisabled("Structure");
     ImGui::Columns(2, nullptr, false);
-    //if (ImGui::Button("Add Cell", { -1.f, 0.f })) p.mutate(true, 0.f, 0.f);
-    //if (ImGui::Button("Remove Cell", { -1.f, 0.f })) p.remove_cell(); todo
+    if (ImGui::Button("Add Cell", { -1.f, 0.f })) 
+       ctx.push({CommandType::AddCell});
+
+    if (ImGui::Button("Remove Cell", { -1.f, 0.f })) 
+        ctx.push({CommandType::RemoveCell});
+
     ImGui::NextColumn();
-    //if (ImGui::Button("Add Spring", { -1.f, 0.f })) p.add_spring();
-    //if (ImGui::Button("Remove Spring", { -1.f, 0.f })) p.remove_spring();
+    if (ImGui::Button("Add Spring", { -1.f, 0.f })) 
+		ctx.push({ CommandType::AddSpring });
+
+    if (ImGui::Button("Remove Spring", { -1.f, 0.f })) 
+        ctx.push({ CommandType::RemoveSpring });
+
     ImGui::Columns(1);
     ImGui::EndChild();
 
@@ -451,7 +466,12 @@ void OrganismTab::draw_tuning_controls_tab(const SimSnapshot& snap)
     ImGui::SetNextItemWidth(-70.f);
     ImGui::SliderFloat("##feed", &feed_energy, 1.f, 500.f, "%.0f energy");
     ImGui::SameLine();
-    //if (ImGui::Button("Inject##org")) p.inject(feed_energy);
+    if (ImGui::Button("Inject##org")) 
+    {
+        SimCommand cmd{CommandType::InjectProtozoa};
+        cmd.float_val = feed_energy;
+        ctx.push(cmd);
+    }
     ImGui::EndChild();
 
     ImGui::EndChild(); // TC_left
@@ -462,17 +482,29 @@ void OrganismTab::draw_tuning_controls_tab(const SimSnapshot& snap)
 
     ImGui::BeginChild("TC_life", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Lifecycle");
-    //ImGui::Checkbox("Immortal##org", &p.immortal);
+
+	bool immortal = p.immortal;
+    if (ImGui::Checkbox("Immortal##org", &immortal))
+    {
+        SimCommand cmd{CommandType::MakeImmortal};
+        cmd.bool_val = immortal;
+        ctx.push(cmd);
+    }
     ImGui::Spacing();
-    //if (ImGui::Button("Force Reproduce##org", { -1.f, 0.f })) p.force_reproduce();
+
+    if (ImGui::Button("Force Reproduce##org", { -1.f, 0.f })) 
+    {
+        SimCommand cmd{CommandType::ForceReproduce};
+        ctx.push(cmd);
+    }
+
     ImGui::Spacing();
     ImGui::PushStyleColor(ImGuiCol_Button, { 0.55f, 0.08f, 0.08f, 1.f });
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, { 0.75f, 0.15f, 0.15f, 1.f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, { 1.00f, 0.25f, 0.25f, 1.f });
     if (ConfirmButton::draw("Force Die##org", { -1.f, 0.f }))
     {
-        //p.kill(); ToDo
-		//snap.selected_a_protozoa = false;
+		ctx.push({ CommandType::KillProtozoa });
     }
     ImGui::PopStyleColor(3);
     ImGui::EndChild();
@@ -481,7 +513,10 @@ void OrganismTab::draw_tuning_controls_tab(const SimSnapshot& snap)
 
     ImGui::BeginChild("TC_clone", { -1.f, 0.f }, true);
     ImGui::TextDisabled("Clone & File");
-	//if (ImGui::Button("Clone nearby##org", { -1.f, 0.f })) snapshot.clone = true; todo
+
+	if (ImGui::Button("Clone nearby##org", { -1.f, 0.f })) 
+        ctx.push({ CommandType::CloneProtozoa });
+
     if (ImGui::Button("Save to file (stub)##org", { -1.f, 0.f })) {}
     if (ImGui::Button("Load & spawn from file (stub)##org", { -1.f, 0.f })) {}
     ImGui::EndChild();

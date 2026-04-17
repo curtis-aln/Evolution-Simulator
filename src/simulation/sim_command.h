@@ -31,13 +31,31 @@ enum class CommandType
 	SetAmplitude,
 	SetFrequency,
 	SetOffset,
-    SetVerticalShift
+    SetVerticalShift,
+
+    // Protozoa
+	MutateProtozoa,         // mutate a specific protozoa (payload identifies protozoa and mutation parameters)
+	AddCell,
+	RemoveCell,           
+	AddSpring,	
+	RemoveSpring,
+	InjectProtozoa,        // inject a protozoa with specific genome parameters
+    MakeImmortal,
+	ForceReproduce,
+	KillProtozoa,
+	CloneProtozoa,         // spawn a mutated clone of the selected protozoa
 };
 
 struct SpawnParams
 {
     int   count = 10;
     bool  mutate = false;
+    float mut_rate = 0.3f;
+    float mut_range = 0.3f;
+};
+
+struct MutateParams
+{
     float mut_rate = 0.3f;
     float mut_range = 0.3f;
 };
@@ -51,10 +69,12 @@ struct SimCommand
 
     WorldToggles toggles{};     // for SetToggles
     SpawnParams  spawn{};       // for SpawnRandom
+    MutateParams mutate{};
 
     float        float_val = 0;
     int          int_val = 0;
     int          cell_spring_idx = 0;
+    bool         bool_val = false;
 };
 
 

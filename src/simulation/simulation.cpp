@@ -106,6 +106,58 @@ void Simulation::update_world()
 				m_world_.get_food_spatial_grid()->change_cell_dimsensions(cmd.int_val, cmd.int_val);
                 m_world_.update_spatial_renderers();
 				break;
+
+            case CommandType::MutateProtozoa:
+				if (selected_protozoa)
+					selected_protozoa->mutate(cmd.mutate.mut_rate, cmd.mutate.mut_range);
+                break;
+
+            case CommandType::AddCell:
+				if (selected_protozoa)
+					selected_protozoa->add_cell();
+				break;  
+
+            case CommandType::RemoveCell:
+                if (selected_protozoa)
+                    selected_protozoa->remove_cell();
+                break;
+
+            case CommandType::AddSpring:
+                if (selected_protozoa)
+                    selected_protozoa->add_spring();
+                break;
+
+            case CommandType::RemoveSpring:
+                if (selected_protozoa)
+                    selected_protozoa->remove_spring();
+                break;
+
+            case CommandType::InjectProtozoa:
+                if (selected_protozoa)
+                    selected_protozoa->inject(cmd.float_val);
+                break;
+
+            case CommandType::KillProtozoa:
+                if (selected_protozoa)
+                    selected_protozoa->kill();
+                break;
+
+            case CommandType::ForceReproduce:
+                if (selected_protozoa)
+                    selected_protozoa->force_reproduce();
+                break;
+
+            case CommandType::MakeImmortal:
+				if (selected_protozoa)
+					selected_protozoa->immortal = cmd.bool_val;
+				break;
+
+            case CommandType::CloneProtozoa:
+                if (selected_protozoa)
+                {
+					m_world_.create_offspring(selected_protozoa, false);
+                }
+                break;
             }
             m_commands.pop();
         }
