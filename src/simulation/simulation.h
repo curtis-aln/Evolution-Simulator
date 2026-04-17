@@ -50,7 +50,6 @@ class Simulation : SimulationSettings, TextSettings
     bool  tracking = false;
     
     bool  mouse_pressed_event = false;
-    bool  running = true;
     float fps_ = 0.f;
 
     ImPlotColormap m_plot_colormap_{};
@@ -61,6 +60,9 @@ class Simulation : SimulationSettings, TextSettings
     // render → sim  (low frequency, mutex protected)
     std::mutex             m_cmd_mutex{};
     std::queue<SimCommand> m_commands{};
+
+    std::thread m_sim_thread_;
+    std::atomic<bool> running{ true }; // replace your existing bool if you have one
 
 
 public:

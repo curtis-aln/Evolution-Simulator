@@ -25,21 +25,26 @@ Simulation::Simulation() : m_world_(&m_window_)
 
 void Simulation::run_simulation()
 {
+    m_sim_thread_ = std::thread([this]()
+        {
+            while (running)
+                update_one_frame();
+        });
+
     while (running)
     {
         handle_events();
-        update_one_frame();
+        manage_frame_rate();
         render();
     }
 
+    m_sim_thread_.join();
     ImGui::SFML::Shutdown();
     ImPlot::DestroyContext();
 }
 
 void Simulation::update_one_frame()
 {
-    manage_frame_rate();
-
     if (m_world_.toggles.m_tick_frame_time)
     {
         update_world();
