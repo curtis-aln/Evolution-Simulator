@@ -15,6 +15,7 @@
 #include "../Utils/Graphics/spatial_grid/simple_spatial_grid.h"
 #include "../Utils/Graphics/spatial_grid/spatial_grid_renderer.h"
 #include "../simulation/sim_snapshot.h"
+#include "Utils/fps_manager.h"
 
 
 class World : public ProtozoaManager
@@ -52,6 +53,8 @@ class World : public ProtozoaManager
     // Generation tracking (internal — summarised into statistics_)
     float tracked_generation_ = 0.f;
     float frames_since_last_gen_change_ = 0.f;
+
+    FrameRateSmoothing<30> frame_rate_smoothing_{};
 
 public:
     // ── Toggles — written by ImGui (main thread), read by update thread ──────

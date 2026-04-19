@@ -75,7 +75,6 @@ struct ProtozoaSettings
 
 	inline static float spring_work_const; // how we scale the energy cost of springs
 
-	inline static size_t cell_max_capacity;
 	inline static size_t reproductive_cooldown;
 	inline static float digestive_time; // per cell
 

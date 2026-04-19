@@ -6,6 +6,8 @@
 
 void World::update()
 {
+	frame_rate_smoothing_.update_frame_rate();
+	statistics_.updating_fps = frame_rate_smoothing_.get_average_frame_rate();
 	toggles.min_speed += toggles.delta_min_speed;
 	check_for_extinction_event(world_circular_bounds_);
 

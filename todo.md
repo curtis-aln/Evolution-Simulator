@@ -28,6 +28,15 @@
 - get time since last reproduced working better, replace with reproduce cooldown
 - when cells are immortal their energy shouldnt drop below zero
 - sometimes the sin wave graph goers by too quick, slider to change the amount of cycles displayed
+- ability to modify max protozoa and max cells
+- ability to toggle vsync
+- ability to set the speed of the updating simulation
+- ability to change autoreset on extinction
+- if off, create a popup that says "All organisms have died, reset simulation?" with yes and no options, if yes is selected reset the simulation, if no is selected pause the simulation and display a message that says "Simulation paused, press play to continue"
+- Ability to change energy parameters of the protozoas
+- Ability to change the food reproductive settings
+- Ability to change the food update settings
+- Ability to save these settings to the toml file
 
 -----------------------------------------------------------------------
 
@@ -36,8 +45,8 @@
 - Add radiation zones which mutates an organism based on their proximity to the center of the zone, the closer they are the higher the mutation rate and range, but also the higher the energy cost for existing in that zone
 - Add black holes which can pull in protozoa and food, but not kill them, just make them orbit until they get pulled out by another protozoa or food item
   can be modified by the user. if the gravitational pull is negative it becomes a white hole which pushes things away instead of pulling them in
-- Add a layered background like you saw in that video
-- major optimization, the same way that cells interact with cells through the batched grid calculation method, should be used for cells with food
+- Add wind Currents Using a grid of vectors which can be queried by the cells and food.
+- Add Obsticals which are a collection of circles and a grid to allow cells and food to query it.
 
 -----------------------------------------------------------------------
 
@@ -53,15 +62,16 @@
 - Simulation should start more zoomed out
 - a foods saturation or brightness should be preportional to how close it is to being able to reproduce
 - When designing the cells, The outer and inner layers should be roughly the same color, the inside should be very transparent and the outside a lot less
-
-
+- Optimize rendering thread to 144fps rather than 30fps
+- Add Glow effect Using my RTX 5060
+- Add a layered background like you saw in that video
 
 -----------------------------------------------------------------------
 
 #### Multithreading todo
-- Get the seperate thread architecture fully working
-- Check with previous version to see if there are any performance degradations
-- Get the Rendering and Updating Working on Seperate Threads
+[Done] Get the seperate thread architecture fully working
+[Done] Check with previous version to see if there are any performance degradations
+[Done] Get the Rendering and Updating Working on Seperate Threads
 - Separate the update thread into Several other worker threads
 - BenchMark the performance with my old laptop
 Multithreadding GUI:
@@ -76,3 +86,8 @@ Multithreadding GUI:
 - create a cell body class
 - each protozoa stores cell_positions_nearby and food positions for debugging, just have it once in the protozoa manager
 - when springs are created through create cell or create spring, give them random properties
+
+-----------------------------------------------------------------------
+
+##### Known Bugs
+- random lines draw accross the screen sometimes, not sure why yet

@@ -1,6 +1,6 @@
 # ── World ─────────────────────────────────────────────────────────────────────
 [world]
-bounds_radius            = 20000.0
+bounds_radius            = 80000.0
 max_protozoa             = 25000
 initial_protozoa         = 1000
 border_repulsion_magnitude = 0.001
@@ -22,9 +22,10 @@ reproductive_cooldown    = 200
 digestive_time           = 100
 initial_energy           = 300.0
 
+
 # ── Food ──────────────────────────────────────────────────────────────────────
 [food]
-max_food = 40000
+max_food = 50000
 initial_food = 10000
 
 # --- spatial grid ---
@@ -58,7 +59,7 @@ death_age                = 700.0
 death_age_chance         = 0.01
 
 # ── Graphics ──────────────────────────────────────────────────────────────────
-[graphics]
+[graphical]
 spring_thickness         = 9.0
 spring_outline_thickness = 6.0
 cell_outline_thickness   = 1.1
