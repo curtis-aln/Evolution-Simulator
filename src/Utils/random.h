@@ -29,28 +29,20 @@ namespace Random
     {
         if constexpr (std::is_integral_v<Type>)
         {
-            std::uniform_int_distribution<Type> int_dist{ min, max };
-            return int_dist(rng);
+            // For integers, use rejection sampling to avoid distribution construction.
+            // This is unbiased as long as the range fits in uint32 which it always will for ARIA.
+            const auto range = static_cast<uint32_t>(max - min) + 1u;
+            const uint32_t threshold = (UINT32_MAX - range + 1u) % range;
+            uint32_t r;
+            do { r = rng(); } while (r < threshold);
+            return min + static_cast<Type>(r % range);
         }
         else
         {
-            std::uniform_real_distribution<Type> float_dist{ min, max };
-            return float_dist(rng);
-        }
-    }
-
-    template <typename Type>
-    Type rand_range(const sf::Vector2<Type>& range)
-    {
-        if constexpr (std::is_integral_v<Type>)
-        {
-            std::uniform_int_distribution<Type> int_dist{ range.x, range.y };
-            return int_dist(rng);
-        }
-        else
-        {
-            std::uniform_real_distribution<Type> float_dist{ range.x, range.y };
-            return float_dist(rng);
+            // Map raw mt19937 output to [0,1) then scale — no distribution object.
+            constexpr float scale = 1.f / static_cast<float>(0xFFFFFFFFu);
+            const float t = static_cast<float>(rng()) * scale;
+            return min + t * (max - min);
         }
     }
 

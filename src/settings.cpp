@@ -100,6 +100,9 @@ void load_settings(const std::string& path)
         return;
     }
 
+    std::cout << "Loading settings from: "
+        << std::filesystem::absolute(path) << '\n';
+
 
     load_simulation_settings(tbl);
     load_graphical_settings(tbl);

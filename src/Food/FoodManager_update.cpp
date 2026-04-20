@@ -1,8 +1,8 @@
 #include "food_manager.h"
 
-void FoodManager::vibrate_food(Food* food)
+void FoodManager::vibrate_food(Food* food, float strength)
 {
-	food->velocity += Random::rand_vector(-vibration_strength, vibration_strength);
+	food->velocity += Random::rand_vector(-strength, strength);
 }
 
 void FoodManager::update_food()
@@ -12,10 +12,9 @@ void FoodManager::update_food()
 		food->time_since_last_reproduced++;
 		food->age++;
 
-		const float vibrate_freq = 0.1f;
+		constexpr float vibrate_freq = 0.1f;
 
-		if (Random::rand01_float() < vibrate_freq)
-			vibrate_food(food);
+		vibrate_food(food, vibration_strength * Random::rand01_float() < vibrate_freq);
 
 		food->velocity *= friction;
 		food->position += food->velocity;
@@ -54,10 +53,11 @@ void FoodManager::check_food_death(const Food* food)
 void FoodManager::update_food_nutrients(Food* food)
 {
 	
-	if (food->nutrients > final_nutrients)
-		return;
+	const bool is_max = food->nutrients > final_nutrients;
+	const float diff = final_nutrients - initial_nutrients;
+	
 
-	const float increment = (final_nutrients - initial_nutrients) / nutrient_development_time;
+	const float increment = (diff / nutrient_development_time) * !is_max;
 	food->nutrients += increment;
 
 

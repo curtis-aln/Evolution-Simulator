@@ -11,9 +11,11 @@ struct SimulationSettings
 	inline static constexpr int frame_smoothing = 30;
 	inline static constexpr double resize_shrinkage = 0.95;
 	inline static const std::string simulation_name = "Project A.R.I.A";
+	inline static const std::string settings_file_location = "media/aria_settings.toml";
+
+	inline static constexpr float camera_lerp_factor = 0.04f; // how quickly the camera follows the selected protozoa
 
 	inline static bool full_screen;
-
 	inline static bool vsync;
 
 	inline static unsigned max_fps;

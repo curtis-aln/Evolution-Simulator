@@ -91,3 +91,9 @@ Multithreadding GUI:
 
 ##### Known Bugs
 - random lines draw accross the screen sometimes, not sure why yet
+
+
+
+10fps at 250,000 food <- Not good enough
+60fps at  500,000
+20fps at 1,000,000

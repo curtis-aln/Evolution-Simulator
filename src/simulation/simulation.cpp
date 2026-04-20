@@ -1,8 +1,6 @@
 #include "simulation.h"
 #include <implot.h>
 
-inline static constexpr float lerp_factor = 0.04f;
-
 Simulation::Simulation() : m_world_(&m_window_)
 {
     m_window_.setFramerateLimit(max_fps);
@@ -202,7 +200,7 @@ void Simulation::camera_follow_selected_protozoa()
     const sf::Vector2f    target = bounds.position + bounds.size / 2.f;
     const sf::Vector2f    current = camera_.m_view_.getCenter();
 
-    camera_.m_view_.setCenter(current + (target - current) * lerp_factor);
+    camera_.m_view_.setCenter(current + (target - current) * camera_lerp_factor);
     camera_.update_window_view();
 }
 

@@ -1,5 +1,5 @@
 #include "statistics_tab.h"
-#include "../helpers/stat_row.h"
+#include "../tabs/stat_row.h"
 #include "../helpers/plot_utils.h"
 #include <imgui.h>
 

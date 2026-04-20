@@ -1,8 +1,8 @@
 # ── World ─────────────────────────────────────────────────────────────────────
 [world]
-bounds_radius            = 80000.0
-max_protozoa             = 25000
-initial_protozoa         = 1000
+bounds_radius            = 160000.0
+max_protozoa             = 0
+initial_protozoa         = 0
 border_repulsion_magnitude = 0.001
 max_speed                = 30.0
 cells_x = 100
@@ -25,12 +25,12 @@ initial_energy           = 300.0
 
 # ── Food ──────────────────────────────────────────────────────────────────────
 [food]
-max_food = 50000
-initial_food = 10000
+max_food = 1000000
+initial_food = 100000
 
 # --- spatial grid ---
-cells_x = 100
-cells_y = 100
+cells_x = 250
+cells_y = 250
 cell_max_capacity        = 20
 update_freq = 4
 
@@ -55,7 +55,7 @@ final_nutrients          = 60.0
 nutrient_development_time = 400
 
 # --- Death ---
-death_age                = 700.0
+death_age                = 1700.0
 death_age_chance         = 0.01
 
 # ── Graphics ──────────────────────────────────────────────────────────────────

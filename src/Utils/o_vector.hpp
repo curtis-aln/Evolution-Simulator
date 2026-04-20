@@ -39,6 +39,9 @@ private:
     // this vectorPtr stores all the actual objects on the heap, they are never modified or removed from. only added to
     std::vector<Obj> objectStore{};
 
+    std::vector<unsigned> free_list{};
+    int free_count = 0;
+
 
 private:
     // Iterator class definition
@@ -88,6 +91,7 @@ public:
     {
         objectStore.reserve(N);
         array.reserve(N);
+        free_list.reserve(N);
     }
 
     [[nodiscard]] Iterator begin() const { return Iterator(const_cast<o_vector*>(this), getFirstAvalableIteration()); }
@@ -100,6 +104,7 @@ public:
     {
         objectStore.emplace_back(item);
         array.push_back(&objectStore.back());
+        free_list.push_back(-1);
         ++array_size;
         ++active_objs;
     }
@@ -110,20 +115,13 @@ public:
 
     Obj* add()
     {
-        if (size() >= array_size)
+        if (free_count == 0)
             return nullptr;
 
-        for (size_t i{ 0 }; i < array_size; ++i)
-        {
-            if (!array[i]->active)
-            {
-                array[i]->active = true;
-                ++active_objs;
-                return array[i];
-            }
-        }
-
-        return nullptr;
+        const unsigned idx = free_list[--free_count];
+        array[idx]->active = true;
+        ++active_objs;
+        return array[idx];
     }
 
 
@@ -134,6 +132,9 @@ public:
         {
             array[vector_index]->active = false;
             --active_objs;
+            free_list[free_count++] = vector_index;
         }
     }
+
+    int      free_slots()   const { return free_count; }
 };

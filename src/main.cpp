@@ -4,8 +4,10 @@
 
 int main()
 {
-	load_settings("media/aria_settings.toml");
+    // Globally available settings loaded from toml file
+	load_settings(SimulationSettings::settings_file_location);
 
+    // Custom Debugger
     CrashLogger::set_exception_translator(); 
 
     try
