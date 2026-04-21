@@ -5,11 +5,11 @@ void World::resolve_food_interactions()
 {
 	for (int cell_id = 0; cell_id < spatial_hash_grid_.CellsX * spatial_hash_grid_.CellsY; ++cell_id)
 	{
-		resolve_food_grid_cell(cell_id);
+		resolve_food_grid_cell(cell_id, tl_nearby_food);
 	}
 }
 
-void World::resolve_food_grid_cell(const int cell_id)
+void World::resolve_food_grid_cell(const int cell_id, FixedSpan<obj_idx>& nearby_food)
 {
 	SimpleSpatialGrid* food_grid = get_food_spatial_grid();
 

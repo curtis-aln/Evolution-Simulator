@@ -10,12 +10,12 @@ void World::resolve_collisions()
 	
 	for (int cell_id = 0; cell_id < spatial_hash_grid_.CellsX * spatial_hash_grid_.CellsY; ++cell_id)
 	{
-		update_cells_in_grid_cell(cell_id);
+		update_cells_in_grid_cell(cell_id, tl_nearby_ids);
 	}
 }
 
 
-void World::update_cells_in_grid_cell(const int grid_cell_id)
+void World::update_cells_in_grid_cell(const int grid_cell_id, FixedSpan<uint32_t>& nearby_ids)
 {
 	// if the grid cell is empty, dont bother
 	if (spatial_hash_grid_.cell_capacities[grid_cell_id] == 0)
@@ -28,27 +28,27 @@ void World::update_cells_in_grid_cell(const int grid_cell_id)
 	const int cell_index_y = grid_cell_id / spatial_hash_grid_.CellsX;
 
 	// Current cell
-	update_nearby_container(cell_index_x, cell_index_y);
+	update_nearby_container(cell_index_x, cell_index_y, nearby_ids);
 	// Right
-	update_nearby_container(cell_index_x + 1, cell_index_y);
+	update_nearby_container(cell_index_x + 1, cell_index_y, nearby_ids);
 	// Bottom-left
-	update_nearby_container(cell_index_x - 1, cell_index_y + 1);
+	update_nearby_container(cell_index_x - 1, cell_index_y + 1, nearby_ids);
 	// Bottom
-	update_nearby_container(cell_index_x, cell_index_y + 1);
+	update_nearby_container(cell_index_x, cell_index_y + 1, nearby_ids);
 	// Bottom-right
-	update_nearby_container(cell_index_x + 1, cell_index_y + 1);
+	update_nearby_container(cell_index_x + 1, cell_index_y + 1, nearby_ids);
 
 	const auto& cell_contents = spatial_hash_grid_.grid[grid_cell_id];
 	const uint8_t cell_size = spatial_hash_grid_.cell_capacities[grid_cell_id];
 
 	for (uint8_t idx = 0; idx < cell_size; ++idx)
 	{
-		update_protozoa_cell(cell_contents[idx]);
+		update_protozoa_cell(cell_contents[idx], nearby_ids);
 	}
 }
 
 
-void World::update_nearby_container(int32_t neighbour_index_x, int32_t neighbour_index_y)
+void World::update_nearby_container(int32_t neighbour_index_x, int32_t neighbour_index_y, FixedSpan<uint32_t>& nearby_ids)
 {
 	// Out of bounds check, no wrapping needed
 	if (neighbour_index_x < 0 || neighbour_index_x >= static_cast<int>(spatial_hash_grid_.CellsX) ||
@@ -66,7 +66,7 @@ void World::update_nearby_container(int32_t neighbour_index_x, int32_t neighbour
 	}
 }
 
-void World::update_protozoa_cell(const int protozoa_cell_index)
+void World::update_protozoa_cell(const int protozoa_cell_index, const FixedSpan<uint32_t>& nearby_ids)
 {
 	const float pos_a_x = render_data_.positions_x[protozoa_cell_index];
 	const float pos_a_y = render_data_.positions_y[protozoa_cell_index];
@@ -104,4 +104,17 @@ void World::update_protozoa_cell(const int protozoa_cell_index)
 		collision_resolutions[protozoa_cell_index] = collisionNormal * (overlap * 0.5f);
 		collision_resolutions[id] = -collisionNormal * (overlap * 0.5f);
 	}
+}
+
+void World::build_color_groups()
+{
+	for (auto& g : collision_color_groups) g.clear();
+
+	for (int y = 0; y < spatial_hash_grid_.CellsY; ++y)
+		for (int x = 0; x < spatial_hash_grid_.CellsX; ++x)
+		{
+			const int color = (x % 3) + 3 * (y % 2);
+			const int cell_id = y * spatial_hash_grid_.CellsX + x;
+			collision_color_groups[color].push_back(cell_id);
+		}
 }

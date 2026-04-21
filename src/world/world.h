@@ -46,8 +46,8 @@ class World : public ProtozoaManager
     std::vector<float> distribution_{};
 
     uint8_t max_capacity_area = cell_max_capacity * 9;
-    FixedSpan<uint32_t> nearby_ids = { max_capacity_area };
-    FixedSpan<obj_idx> nearby_food{ max_capacity_area };
+    static thread_local FixedSpan<uint32_t> tl_nearby_ids;
+    static thread_local FixedSpan<obj_idx> tl_nearby_food;
 
     // Statistics accumulated each tick by the update thread.
     WorldStatistics statistics_{};
@@ -57,6 +57,9 @@ class World : public ProtozoaManager
     float frames_since_last_gen_change_ = 0.f;
 
     FrameRateSmoothing<30> frame_rate_smoothing_{};
+
+    // for multithreadded collision resolution
+    std::array<std::vector<int>, 6> collision_color_groups;
 
 public:
     // ── Toggles — written by ImGui (main thread), read by update thread ──────
@@ -111,9 +114,10 @@ public:
     const std::vector<float>& get_generation_distribution();
 
 private:
-    void update_cells_in_grid_cell(int grid_cell_id);
-    void update_protozoa_cell(int protozoa_cell_index);
-    void update_nearby_container(int32_t neighbour_index_x, int32_t neighbour_index_y);
+    void update_cells_in_grid_cell(int grid_cell_id, FixedSpan<uint32_t>& nearby_ids);
+    void update_protozoa_cell(int protozoa_cell_index, const FixedSpan<uint32_t>& nearby_ids);
+    void build_color_groups();
+    void update_nearby_container(int32_t neighbour_index_x, int32_t neighbour_index_y, FixedSpan<uint32_t>& nearby_ids);
 
     void update_position_container();
     void update_statistics();
@@ -121,5 +125,5 @@ private:
     void render_protozoa(Font* font);
     void init_organisms();
     void resolve_food_interactions();
-    void resolve_food_grid_cell(int cell_id);
+    void resolve_food_grid_cell(int cell_id, FixedSpan<obj_idx>& nearby_food);
 };

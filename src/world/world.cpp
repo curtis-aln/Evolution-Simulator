@@ -3,6 +3,9 @@
 #include "../Utils/Graphics/CircleBatchRenderer.h"
 #include "../protozoa/genetics/CellGenome.h"
 
+thread_local FixedSpan<uint32_t> World::tl_nearby_ids{100};
+thread_local FixedSpan<obj_idx> World::tl_nearby_food{100};
+
 World::World(sf::RenderWindow* window)
     : m_window_(window),
     world_border_renderer_(make_circle(world_circular_bounds_.radius, world_circular_bounds_.center)),

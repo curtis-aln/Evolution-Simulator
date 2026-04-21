@@ -92,7 +92,7 @@ Multithreadding GUI:
 ##### Known Bugs
 - random lines draw accross the screen sometimes, not sure why yet
 - if the cell grid and the food grid are different sizes then the cells index the wrong location in the food grid and they cant resolve
-
+- food grid tracking in imgui has bugs
 
 before: 
 67.8642s
