@@ -19,10 +19,12 @@ World::World(sf::RenderWindow* window)
     collision_resolutions.resize(maximum_cells);
 
     inner_circle_renderer_.set_colors(&render_data_.outer_colors);
-    inner_circle_renderer_.set_positions(&render_data_.positions);
+    inner_circle_renderer_.set_positions_x(&render_data_.positions_x);
+    inner_circle_renderer_.set_positions_y(&render_data_.positions_y);
     inner_circle_renderer_.set_radii(&inner_radii_);
     outer_circle_renderer_.set_colors(&render_data_.outer_colors);
-    outer_circle_renderer_.set_positions(&render_data_.positions);
+    outer_circle_renderer_.set_positions_x(&render_data_.positions_x);
+    outer_circle_renderer_.set_positions_y(&render_data_.positions_y);
     outer_circle_renderer_.set_radii(&inner_radii_);
 }
 

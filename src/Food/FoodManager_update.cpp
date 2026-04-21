@@ -81,7 +81,7 @@ void FoodManager::init_food()
 	{
 		Food food;
 		food.id = i;
-		food.position = Random::rand_pos_in_circle(world_bounds_->center, world_bounds_->radius);
+		food.position = Random::rand_position_in_circle(world_bounds_->center, world_bounds_->radius);
 		food.velocity = Random::rand_vector(-10.f, 10.f);
 		food.color = Random::rand_color(food_darkest_color, food_lightest_color);
 		food_vector.emplace(food);

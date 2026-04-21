@@ -91,7 +91,11 @@ void Protozoa::add_cell()
     const int parent_index = Random::rand_range(size_t(0), m_cells_.size() - 1);
     const Cell& parent = m_cells_[parent_index];
 
-    sf::Vector2f position = Random::rand_pos_in_circle(parent.position_, parent.radius * 3.f);
+    sf::FloatRect spawn_area = {
+        {parent.position_.x - parent.radius * 3.f, parent.position_.y - parent.radius * 3.f},
+        {parent.radius * 6.f, parent.radius * 6.f}
+    };
+    sf::Vector2f position = Random::rand_pos_in_rect(spawn_area);
 
     // creating the new cell and adding it to our cells
     Cell child = parent;

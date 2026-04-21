@@ -17,7 +17,9 @@ class FoodManager : FoodSettings
     CircleBatchRenderer food_renderer;
     o_vector<Food> food_vector{ max_food };
 
-    std::vector<sf::Vector2f> food_positions;
+    std::vector<float> food_positions_x;
+    std::vector<float> food_positions_y;
+
     std::vector<sf::Color>    food_colors;
     std::vector<float> food_radii;
 

@@ -89,7 +89,8 @@ public:
     void fill_snapshot(SimSnapshot& snapshot);
 
     // ── Render data getters — read by renderer from snapshot ─────────────────
-    const std::vector<sf::Vector2f>& get_positions()    const { return render_data_.positions; }
+    const std::vector<float>& get_positions_x()    const { return render_data_.positions_x; }
+    const std::vector<float>& get_positions_y()    const { return render_data_.positions_y; }
     const std::vector<sf::Color>& get_outer_colors() const { return render_data_.outer_colors; }
     const std::vector<sf::Color>& get_inner_colors() const { return render_data_.inner_colors; }
     const std::vector<float>& get_radii()        const { return render_data_.radii; }

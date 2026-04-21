@@ -5,12 +5,14 @@ FoodManager::FoodManager(sf::RenderWindow* window, Circle* world_circular_bounds
 {
 	init_food();
 
-	food_positions.resize(max_food, {});
+	food_positions_x.resize(max_food, {});
+	food_positions_y.resize(max_food, {});
 	food_colors.resize(max_food, {});
 	food_radii.resize(max_food, food_radius);
 
 	food_renderer.set_colors(&food_colors);
-	food_renderer.set_positions(&food_positions);
+	food_renderer.set_positions_x(&food_positions_x);
+	food_renderer.set_positions_y(&food_positions_y);
 	food_renderer.set_radii(&food_radii);
 }
 
@@ -26,8 +28,9 @@ void FoodManager::render()
 	int idx = 0;
 	for (Food* food : food_vector)
 	{
-		food_positions[idx] = food->position;
-		
+		food_positions_x[idx] = food->position.x;
+		food_positions_y[idx] = food->position.y;
+
 		sf::Color c = food->color;
 		sf::Color ck = food->color;
 

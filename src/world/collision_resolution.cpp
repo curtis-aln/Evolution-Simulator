@@ -1,6 +1,7 @@
 #include "world.h"
 
 
+
 void World::resolve_collisions()
 {
 	if (!toggles.toggle_collisions)
@@ -67,7 +68,8 @@ void World::update_nearby_container(int32_t neighbour_index_x, int32_t neighbour
 
 void World::update_protozoa_cell(const int protozoa_cell_index)
 {
-	const sf::Vector2f position_a = render_data_.positions[protozoa_cell_index];
+	const float pos_a_x = render_data_.positions_x[protozoa_cell_index];
+	const float pos_a_y = render_data_.positions_y[protozoa_cell_index];
 
 	for (const uint32_t id : nearby_ids)
 	{
@@ -75,9 +77,13 @@ void World::update_protozoa_cell(const int protozoa_cell_index)
 		if (protozoa_cell_index == id)
 			continue;
 
-		const sf::Vector2f position_b = render_data_.positions[id];
+		const float pos_b_x = render_data_.positions_x[id];
+		const float pos_b_y = render_data_.positions_y[id];
 
-		const float dist_sq = (position_a - position_b).lengthSquared();
+		const float diff_x = pos_a_x - pos_b_x;
+		const float diff_y = pos_a_y - pos_b_y;
+
+		const float dist_sq = diff_x * diff_x + diff_y * diff_y;
 		const float local_diam = render_data_.radii[protozoa_cell_index] + render_data_.radii[id];
 
 		if (dist_sq > local_diam * local_diam)
@@ -92,17 +98,10 @@ void World::update_protozoa_cell(const int protozoa_cell_index)
 		const float overlap = local_diam - dist;
 
 		// Compute the collision normal
-		const sf::Vector2f collisionNormal = (position_a - position_b) / dist;
+		const sf::Vector2f collisionNormal = sf::Vector2f(diff_x, diff_y) / dist;
 
 		// Move the cells apart
 		collision_resolutions[protozoa_cell_index] = collisionNormal * (overlap * 0.5f);
 		collision_resolutions[id] = -collisionNormal * (overlap * 0.5f);
-
-		Cell* cell_a = cell_pointers_[protozoa_cell_index];
-		Cell* cell_b = cell_pointers_[id];
-		cell_a->colliding_with_ = cell_b->position_;
-		cell_b->colliding_with_ = cell_a->position_;
-		cell_a->collision_ids = { protozoa_cell_index, cell_b->id };
-		cell_b->collision_ids = { protozoa_cell_index, cell_b->id };
 	}
 }

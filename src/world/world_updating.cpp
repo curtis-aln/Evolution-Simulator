@@ -50,7 +50,8 @@ void World::update_position_container()
 			cell.bound(world_circular_bounds_);
 			render_data_.outer_colors[idx] = cell.cell_outer_color;
 			render_data_.inner_colors[idx] = cell.cell_inner_color;
-			render_data_.positions[idx] = cell.position_;
+			render_data_.positions_x[idx] = cell.position_.x;
+			render_data_.positions_y[idx] = cell.position_.y;
 			render_data_.radii[idx] = cell.radius;
 			cell_pointers_[idx] = &cell;
 			cell.colliding_with_ = cell.position_;

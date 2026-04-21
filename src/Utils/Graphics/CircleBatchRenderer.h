@@ -31,7 +31,8 @@ class CircleBatchRenderer
 
 	// keeping pointers to the data vectors to avoid passing them every frame
     std::vector<sf::Color>* colors_{};
-	std::vector<sf::Vector2f>* positions_{};
+	std::vector<float>* positions_x_{};
+	std::vector<float>* positions_y_{};
 	std::vector<float>* radii_{};
 
 public:
@@ -43,7 +44,8 @@ public:
     }
 
     void set_colors(std::vector<sf::Color>* colors) { colors_ = colors; }
-    void set_positions(std::vector<sf::Vector2f>* positions) { positions_ = positions; }
+    void set_positions_x(std::vector<float>* positions_x) { positions_x_ = positions_x; }
+    void set_positions_y(std::vector<float>* positions_y) { positions_y_ = positions_y; }
     void set_radii(std::vector<float>* radii) { radii_ = radii; }
 	void set_size(size_t size) { circle_count_ = size; }
 
@@ -61,16 +63,17 @@ public:
         for (size_t i = 0; i < circle_count_; ++i)
         {
             const size_t base = i * 6;
-            const sf::Vector2f pos = (*positions_)[i];
+            const float pos_x = (*positions_x_)[i];
+            const float pos_y = (*positions_y_)[i];
             const float r = (*radii_)[i];
             const sf::Color col = (*colors_)[i];
 
-            vertex_array[base + 0] = { { pos.x - r, pos.y - r }, col, {u0, v0} };
-            vertex_array[base + 1] = { { pos.x + r, pos.y - r }, col, {u1, v0} };
-            vertex_array[base + 2] = { { pos.x + r, pos.y + r }, col, {u1, v1} };
-            vertex_array[base + 3] = { { pos.x - r, pos.y - r }, col, {u0, v0} };
-            vertex_array[base + 4] = { { pos.x + r, pos.y + r }, col, {u1, v1} };
-            vertex_array[base + 5] = { { pos.x - r, pos.y + r }, col, {u0, v1} };
+            vertex_array[base + 0] = { { pos_x - r, pos_y - r }, col, {u0, v0} };
+            vertex_array[base + 1] = { { pos_x + r, pos_y - r }, col, {u1, v0} };
+            vertex_array[base + 2] = { { pos_x + r, pos_y + r }, col, {u1, v1} };
+            vertex_array[base + 3] = { { pos_x - r, pos_y - r }, col, {u0, v0} };
+            vertex_array[base + 4] = { { pos_x + r, pos_y + r }, col, {u1, v1} };
+            vertex_array[base + 5] = { { pos_x - r, pos_y + r }, col, {u0, v1} };
 
             
         }

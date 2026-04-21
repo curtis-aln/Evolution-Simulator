@@ -82,7 +82,7 @@ namespace Random
     }
 
     template<typename Type>
-    sf::Vector2<Type> rand_pos_in_circle(const sf::Vector2<Type>& center, float radius)
+    sf::Vector2<Type> rand_position_in_circle(const sf::Vector2<Type>& center, float radius)
     {
         float u = rand01_float(); // [0,1]
         float v = rand01_float(); // [0,1]

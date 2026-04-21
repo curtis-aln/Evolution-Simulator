@@ -79,7 +79,8 @@ struct WorldStatistics
 // ─────────────────────────────────────────────────────────────────────────────
 struct RenderData
 {
-    std::vector<sf::Vector2f> positions;
+    std::vector<float> positions_x;
+    std::vector<float> positions_y;
     std::vector<sf::Color>    outer_colors;
     std::vector<sf::Color>    inner_colors;
     std::vector<float>        radii;
@@ -87,7 +88,8 @@ struct RenderData
 
     void reserve(int max_cells)
     {
-        positions.resize(max_cells);
+        positions_x.resize(max_cells);
+        positions_y.resize(max_cells);
         outer_colors.resize(max_cells);
         inner_colors.resize(max_cells);
         radii.resize(max_cells);

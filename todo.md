@@ -95,7 +95,10 @@ Multithreadding GUI:
 
 
 before: 
-67.8642
+67.8642s
 
+running on charge:
+55.4s
 
-
+removing unessarary debugging in collision resolution
+48.1s
