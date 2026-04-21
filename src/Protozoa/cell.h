@@ -74,6 +74,7 @@ struct Cell : public CellGenome
 			// removing the food from the nearby container to prevent multiple cells from eating the same food in one frame
 			nearby_food_container.remove(i);
 			--i;
+			//return; // cell has a food eat cooldown
 		}
 	}
 

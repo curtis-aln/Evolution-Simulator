@@ -4,8 +4,9 @@
 
 int main()
 {
+    Random::set_seed(0);
     // Globally available settings loaded from toml file
-	load_settings(SimulationSettings::settings_file_location);
+	load_settings(ARIA_SETTINGS_PATH);
 
     // Custom Debugger
     CrashLogger::set_exception_translator(); 

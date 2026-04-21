@@ -18,8 +18,12 @@ World::World(sf::RenderWindow* window)
     inner_radii_.resize(maximum_cells);
     collision_resolutions.resize(maximum_cells);
 
-    inner_circle_renderer_.init(90, maximum_cells);
-    outer_circle_renderer_.init(90 + GraphicalSettings::cell_outline_thickness, maximum_cells);
+    inner_circle_renderer_.set_colors(&render_data_.outer_colors);
+    inner_circle_renderer_.set_positions(&render_data_.positions);
+    inner_circle_renderer_.set_radii(&inner_radii_);
+    outer_circle_renderer_.set_colors(&render_data_.outer_colors);
+    outer_circle_renderer_.set_positions(&render_data_.positions);
+    outer_circle_renderer_.set_radii(&inner_radii_);
 }
 
 void World::render(Font* font, sf::Vector2f mouse_pos)
@@ -38,16 +42,19 @@ void World::render(Font* font, sf::Vector2f mouse_pos)
 
 void World::render_protozoa(Font* font)
 {
-    outer_circle_renderer_.update_colors(render_data_.outer_colors, entity_count);
-    outer_circle_renderer_.render(render_data_.positions, render_data_.radii, entity_count);
+    outer_circle_renderer_.set_size(entity_count);
+	outer_circle_renderer_.update();
+    outer_circle_renderer_.render();
 
     if (!toggles.simple_mode)
     {
         for (int i = 0; i < entity_count; ++i)
             inner_radii_[i] = render_data_.radii[i] / GraphicalSettings::cell_outline_thickness;
 
-        inner_circle_renderer_.update_colors(render_data_.inner_colors, entity_count);
-        inner_circle_renderer_.render(render_data_.positions, inner_radii_, entity_count);
+        
+        inner_circle_renderer_.set_size(entity_count);
+        inner_circle_renderer_.update();
+        inner_circle_renderer_.render();
     }
 
     if (selected_protozoa_ != nullptr && toggles.debug_mode)

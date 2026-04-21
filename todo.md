@@ -91,9 +91,11 @@ Multithreadding GUI:
 
 ##### Known Bugs
 - random lines draw accross the screen sometimes, not sure why yet
+- if the cell grid and the food grid are different sizes then the cells index the wrong location in the food grid and they cant resolve
+
+
+before: 
+67.8642
 
 
 
-10fps at 250,000 food <- Not good enough
-60fps at  500,000
-20fps at 1,000,000

@@ -31,8 +31,10 @@ class World : public ProtozoaManager
 
     std::vector<Cell*> cell_pointers_{};
 
-    CircleBatchRenderer outer_circle_renderer_{ m_window_ };
-    CircleBatchRenderer inner_circle_renderer_{ m_window_ };
+    size_t max_circles = max_protozoa * ProtozoaSettings::max_cells;
+    float tex_rad = 120;
+    CircleBatchRenderer outer_circle_renderer_{ m_window_, tex_rad, max_circles };
+    CircleBatchRenderer inner_circle_renderer_{ m_window_, tex_rad, max_circles };
     std::vector<float>  inner_radii_{};
 
     FoodManager        food_manager_{ m_window_, &world_circular_bounds_ };

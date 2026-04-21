@@ -1,7 +1,7 @@
 #include "food_manager.h"
 
 FoodManager::FoodManager(sf::RenderWindow* window, Circle* world_circular_bounds)
-	: world_bounds_(world_circular_bounds), food_renderer(window), window_(window)
+	: world_bounds_(world_circular_bounds), food_renderer(window, food_radius, max_food), window_(window)
 {
 	init_food();
 
@@ -9,7 +9,9 @@ FoodManager::FoodManager(sf::RenderWindow* window, Circle* world_circular_bounds
 	food_colors.resize(max_food, {});
 	food_radii.resize(max_food, food_radius);
 
-	food_renderer.init(food_radius, max_food);
+	food_renderer.set_colors(&food_colors);
+	food_renderer.set_positions(&food_positions);
+	food_renderer.set_radii(&food_radii);
 }
 
 void FoodManager::update()
@@ -25,8 +27,9 @@ void FoodManager::render()
 	for (Food* food : food_vector)
 	{
 		food_positions[idx] = food->position;
-
+		
 		sf::Color c = food->color;
+		sf::Color ck = food->color;
 
 		float age = static_cast<float>(food->age);
 		c.a = std::min(age / kFoodVisibilityRampFrames, 1.f) * kFoodMaxAlpha;
@@ -36,8 +39,9 @@ void FoodManager::render()
 		idx++;
 	}
 
-	food_renderer.update_colors(food_colors, idx);
-	food_renderer.render(food_positions, food_radii, idx);
+	food_renderer.set_size(idx);
+	food_renderer.update();
+	food_renderer.render();
 }
 
 // world interacting with the food
