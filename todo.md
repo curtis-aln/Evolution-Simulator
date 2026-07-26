@@ -168,18 +168,7 @@ Simulation has discovered it is more evolutionarialy efficient to stay still and
 [Done] Food should slowly move.
 - Food should be repelled from Cells
 
-Cells Can blow up to rediculous populations:
-- increase the max particles per grid cell count
-- cells can take integrity damage from collisions
-- No nutrient transfer should be allowed to take place between connector cells
-- i cant freely change the size of the cell capacities
 
-9000 frames over 60s
-8200 frames - initial implementation (single thread)
-8655 frames - o_vector improvements
-9056 frames - only updating food indexes every so often
-10007 frames - used ensure with food detection index
-11754 franes - optimized random in food
-12926 frames - mulithreadded body bounding
-14124 frames - multithreadded food update
-14500 frames - multithreadded cells
+Today Todo
+- when clicking on a cell it should bring you to the organism tab
+- when deselecting or an organism dies, it should bring you back to the simulation Tab

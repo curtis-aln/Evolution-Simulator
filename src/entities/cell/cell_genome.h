@@ -8,17 +8,17 @@ struct CellGeneticConstraints
     inline static Range radius = { 15.f,         220.f };
     inline static float radius_step = 5.f;
     inline static Range amplitude = { -2.f,         2.f };
-    inline static Range frequency = { -1.f / 5.f,  1.f / 5.f };
+    inline static Range frequency = { -1.f / 1.f,  1.f / 1.f };
     inline static Range offset = { -3.14159f,    3.14159f };
     inline static Range vertical_shift = { -0.6f,        0.6f };
 };
 
-struct CellInitialSpawnRanges
+static struct CellInitialSpawnRanges
 {
     inline static Range radius = { 25.f,          85.f };
 
-    inline static Range amplitude = { 0.01f,          0.02f };
-    inline static Range frequency = { 1.f / 180.f,   1.f / 20.f };
+    inline static Range amplitude = { 0.01f,          0.08f };
+    inline static Range frequency = { 1.f / 40.f,   1.f / 2.f };
     inline static Range offset = CellGeneticConstraints::offset;
     inline static Range vertical_shift = { 0.965f,           0.99f };
 };
@@ -34,26 +34,28 @@ struct HardConstants
 
 struct CellGenome : GenomeBase, HardConstants
 {
-    float radius = Random::rand_range(CellInitialSpawnRanges::radius.min, CellInitialSpawnRanges::radius.max);
-    float amplitude = Random::rand_range(CellInitialSpawnRanges::amplitude.min, CellInitialSpawnRanges::amplitude.max);
-    float frequency = Random::rand_range(CellInitialSpawnRanges::frequency.min, CellInitialSpawnRanges::frequency.max);
-    float offset = Random::rand_range(CellInitialSpawnRanges::offset.min, CellInitialSpawnRanges::offset.max);
-    float vertical_shift = Random::rand_range(CellInitialSpawnRanges::vertical_shift.min, CellInitialSpawnRanges::vertical_shift.max);
+    float radius, amplitude, frequency, offset, vertical_shift;
+    uint8_t outer_r, outer_g, outer_b, inner_r, inner_g, inner_b;
 
-    uint8_t outer_r = Random::rand_byte(), outer_g = Random::rand_byte(), outer_b = Random::rand_byte();
-    uint8_t inner_r = Random::rand_byte(), inner_g = Random::rand_byte(), inner_b = Random::rand_byte();
 
-    CellGenome() = default;
+    CellGenome()
+    {
+        randomize();
+    };
 
     void randomize()
     {
-        mutation_rate = Random::rand_range(0.f, 0.3f);
-        mutation_range = Random::rand_range(0.f, 0.3f);
+        // lambda function
+        auto rand_in_range = [](float& val, const Range & range){
+			val = Random::rand_range(range.min, range.max);};
 
-        amplitude = Random::rand_range(CellInitialSpawnRanges::amplitude.min, CellInitialSpawnRanges::amplitude.max);
-        frequency = Random::rand_range(CellInitialSpawnRanges::frequency.min, CellInitialSpawnRanges::frequency.max);
-        offset = Random::rand_range(CellInitialSpawnRanges::offset.min, CellInitialSpawnRanges::offset.max);
-        vertical_shift = Random::rand_range(CellInitialSpawnRanges::vertical_shift.min, CellInitialSpawnRanges::vertical_shift.max);
+		using Limit = CellInitialSpawnRanges;
+        rand_in_range(amplitude, Limit::amplitude);
+        rand_in_range(frequency, Limit::frequency);
+        rand_in_range(offset, Limit::offset);
+        rand_in_range(vertical_shift, Limit::vertical_shift);
+
+		rand_in_range(radius, Limit::radius);
 
         outer_r = Random::rand_byte(); outer_g = Random::rand_byte(); outer_b = Random::rand_byte();
         inner_r = Random::rand_byte(); inner_g = Random::rand_byte(); inner_b = Random::rand_byte();

@@ -106,7 +106,7 @@ struct CellManagerStatistics
     int   cell_count = 0;
 
     int   peak_protozoa_ever = 0;
-    int   highest_generation_ever = 0;
+    uint32_t   highest_generation_ever = 0;
     int   most_offspring_ever = 0;
 
     int container_size_read = 0;

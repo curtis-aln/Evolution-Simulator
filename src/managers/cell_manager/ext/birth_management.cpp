@@ -243,8 +243,11 @@ void CellManager::create_weak_offspring(uint32_t parent_id)
 
 	int32_t spring_id = create_spring(parent_id, pair.cell_id);
 
-	//if (spring_id < 0) // potential error here
-	//	return;
+	if (spring_id < 0) // potential error here
+	{
+		std::cout << "bad call\n";
+		return;
+	}
 
 	Spring* spring = all_springs_.at(spring_id);
 

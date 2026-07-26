@@ -1,5 +1,4 @@
 #pragma once
-#include "../range.h"
 #include "../genome_base.h"
 
 struct SpringGeneticConstraints
@@ -40,9 +39,6 @@ struct SpringGenome : GenomeBase
 
     void randomize()
     {
-        mutation_rate = Random::rand_range(0.f, 0.3f);
-        mutation_range = Random::rand_range(0.f, 0.3f);
-
         amplitude = Random::rand_range(SpringInitialSpawnRanges::amplitude.min, SpringInitialSpawnRanges::amplitude.max);
         frequency = Random::rand_range(SpringInitialSpawnRanges::frequency.min, SpringInitialSpawnRanges::frequency.max);
         offset = Random::rand_range(SpringInitialSpawnRanges::offset.min, SpringInitialSpawnRanges::offset.max);
