@@ -18,33 +18,36 @@ struct SpringInitialSpawnRanges
     inline static Range frequency = { 1.f / 30.f,  1.f / 2.f };
     inline static Range offset = SpringGeneticConstraints::offset;
     inline static Range vertical_shift = { 0.7f,          0.7f };
-    inline static Range spring_const = { 0.1f, 0.1f };
-    inline static Range damping = { 0.4f,0.8f };
+
+    inline static Range spring_const = { 0.01f, 0.3f };
+    inline static Range damping = { 0.2f, 0.8f };
+
     inline static Range nutrient_transfer_rate = { -0.1f, 0.5f };
 };
 
 struct SpringGenome : GenomeBase
 {
-    float amplitude = Random::rand_range(SpringInitialSpawnRanges::amplitude.min, SpringInitialSpawnRanges::amplitude.max);
-    float frequency = Random::rand_range(SpringInitialSpawnRanges::frequency.min, SpringInitialSpawnRanges::frequency.max);
-    float offset = Random::rand_range(SpringInitialSpawnRanges::offset.min, SpringInitialSpawnRanges::offset.max);
-    float vertical_shift = Random::rand_range(SpringInitialSpawnRanges::vertical_shift.min, SpringInitialSpawnRanges::vertical_shift.max);
-    
-    float nutrient_transfer_rate = Random::rand_range(SpringInitialSpawnRanges::nutrient_transfer_rate.min, SpringInitialSpawnRanges::nutrient_transfer_rate.max);
+    float amplitude, frequency, offset, vertical_shift;
+    float nutrient_transfer_rate;
+    float spring_const, damping;
 
-    float spring_const = 0.05f;
-    float damping = 0.6f;
-
-    SpringGenome() = default;
+    SpringGenome() { randomize(); };
 
     void randomize()
     {
-        amplitude = Random::rand_range(SpringInitialSpawnRanges::amplitude.min, SpringInitialSpawnRanges::amplitude.max);
-        frequency = Random::rand_range(SpringInitialSpawnRanges::frequency.min, SpringInitialSpawnRanges::frequency.max);
-        offset = Random::rand_range(SpringInitialSpawnRanges::offset.min, SpringInitialSpawnRanges::offset.max);
-        vertical_shift = Random::rand_range(SpringInitialSpawnRanges::vertical_shift.min, SpringInitialSpawnRanges::vertical_shift.max);
+        using Limit = SpringInitialSpawnRanges;
 
-		nutrient_transfer_rate = Random::rand_range(SpringInitialSpawnRanges::nutrient_transfer_rate.min, SpringInitialSpawnRanges::nutrient_transfer_rate.max);
+        // Fundimental spring logsitics
+		rand_in_range(amplitude, Limit::amplitude);
+        rand_in_range(frequency, Limit::frequency);
+        rand_in_range(offset, Limit::offset);
+        rand_in_range(vertical_shift, Limit::vertical_shift);
+
+		rand_in_range(spring_const, Limit::spring_const);
+		rand_in_range(damping, Limit::damping);
+
+        // Nutrients transfer
+		rand_in_range(nutrient_transfer_rate, Limit::nutrient_transfer_rate);
     }
 
     void mutate(float rate = 0.f, float range = 0.f)

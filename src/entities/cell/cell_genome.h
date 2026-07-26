@@ -6,7 +6,6 @@
 struct CellGeneticConstraints
 {
     inline static Range radius = { 15.f,         220.f };
-    inline static float radius_step = 5.f;
     inline static Range amplitude = { -2.f,         2.f };
     inline static Range frequency = { -1.f / 1.f,  1.f / 1.f };
     inline static Range offset = { -3.14159f,    3.14159f };
@@ -30,12 +29,25 @@ struct HardConstants
     inline static uint8_t   outer_transparency = 200;
     inline static uint8_t   inner_transparency = 100;
     inline static float     colour_mutation_range = 0.025f;
+
+    // some mutations require a multiplier or constant to see an effect
+    inline static float radius_mutation_multiplier = 5.f;
+    inline static float friction_multiplier = 0.5f;
 };
 
 struct CellGenome : GenomeBase, HardConstants
 {
     float radius, amplitude, frequency, offset, vertical_shift;
     uint8_t outer_r, outer_g, outer_b, inner_r, inner_g, inner_b;
+
+    // reprductive genes
+    float birth_energy_thresh = 1.0f; // as a decimal percentage
+    float birth_integrity_thresh = 0.25f;
+    float birth_nutrients_thresh = 0.0f;
+
+    float offspring_energy_to_give = 0.25; // decimal percentage of energy the parent gives to its offspring
+    float connective_spring_spring_const = 0.1f;
+    float connective_spring_damping = 0.1f;
 
 
     CellGenome()
@@ -68,11 +80,11 @@ struct CellGenome : GenomeBase, HardConstants
 
         const auto& C = CellGeneticConstraints{};
 
-        radius = maybe_mutate(radius, C.radius, rate, range);
-        amplitude = maybe_mutate(amplitude, C.amplitude, rate, range * 0.1f);
-        frequency = maybe_mutate(frequency, C.frequency, rate, range);
-        offset = maybe_mutate(offset, C.offset, rate, range);
-        vertical_shift = maybe_mutate(vertical_shift, C.vertical_shift, rate, range);
+        radius = maybe_mutate(radius, C.radius, rate, range * radius_mutation_multiplier);
+        amplitude = maybe_mutate(amplitude, C.amplitude, rate, range * friction_multiplier);
+        frequency = maybe_mutate(frequency, C.frequency, rate, range * friction_multiplier);
+        offset = maybe_mutate(offset, C.offset, rate, range * friction_multiplier);
+        vertical_shift = maybe_mutate(vertical_shift, C.vertical_shift, rate, range * friction_multiplier);
 
         mutate_meta();
         mutate_colour(outer_r, outer_g, outer_b);

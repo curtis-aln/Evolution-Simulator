@@ -2,7 +2,7 @@
 
 void CellManager::deselect_cell()
 {
-	selected_cell = nullptr;
+	selected_cell_id_ = -1;
 	protozoa_tracker_.is_active = false;
 }
 
@@ -10,7 +10,7 @@ void CellManager::deselect_cell()
 void CellManager::update()
 {
 	// if we have a selected cell and it has died, we need to deselect it to avoid null errors
-	if (selected_cell == nullptr || selected_cell->should_remove())
+	if (selected_cell_id_ == -1 || all_cells_.at(selected_cell_id_)->should_remove())
 	{
 		deselect_cell();
 	}
@@ -103,7 +103,7 @@ Cell* CellManager::find_cell_at_point(const sf::Vector2f mouse_position, bool ma
 			// so it can be used in other parts of the program (like rendering debug info for the selected cell).
 			if (make_selected_cell)
 			{
-				selected_cell = cell;
+				selected_cell_id_ = cell->id_;
 				protozoa_tracker_.is_active = true;
 			}
 			return cell;
@@ -158,9 +158,9 @@ const sf::Vector2f* CellManager::get_selected_protozoa_pos() const
 {
 	// This function returns the position of the selected protozoa, 
 	// if there is one.
-	if (selected_cell != nullptr)
+	if (selected_cell_id_ != -1)
 	{
-		Body* body = bodies_->at(selected_cell->body_id_);
+		Body* body = bodies_->at(all_cells_.at(selected_cell_id_)->body_id_);
 		return &body->position_;
 	}
 	return nullptr;
@@ -178,10 +178,10 @@ Body* CellManager::get_cell_body(int cell_id)
 
 void CellManager::drag_selected_cell_to_point(const sf::Vector2f& target_position, const float move_fraction)
 {
-	if (selected_cell == nullptr)
+	if (selected_cell_id_ == -1)
 		return;
 
-	Body* body = bodies_->at(selected_cell->body_id_);
+	Body* body = bodies_->at(all_cells_.at(selected_cell_id_)->body_id_);
 	body->position_ = target_position;
 	
 	const sf::Vector2f mouse_pos = m_window_->mapPixelToCoords(sf::Mouse::getPosition(*m_window_));

@@ -14,7 +14,7 @@ static struct BaseConstants
     static constexpr float mutation_rate_range = 0.01f;
 
     inline static Range init_mutation_rate_spread = { 0.4f, 0.8f };
-    inline static Range init_mutation_range_spread = { 0.01f, 0.3f };
+    inline static Range init_mutation_range_spread = { 0.01f, 1.f };
 };
 
 // Behaviour shared by every genome type
@@ -47,13 +47,13 @@ protected:
             };
 
         if (Random::rand01_float() < mutation_rate_rate)
-            mutation_rate = std::clamp(nudge(mutation_rate, mutation_rate_range), 0.f, 1.f);
+            mutation_rate = nudge(mutation_rate, mutation_rate_range);
         if (Random::rand01_float() < mutation_rate_rate)
-            mutation_range = std::clamp(nudge(mutation_range, mutation_rate_range), 0.f, 1.f);
+            mutation_range = nudge(mutation_range, mutation_rate_range);
     }
 
     void rand_in_range(float& val, const Range& range)
     {
-        Random::rand_range(range.min, range.max);
+        val = Random::rand_range(range.min, range.max);
     };
 };

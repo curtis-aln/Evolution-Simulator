@@ -76,7 +76,7 @@ class CellManager: protected CellManagerSettings
 	FixedSpan<obj_idx> nearby_food_ids{ total_max_capacity };
 
 	// The user can click on a protozoa to select it for debugging purposes. we store a pointer to it here.
-	Cell* selected_cell = nullptr;
+	int32_t selected_cell_id_ = -1;
 
 	std::vector<float> recent_lifetimes_ = {}; // a vector storing the lifetimes of the 500 most recent protozoa deaths, used to calculate average_lifetime_
 	std::vector<float> distribution_{}; // a vector storing the generation of all protozoa in the world, used to calculate average generation
@@ -153,7 +153,7 @@ public:
 
 	// selected cell management
 	void deselect_cell();
-	Cell* get_selected_cell() const { return selected_cell; }
+	const Cell* get_selected_cell() const { return all_cells_.at(selected_cell_id_); }
 	
 	// updating, public
 	void update();

@@ -65,8 +65,8 @@ void CellManager::reset()
 	connection_requests.clear();
 	recent_lifetimes_.clear();
 	distribution_.clear();
-	selected_cell = nullptr;
-	
+	selected_cell_id_ = -1;
+
 	for (Cell* cell : all_cells_)
 	{
 		all_cells_.remove(cell->id_);

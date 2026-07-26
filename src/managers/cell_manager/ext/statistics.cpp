@@ -66,10 +66,10 @@ const std::vector<float>& CellManager::get_generation_distribution()
 void CellManager::update_statistics()
 {
 	// Selected cell Logic
-	statistics_.selected_a_cell = selected_cell != nullptr;
-	if (selected_cell != nullptr)
+	statistics_.selected_a_cell = selected_cell_id_ != -1;
+	if (selected_cell_id_ != -1)
 	{
-		protozoa_tracker_.update_primitive(selected_cell->id_, all_cells_, all_springs_, *bodies_);
+		protozoa_tracker_.update_primitive(all_cells_.at(selected_cell_id_)->id_, all_cells_, all_springs_, *bodies_);
 	}
 
 	statistics_.average_generation = calculate_average_generation();
