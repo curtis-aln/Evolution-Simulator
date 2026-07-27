@@ -143,11 +143,16 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
             bool is_active = (m_mouse_mode_ == mode);
             if (is_active) ImGui::PushStyleColor(ImGuiCol_Button, active_color);
 
-            if (ImGui::Button(label, { last_in_row ? -1.f : hw, 0.f }))
+            if(ImGui::Button(label, { last_in_row ? -1.f : hw, 0.f }))
             {
-                m_mouse_mode_ = mode;
-                SimCommand cmd{ .section = CommandSection::SimulationEvent, .type = CommandType::SetMouseMode, .int_val = mode };
+                m_mouse_mode_ = is_active ? -1 : mode;
+
+                SimCommand cmd{ .section = CommandSection::SimulationEvent, .type = CommandType::SetMouseMode, .int_val = m_mouse_mode_ };
                 ctx.push(cmd);
+
+                ctx.toggles.show_influence_radius = (m_mouse_mode_ != -1);
+                SimCommand toggle_cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = ctx.toggles };
+                ctx.push(toggle_cmd);
             }
 
             if (is_active) ImGui::PopStyleColor();
@@ -165,6 +170,7 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
     // ── Checkboxes (shared state across all modes) ────────────────────────────────
     const char* mode_label =
+        m_mouse_mode_ == -1 ? "Select a mode:" :
         m_mouse_mode_ == 0 ? "Add:" :
         m_mouse_mode_ == 1 ? "Remove:" :
         m_mouse_mode_ == 2 ? "Attract:" : "Repel:";
@@ -203,16 +209,6 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     if (ImGui::SliderFloat("##radius", &m_mouse_radius_, 200.f, 10000.f, "Radius %.0f"))
     {
         SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetInfluenceRadius, .float_val = m_mouse_radius_ };
-        ctx.push(cmd);
-    }
-
-    ImGui::Spacing();
-
-	m_show_influence_radius_ = snap.toggles.show_influence_radius; // sync with sim state
-    if (ImGui::Checkbox("Show Influence Radius##other", &m_show_influence_radius_))
-    {
-        SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = ctx.toggles };
-        ctx.toggles.show_influence_radius = m_show_influence_radius_;
         ctx.push(cmd);
     }
 
