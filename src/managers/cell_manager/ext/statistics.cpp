@@ -33,21 +33,30 @@ void CellManager::register_birth_stat()
 
 void CellManager::register_death_stat(const float lifetime, const bool had_offspring)
 {
-	// This function is called whenever a cell dies, it updates the statistics related to cell deaths, 
-	// including average lifetime and infant mortality rate.
 	recent_lifetimes_.push_back(lifetime);
-	if (recent_lifetimes_.size() > max_lifetime_samples_)
-		recent_lifetimes_.erase(recent_lifetimes_.begin());
+	recent_lifetimes_sum_ += lifetime;
 
-	float sum = 0.f;
-	for (float l : recent_lifetimes_) sum += l;
-	statistics_.average_lifetime = recent_lifetimes_.empty() ? 0.f : sum / recent_lifetimes_.size();
+	if (recent_lifetimes_.size() > max_lifetime_samples_)
+	{
+		recent_lifetimes_sum_ -= recent_lifetimes_.front();
+		recent_lifetimes_.pop_front();
+	}
+
+	statistics_.average_lifetime = recent_lifetimes_.empty()
+		? 0.f
+		: recent_lifetimes_sum_ / static_cast<float>(recent_lifetimes_.size());
 
 	statistics_.deaths_this_window++;
 	++statistics_.total_deaths;
-	if (!had_offspring) ++statistics_.infant_deaths;
-	statistics_.infant_mortality_rate = statistics_.total_deaths > 0
-		? static_cast<float>(statistics_.infant_deaths) / statistics_.total_deaths : 0.f;
+
+	if (!had_offspring)
+	{
+		++statistics_.non_repro_deaths_this_window;
+	}
+	if (lifetime < 30.f)
+	{
+		++statistics_.infant_deaths_this_window;
+	}
 
 	statistics_.longest_lived_ever = std::max(static_cast<uint16_t>(lifetime), statistics_.longest_lived_ever);
 }
@@ -62,6 +71,26 @@ const std::vector<float>& CellManager::get_generation_distribution()
 	return distribution_;
 }
 
+void CellManager::update_100frame_stats(int iterations)
+{
+	if (iterations % survival_rate_window_size_ == 0)
+	{
+		statistics_.deaths_per_hundered_frames = static_cast<float>(statistics_.deaths_this_window);
+		statistics_.births_per_hundered_frames = static_cast<float>(statistics_.births_this_window);
+		statistics_.non_repro_deaths_per_hundered_frames = static_cast<float>(statistics_.non_repro_deaths_this_window);
+
+		statistics_.infant_mortality_rate = statistics_.deaths_this_window > 0
+			? static_cast<float>(statistics_.infant_deaths_this_window) / static_cast<float>(statistics_.deaths_this_window)
+			: 0.f;
+
+		// Reset window
+		statistics_.deaths_this_window = 0;
+		statistics_.births_this_window = 0;
+		statistics_.infant_deaths_this_window = 0;
+		statistics_.non_repro_deaths_this_window = 0;
+	}
+}
+
 
 void CellManager::update_statistics()
 {
@@ -74,16 +103,6 @@ void CellManager::update_statistics()
 
 	statistics_.average_generation = calculate_average_generation();
 
-	// Updating death and birth rates per hundred frames TODO
-	//if (iterations % survival_rate_window_size_ == 0)
-	//{
-	//	statistics_.deaths_per_hundered_frames = static_cast<float>(deaths_this_window_);
-	//	statistics_.births_per_hundered_frames = static_cast<float>(births_this_window_);
-
-	//	// Reset window
-	//	deaths_this_window_ = 0;
-	//	births_this_window_ = 0;
-	//}
 
 	// Peak population
 	const int p_count = static_cast<int>(all_cells_.size());

@@ -98,11 +98,7 @@ struct CellManagerStatistics
 
     uint16_t longest_lived_ever = 0;
 
-    int   total_deaths = 0;
-    int   infant_deaths = 0;
-    int deaths_this_window = 0;
-    int births_this_window = 0;
-
+    int   total_deaths = 0;  // increments whenever a cell dies
     int   cell_count = 0;
 
     int   peak_protozoa_ever = 0;
@@ -120,14 +116,24 @@ struct CellManagerStatistics
     float energy_efficiency = 0.f;
     float average_lifetime = 0.f;
 
-    float births_per_hundered_frames = 0.f;
-    float deaths_per_hundered_frames = 0.f;
-    float infant_mortality_rate = 0.f;
+    
 
     float spring_breaking_length = 0.f;
     float spring_breaking_force = 0.f;
     float spring_work_const = 0.f;
     float spring_damage_threshold = 0.f;
+
+    // hundered frame
+    float births_per_hundered_frames = 0.f;
+    float deaths_per_hundered_frames = 0.f;
+    float non_repro_deaths_per_hundered_frames = 0.f;
+    float infant_mortality_rate = 0.f;
+
+    int infant_deaths_this_window = 0;
+    int non_repro_deaths_this_window = 0;
+    int deaths_this_window = 0;
+    int births_this_window = 0;
+
 };
 
 

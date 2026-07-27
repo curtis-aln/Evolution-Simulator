@@ -228,6 +228,8 @@ CellBodyPair CellManager::create_cell(sf::Vector2f position, bool random_genetic
 	body->radius_ = cell->radius;
 	body->mass_ = body->radius_;
 
+	register_birth_stat();
+
 	return { cell->id_, body->id_, true };
 }
 

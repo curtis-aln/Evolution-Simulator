@@ -46,6 +46,7 @@
 - Add ambient music with mild bubble sound effects
 - std::cout debug prints in production code - Add a constexpr bool DEBUG_LOGGING = false flag in settings and gate all std::cout behind it, or use a proper logger.
 - orginize settings files
+- Ability to have the simulation window open on the same display that visual studio is on
 
 -----------------------------------------------------------------------
 
@@ -172,3 +173,13 @@ Simulation has discovered it is more evolutionarialy efficient to stay still and
 Today Todo
 - when clicking on a cell it should bring you to the organism tab
 - when deselecting or an organism dies, it should bring you back to the simulation Tab
+
+
+# ------------------------------- FOUR HOUR PROGRAMMING MARATHON -------------------------------
+# 15:15 - 16:15 bugs & GUI
+15:32 - Fixde 100 frame statistics, that wernt showing
+
+
+# 16:15 - 18:15 GUI & settings compatability
+
+# 18:15 - 19:15 - Graphics Improvements

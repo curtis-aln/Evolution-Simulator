@@ -75,6 +75,7 @@ void GraphsTab::draw_stat_panels(const SimSnapshot& snap)
     StatRow::draw("Longest Lifetime", "%d fr", snap.cell_manager_stats.longest_lived_ever);
     StatRow::draw("Births /100f", "%.1f", snap.cell_manager_stats.births_per_hundered_frames);
     StatRow::draw("Deaths /100f", "%.1f", snap.cell_manager_stats.deaths_per_hundered_frames);
+    StatRow::draw("Non-repro. deaths /100f", "%.1f", snap.cell_manager_stats.non_repro_deaths_per_hundered_frames);
     StatRow::draw("Infant mortality", "%.1f%%", snap.cell_manager_stats.infant_mortality_rate * 100.f);
 
     // ── Genetics ──────────────────────────────────────────────────────────────

@@ -18,6 +18,8 @@ void CellManager::remove_cell(Cell* cell)
 	if (cell == nullptr)
 		return;
 
+	register_death_stat(cell->frames_alive_, cell->offspring_count > 0);
+
 	all_cells_.remove(cell);
 	bodies_->remove(cell->body_id_);
 }

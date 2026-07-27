@@ -20,7 +20,7 @@ food_transparency          = 200         # 0-255
 
 # ── World ────────────────────────────────────────────────────────────────
 [world]
-bounds_radius               = 70000
+bounds_radius               = 40000
 border_repulsion_magnitude  = 0.001
 cells_x                     = 256    
 cells_y                     = 256
@@ -54,8 +54,8 @@ initial_food                 = 100000
 # ── Food ─────────────────────────────────────────────────────────────────
 [food]
 # spatial grid
-cells_x                     = 1024
-cells_y                      = 1024
+cells_x                     = 256
+cells_y                      = 256
 cell_max_capacity             = 15
 update_freq                    = 4
 
@@ -69,7 +69,7 @@ food_visibility_ramp_frames  = 90.0
 food_max_alpha                = 200.0
 
 # birth
-spawn_proportionality_constant = 0.0065
+spawn_proportionality_constant = 0.0005
 food_spawn_distance           = 200.0
 reproductive_cooldown          = 520
 reproductive_threshold          = 300

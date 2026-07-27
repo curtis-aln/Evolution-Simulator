@@ -20,6 +20,7 @@ void World::update(SimSnapshot& write_snapshot)
 		// updating the food and the cells in the world
 		food_manager_.update(write_snapshot.food_data);
 		cell_manager_.update();
+		cell_manager_.update_100frame_stats(statistics_.iterations_);
 
 		update_entities();
 

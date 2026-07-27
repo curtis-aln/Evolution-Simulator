@@ -78,7 +78,10 @@ class CellManager: protected CellManagerSettings
 	// The user can click on a protozoa to select it for debugging purposes. we store a pointer to it here.
 	int32_t selected_cell_id_ = -1;
 
-	std::vector<float> recent_lifetimes_ = {}; // a vector storing the lifetimes of the 500 most recent protozoa deaths, used to calculate average_lifetime_
+	// header
+	std::deque<float> recent_lifetimes_;
+	float recent_lifetimes_sum_ = 0.f; // a vector storing the lifetimes of the 500 most recent protozoa deaths, used to calculate average_lifetime_
+	
 	std::vector<float> distribution_{}; // a vector storing the generation of all protozoa in the world, used to calculate average generation
 
 	// used to store requests for new protozoa to be created, and for new connections to be made between cells
@@ -160,6 +163,8 @@ public:
 
 	// public statistics
 	const std::vector<float>& get_generation_distribution();
+
+	void update_100frame_stats(int iterations);
 
 	void update_statistics();
 	CellManagerStatistics& get_statistics() { return statistics_; }
