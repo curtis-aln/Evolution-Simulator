@@ -40,4 +40,13 @@ struct Body
 	{
 		velocity_ = { 0.f, 0.f };
 	}
+
+	void copy(const Body* other)
+	{
+		position_ = other->position_;
+		velocity_ = other->velocity_;
+		mass_ = other->mass_;
+		radius_ = other->radius_;
+	}
+
 };

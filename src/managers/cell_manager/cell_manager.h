@@ -193,4 +193,6 @@ private: // only functions this class can access
 
 	void handle_death();
 	void remove_cell(Cell* cell);
+
+	void clone_selected_protozoa();
 };

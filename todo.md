@@ -1,6 +1,5 @@
 ----------------------------------------------------------------------
 ##### ImGUI TODO
-- add infant mortality stat (chance of dying before reaching frame 50)
 - Clone: duplicate an organism exactly, spawn the copy nearby
 - add the ability to pinch, pin, and throw organisms around 
 - add a "Navigate to most sucessfull organism" button which locks on to the organism which has reporoduced the most
@@ -178,7 +177,7 @@ Today Todo
 # ------------------------------- FOUR HOUR PROGRAMMING MARATHON -------------------------------
 # 15:15 - 16:15 bugs & GUI
 15:32 - Fixde 100 frame statistics, that wernt showing
-
+15:57 - Ability to clone protozoa
 
 # 16:15 - 18:15 GUI & settings compatability
 

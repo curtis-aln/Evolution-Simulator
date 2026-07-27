@@ -384,10 +384,7 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		break;
 
 	case CommandType::CloneProtozoa:
-		//if (selected_protozoa)
-		//{
-		//    m_world_.create_offspring(selected_protozoa, false);
-		//}
+		clone_selected_protozoa();
 		break;
 
 	case CommandType::SetSpringAmplitude:
@@ -435,5 +432,67 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		//}
 		break;
 
+	}
+}
+
+
+void CellManager::clone_selected_protozoa()
+{
+	if (selected_cell_id_ == -1 || protozoa_tracker_.is_active == false)
+		return;
+
+	sf::Vector2f parent_center = protozoa_tracker_.position;
+	sf::Vector2f child_spawn_pos = Random::rand_position_in_circle(parent_center, 100.f);
+	float child_spawn_rad = 60.f;
+
+	// maps the parent's absolute cell id -> the corresponding clone's absolute cell id
+	std::unordered_map<int32_t, int32_t> old_to_new_cell_id;
+	old_to_new_cell_id.reserve(protozoa_tracker_.cells.size());
+
+	for (Cell& cell : protozoa_tracker_.cells)
+	{
+		
+		CellBodyPair cpair = create_cell({0, 0}, false);
+
+		if (!cpair.is_valid)
+		{
+			std::cerr << "[ERROR]: Failed to create cell during protozoa cloning. Max cells reached.\n";
+			return;
+		}
+
+		const Body* parent_body = bodies_->at(cell.body_id_);
+
+		Cell* new_cell = all_cells_.at(cpair.cell_id);
+		Body* new_body = bodies_->at(cpair.body_id);
+
+		new_cell->copy_genetics(cell);
+		new_body->copy(parent_body);
+		new_body->position_ = Random::rand_position_in_circle(child_spawn_pos, child_spawn_rad);
+
+		old_to_new_cell_id[cell.id_] = cpair.cell_id;
+	}
+
+	for (Spring& spring : protozoa_tracker_.springs)
+	{
+		auto it_a = old_to_new_cell_id.find(spring.cell_A_id);
+		auto it_b = old_to_new_cell_id.find(spring.cell_B_id);
+
+		if (it_a == old_to_new_cell_id.end() || it_b == old_to_new_cell_id.end())
+		{
+			std::cerr << "[ERROR]: Spring references a cell not present in the cloned set.\n";
+			continue;
+		}
+
+		int32_t spring_id = create_spring(it_a->second, it_b->second);
+
+		if (spring_id == -1)
+		{
+			std::cerr << "[ERROR]: Failed to create spring during protozoa cloning. Max springs reached.\n";
+			return;
+		}
+
+		Spring* new_spring = all_springs_.at(spring_id);
+
+		new_spring->copy_genetics(spring);
 	}
 }
