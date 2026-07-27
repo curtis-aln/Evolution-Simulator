@@ -46,7 +46,8 @@ void Simulation::handle_left_release()
 void Simulation::handle_right_release()
 {
 	right_mouse_pressed_event = false;
-	m_world_.should_drag_protozoa_ = false; // release the protozoa if we were dragging one
+	m_world_.dragging = false; // release the protozoa if we were dragging one
+	m_world_.get_cell_manager()->deselect_cell();
 }
 
 // ---- Keyboard helpers ---------------------------------------------

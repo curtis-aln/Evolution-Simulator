@@ -43,6 +43,8 @@ class World : public WorldSettings
 
     float tex_rad = 120;
 
+    
+
     FoodManager        food_manager_{ m_window_, &world_circular_bounds_, &bodies_ };
 	CellManager 	  cell_manager_{ m_window_ , &world_circular_bounds_, &bodies_ };
 
@@ -74,7 +76,7 @@ public:
     // accessing them; copy into SharedState before handing to the update thread.
     WorldToggles toggles;
 
-    bool should_drag_protozoa_ = false;
+    bool dragging = false;
 
 
 public:

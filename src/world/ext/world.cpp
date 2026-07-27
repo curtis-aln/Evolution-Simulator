@@ -93,6 +93,12 @@ void World::handle_right_click(WorldBorder& spawn_area)
 
     switch (statistics_.mouse_mode)
     {
+    case -1: // drag selected cell
+		cell_manager_.find_cell_at_point(center, true);
+        dragging = true;
+        break;
+
+
     case 0: // Add
         for (int i = 0; i < static_cast<int>(intensity); i++)
         {

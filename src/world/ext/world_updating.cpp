@@ -12,7 +12,7 @@ void World::update(SimSnapshot& write_snapshot)
 	if (get_entity_count() != bodies_.size())
 		std::cerr << "Warning: Entity count mismatch! bodies_.size() = " << bodies_.size() << ", get_entity_count() = " << get_entity_count() << std::endl;
 	
-	if (should_drag_protozoa_)
+	if (dragging)
 		cell_manager_.drag_selected_cell_to_point(m_window_->mapPixelToCoords(sf::Mouse::getPosition(*m_window_)), 0.1f);
 
 	if (toggles.m_tick_frame_time || !toggles.paused)

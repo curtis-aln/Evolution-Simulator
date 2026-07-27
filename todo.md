@@ -178,6 +178,7 @@ Today Todo
 15:32 - Fixde 100 frame statistics, that wernt showing
 15:57 - Ability to clone protozoa
 - you can now deselect the right click options, and when you select it shows the radius by default
+- you can now drag cells
 
 # 16:15 - 18:15 GUI & settings compatability
 
