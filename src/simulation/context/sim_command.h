@@ -19,6 +19,12 @@ enum class CommandType
 	SetRenderingFrameRate,   // Sets the frame rate for the rendering thread
 	SetMouseMode,            // The mouse mode (add, remove, attract, repel)
 	SetZoomLevel,           // the zoom level slider
+    SetToSimulationTab,
+	SetToGraphsTab,
+    SetToOrganismTab,
+    SetToTaggedTab,
+    SetToGridTab,
+    SetToOVecDebugTab,
 
     // WORLD EVENT  ──────────────────────────────────────────────────
     SetWorldToggles,         // sets the world toggles

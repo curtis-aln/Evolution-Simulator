@@ -14,10 +14,16 @@ void Simulation::handle_left_click(const sf::Vector2f& cam_pos)
 	if (zoom > 0.062 && try_select_protozoa(cam_pos))
 	{
 		left_mouse_pressed_event = true;
+		std::cout << "hi\n";
+		m_control_panel_.select_tab("Organism");
 	}
 	else
 	{
-		m_world_.get_cell_manager()->deselect_cell();
+		if (m_world_.get_cell_manager()->get_selected_protozoa_pos() != nullptr)
+		{
+			m_control_panel_.select_tab("Simulation");
+			m_world_.get_cell_manager()->deselect_cell();
+		}
 		camera_.begin_pan();  // start pan only if we didn't click an organism
 	}
 }
@@ -151,6 +157,18 @@ void Simulation::handle_simulation_event(SimCommand& cmd)
 	case CommandType::SetZoomLevel:
 		camera_.set_zoom(cmd.float_val,
 			camera_.window_pos_to_world_pos(sf::Vector2f{ (float)(videoMode.size.x / 2u), (float)(videoMode.size.y / 2u) }));
+		break;
+
+	case CommandType::SetWorldToggles:
+		m_world_.toggles = cmd.toggles;
+		break;
+
+	case CommandType::SetToSimulationTab:
+		m_control_panel_.select_tab("Simulation");
+		break;
+
+	case CommandType::SetToOrganismTab:
+		m_control_panel_.select_tab("Organisms");
 		break;
 	}
 }
