@@ -166,6 +166,8 @@ public:
 
 	void update_100frame_stats(int iterations);
 
+	void update_protozoa_tracker();
+
 	void update_statistics();
 	CellManagerStatistics& get_statistics() { return statistics_; }
 

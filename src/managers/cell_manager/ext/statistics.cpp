@@ -92,14 +92,19 @@ void CellManager::update_100frame_stats(int iterations)
 }
 
 
-void CellManager::update_statistics()
+void CellManager::update_protozoa_tracker()
 {
-	// Selected cell Logic
 	statistics_.selected_a_cell = selected_cell_id_ != -1;
 	if (selected_cell_id_ != -1)
 	{
 		protozoa_tracker_.update_primitive(all_cells_.at(selected_cell_id_)->id_, all_cells_, all_springs_, *bodies_);
 	}
+}
+
+void CellManager::update_statistics()
+{
+	// Selected cell Logic
+	
 
 	statistics_.average_generation = calculate_average_generation();
 

@@ -1,6 +1,10 @@
 ----------------------------------------------------------------------
 ##### ImGUI TODO
-- add the ability to pinch, pin, and throw organisms around 
+- when you click on an organism while the simulation is paused it should show the organisms stats
+- when you click on a protozoa it should bring you to the organism tab
+- when you deselect a protozoa or an organism dies, it should bring you back to the simulation Tab
+
+
 - add a "Navigate to most sucessfull organism" button which locks on to the organism which has reporoduced the most
 
 - Track collision resolutions per frame

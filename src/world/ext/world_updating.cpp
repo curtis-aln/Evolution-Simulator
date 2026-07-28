@@ -30,6 +30,8 @@ void World::update(SimSnapshot& write_snapshot)
 			food_eat_resolver_.resolve_existing_detections();
 	}
 
+	cell_manager_.update_protozoa_tracker();
+
 	// We always update the position container, otherwise the simulation jitters when paused
 	update_position_container_optimized(write_snapshot);
 
