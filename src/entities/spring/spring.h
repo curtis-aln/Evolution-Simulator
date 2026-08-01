@@ -3,14 +3,13 @@
 #include <algorithm>
 
 #include "../cell/cell.h"
-#include "spring_genome.h"
 #include "spring_settings.h"
 
 struct SpringResult { float work_done; float force_magnitude; bool broken; };
 
-struct Spring : SpringGenome, SpringSettings
+struct Spring : SpringSettings
 {
-	// These paramaters determine the organics of the spring
+	// These parameters determine the organics of the spring
 	inline static float SPRING_BREAK_FORCE = 0.f;
 	inline static float SPRING_BREAK_LENGTH = 0.f;
 	inline static float SPRING_DAMAGE_THRESH = 0.f;
@@ -22,6 +21,9 @@ private:
 public:
 	// unique spring ID, used for genome referencing, must not change during the spring's lifetime
 	uint32_t id_{};
+
+	// The springs genetic information, determined by its two connecting cells
+	SpringGenome genome{};
 
 	// we store the id's of the cells here so whe we call update in the main class we know where to look for the cells, relative to the protozoa
 	uint32_t cell_A_id{};
@@ -44,7 +46,7 @@ public:
 	
 
 	Spring(const uint8_t _id=0, const uint8_t _cell_A_id=0, const uint8_t _cell_B_id=0)
-		: cell_A_id(_cell_A_id), cell_B_id(_cell_B_id), id_(_id), SpringGenome()
+		: cell_A_id(_cell_A_id), cell_B_id(_cell_B_id), id_(_id)
 	{
 
 	}
@@ -59,10 +61,11 @@ public:
 		damping_force = 0.f;
 		ratio = 0.f;
 
-		frequency = 0.f;
-		offset = 0.f;
-		vertical_shift = 1.f;
-		amplitude = 0.f;
+		genome.frequency = 0.f;
+		genome.offset = 0.f;
+		genome.vertical_shift = 1.f;
+		genome.amplitude = 0.f;
+
 		movement_vector = { 0, 0 };
 	}
 
@@ -82,8 +85,7 @@ public:
 
 	void create_offspring(Spring& offspring)
 	{
-		offspring.copy_genetics(*this);
-		offspring.generation++;
+		offspring.genome.copy_genetics(genome);
 	}
 
 	// returns a movement vector
@@ -107,12 +109,12 @@ public:
 		rest_length = calculate_rest_length(clock_);
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
-		spring_force = spring_const * (length_diff);
+		spring_force = genome.spring_const * (length_diff);
 
 		// Calculating the damping force
 		const sf::Vector2f normalised_dir{ dir.x * inv_length, dir.y * inv_length};
 		const sf::Vector2f vel_difference = (vel_b - vel_a);
-		damping_force = normalised_dir.dot(vel_difference) * damping;
+		damping_force = normalised_dir.dot(vel_difference) * genome.damping;
 
 		// Calculating total force (sum of the two forces)
 		const float total_force = spring_force + damping_force;
@@ -173,14 +175,14 @@ private:
 	// takes in the nutrients of cell a and cell b and reutrns the transfer amount
 	float transfer_nutrients(float nutrients_a, float nutrients_b)
 	{
-		return std::copysign(nutrient_transfer_rate, nutrients_b - nutrients_a);
+		return std::copysign(genome.nutrient_transfer_rate, nutrients_b - nutrients_a);
 	}
 
 	float calculate_rest_length(const int internal_clock)
 	{
 		// sin oscillates around vertical_shift with ±amplitude swing
-		const float sin_value = fast_sin(frequency * internal_clock + offset); // [-1, 1]
-		ratio = vertical_shift + amplitude * sin_value;     // [vs-a, vs+a]
+		const float sin_value = fast_sin(genome.frequency * internal_clock + genome.offset); // [-1, 1]
+		ratio = genome.vertical_shift + genome.amplitude * sin_value;     // [vs-a, vs+a]
 		const float clamped = std::clamp(ratio, 0.f, 1.f);
 		return clamped * maximum_extension;
 	}

@@ -468,11 +468,11 @@ void OrganismTab::draw_cell_detail(ImGuiContext& ctx, const Cell& c, const sf::V
 // ─────────────────────────────────────────────────────────────────────────────
 void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p, const Spring& s)
 {
-    const int period = safe_time_period(s.frequency);
+    const int period = safe_time_period(s.genome.frequency);
     const int display_size = std::min(m_wave_cycles_ * period, k_max_wave_buf);
     const int head = static_cast<int>(p.frames_alive) % display_size;
     float ext_min, ext_max;
-    wave_range(s.amplitude, s.vertical_shift, 0.f, 1.f, ext_min, ext_max);
+    wave_range(s.genome.amplitude, s.genome.vertical_shift, 0.f, 1.f, ext_min, ext_max);
 
 
     // ── Stats ─────────────────────────────────────────────────────────────
@@ -485,8 +485,7 @@ void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p
     ImGui::Text("Length Diff:  %.2f", length_diff);
     ImGui::Text("Period        %d frames", period);
     ImGui::Text("Extension min %.0f  max %.0f", ext_min, ext_max);
-    ImGui::Text("Generation    %d", s.generation);
-    ImGui::Text("Mutation R    %.4f  Rng %.4f", s.mutation_rate, s.mutation_range);
+    ImGui::Text("Mutation R    %.4f  Rng %.4f", s.genome.mutation_rate, s.genome.mutation_range);
 
     ImGui::Spacing();
     ImGui::TextDisabled("Forces");
@@ -515,12 +514,12 @@ void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p
     ImGui::TextDisabled("Physical");
     ImGui::SetNextItemWidth(-1.f);
 
-    slider_float_cmd(ctx, "##sk", s.spring_const,
+    slider_float_cmd(ctx, "##sk", s.genome.spring_const,
         0.f, SpringGeneticConstraints::spring_const.max,
         "Spring constant = %.3f", CommandSection::CellManagerEvent, CommandType::SetSpringConst);
 
     ImGui::SetNextItemWidth(-1.f);
-    slider_float_cmd(ctx, "##sd", s.damping,
+    slider_float_cmd(ctx, "##sd", s.genome.damping,
         0.f, SpringGeneticConstraints::damping.max,
         "Damping         = %.3f", CommandSection::CellManagerEvent, CommandType::SetDampingConst);
 
@@ -532,10 +531,10 @@ void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p
     draw_wave_panel(ctx, "SL_wave",
         "Extension  amplitude * sin(frequency * t + phase) + shift  [0, 1]",
         static_cast<int>(p.frames_alive), s.id_, "ratio", ext_buf,
-        { s.amplitude,      0.f,                                          SpringGeneticConstraints::amplitude.max,      "Amplitude = %.3f", CommandType::SetSpringAmplitude },
-        { s.frequency,      -SpringGeneticConstraints::frequency.min,     SpringGeneticConstraints::frequency.max,      "Frequency = %.5f", CommandType::SetSpringFrequency },
-        { s.offset,         -SpringGeneticConstraints::offset.min,        SpringGeneticConstraints::offset.max,         "Phase     = %.3f", CommandType::SetSpringOffset },
-        { s.vertical_shift, -SpringGeneticConstraints::vertical_shift.min, SpringGeneticConstraints::vertical_shift.max, "Shift     = %.3f", CommandType::SetSpringVerticalShift });
+        { s.genome.amplitude,      0.f,                                          SpringGeneticConstraints::amplitude.max,      "Amplitude = %.3f", CommandType::SetSpringAmplitude },
+        { s.genome.frequency,      -SpringGeneticConstraints::frequency.min,     SpringGeneticConstraints::frequency.max,      "Frequency = %.5f", CommandType::SetSpringFrequency },
+        { s.genome.offset,         -SpringGeneticConstraints::offset.min,        SpringGeneticConstraints::offset.max,         "Phase     = %.3f", CommandType::SetSpringOffset },
+        { s.genome.vertical_shift, -SpringGeneticConstraints::vertical_shift.min, SpringGeneticConstraints::vertical_shift.max, "Shift     = %.3f", CommandType::SetSpringVerticalShift });
 
 }
 

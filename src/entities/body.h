@@ -2,16 +2,19 @@
 
 /* Body class is a simple struct which holds the physical properties of a cell, such as position, velocity, and mass. */
 
+using BodyId = uint32_t;
+
+
 struct Body
 {
 	bool active = true;
 
 	// This id references the body itself
-	uint32_t id_ = 0;
+	BodyId id_ = 0;
 
 	// Keeping track of nearby id's to resolve collisions with
-	std::array<uint32_t, 8> nearby_ids_;
-	int nearby_ids_size_ = 0;
+	std::array<BodyId, 8> nearby_ids_;
+	uint8_t nearby_ids_size_ = 0;
 
 	inline static constexpr float density = 1.f; // the density of the cell, used to calculate radius from mass
 
@@ -20,7 +23,7 @@ struct Body
 	float mass_;
 	float radius_;
 
-	Body(uint32_t id = 0)
+	Body(BodyId id = 0)
 		: id_(id)
 	{
 		
@@ -39,6 +42,7 @@ struct Body
 	void reset()
 	{
 		velocity_ = { 0.f, 0.f };
+		nearby_ids_size_ = 0;
 	}
 
 	void copy(const Body* other)
@@ -47,6 +51,7 @@ struct Body
 		velocity_ = other->velocity_;
 		mass_ = other->mass_;
 		radius_ = other->radius_;
+		nearby_ids_size_ = 0;
 	}
 
 };

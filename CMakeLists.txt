@@ -78,7 +78,7 @@ add_executable(ProjectARIA
     src/pch/pch.cpp
 
     # ── Entities
-    src/entities/cell/ext/cell.cpp
+    "src/entities/cell/cell.cpp"
 
     # ── managers
     "src/managers/food_manager/ext/FoodManager.cpp"
@@ -129,7 +129,8 @@ add_executable(ProjectARIA
  "src/managers/cell_manager/cell_manager_settings.h" 
  "src/managers/cell_manager/ext/init.cpp" 
  "src/managers/cell_manager/ext/statistics.cpp" 
- "src/world/world_border.h" "src/entities/cell/ext/cell.cpp" 
+ "src/world/world_border.h" 
+ "src/entities/cell/cell.cpp" 
  "src/world/world_settings.h" 
  "src/entities/body.h" 
   

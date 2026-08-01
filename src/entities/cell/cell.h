@@ -64,6 +64,10 @@ public:
 	uint32_t id_ = 0; // The unique identifier for this cell
 	uint32_t body_id_ = 0; // Reference to the body 
 
+	// when a spring is created between this cell and other, the springs properties
+	// will be average between the two cell's spring genomes
+	SpringGenome spring_genome{};
+
 	float energy = initial_energy;
 
 	// Stomach and food

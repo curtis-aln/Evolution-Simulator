@@ -91,13 +91,13 @@ public:
 
 				for (int k = begin; k < end; ++k)
 				{
-					const int body_id = collision_bodies_->occupied_list[k];
+					const BodyId body_id = collision_bodies_->occupied_list[k];
 					Body* obj = collision_bodies_->at(body_id);
 
-					for (int j = 0; j < obj->nearby_ids_size_; ++j)
+					for (uint8_t j = 0; j < obj->nearby_ids_size_; ++j)
 					{
-						int idx = obj->nearby_ids_[j];
-						if (idx == obj->id_ || idx >= (int)collision_bodies_->raw_object_store_.size())
+						BodyId idx = obj->nearby_ids_[j];
+						if (idx == obj->id_ || idx >= (BodyId)collision_bodies_->raw_object_store_.size())
 							continue;  // skip self-collision
 						Body* other_body = collision_bodies_->at(idx);
 						if (other_body == nullptr || !other_body->active)
@@ -142,7 +142,7 @@ private:
 	void primitive_detect_collisions_for_grid_cell(const int grid_cell_id, CollisionVector& collision_vector);
 	void detect_collisions_for_grid_cell(const int grid_cell_id, FixedSpan<uint32_t>& nearby_ids, CollisionVector& collision_vector);
 	void update_nearby_container(const int32_t neighbour_index_x, const int32_t neighbour_index_y, FixedSpan<uint32_t>& nearby_ids);
-	void check_collisions_for_body(const int protozoa_cell_index, const FixedSpan<uint32_t>& nearby_ids, CollisionVector& collision_vector, int check_count = -1);
+	void check_collisions_for_body(const BodyId protozoa_cell_index, const FixedSpan<uint32_t>& nearby_ids, CollisionVector& collision_vector, int check_count = -1);
 
 	void body2bodycollisiondetection(const Body* protozoa_cell, const Body* other_cell, CollisionVector& collision_vector);
 

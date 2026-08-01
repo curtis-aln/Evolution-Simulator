@@ -110,28 +110,32 @@ void CollisionResolver::update_nearby_container(const int32_t neighbour_index_x,
 }
 
 void CollisionResolver::check_collisions_for_body(
-	const int collision_body_id,
-	const FixedSpan<uint32_t>&nearby_ids,
+	const BodyId collision_body_id,
+	const FixedSpan<obj_idx>&nearby_ids,
 	CollisionVector & collision_vector,
 	int check_count)  // -1 means check all
 {
-	const int limit = (check_count < 0) ? nearby_ids.count : check_count;
+	const uint8_t limit = (check_count < 0) ? nearby_ids.count : check_count;
 
 	Body* protozoa_cell = collision_bodies_->at(collision_body_id);
 
-	for (int idx = 0; idx < limit; ++idx)
+	for (uint8_t idx = 0; idx < limit; ++idx)
 	{
-		const int id = nearby_ids.buffer[idx];
+		const BodyId id = nearby_ids.buffer[idx];
 
 		// Only process forward pairs — eliminates all (b,a) duplicates
 		if (id <= collision_body_id)
 			continue;
 
-		body2bodycollisiondetection(protozoa_cell, collision_bodies_->at(nearby_ids.buffer[idx]), collision_vector);
+		body2bodycollisiondetection(protozoa_cell, collision_bodies_->at(id), collision_vector);
 
 		if (idx < protozoa_cell->nearby_ids_.size())
 		{
-			protozoa_cell->nearby_ids_[idx] = nearby_ids.buffer[idx];
+			if (id > 1000000)
+			{
+				std::cout << "Error: id is too large, this should never happen\n";
+			}
+			protozoa_cell->nearby_ids_[idx] = id;
 			protozoa_cell->nearby_ids_size_++;
 		}
 	}

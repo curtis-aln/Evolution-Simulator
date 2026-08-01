@@ -59,7 +59,7 @@ bool CellManager::build_protozoa_from_seed(uint32_t seed_cell_id, int max_recurs
 	if (spring_id == -1)
 		return false;
 	Spring* spring = all_springs_.at(spring_id);
-	spring->randomize();
+	spring->genome.randomize();
 
 	if (recursion_depth < max_recursion_depth)
 		build_protozoa_from_seed(pair.cell_id, max_recursion_depth, recursion_depth + 1);
@@ -166,9 +166,9 @@ void CellManager::apply_birth_requests()
 		
 		Spring* spring = all_springs_.at(new_spring_id);
 
-		spring->spring_const = 0.00005f;
-		spring->amplitude = 0.4f;
-		spring->damping = 0.0005;
+		spring->genome.spring_const = 0.00005f;
+		spring->genome.amplitude = 0.4f;
+		spring->genome.damping = 0.0005;
 
 
 		const sf::Vector2f diff = parent_body->position_ - offspring_body->position_;
@@ -259,8 +259,8 @@ void CellManager::create_weak_offspring(uint32_t parent_id)
 	Spring* spring = all_springs_.at(spring_id);
 
 	// creating a spring that is firm but doesnt oscilate mutch
-	spring->randomize();
-	spring->amplitude = 0.2f;
+	spring->genome.randomize();
+	spring->genome.amplitude = 0.2f;
 
 	// creating a child which doesnt grab on too much
 	parent->create_offspring(child, parent_body, child_body, true);

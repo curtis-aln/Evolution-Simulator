@@ -22,7 +22,7 @@ void CellManager::update()
 	// reproductive system
 	collect_reproduction_requests();
 	apply_birth_requests();
-	apply_connection_requests();
+	//apply_connection_requests();
 
 	// death
 	handle_death();
@@ -493,6 +493,6 @@ void CellManager::clone_selected_protozoa()
 
 		Spring* new_spring = all_springs_.at(spring_id);
 
-		new_spring->copy_genetics(spring);
+		new_spring->genome.copy_genetics(spring.genome);
 	}
 }
