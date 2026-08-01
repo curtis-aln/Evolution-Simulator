@@ -55,7 +55,7 @@ static void load_cell_settings(toml::table& tbl)
     REQUIRE(CellSettings::max_cells, tbl["cell"]["max_cells"]);              // "protozoa" -> "cell", NEW key
     REQUIRE(CellSettings::spawn_radius, tbl["cell"]["spawn_radius"]);        // "protozoa" -> "cell", NEW key
     REQUIRE(CellSettings::energy_decay_rate, tbl["cell"]["energy_decay_rate"]);
-    REQUIRE(CellSettings::reproductive_cooldown, tbl["cell"]["reproductive_cooldown"]);
+    REQUIRE(CellSettings::repro_cooldown, tbl["cell"]["reproductive_cooldown"]);
     REQUIRE(CellSettings::initial_energy, tbl["cell"]["initial_energy"]);
     REQUIRE(CellSettings::wander_threshold, tbl["cell"]["wander_threshold"]);
     REQUIRE(CellSettings::digestive_time, tbl["cell"]["digestive_time"]);
@@ -80,7 +80,7 @@ static void load_food_settings(toml::table& tbl)
     REQUIRE(FoodManagerSettings::food_radius, tbl["food"]["food_radius"]);
     REQUIRE(FoodManagerSettings::friction, tbl["food"]["friction"]);
     REQUIRE(FoodManagerSettings::death_age, tbl["food"]["death_age"]);
-    REQUIRE(FoodManagerSettings::reproductive_cooldown, tbl["food"]["reproductive_cooldown"]);
+    REQUIRE(FoodManagerSettings::repro_cooldown, tbl["food"]["reproductive_cooldown"]);
     REQUIRE(FoodManagerSettings::reproductive_threshold, tbl["food"]["reproductive_threshold"]);
     REQUIRE(FoodManagerSettings::initial_nutrients, tbl["food"]["initial_nutrients"]);
     REQUIRE(FoodManagerSettings::final_nutrients, tbl["food"]["final_nutrients"]);

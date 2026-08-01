@@ -302,11 +302,11 @@ void OrganismTab::draw_cells_springs_tab(const SimSnapshot& snap, ImGuiContext& 
         &SimCommand::int_val, kStructureModes, snap.world_stats.structure_mode,
         ImVec4{ 0.4f, 0.4f, 0.4f, 1.f }, 20);
 
-    bool immortal = false;
-    if (ImGui::Checkbox("Immortal##org", &immortal))
+    bool immortal_ = false;
+    if (ImGui::Checkbox("Immortal##org", &immortal_))
     {
         SimCommand cmd{ .type = CommandType::MakeImmortal };
-        cmd.bool_val = immortal;
+        cmd.bool_val = immortal_;
         ctx.push(cmd);
     }
     ImGui::Spacing();
@@ -382,7 +382,7 @@ void OrganismTab::draw_cell_detail(ImGuiContext& ctx, const Cell& c, const sf::V
     if (speed_sq != 0)
 	    speed = vel.length();
 
-    const int frames_alive = c.frames_alive_;
+    const int frames_alive = c.internal_clock_;
     const float current_friction = c.calculate_friction();
 
     const int period = safe_time_period(c.frequency);
@@ -621,14 +621,14 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
 
         // Energy bar
         {
-            const float f = std::clamp(c.energy / CellSettings::reproduce_energy_thresh, 0.f, 1.f);
+            const float f = std::clamp(c.energy / CellSettings::repro_thresh_, 0.f, 1.f);
             ImGui::TextDisabled("E"); ImGui::SameLine(0.f, 3.f);
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, fraction_color(f));
             ImGui::ProgressBar(f, { k_mini_cell_box_width, k_mini_bar_height }, "");
             ImGui::PopStyleColor();
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Energy: %.2f  /  %.0f (repro thresh)",
-                    c.energy, CellSettings::reproduce_energy_thresh);
+                    c.energy, CellSettings::repro_thresh_);
         }
         // Nutrients bar
         {
@@ -705,7 +705,7 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
     ImGui::TextDisabled("Thresholds  &  costs");
     ImGui::Separator();
     ImGui::Text("Initial energy           %.1f", CellSettings::initial_energy);
-    ImGui::Text("Reproduce threshold      %.1f", CellSettings::reproduce_energy_thresh);
+    ImGui::Text("Reproduce threshold      %.1f", CellSettings::repro_thresh_);
     ImGui::Text("Offspring energy cost    %.1f", CellSettings::offspring_energy_cost);
     ImGui::Text("Integrity max            %.1f", CellSettings::integrity);
     ImGui::Text("Nutrients cap (*)        %.1f", k_max_nutrients);

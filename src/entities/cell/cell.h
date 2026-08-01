@@ -50,19 +50,20 @@ inline float fast_sin(float x)
 	return y;
 }
 
+
 struct Cell : public CellGenome, CellSettings
 {
-private:
-	uint16_t clock_ = 0;
-	bool reproduce = false; // signals to the protozoa manager that this cell needs an offspring index set
 
-protected:
-	bool dead = false;
-	bool immortal = false;
+private:
+	
+
+	bool reproduce_ = false; // signals to the protozoa manager that this cell needs an offspring index set
+	bool dead_ = false;      // signals that the cell is in its decaying state
+	bool immortal_ = false;  // cell is unaffected by death
 
 public:
-	uint32_t id_ = 0; // The unique identifier for this cell
-	uint32_t body_id_ = 0; // Reference to the body 
+	uint32_t id_ = 0;        // The unique identifier for this cell
+	uint32_t body_id_ = 0;   // Reference to the body 
 
 	// when a spring is created between this cell and other, the springs properties
 	// will be average between the two cell's spring genomes
@@ -72,7 +73,7 @@ public:
 
 	// Stomach and food
 	uint16_t time_since_last_ate_ = 0;
-	uint16_t time_since_last_reproduced_ = 0;
+	uint16_t repro_timer_ = 0;
 	float nutrients_ = 0.f;
 	uint8_t total_food_eaten_ = 0;
 	uint8_t stomach_ = 0;
@@ -81,7 +82,7 @@ public:
 	float sinwave_current_friction_ = 0.f;
 
 	// Statistics information
-	uint16_t frames_alive_ = 0;
+	uint16_t internal_clock_ = 0;
 	uint8_t  offspring_count = 0;
 
 	// reproductive related variables
@@ -97,42 +98,39 @@ public:
 	int nearby_food_ids_size_ = 0;
 
 
-	Cell(const uint32_t _id = 0)
-	{
-		body_id_ = _id;
-	}
+public:
+	Cell(const uint32_t body_id = 0) { body_id_ = body_id; }
 
-	[[nodiscard]] bool is_alive() const { return !dead; }
-	[[nodiscard]] bool should_reproduce() const { return reproduce; }
+	// ------------ Data accessors ------------
+	[[nodiscard]] bool is_alive() const { return !dead_; }
+	[[nodiscard]] bool can_die() const { return energy <= 0; }
+
+	[[nodiscard]] bool should_reproduce() const { return reproduce_; }
+	[[nodiscard]] bool can_reproduce() const { return energy >= repro_thresh_ && repro_timer_ >= repro_cooldown; }
+
 	[[nodiscard]] bool should_remove() const { return can_die() && (integrity <= 0); }
 
 	[[nodiscard]] sf::Color get_outer_color() const { return { outer_r, outer_g, outer_b, outer_transparency }; }
 	[[nodiscard]] sf::Color get_inner_color() const { return { inner_r, inner_g, inner_b, inner_transparency }; }
 
-	void recreate();
-	void eat(const float nutrients);
+	[[nodiscard]] sf::Vector2f get_pos_nearby(const Body* body, const float range) const;
+	[[nodiscard]] float calculate_friction() const;
 
+	// ------------ Cell functionality ------------
+	void update_statistics();
+	void update_organics();
+
+	void eat(const float nutrients);
+	void create_offspring(Cell* child, Body* parent_body, Body* child_body, const bool mutate);
 	static bool consume_food_check(const sf::Vector2f& cell_pos, const sf::Vector2f& food_pos, const float combined_rad);
 
-	void accelerate(const sf::Vector2f acceleration);
-
-	void create_offspring(Cell* child, Body* parent_body, Body* child_body, const bool mutate);
-
-	[[nodiscard]] bool can_die() const;
-
-	[[nodiscard]] bool can_reproduce() const;
+	void recreate();
 
 	void turn_off_reproduction();
 
-	[[nodiscard]] sf::Vector2f get_pos_nearby(const Body* body, const float range) const;
 
-	[[nodiscard]] float calculate_friction() const;
-
-	void update_statistics();
-
-	void update_organics();
-
+private:
+	// Energy, Nutrient, and Integrity management
 	void process_nutrients();
-
 	void repair_integrity();
 };

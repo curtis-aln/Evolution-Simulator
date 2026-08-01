@@ -16,7 +16,7 @@ void CellManager::handle_death()
 void CellManager::remove_cell(Cell* cell)
 {
     if (cell == nullptr) return;
-    register_death_stat(cell->frames_alive_, cell->offspring_count > 0);
+    register_death_stat(cell->internal_clock_, cell->offspring_count > 0);
 
     if (cell->pending_parent_id != -1)
     {

@@ -5,24 +5,23 @@
 void Cell::recreate()
 {
 	energy = initial_energy;
-	clock_ = 0;
+	internal_clock_ = 0;
 	generation = 0;
 	time_since_last_ate_ = 0;
 	nutrients_ = 0.f;
 	total_food_eaten_ = 0;
 	stomach_ = 0;
-	frames_alive_ = 0;
 	integrity = 100;
 	offspring_count = 0;
 	frames_since_offspring_pending_ = 0;
 
-	reproduce = false;
+	reproduce_ = false;
 	offspring_index = -1;
 	connection_index = -1;
 	spring_to_copy_index = -1;
 
-	dead = false;
-	immortal = false;
+	dead_ = false;
+	immortal_ = false;
 }
 
 void Cell::eat(const float nutrients)
@@ -52,7 +51,7 @@ void Cell::create_offspring(Cell* child, Body* parent_body, Body* child_body, co
 
 	child_body->position_ = get_pos_nearby(parent_body, 2.f);
 
-	time_since_last_reproduced_ = 0;
+	repro_timer_ = 0;
 	offspring_count++;
 	child->generation++;
 
@@ -69,30 +68,10 @@ void Cell::create_offspring(Cell* child, Body* parent_body, Body* child_body, co
 
 }
 
-[[nodiscard]] bool  Cell::can_die() const
-{
-	if (energy <= 0 || integrity <= 0)
-	{
-		return true;
-	}
-	return false;
-}
-
-[[nodiscard]] bool  Cell::can_reproduce() const
-{
-	if (energy < reproduce_energy_thresh)
-		return false;
-
-	if (time_since_last_reproduced_ < reproductive_cooldown)
-		return false;
-
-	return true;
-}
-
 void Cell::turn_off_reproduction()
 {
-	time_since_last_reproduced_ = 0;
-	reproduce = false;
+	repro_timer_ = 0;
+	reproduce_ = false;
 }
 
 
@@ -108,7 +87,7 @@ void Cell::turn_off_reproduction()
 
 [[nodiscard]] float Cell::calculate_friction() const
 {
-	const float sin_value = fast_sin(frequency * clock_ + offset); // [-1, 1]
+	const float sin_value = fast_sin(frequency * internal_clock_ + offset); // [-1, 1]
 	const float ratio = vertical_shift + amplitude * sin_value;     // [vs-a, vs+a]
 	const float clamped = std::clamp(ratio, 0.f, 1.f);
 	// clamping friction to [0, 1]
@@ -117,10 +96,9 @@ void Cell::turn_off_reproduction()
 
 void  Cell::update_statistics()
 {
-	clock_++;
+	internal_clock_++;
 	time_since_last_ate_++;
-	frames_alive_++;
-	time_since_last_reproduced_++;
+	repro_timer_++;
 
 	if (offspring_index >= 0)
 		frames_since_offspring_pending_++;
@@ -131,7 +109,7 @@ void  Cell::update_statistics()
 
 void Cell::update_organics()
 {
-	if (dead)
+	if (dead_)
 	{
 		sinwave_current_friction_ = 0.3f;
 		integrity -= integrity_drain_rate;	
@@ -151,7 +129,7 @@ void Cell::update_organics()
 	if (energy <= 0.f)
 	{
 		energy = 0.f;
-		dead = true;
+		dead_ = true;
 		integrity = std::max(0.f, integrity - integrity_drain_rate);
 		return;  // dead cells don't repair or reproduce
 	}
@@ -161,7 +139,7 @@ void Cell::update_organics()
 
 	// 5. Flag for reproduction — use assignment so it clears itself
 	//    when energy drops back below threshold
-	reproduce = (energy >= reproduce_energy_thresh) && (offspring_index < 0);
+	reproduce_ = (energy >= repro_thresh_) && (offspring_index < 0);
 }
 
 

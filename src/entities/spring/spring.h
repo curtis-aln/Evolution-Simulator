@@ -29,7 +29,7 @@ public:
 	uint32_t cell_A_id{};
 	uint32_t cell_B_id{};
 
-	uint16_t clock_{};
+	uint16_t internal_clock_{};
 
 	float work_done = 0.f;
 	float rest_length = 0.f;
@@ -53,7 +53,7 @@ public:
 
 	void reset()
 	{
-		clock_ = 0;
+		internal_clock_ = 0;
 		work_done = 0.f;
 		current_length = 0.f;
 		broken = false;
@@ -72,7 +72,7 @@ public:
 	void break_spring()
 	{
 		// springs have a spawn immunity
-		if (clock_ > 30)
+		if (internal_clock_ > 30)
 			broken = true;
 		else
 			broken = false;
@@ -91,7 +91,7 @@ public:
 	// returns a movement vector
 	void update_physics(const sf::Vector2f& pos_a, const sf::Vector2f& vel_a, const sf::Vector2f& pos_b, const sf::Vector2f& vel_b)
 	{
-		clock_++;
+		internal_clock_++;
 
 		const sf::Vector2f dir = pos_b - pos_a;
 		const float length_squared = dir.x * dir.x + dir.y * dir.y;
@@ -106,7 +106,7 @@ public:
 		const float inv_length = 1.0f / current_length;
 
 		// finding the rest length of the spring
-		rest_length = calculate_rest_length(clock_);
+		rest_length = calculate_rest_length(internal_clock_);
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
 		spring_force = genome.spring_const * (length_diff);

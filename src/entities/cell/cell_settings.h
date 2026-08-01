@@ -8,7 +8,7 @@ struct CellSettings
 	inline static float nutrients_conversion_rate = .185f;
 
 	inline static float offspring_energy_cost = 100.f;
-	inline static float reproduce_energy_thresh = 200.f;
+	inline static float repro_thresh_ = 200.f;
 	
 
 	inline static float bite_amount = 65.f;
@@ -22,7 +22,7 @@ struct CellSettings
 
 	inline static float wander_threshold; // if a cell wanders too far away from the protozoa it kills the whole thing
 
-	inline static size_t reproductive_cooldown;
+	inline static size_t repro_cooldown;
 	inline static float digestive_time; // per cell
 
 	inline static float initial_energy; // energy the protozoa spawn with

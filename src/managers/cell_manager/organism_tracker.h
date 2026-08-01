@@ -285,17 +285,17 @@ private:
         {
             total_energy += cell.energy;
             total_nutrients += cell.nutrients_;
-            frames_alive += cell.frames_alive_;
+            frames_alive += cell.internal_clock_;
             total_food_eaten += cell.total_food_eaten_;
 			average_generation += cell.generation;
             offspring_count += cell.offspring_count;
-			time_since_last_reproduced += cell.time_since_last_reproduced_;
+			time_since_last_reproduced += cell.repro_timer_;
 
             cells_ready_to_reproduce += cell.can_reproduce();
         }
 
         average_generation /= cell_count;
-        max_energy = cell_count * CellSettings::reproduce_energy_thresh;
+        max_energy = cell_count * CellSettings::repro_thresh_;
         max_nutrients = max_energy;
         average_energy = total_energy / cell_count;
         frames_alive = frames_alive / cell_count;
