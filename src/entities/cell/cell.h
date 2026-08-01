@@ -53,10 +53,7 @@ inline float fast_sin(float x)
 
 struct Cell : public CellGenome, CellSettings
 {
-
 private:
-	
-
 	bool reproduce_ = false; // signals to the protozoa manager that this cell needs an offspring index set
 	bool dead_ = false;      // signals that the cell is in its decaying state
 	bool immortal_ = false;  // cell is unaffected by death

@@ -143,6 +143,41 @@ struct SpringGenome : GenomeBase
         mutation_rate = parent.mutation_rate;
         mutation_range = parent.mutation_range;
     }
+
+    void sexually_reproduce(const SpringGenome& parentA, const SpringGenome& parentB, bool cross_mutate = true)
+    {
+        const auto& C = SpringGeneticConstraints{};
+
+        // Inherit mutation_rate/mutation_range the same way genes are inherited below,
+        // so the rate used to mutate this child's genes reflects its own lineage.
+        mutation_rate = cross_mutate
+            ? (Random::rand01_float() < 0.5f ? parentA.mutation_rate : parentB.mutation_rate)
+            : (parentA.mutation_rate + parentB.mutation_rate) * 0.5f;
+
+        mutation_range = cross_mutate
+            ? (Random::rand01_float() < 0.5f ? parentA.mutation_range : parentB.mutation_range)
+            : (parentA.mutation_range + parentB.mutation_range) * 0.5f;
+
+        generation = std::max(parentA.generation, parentB.generation) + 1;
+
+        // Picks (cross_mutate) or blends (!cross_mutate) a gene from both parents, then mutates it.
+        auto inherit = [&](float a, float b, Range limit) -> float {
+            const float value = cross_mutate
+                ? (Random::rand01_float() < 0.5f ? a : b)
+                : (a + b) * 0.5f;
+            return maybe_mutate(value, limit, mutation_rate, mutation_range);
+            };
+
+        amplitude = inherit(parentA.amplitude, parentB.amplitude, C.amplitude);
+        frequency = inherit(parentA.frequency, parentB.frequency, C.frequency);
+        offset = inherit(parentA.offset, parentB.offset, C.offset);
+        vertical_shift = inherit(parentA.vertical_shift, parentB.vertical_shift, C.vertical_shift);
+        spring_const = inherit(parentA.spring_const, parentB.spring_const, C.spring_const);
+        damping = inherit(parentA.damping, parentB.damping, C.damping);
+        nutrient_transfer_rate = inherit(parentA.nutrient_transfer_rate, parentB.nutrient_transfer_rate, C.nutrient_transfer_rate);
+
+        mutate_meta();
+    }
 };
 
 // ---------------------------------------------------------------------------
