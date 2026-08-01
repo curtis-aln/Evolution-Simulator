@@ -1,8 +1,7 @@
 ----------------------------------------------------------------------
 ##### ImGUI TODO
-- when you click on a protozoa it should bring you to the organism tab
-- when you deselect a protozoa or an organism dies, it should bring you back to the simulation Tab
-
+- o for incremental steps no longer works
+- Fix the spiderweb bug
 
 - add a "Navigate to most sucessfull organism" button which locks on to the organism which has reporoduced the most
 
@@ -176,13 +175,104 @@ Today Todo
 - when deselecting or an organism dies, it should bring you back to the simulation Tab
 
 
-# ------------------------------- FOUR HOUR PROGRAMMING MARATHON -------------------------------
-# 15:15 - 16:15 bugs & GUI
-15:32 - Fixde 100 frame statistics, that wernt showing
-15:57 - Ability to clone protozoa
-- you can now deselect the right click options, and when you select it shows the radius by default
-- you can now drag cells
 
-# 16:15 - 18:15 GUI & settings compatability
 
-# 18:15 - 19:15 - Graphics Improvements
+# ----- Reproducive system
+# Reproduction & Growth: Proximity-Based Local Bonding
+- Make the Inject code work for the organism tab
+
+- Remove all spring genetic information and move it into cells
+- remove old reproduction code
+- When a cell is ready to reproduce, it should spawn a new cell nearby and connect it with a weak spring
+- Make a reproductive spatial grid and add the appropriate cells to it every N frames
+- Make a view where you can only see the reproductive spatial grid and the cells in it
+- Add the following traits to the cell genome:
+  - connection age window (min age, max age)
+
+
+## Part 1 - Removing Spring genetic information
+- When a spring is created, it's physical properties should be an average of the two cells it connects
+  - amplitude, frequency, offset, vertical_shift, spring_const, damping, nutrient_transfer_rate
+- During the protoza creation process, spawn a pool of cells, then randomly connect them with springs
+
+## Part 2 - Adding new reproductive system
+
+
+
+## Core mechanism
+
+1. **Budding.** When a cell's stored energy crosses its reproduction threshold, it
+   spawns one new cell nearby (offset direction and distance are genome-driven).
+2. **Weak tether.** The new cell is immediately connected to its parent by a
+   low-strength spring, so it doesn't drift off uncontrolled.
+3. **Proximity bonding pass.** Every tick (reusing the existing spatial hash / collision
+   query — no new spatial structure needed), any two cells that are close enough,
+   don't already share a spring, are within their bond-receptive age window, and pass a
+   compatibility check, form a new spring between them. This is what actually braces
+   structures into triangles, meshes, or thick clusters rather than pure chains.
+4. **Tether evolution over time.** The weak tether spring's strength changes over the
+   cell's life according to a heritable rate — it can harden into a full structural
+   spring (permanent fusion) or stay weak (loose colonial attachment) or eventually
+   snap (dispersal).
+
+No step here requires walking the graph, referencing an organism, or keeping any index
+alive longer than the current tick.
+
+## Evolutionary traits
+
+| Trait | Scope | Effect |
+|---|---|---|
+| **Reproduction energy threshold** | cell | Energy level required to trigger budding a new cell. |
+| **Bud offset angle / distance** | cell | Where the child cell spawns relative to the parent. Governs whether growth is chain-like, radial, or clustered. |
+| **Bond receptivity window (min age, max age)** | cell | The age range during which a cell will accept *new* proximity-formed springs. Short window → body plan locks in fast, rigid organisms. Long/permanent window → ever-remodeling, soft-bodied organisms. |
+| **Compatibility tag** | cell | A heritable value; two cells only bond if their tags are within tolerance of each other. Acts as kin recognition — prevents indiscriminate bonding with unrelated organisms or corpses. Can also be relaxed by mutation to allow symbiotic/parasitic fusion between lineages. |
+| **Bonding range / rest-length tolerance** | cell | How close two cells must be (relative to spring rest length) to qualify for proximity bonding. Controls "reach" — tight structures vs. loosely bonded sprawling ones. |
+| **Max spring degree** | cell | Caps how many springs one cell can hold. Determines whether a lineage favors many simple low-degree cells (chains) or hub-like high-degree cells (dense meshes). |
+| **Tether initial strength** | spring (parent–child) | Stiffness of the newly formed tether at the moment of birth. |
+| **Tether strengthening rate** | spring (parent–child) | How fast the tether's strength grows toward a full structural spring. Near-zero → permanently weak, loosely attached offspring (colonial growth). High → rapid fusion into a rigid, permanently connected body. |
+| **Detachment probability** | spring (parent–child) | Per-tick (or age-scaled) chance the tether snaps outright before strengthening. High values → effective seed dispersal, a lone cell floats off to rebuild complexity from scratch via the same rules. Near-zero → offspring never leave the parent structure. |
+
+## Emergent design space
+
+These traits are not separate "modes" that need to be selected between — they're all
+continuous values in one shared parameter space, and different regions of that space
+naturally produce different macroscopic strategies:
+
+- **Chains / tendrils** — narrow bond receptivity window, low bud offset angle, low
+  detachment probability.
+- **Triangulated / meshed bodies** — wide bonding range, higher max spring degree,
+  moderate receptivity window (long enough for proximity bonding to brace the shape).
+- **Loose colonies** — low tether strengthening rate, low detachment probability
+  (stays attached, but never fuses rigidly).
+- **Dispersing seeders** — high detachment probability; effectively "spore" behavior
+  without needing any explicit seed-encoding mechanism, since the dispersed cell just
+  regrows using the same local rules.
+
+No separate reproduction system is needed to cover any of these cases — they all fall
+out of selection acting on the same handful of numbers.
+
+## Implementation notes
+
+- **Concurrency:** reproduction and proximity-bond checks should not mutate the pools
+  directly from within parallel work. Mirror the pattern already used for collision
+  resolution — write spawn/bond requests to thread-local buffers during the parallel
+  pass, then apply them in a single synchronized pass afterward. This is also the only
+  point at which cell/spring indices need to be valid, which keeps the fragile surface
+  area small.
+- **Spatial hash reuse:** the proximity-bonding pass should reuse the existing
+  spatial hash query used for collision detection rather than building a second
+  structure — same self-correcting, rebuilt-every-frame index, no staleness possible.
+- **Stale reference safety:** parent/child and bonded-pair references should still use
+  the generation-counted `Handle` pattern already used elsewhere in the sim, so a spring
+  whose cell has died can detect it in O(1) and self-remove rather than relying on any
+  external cleanup pass.
+
+
+
+
+
+
+
+
+
+

@@ -146,6 +146,8 @@ void CellManager::apply_birth_requests()
 
 		Body* offspring_body = bodies_->at(pair.body_id);
 		Cell* offspring = all_cells_.at(pair.cell_id);
+
+		offspring->pending_parent_id = parent_cell->id_;
 		
 		// create the offspring by filling in its genetics and other properties based on the parent cell
 		parent_cell->create_offspring(offspring, parent_body, offspring_body, true);
@@ -204,23 +206,28 @@ void CellManager::apply_connection_requests()
 {
 	for (const ConnectionRequest& req : connection_requests)
 	{
+		// first we need to check that both cells are still alive
+		Cell* cell = all_cells_.at(req.offspring_id);
+		Cell* other_cell = all_cells_.at(req.connect_to_id);
+
+		if (all_cells_.is_obj_active(cell->id_) == false || all_cells_.is_obj_active(other_cell->id_) == false)
+			continue;
+
 		uint32_t new_spring_id = create_spring(static_cast<uint32_t>(req.offspring_id), static_cast<uint32_t>(req.connect_to_id));
 		
 		if (new_spring_id == -1)
 			continue;
 
 		Spring* new_spring = all_springs_.at(new_spring_id);
-
 		Spring* parent_spring = all_springs_.at(req.spring_to_copy_index);
 		parent_spring->create_offspring(*new_spring);
 		
-		Cell* cell = all_cells_.at(parent_spring->cell_A_id);
-		Cell* other_cell = all_cells_.at(parent_spring->cell_B_id);
 
 		// reset the reproductive fields so we don't create multiple connection requests for the same cells
 		cell->connection_index = -1;
 		cell->offspring_index = -1;
 		cell->spring_to_copy_index = -1;
+		cell->pending_parent_id = -1;
 
 		other_cell->connection_index = -1;
 		other_cell->offspring_index = -1;

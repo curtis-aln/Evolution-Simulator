@@ -85,6 +85,8 @@ public:
 	int32_t connection_index = -1; // tells the protozoa manager what to connect offspring index to
 	int32_t spring_to_copy_index = -1; // tells the protozoa manager which spring to copy 
 
+	int32_t pending_parent_id = -1; // set when this cell is created as an offspring
+
 	uint16_t frames_since_offspring_pending_ = 0;
 
 	std::array<uint32_t, 8> nearby_food_ids_{};
