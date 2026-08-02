@@ -69,7 +69,7 @@ void CellManager::update_new_born_cells()
 {
 	for (Cell* cell : all_cells_)
 	{
-		if (cell->internal_clock_ > 100)
+		if (cell->internal_clock_ > 100 || cell->internal_clock_ % 30 != 0)
 			return;
 
 		Body* body = bodies_->at(cell->body_id_);

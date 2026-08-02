@@ -4,7 +4,7 @@ struct SpringSettings
 {
 	inline static float energy_share_rate = 0.1f;
 
-	inline static float spring_break_force = 10.f;
+	inline static float spring_break_force = 20.f;
 	inline static float spring_damage_threshold = 0.5f;
 
 	inline static float breaking_length;

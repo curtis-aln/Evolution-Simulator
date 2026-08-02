@@ -20,7 +20,7 @@ struct WorldToggles
     bool simple_mode = false;  // only render outer circles of cells
     bool debug_mode = false;  // show per-cell debug info
     bool skeleton_mode = false;  // only render springs, no cell bodies
-    bool paused = true;  // pause the simulation update loop
+    bool paused = false;  // pause the simulation update loop
     bool draw_cell_grid = false;  // render the cell spatial hash grid
     bool draw_food_grid = false;  // render the food spatial hash grid
     bool toggle_collisions = true;   // enable/disable cell collision handling
