@@ -12,7 +12,7 @@ void FoodManager::let_food_reproduce()
 	// Each food must pass the reproduce check and the spawn chance
 	for (Food* food : food_vector)
 	{
-		if (!can_food_reproduce(food) || Random::rand01_float() > calculate_spawn_chance())
+		if (!can_food_reproduce(food) || calculate_spawn_chance() < Random::rand01_float())
 			continue;
 
 		bool break_out_of_loop = reproduce_food(food);

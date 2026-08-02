@@ -11,6 +11,7 @@ struct FoodManagerSettings
 
 	inline static unsigned max_food;
 	inline static unsigned initial_food;
+
 	inline static float food_radius;
 	inline static float friction;
 

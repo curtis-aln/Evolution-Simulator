@@ -144,8 +144,6 @@ public:
 			update_integrity(cell_a.integrity, cell_b.integrity);
 		}
 
-		handle_reproduction(cell_a, cell_b);
-
 		float transfer = transfer_nutrients(cell_a.nutrients_, cell_b.nutrients_);
 
 		cell_a.nutrients_ += transfer;
@@ -163,15 +161,6 @@ public:
 	}
 
 private:
-	void handle_reproduction(Cell& cell_a, Cell& cell_b)
-	{
-		if (cell_a.offspring_index >= 0 && cell_b.offspring_index >= 0)
-		{
-			cell_a.connection_index = cell_b.offspring_index;
-			cell_a.spring_to_copy_index = id_;
-		}
-	}
-
 	// takes in the nutrients of cell a and cell b and reutrns the transfer amount
 	float transfer_nutrients(float nutrients_a, float nutrients_b)
 	{

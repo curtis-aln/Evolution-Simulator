@@ -404,9 +404,6 @@ void OrganismTab::draw_cell_detail(ImGuiContext& ctx, const Cell& c, const sf::V
     ImGui::Text("Ate      %d  (%zu fr ago)", c.total_food_eaten_, c.time_since_last_ate_);
 
     ImGui::Text("reproduce: %d", c.can_reproduce());
-	ImGui::Text("offspring idx: %d", c.offspring_index);
-	ImGui::Text("connection idx: %d", c.connection_index);
-	ImGui::Text("spring copy idx: %d", c.spring_to_copy_index);
 
     // Digest cooldown bar
     const float digest_remaining = std::max(0.f,

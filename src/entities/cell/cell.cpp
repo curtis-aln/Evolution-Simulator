@@ -13,13 +13,8 @@ void Cell::recreate()
 	stomach_ = 0;
 	integrity = 100;
 	offspring_count = 0;
-	frames_since_offspring_pending_ = 0;
 
 	reproduce_ = false;
-	offspring_index = -1;
-	connection_index = -1;
-	spring_to_copy_index = -1;
-
 	dead_ = false;
 	immortal_ = false;
 }
@@ -59,9 +54,13 @@ void Cell::create_offspring(Cell* child, Body* parent_body, Body* child_body, co
 	child->energy /= 2;
 
 	child->copy_genetics(*this);
+	child->spring_genome.copy_genetics(spring_genome);
 
 	if (mutate)
+	{
 		child->mutate();
+		child->spring_genome.mutate();
+	}
 
 	// setting the physical parameters of the childs body
 	child_body->radius_ = child->radius;
@@ -99,11 +98,6 @@ void  Cell::update_statistics()
 	internal_clock_++;
 	time_since_last_ate_++;
 	repro_timer_++;
-
-	if (offspring_index >= 0)
-		frames_since_offspring_pending_++;
-	else
-		frames_since_offspring_pending_ = 0;
 }
 
 
@@ -139,7 +133,7 @@ void Cell::update_organics()
 
 	// 5. Flag for reproduction — use assignment so it clears itself
 	//    when energy drops back below threshold
-	reproduce_ = (energy >= repro_thresh_) && (offspring_index < 0);
+	reproduce_ = (energy >= repro_thresh_);
 }
 
 

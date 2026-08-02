@@ -68,6 +68,86 @@ bool CellManager::build_protozoa_from_seed(uint32_t seed_cell_id, int max_recurs
 }
 
 
+void CellManager::create_protozoa_from_pool(const sf::Vector2f position, const unsigned max_cells, const unsigned max_springs)
+{
+	float spawn_radius = CellSettings::spawn_radius * 10.f;
+
+	std::vector<uint32_t> cell_indexes;
+	cell_indexes.reserve(max_cells);
+
+	for (int i = 0; i < max_cells; ++i)
+	{
+		const sf::Vector2f spawn_pos = Random::rand_position_in_circle(position, spawn_radius);
+		const CellBodyPair& pair = create_cell(spawn_pos, true);
+		if (!pair.is_valid)
+			break;
+		cell_indexes.push_back(pair.cell_id);
+	}
+
+	const size_t n = cell_indexes.size();
+	if (n < 2 || max_springs == 0)
+		return; // nothing to connect
+
+	// Track which pairs already have a spring, so we never place two springs
+	// on the same pair of cells. Pair key: smaller index combined with larger.
+	auto pair_key = [](uint32_t a, uint32_t b) -> uint64_t {
+		if (a > b) std::swap(a, b);
+		return (static_cast<uint64_t>(a) << 32) | b;
+		};
+	std::unordered_set<uint64_t> used_pairs;
+	used_pairs.reserve(max_springs);
+
+	unsigned springs_placed = 0;
+
+	auto try_add_spring = [&](uint32_t cell_a, uint32_t cell_b) -> bool {
+		const uint64_t key = pair_key(cell_a, cell_b);
+		if (used_pairs.contains(key))
+			return false;
+
+		const int32_t result = create_spring(cell_a, cell_b); // adjust to your actual API
+		if (result == -1)
+			return false;
+
+		Spring* spring = all_springs_.at(result);
+		spring->genome.randomize();
+
+		used_pairs.insert(key);
+		++springs_placed;
+		return true;
+		};
+
+	// --- Phase 1: random spanning tree, guarantees every cell is connected ---
+	// Shuffle the indexes, then link each new cell to a random *already-connected* cell.
+	// This produces a random tree shape rather than a straight chain or star.
+	std::vector<uint32_t> shuffled = cell_indexes;
+	std::shuffle(shuffled.begin(), shuffled.end(), Random::get_engine());
+
+	for (size_t i = 1; i < shuffled.size() && springs_placed < max_springs; ++i)
+	{
+		const size_t connect_to = Random::rand_range(size_t(0), i - 1); // random index in [0, i)
+		try_add_spring(shuffled[i], shuffled[connect_to]);
+	}
+
+	// --- Phase 2: fill remaining spring budget with random extra edges ---
+	const unsigned remaining_budget = max_springs - springs_placed;
+	if (remaining_budget == 0 || n < 2)
+		return;
+
+	// Cap attempts so a nearly-saturated small graph can't spin forever
+	// trying to find a pair that isn't already used.
+	const unsigned max_attempts = remaining_budget * 10;
+	for (unsigned attempt = 0; attempt < max_attempts && springs_placed < max_springs; ++attempt)
+	{
+		const uint32_t a = cell_indexes[Random::rand_range(size_t(0), n - 1)];
+		uint32_t b = cell_indexes[Random::rand_range(size_t(0), n - 1)];
+		if (a == b)
+			continue;
+
+		try_add_spring(a, b);
+	}
+}
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  collect_reproduction_requests
 //
@@ -94,28 +174,6 @@ void CellManager::collect_reproduction_requests()
 		{
 			cell->turn_off_reproduction();
 			birth_requests.push_back({ cell->id_ });
-		}
-
-		// Abandon an offspring link that's been waiting too long for its
-		// sibling to arrive. Guard on spring_to_copy_index < 0 so we never
-		// cancel a connection that resolved on THIS tick.
-		if (cell->offspring_index >= 0
-			&& cell->spring_to_copy_index < 0
-			&& cell->frames_since_offspring_pending_ > OFFSPRING_CONNECTION_TIMEOUT)
-		{
-			cell->offspring_index = -1;
-			cell->connection_index = -1;
-			cell->spring_to_copy_index = -1;
-			cell->frames_since_offspring_pending_ = 0;
-			continue;
-		}
-
-		if (cell->spring_to_copy_index >= 0)
-		{
-			connection_requests.push_back(ConnectionRequest{
-				cell->offspring_index,
-				cell->connection_index,
-				cell->spring_to_copy_index });
 		}
 	}
 }
@@ -146,15 +204,11 @@ void CellManager::apply_birth_requests()
 
 		Body* offspring_body = bodies_->at(pair.body_id);
 		Cell* offspring = all_cells_.at(pair.cell_id);
-
-		offspring->pending_parent_id = parent_cell->id_;
 		
 		// create the offspring by filling in its genetics and other properties based on the parent cell
 		parent_cell->create_offspring(offspring, parent_body, offspring_body, true);
 		parent_cell->turn_off_reproduction();
 
-		// it's important to tell the parent cell which offspring is theirs, so we can apply connection requests
-		parent_cell->offspring_index = offspring->id_;
 
 		// when we create this offspring we create a spring to it, the spring has a weak connection as it is made to break
 		// This is a temporary spring, it needs hold the new cell close to the parent cell until the real spring is made
@@ -219,19 +273,7 @@ void CellManager::apply_connection_requests()
 			continue;
 
 		Spring* new_spring = all_springs_.at(new_spring_id);
-		Spring* parent_spring = all_springs_.at(req.spring_to_copy_index);
-		parent_spring->create_offspring(*new_spring);
-		
-
-		// reset the reproductive fields so we don't create multiple connection requests for the same cells
-		cell->connection_index = -1;
-		cell->offspring_index = -1;
-		cell->spring_to_copy_index = -1;
-		cell->pending_parent_id = -1;
-
-		other_cell->connection_index = -1;
-		other_cell->offspring_index = -1;
-		other_cell->spring_to_copy_index = -1;
+		new_spring->genome.sexually_reproduce(cell->spring_genome, other_cell->spring_genome, true);
 	}
 
 	connection_requests.clear();

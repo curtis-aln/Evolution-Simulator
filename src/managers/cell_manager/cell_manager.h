@@ -74,6 +74,7 @@ class CellManager: protected CellManagerSettings
 
 	uint8_t total_max_capacity = FoodManagerSettings::cell_max_capacity * static_cast<uint8_t>(9);
 	FixedSpan<obj_idx> nearby_food_ids{ total_max_capacity };
+	FixedSpan<obj_idx> nearby_cell_ids{ total_max_capacity };
 
 	// The user can click on a protozoa to select it for debugging purposes. we store a pointer to it here.
 	int32_t selected_cell_id_ = -1;
@@ -103,6 +104,9 @@ class CellManager: protected CellManagerSettings
 	BarrierThreadPool thread_pool_{ (int)WorldSettings::updating_threads };
 	bool update_jobs_built_ = false;
 	int  current_total_cells_ = 0;
+
+	// this spatial grid holds new born cells so that the they can form connections between other newly born cells
+	SimpleSpatialGrid new_born_cell_grid_{ WorldSettings::cells_x, WorldSettings::cells_y, WorldSettings::cell_max_capacity, WorldSettings::bounds_radius * 2.0f, WorldSettings::bounds_radius * 2.0f };
 	
 
 public:
@@ -156,10 +160,11 @@ public:
 
 	// selected cell management
 	void deselect_cell();
+	void add_new_cells_to_grid();
 	const Cell* get_selected_cell() const { return all_cells_.at(selected_cell_id_); }
 	
 	// updating, public
-	void update();
+	void update(int iterations);
 
 	// public statistics
 	const std::vector<float>& get_generation_distribution();
@@ -182,6 +187,7 @@ private: // only functions this class can access
 	void apply_connection_requests();
 
 	void create_weak_offspring(uint32_t parent_id);
+	void create_protozoa_from_pool(const sf::Vector2f position, const unsigned max_cells, const unsigned max_springs);
 
 	// statistics 
 	void register_death_stat(const float lifetime, const bool had_offspring);
@@ -189,9 +195,12 @@ private: // only functions this class can access
 
 	// updating
 	void update_springs();
+	
 	void update_cells();
 
 	void update_cell(Cell* cell);
+
+	void update_new_born_cells();
 
 	void handle_death();
 	void remove_cell(Cell* cell);

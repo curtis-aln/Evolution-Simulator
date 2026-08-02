@@ -18,20 +18,6 @@ void CellManager::remove_cell(Cell* cell)
     if (cell == nullptr) return;
     register_death_stat(cell->internal_clock_, cell->offspring_count > 0);
 
-    if (cell->pending_parent_id != -1)
-    {
-        if (Cell* parent = all_cells_.at(cell->pending_parent_id))
-        {
-            if (parent->offspring_index == static_cast<int32_t>(cell->id_))
-            {
-                parent->offspring_index = -1;
-                parent->connection_index = -1;
-                parent->spring_to_copy_index = -1;
-                parent->frames_since_offspring_pending_ = 0;
-            }
-        }
-    }
-
     all_cells_.remove(cell);
     bodies_->remove(cell->body_id_);
 }

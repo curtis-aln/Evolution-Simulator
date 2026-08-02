@@ -97,6 +97,10 @@ void CellManager::create_new_protozoa(int count, WorldBorder* spawn_area)
 	// The cells we currently have act as seeds that allow us to build the protozoa
 	for (int i = 0; i < count; i++)
 	{
+		sf::Vector2f pos = spawn_area->rand_pos();
+		int cell_count = Random::rand_range(2, 5);
+		create_protozoa_from_pool(pos, cell_count, cell_count * 1.5);
+
 		sf::Vector2f spawn_pos = spawn_area->rand_pos();
 		CellBodyPair pair = create_cell(spawn_pos, true);
 

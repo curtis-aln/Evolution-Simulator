@@ -7,7 +7,22 @@ void CellManager::deselect_cell()
 }
 
 
-void CellManager::update()
+void CellManager::add_new_cells_to_grid()
+{
+	new_born_cell_grid_.clear();
+
+	for (Cell* cell : all_cells_)
+	{
+		if (cell->internal_clock_ < 100)
+		{
+			Body* body = bodies_->at(cell->body_id_);
+			new_born_cell_grid_.add_object(body->position_.x, body->position_.y, cell->id_);
+		}
+	}
+}
+
+
+void CellManager::update(int iterations)
 {
 	// if we have a selected cell and it has died, we need to deselect it to avoid null errors
 	if (selected_cell_id_ == -1 || all_cells_.at(selected_cell_id_)->should_remove())
@@ -16,13 +31,18 @@ void CellManager::update()
 	}
 
 	// updating the cells and springs
+	if (iterations > 110)
+	{
+		add_new_cells_to_grid();
+	}
 	update_cells();
 	update_springs();
+	update_new_born_cells();
 	
 	// reproductive system
 	collect_reproduction_requests();
 	apply_birth_requests();
-	//apply_connection_requests();
+	apply_connection_requests();
 
 	// death
 	handle_death();
@@ -43,6 +63,36 @@ void CellManager::update_cell(Cell* cell)
 	cell->update_statistics();
 	cell->update_organics();
 	body->velocity_ *= cell->sinwave_current_friction_;
+}
+
+void CellManager::update_new_born_cells()
+{
+	for (Cell* cell : all_cells_)
+	{
+		if (cell->internal_clock_ > 100)
+			return;
+
+		Body* body = bodies_->at(cell->body_id_);
+
+		// this cell is going to try to connect to other cells in its vicinity
+		nearby_cell_ids.clear();
+		new_born_cell_grid_.find(body->position_.x, body->position_.y, &nearby_cell_ids);
+
+		for (int i = 0; i < nearby_cell_ids.count; ++i)
+		{
+			cell_idx other_cell_id = nearby_cell_ids[i];
+			if (other_cell_id == cell->id_)
+				continue;
+			Cell* other_cell = all_cells_.at(other_cell_id);
+
+			float dist_sq = (body->position_ - bodies_->at(other_cell->body_id_)->position_).lengthSquared();
+			float combined_rad = (cell->radius + other_cell->radius) * 10;
+			if (dist_sq < combined_rad * combined_rad)
+			{
+				connection_requests.push_back(ConnectionRequest{ (int)cell->id_, (int)other_cell->id_, -1 });
+			}
+		}
+	}
 }
 
 void CellManager::update_springs()
