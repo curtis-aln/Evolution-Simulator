@@ -28,16 +28,16 @@ void World::update(SimSnapshot& write_snapshot)
 			food_eat_resolver_.resolve();
 		else
 			food_eat_resolver_.resolve_existing_detections();
+
+		// once the iteration has been completed, we update the statistics for the next frame
+		if (toggles.track_statistics)
+			update_statistics();
 	}
 
 	cell_manager_.update_protozoa_tracker();
 
 	// We always update the position container, otherwise the simulation jitters when paused
 	update_position_container_optimized(write_snapshot);
-
-	// once the iteration has been completed, we update the statistics for the next frame
-	if (toggles.track_statistics)
-		update_statistics();
 
 	fill_snapshot(write_snapshot);
 

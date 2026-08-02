@@ -153,8 +153,6 @@ void Simulation::render()
     float dt = static_cast<float>(rendering_clock_.get_delta_time());
     sim_state_.total_time_elapsed += dt;
 
-    if (snap.world_stats.iterations_ <= 2)
-        return;
     m_window_.clear(bg_color_);
     if (m_world_.toggles.m_rendering_)
     {
