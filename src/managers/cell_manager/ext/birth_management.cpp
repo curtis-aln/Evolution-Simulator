@@ -213,14 +213,23 @@ void CellManager::apply_connection_requests()
 
 void CellManager::create_weak_offspring(uint32_t parent_id)
 {
+	// This function creates a new offspring cell for the given parent cell, 
+	// and connects them with a spring that is weak and has low oscillation. 
+	// The offspring is initialized with some random properties to ensure it doesn't cling too tightly to the parent.
+	// This is so when this mutation occours it doesnt throw off the whole organism
+
 	CellBodyPair pair = create_cell();
 	if (!pair.is_valid)
 		return;
 
 	Cell* parent = all_cells_.at(parent_id);
-	Body* parent_body = bodies_->at(parent->body_id_);
 	Cell* child = all_cells_.at(pair.cell_id);
-	Body* child_body = bodies_->at(pair.body_id);
+
+	// creating a child which doesnt grab on too much
+	parent->create_offspring(child, bodies_->at(parent->body_id_), bodies_->at(pair.body_id), true);
+	child->randomize();
+	child->amplitude = 0.2f;
+	child->vertical_shift = 0.5f;
 
 	int32_t spring_id = create_spring(parent_id, pair.cell_id);
 
@@ -235,10 +244,4 @@ void CellManager::create_weak_offspring(uint32_t parent_id)
 	// creating a spring that is firm but doesnt oscilate mutch
 	spring->genome.randomize();
 	spring->genome.amplitude = 0.2f;
-
-	// creating a child which doesnt grab on too much
-	parent->create_offspring(child, parent_body, child_body, true);
-	child->randomize();
-	child->amplitude = 0.2f;
-	child->vertical_shift = 0.5f;
 }
