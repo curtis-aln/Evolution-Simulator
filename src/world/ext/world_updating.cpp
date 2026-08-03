@@ -6,6 +6,7 @@
 // write_snapshot is written to so the renderer knows what to draw
 void World::update(SimSnapshot& write_snapshot)
 {
+	write_snapshot.render.clear_render_data();
 	visible_bounds = calulcate_visible_range();
 
 	// Sanity Check
@@ -18,7 +19,7 @@ void World::update(SimSnapshot& write_snapshot)
 	if (toggles.m_tick_frame_time || !toggles.paused)
 	{
 		// updating the food and the cells in the world
-		food_manager_.update(write_snapshot.food_data);
+		food_manager_.update(write_snapshot);
 		cell_manager_.update(statistics_.iterations_);
 		cell_manager_.update_100frame_stats(statistics_.iterations_);
 
@@ -200,14 +201,15 @@ sf::FloatRect World::calulcate_visible_range()
 
 void World::update_position_container_optimized(SimSnapshot& write_snapshot)
 {
-	RenderData& rend_data = write_snapshot.render;
-	rend_data.outer_colors.clear();
-	rend_data.inner_colors.clear();
-	rend_data.positions.clear();
-	rend_data.velocities.clear();
-	rend_data.radii.clear();
 
-	for (const Cell* cell : cell_manager_.get_all_cells())
+	RenderData& rend_data = write_snapshot.render;
+	auto& all_cells = cell_manager_.get_all_cells();
+
+	int current_vector_size = rend_data.positions.size();
+	int cell_count = cell_manager_.get_cell_count();
+	int resize_to = current_vector_size + cell_count;
+
+	for (const Cell* cell : all_cells)
 	{
 		Body* body = bodies_.at(cell->body_id_);
 		if (!visible_bounds.contains(body->position_))

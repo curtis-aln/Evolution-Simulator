@@ -1,6 +1,8 @@
 #include "../cell_manager.h"
 
-CellManager::CellManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies) : m_window_(window), world_bounds_(world_bounds), bodies_(bodies), all_cells_(max_protozoa), all_springs_(max_protozoa)
+CellManager::CellManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies) 
+	: m_window_(window), world_bounds_(world_bounds), bodies_(bodies), 
+	all_cells_(max_protozoa), all_springs_(max_protozoa), all_cell_matter_(max_protozoa)
 {
 	// Initialize the cell manager with the given window, world bounds, and body vector
 	create_new_protozoa(CellManagerSettings::initial_protozoa, world_bounds);

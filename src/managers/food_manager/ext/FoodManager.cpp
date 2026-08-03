@@ -1,43 +1,35 @@
 #include "../food_manager.h"
+#include "../../../simulation/context/sim_snapshot.h"
 
-struct SimSnapshot;
-struct FoodData;
 
 FoodManager::FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies)
-	: world_bounds_(world_bounds), bodies_(bodies), food_renderer(window, food_radius, max_food), window_(window)
+	: world_bounds_(world_bounds), bodies_(bodies)
 {
 
 }
 
 
-void FoodManager::update(FoodData& snap_food_data)
+void FoodManager::update(SimSnapshot& write_snapshot)
 {
-	update_position_data(snap_food_data);
+	update_position_data(write_snapshot.render);
 	let_food_reproduce();
 	update_food();
 	update_statistics();
 }
 
-void FoodManager::render(const FoodData& snapshot_food_data)
+void FoodManager::update_position_data(RenderData& food_data)
 {
-	food_renderer.set_colors(snapshot_food_data.colors);
-	food_renderer.set_positions(snapshot_food_data.positions);
-	food_renderer.set_radii(snapshot_food_data.radii);
-
-	food_renderer.set_size(snapshot_food_data.active_count);
-	food_renderer.update();
-	food_renderer.render();
-}
-
-void FoodManager::update_position_data(FoodData& food_data)
-{
+	int current_vector_size = food_data.positions.size();
 	int food_count = food_vector.size();
-	food_data.positions.resize(food_count);
-	food_data.radii.resize(food_count);
-	food_data.colors.resize(food_count);
-	food_data.active_count = food_count;
+	int resize_to = current_vector_size + food_count;
 
-	int idx = 0;
+	food_data.positions.resize(resize_to);
+	food_data.radii.resize(resize_to);
+	food_data.inner_colors.resize(resize_to);
+	food_data.outer_colors.resize(resize_to);
+	food_data.velocities.resize(resize_to);
+
+	int idx = current_vector_size;
 	for (Food* food : food_vector)
 	{
 		if (food->is_food_dead())
@@ -51,7 +43,9 @@ void FoodManager::update_position_data(FoodData& food_data)
 
 		food_data.positions[idx] = body->position_;
 		food_data.radii[idx] = body->radius_;
-		food_data.colors[idx] = calc_food_color(food, idx);
+		food_data.inner_colors[idx] = calc_food_color(food, idx);
+		food_data.outer_colors[idx] = calc_food_color(food, idx);
+		food_data.velocities[idx] = body->velocity_;
 		idx++;
 	}
 }

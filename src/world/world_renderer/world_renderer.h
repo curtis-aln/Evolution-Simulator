@@ -66,7 +66,6 @@ public:
 		if (snapshot.toggles.draw_cell_grid)
 			cell_grid_renderer_.render(*m_window_, mouse_pos, 800.f);
 
-		food_manager_->render(snapshot.food_data);
 		render_protozoa(snapshot);
 
 		render_influence_radii(snapshot);

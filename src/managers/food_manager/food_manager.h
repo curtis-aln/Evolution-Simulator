@@ -9,7 +9,6 @@
 #include "food_manager_settings.h"
 #include "../../Utils/spatial_grid/simple_spatial_grid.h"
 #include "../../Utils/spatial_grid/spatial_grid_renderer.h"
-#include "food_data.h"
 #include "world/world_border.h"
 #include "../../simulation/context/state.h"
 #include <Utils/thread_pool.h>
@@ -35,8 +34,6 @@ class FoodManager : public FoodManagerSettings
 {
     sf::RenderWindow* window_;
     WorldBorder* world_bounds_;
-
-    CircleBatchRenderer food_renderer;
 
     o_vector<Body>* bodies_;
     o_vector<Food> food_vector{ max_food };
@@ -69,9 +66,9 @@ public:
     bool has_food_with_body_id(int body_id);
     const o_vector<Food>& get_food_vector() const;
     o_vector<Food>& get_food_vector();
-    void update(FoodData& snap_food_data);
-    void   render(const FoodData& snapshot_food_data);
-    void update_position_data(FoodData& food_data);
+    void update(SimSnapshot& write_snapshot);
+
+    void update_position_data(RenderData& food_data);
     sf::Color calc_food_color(const Food* food, int food_id) const;
     void   remove_food(int food_id);
     Food* at(int idx);

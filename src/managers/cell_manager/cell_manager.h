@@ -16,6 +16,7 @@
 #include "../../simulation/context/sim_snapshot.h"
 
 #include <simulation/context/sim_command.h>
+#include <entities/CellMatter.h>
 
 
 struct CellBodyPair
@@ -96,6 +97,7 @@ class CellManager: protected CellManagerSettings
 	// the main data structure for storing all protozoa in the world, this is a custom vector class that allows for fast iteration over active objects
 	o_vector<Cell> all_cells_;
 	o_vector<Spring> all_springs_;
+	o_vector<CellMatter> all_cell_matter_;
 
 	// This builds a model around a protozoa that doesnt globally exist, so it can be monitored and learned about
 	OrganismTracker protozoa_tracker_{};

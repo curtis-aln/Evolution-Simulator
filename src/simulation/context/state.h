@@ -164,8 +164,6 @@ struct RenderData
     OVecDebugImGuiSnapshot body_debug_snapshot;
     OVecDebugImGuiSnapshot spring_debug_snapshot;
 
-    // for
-
     void reserve(const int max_cells)
     {
         positions.resize(max_cells);
@@ -175,6 +173,15 @@ struct RenderData
         radii.resize(max_cells);
         spring_connections.resize(max_cells);
     }
+
+	void clear_render_data()
+	{
+		positions.clear();
+		velocities.clear();
+		outer_colors.clear();
+		inner_colors.clear();
+		radii.clear();
+	}
 };
 
 
