@@ -70,7 +70,7 @@ void FoodManager::init()
 			continue;
 		}
 
-		Food* food = food_body_pair.food_ptr;
+		Food* food = food_vector.at(food_body_pair.food_id);
 		food->color = Random::rand_color(food_darkest_color, food_lightest_color);
 		food->nutrients = Random::rand_range(initial_nutrients, initial_nutrients + 50.f);
 	}

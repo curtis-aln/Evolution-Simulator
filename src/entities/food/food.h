@@ -13,10 +13,10 @@
 
 struct Food : FoodManagerSettings
 {
-	int id_ = 0; // unique food ID, relative to the food container
-	int body_id_ = 0; // unique body ID, relative to the body container
-	float age = 0;
-	int time_since_last_reproduced = 0;
+	uint32_t id_ = 0; // unique food ID, relative to the food container
+	uint32_t body_id_ = 0; // unique body ID, relative to the body container
+	uint16_t age = 0;
+	uint16_t time_since_last_reproduced = 0;
 
 	float nutrients = initial_nutrients;
 

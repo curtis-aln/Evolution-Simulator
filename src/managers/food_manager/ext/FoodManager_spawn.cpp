@@ -41,9 +41,12 @@ bool FoodManager::reproduce_food(Food* parent_food)
 	sf::Vector2f parent_pos = parent_body->position_;
 
 	// Creating a new food body pair and linking them together
-	Food* child_food = food_vector.add();
-	Body* child_body = bodies_->add();
-	child_food->body_id_ = child_body->id_;
+	FoodBodyPair pair = create_food(parent_pos, true);
+	if (pair.is_valid() == false)
+		return true;
+
+	Food* child_food = food_vector.at(pair.food_id);
+	Body* child_body = bodies_->at(pair.body_id);
 
 	// spawning the food next to another existing food 
 	sf::FloatRect spawn_rect = {
@@ -72,7 +75,7 @@ FoodBodyPair FoodManager::create_food(const sf::Vector2f& position, bool random_
 	// Finding a body
 	Body* body = bodies_->emplace(true, true);
 	if (body == nullptr)
-		return { nullptr, nullptr };
+		return { -1, -1 };
 
 	// Finding a cell
 	Food* food = food_vector.emplace(true, true);
@@ -81,7 +84,7 @@ FoodBodyPair FoodManager::create_food(const sf::Vector2f& position, bool random_
 		// raise an error as there shouldnt be a situation where we have a body but no cell, this should never happen
 		std::cerr << "[ERROR]: Failed to create food during initialization. Max food reached.\n";
 		bodies_->remove(body);
-		return { nullptr, nullptr };
+		return { -1, -1 };
 	}
 
 	// connecting the two
@@ -90,5 +93,5 @@ FoodBodyPair FoodManager::create_food(const sf::Vector2f& position, bool random_
 	body->position_ = position;
 	body->radius_ = food_initial_radius;
 
-	return { food, body };
+	return { (int32_t)food->id_, (int32_t)body->id_ };
 }

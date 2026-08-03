@@ -18,12 +18,12 @@
 
 struct FoodBodyPair
 {
-    Food* food_ptr;
-    Body* body_ptr;
+    int32_t food_id;
+    int32_t body_id;
 
     bool is_valid()
     {
-        return (food_ptr != nullptr) && (body_ptr != nullptr);
+        return (food_id != -1) && (body_id != -1);
     }
 };
 
