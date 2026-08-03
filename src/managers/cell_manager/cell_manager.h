@@ -58,9 +58,6 @@ struct ConnectionRequest
 {
 	int32_t offspring_id;
 	int32_t connect_to_id;
-	int32_t  spring_to_copy_index;
-
-	bool weak = false;
 };
 
 inline static constexpr size_t max_lifetime_samples_ = 500;
@@ -115,97 +112,97 @@ public:
 	uint16_t max_size = static_cast<uint16_t>(10000);
 	FixedSpan<cell_idx, uint16_t> select_indexes{ max_size };	
 
-	// Functions
+
 public:
-	// Constructor and initialization
+	// Constructor
 	CellManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies);
+	void reset_cell_manager();
 
-	void ensure_update_jobs_built();
+	// entries
+	void handle_cell_manager_event(SimCommand& cmd);
+	void update(int iterations);
+	void update_protozoa_tracker();
+	void fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bounds);
 
-	void reset();
+	// user input & mouse handling
+	void create_new_protozoa(int count, WorldBorder* spawn_area);
+	void drag_selected_cell_to_point(const sf::Vector2f& target_position, const float move_fraction);
+	void remove_cells_in_radius(const sf::Vector2f& position, const float radius);
+	void influence_cell_velocities_in_radii(const sf::Vector2f& position, const float radius, const int intensity);
+
+	// data fetching
+	unsigned get_cell_count() const { return all_cells_.size(); }
+	unsigned get_matter_count() const { return all_cell_matter_.size(); }
 
 	bool has_cell_with_body_id(int body_id);
 	
-	void create_new_protozoa(int count, WorldBorder* spawn_area);
-	void check_for_extinction_event();
-	void drag_selected_cell_to_point(const sf::Vector2f& target_position, const float move_fraction);
-
-	CellBodyPair create_cell(sf::Vector2f position = { 0, 0 }, bool random_genetics = false);
-
-	int32_t create_spring(const uint32_t cell_a_id, const uint32_t cell_b_id);
-
-	void gather_food_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, const sf::Vector2f& position, const float radius);
-
-	void remove_cells_in_radius(const sf::Vector2f& position, const float radius);
-
-	void influence_cell_velocities_in_radii(const sf::Vector2f& position, const float radius, const int intensity);
-
-	void handle_cell_manager_event(SimCommand& cmd);
-
-	// data fetching
-	int get_cell_count() const;
-	float calculate_average_generation() const;
 	Cell* find_cell_by_id(const int id) { return all_cells_.at(id); }
 	Cell* find_cell_at_point(const sf::Vector2f mouse_position, bool make_selected_cell);
-	void fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bounds);
-	void fill_render_data(RenderData& render_data, sf::FloatRect& visible_bounds);
+	sf::Vector2f& get_cell_pos(int cell_id);
+	Body* get_cell_body(int cell_id);
+	
 	const sf::Vector2f* get_selected_protozoa_pos() const;
 
-	sf::Vector2f& get_cell_pos(int cell_id);
-
-	Body* get_cell_body(int cell_id);
-
 	const o_vector<Cell>& get_all_cells() const { return all_cells_; }
-	o_vector<Cell>& get_all_cells() { return all_cells_; }
 	const o_vector<Spring>& get_all_springs() const { return all_springs_; }
+	const o_vector<CellMatter>& get_all_cell_matter() const { return all_cell_matter_; }
+
+	o_vector<Cell>& get_all_cells() { return all_cells_; }
 	o_vector<Spring>& get_all_springs() { return all_springs_; }
+	
 
 	// selected cell management
 	void deselect_cell();
-	void add_new_cells_to_grid();
 	const Cell* get_selected_cell() const { return all_cells_.at(selected_cell_id_); }
-	
-	// updating, public
-	void update(int iterations);
 
 	// public statistics
-	const std::vector<float>& get_generation_distribution();
-
-	void update_100frame_stats(int iterations);
-
-	void update_protozoa_tracker();
-
-	void update_statistics();
 	CellManagerStatistics& get_statistics() { return statistics_; }
-
-protected: // only functions the world can access todo
-
+	const std::vector<float>& get_generation_distribution();
+	void update_100frame_stats(int iterations);
+	void update_statistics();
+	
 
 private: // only functions this class can access
-	// protozoa building, and reproducing
-	bool build_protozoa_from_seed(uint32_t seed_cell_id, int max_recursion_depth, int recursion_depth = 1);
-	void collect_reproduction_requests();
-	void apply_birth_requests();
-	void apply_connection_requests();
-
-	void create_weak_offspring(uint32_t parent_id);
-	void create_protozoa_from_pool(const sf::Vector2f position, const unsigned max_cells, const unsigned max_springs);
+	// Utility
+	void gather_food_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, const sf::Vector2f& position, const float radius);
+	void check_for_extinction_event();
 
 	// statistics 
 	void register_death_stat(const float lifetime, const bool had_offspring);
 	void register_birth_stat();
+	float calculate_average_generation() const;
+	void fill_render_data(RenderData& render_data, sf::FloatRect& visible_bounds);
 
 	// updating
 	void update_springs();
-	
 	void update_cells();
-
 	void update_cell(Cell* cell);
-
 	void update_new_born_cells();
 
+	void ensure_update_jobs_built();
+
+	// decaying objects
+	void process_newly_decaying_cell(Cell* cell);
+
+	// newly born cells
+	void add_new_cells_to_grid();
+	void try_connect_newborn_cell(Cell* cell);
+
+	// birth - springs
+	int32_t create_spring(const uint32_t cell_a_id, const uint32_t cell_b_id);
+	void create_weak_offspring(uint32_t parent_id);
+	void apply_connection_requests();
+
+	// birth - cells
+	CellBodyPair create_cell(sf::Vector2f position = { 0, 0 }, bool random_genetics = false);
+	void clone_selected_protozoa();
+	void create_protozoa_from_pool(const sf::Vector2f position, const unsigned max_cells, const unsigned max_springs);
+	void collect_reproduction_requests();
+	void apply_birth_requests();
+	
+	// death
 	void handle_death();
 	void remove_cell(Cell* cell);
-
-	void clone_selected_protozoa();
+	
+	
 };

@@ -61,7 +61,7 @@ void CellManager::ensure_update_jobs_built()
 }
 
 
-void CellManager::reset()
+void CellManager::reset_cell_manager()
 {
 	birth_requests.clear();
 	connection_requests.clear();
@@ -75,6 +75,13 @@ void CellManager::reset()
 		bodies_->remove(cell->body_id_);
 		cell->recreate();
 	}
+
+	for (CellMatter* matter : all_cell_matter_)
+	{
+		all_cell_matter_.remove(matter->id_);
+		bodies_->remove(matter->body_id_);
+	}
+
 
 	for (Spring* spring : all_springs_)
 	{
@@ -102,17 +109,6 @@ void CellManager::create_new_protozoa(int count, WorldBorder* spawn_area)
 		sf::Vector2f pos = spawn_area->rand_pos();
 		int cell_count = Random::rand_range(2, 5);
 		create_protozoa_from_pool(pos, cell_count, cell_count * 1.5);
-
-		sf::Vector2f spawn_pos = spawn_area->rand_pos();
-		CellBodyPair pair = create_cell(spawn_pos, true);
-
-		if (!pair.is_valid)
-			break;
-
-		// we want to limit the number of cells in a protozoa to avoid performance issues 
-		int max_recursion_depth = Random::rand_range(1, 2);
-		if (!build_protozoa_from_seed(pair.cell_id, max_recursion_depth))
-			break;
 	}
 	
 }

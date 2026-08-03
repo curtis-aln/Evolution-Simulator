@@ -84,7 +84,7 @@ void FoodManager::init()
 }
 
 
-void FoodManager::reset()
+void FoodManager::reset_cell_manager()
 {
 	for (Food* food : food_vector)
 	{

@@ -27,7 +27,7 @@ struct Food : FoodManagerSettings
 	float vibration_x = 0.f;
 	float vibration_y = 0.f;
 
-	void reset()
+	void reset_cell_manager()
 	{
 		body_id_ = 0;
 		age = 0;

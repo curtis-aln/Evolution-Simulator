@@ -54,7 +54,7 @@ public:
     FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies);
     void  init();
 
-    void reset();
+    void reset_cell_manager();
 
     void remove_food_in_area(const sf::Vector2f& center, float radius);
 

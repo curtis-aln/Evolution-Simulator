@@ -22,9 +22,9 @@ void World::render(const SimSnapshot& snapshot, const sf::Vector2f mouse_pos)
 void World::reset_world()
 {
 	// Resetting the food manager
-    food_manager_.reset();
+    food_manager_.reset_cell_manager();
 	// Resetting the cell manager
-    cell_manager_.reset();
+    cell_manager_.reset_cell_manager();
 
 	// Resetting the world information and Statistics
 	statistics_ = WorldStatistics{};

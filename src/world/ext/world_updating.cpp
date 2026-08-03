@@ -224,6 +224,17 @@ void World::update_position_container_optimized(SimSnapshot& write_snapshot)
 		rend_data.velocities.push_back(body->velocity_);
 		rend_data.radii.push_back(cell->radius);
 	}
+
+	for (const CellMatter* matter : cell_manager_.get_all_cell_matter())
+	{
+		Body* body = bodies_.at(matter->body_id_);
+
+		rend_data.outer_colors.push_back(matter->outer_color());
+		rend_data.inner_colors.push_back(matter->inner_color());
+		rend_data.positions.push_back(body->position_);
+		rend_data.velocities.push_back(body->velocity_);
+		rend_data.radii.push_back(body->radius_);
+	}
 }
 
 void World::update_position_container(SimSnapshot& write_snapshot)

@@ -69,28 +69,49 @@ void CellManager::update_new_born_cells()
 {
 	for (Cell* cell : all_cells_)
 	{
-		if (cell->internal_clock_ > 100 || cell->internal_clock_ % 30 != 0)
-			return;
+		if (!cell->is_alive())
+			process_newly_decaying_cell(cell);
 
-		Body* body = bodies_->at(cell->body_id_);
+		if (cell->internal_clock_ < 100 && cell->internal_clock_ % 30 == 0)
+			try_connect_newborn_cell(cell);
 
-		// this cell is going to try to connect to other cells in its vicinity
-		nearby_cell_ids.clear();
-		new_born_cell_grid_.find(body->position_.x, body->position_.y, &nearby_cell_ids);
+		
+	}
+}
 
-		for (int i = 0; i < nearby_cell_ids.count; ++i)
+void CellManager::process_newly_decaying_cell(Cell* cell)
+{
+	Body* body = bodies_->at(cell->body_id_);
+
+	// reusing the same body but changing the identity
+	CellMatter* cell_matter = all_cell_matter_.emplace(true, true);
+	cell_matter->cell_to_matter(body);
+
+	// removing the cell class from the world
+	all_cells_.remove(cell);
+
+}
+
+void CellManager::try_connect_newborn_cell(Cell* cell)
+{
+	Body* body = bodies_->at(cell->body_id_);
+
+	// this cell is going to try to connect to other cells in its vicinity
+	nearby_cell_ids.clear();
+	new_born_cell_grid_.find(body->position_.x, body->position_.y, &nearby_cell_ids);
+
+	for (int i = 0; i < nearby_cell_ids.count; ++i)
+	{
+		cell_idx other_cell_id = nearby_cell_ids[i];
+		if (other_cell_id == cell->id_)
+			continue;
+		Cell* other_cell = all_cells_.at(other_cell_id);
+
+		float dist_sq = (body->position_ - bodies_->at(other_cell->body_id_)->position_).lengthSquared();
+		float combined_rad = (cell->radius + other_cell->radius) * 10;
+		if (dist_sq < combined_rad * combined_rad)
 		{
-			cell_idx other_cell_id = nearby_cell_ids[i];
-			if (other_cell_id == cell->id_)
-				continue;
-			Cell* other_cell = all_cells_.at(other_cell_id);
-
-			float dist_sq = (body->position_ - bodies_->at(other_cell->body_id_)->position_).lengthSquared();
-			float combined_rad = (cell->radius + other_cell->radius) * 10;
-			if (dist_sq < combined_rad * combined_rad)
-			{
-				connection_requests.push_back(ConnectionRequest{ (int)cell->id_, (int)other_cell->id_, -1 });
-			}
+			connection_requests.push_back(ConnectionRequest{ (int)cell->id_, (int)other_cell->id_ });
 		}
 	}
 }
@@ -264,7 +285,7 @@ CellBodyPair CellManager::create_cell(sf::Vector2f position, bool random_genetic
 	cell->recreate();
 
 	// resetting the body just incase it isnt brand new
-	body->reset();
+	body->reset_cell_manager();
 
 	// connecting the two
 	cell->body_id_ = body->id_;
@@ -291,7 +312,7 @@ int32_t CellManager::create_spring(const uint32_t cell_a_id, const uint32_t cell
 	{
 		return -1;
 	}
-	spring->reset();
+	spring->reset_cell_manager();
 	spring->cell_A_id = cell_a_id;
 	spring->cell_B_id = cell_b_id;
 	return spring->id_;

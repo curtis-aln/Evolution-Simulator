@@ -1,11 +1,5 @@
 #include "../cell_manager.h"
 
-int CellManager::get_cell_count() const
-{
-	// the amount of cells alive in the simulation
-	return all_cells_.size();
-}
-
 float CellManager::calculate_average_generation() const
 {
 	// when a cell reproduces it sets its offspring generation to 1 + its current, this can be used to track 

@@ -51,7 +51,7 @@ public:
 
 	}
 
-	void reset()
+	void reset_cell_manager()
 	{
 		internal_clock_ = 0;
 		work_done = 0.f;
