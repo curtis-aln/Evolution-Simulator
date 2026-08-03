@@ -14,6 +14,8 @@ struct CellMatter
 
 	static constexpr float spawn_chance = 0.75f;
 
+	bool dead = false;
+
 	uint16_t id_ = 0;
 	uint16_t body_id_ = 0;
 
@@ -23,6 +25,14 @@ struct CellMatter
 
 	sf::Color inner_color() const { return sf::Color(inner_gray_, inner_gray_, inner_gray_); }
 	sf::Color outer_color() const { return sf::Color(outer_gray_, outer_gray_, outer_gray_); }
+
+	void update(Body* body)
+	{
+		time_alive++;
+		body->velocity_ *= friction;
+
+		dead = time_alive > max_time_to_live;
+	}
 
 	void reset_cell_manager()
 	{

@@ -66,7 +66,7 @@ public:
     bool has_food_with_body_id(int body_id);
     const o_vector<Food>& get_food_vector() const;
     o_vector<Food>& get_food_vector();
-    void update(SimSnapshot& write_snapshot);
+    void update();
 
     void update_position_data(RenderData& food_data);
     sf::Color calc_food_color(const Food* food, int food_id) const;

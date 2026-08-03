@@ -101,7 +101,7 @@ public:
     const FoodManager* get_food_manager() const { return &food_manager_; }
     const CellManager* get_cell_manager() const { return &cell_manager_; }
     CellManager* get_cell_manager() { return &cell_manager_; }
-	int get_entity_count() const { return cell_manager_.get_cell_count() + food_manager_.get_size() ; }
+	int get_entity_count() const { return cell_manager_.get_cell_count() + food_manager_.get_size() + cell_manager_.get_matter_count(); }
 
     // world.h
     static SpatialGridData get_grid_data(SimpleSpatialGrid* grid);
@@ -140,8 +140,6 @@ private:
     void debug_sanity_checks();
 
     sf::FloatRect calulcate_visible_range();
-
-    void update_position_container_optimized(SimSnapshot& write_snapshot);
 
     void update_position_container(SimSnapshot& write_snapshot);
     void update_statistics();

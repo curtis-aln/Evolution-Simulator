@@ -38,6 +38,7 @@ void CellManager::update(int iterations)
 	update_cells();
 	update_springs();
 	update_new_born_cells();
+	update_cell_matter();
 	
 	// reproductive system
 	collect_reproduction_requests();
@@ -55,6 +56,15 @@ void CellManager::update_cells()
 	current_total_cells_ = all_cells_.occupied_count;
 	ensure_update_jobs_built();
 	thread_pool_.run_and_wait();
+}
+
+void CellManager::update_cell_matter()
+{
+	for (CellMatter* matter : all_cell_matter_)
+	{
+		Body* body = bodies_->at(matter->body_id_);
+		matter->update(body);
+	}
 }
 
 void CellManager::update_cell(Cell* cell)
@@ -90,6 +100,44 @@ void CellManager::process_newly_decaying_cell(Cell* cell)
 	// removing the cell class from the world
 	all_cells_.remove(cell);
 
+}
+
+
+void CellManager::update_position_container(RenderData& rend_data, const sf::FloatRect& visible_bounds)
+{
+	int current_vector_size = rend_data.positions.size();
+	int cell_count = get_cell_count();
+	int resize_to = current_vector_size + cell_count;
+
+	for (const Cell* cell : all_cells_)
+	{
+		Body* body = bodies_->at(cell->body_id_);
+		if (!visible_bounds.contains(body->position_))
+			continue;
+
+		sf::Color color_inner = !cell->is_alive() ? sf::Color(60, 60, 60, 180) : cell->get_inner_color();
+		sf::Color color_outer = !cell->is_alive() ? sf::Color(90, 90, 90, 160) : cell->get_outer_color();
+
+		rend_data.outer_colors.push_back(color_outer);
+		rend_data.inner_colors.push_back(color_inner);
+		rend_data.positions.push_back(body->position_);
+		rend_data.velocities.push_back(body->velocity_);
+		rend_data.radii.push_back(cell->radius);
+	}
+
+	for (const CellMatter* matter : all_cell_matter_)
+	{
+		Body* body = bodies_->at(matter->body_id_);
+
+		if (!visible_bounds.contains(body->position_))
+			continue;
+
+		rend_data.outer_colors.push_back(matter->outer_color());
+		rend_data.inner_colors.push_back(matter->inner_color());
+		rend_data.positions.push_back(body->position_);
+		rend_data.velocities.push_back(body->velocity_);
+		rend_data.radii.push_back(body->radius_);
+	}
 }
 
 void CellManager::try_connect_newborn_cell(Cell* cell)

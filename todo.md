@@ -275,8 +275,5 @@ out of selection acting on the same handful of numbers.
 
 
 
-
-
-
   18,000
   18,204

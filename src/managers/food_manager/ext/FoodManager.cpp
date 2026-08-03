@@ -9,9 +9,8 @@ FoodManager::FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_
 }
 
 
-void FoodManager::update(SimSnapshot& write_snapshot)
+void FoodManager::update()
 {
-	update_position_data(write_snapshot.render);
 	let_food_reproduce();
 	update_food();
 	update_statistics();

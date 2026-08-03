@@ -19,7 +19,7 @@ void World::update(SimSnapshot& write_snapshot)
 	if (toggles.m_tick_frame_time || !toggles.paused)
 	{
 		// updating the food and the cells in the world
-		food_manager_.update(write_snapshot);
+		food_manager_.update();
 		cell_manager_.update(statistics_.iterations_);
 		cell_manager_.update_100frame_stats(statistics_.iterations_);
 
@@ -38,7 +38,8 @@ void World::update(SimSnapshot& write_snapshot)
 	cell_manager_.update_protozoa_tracker();
 
 	// We always update the position container, otherwise the simulation jitters when paused
-	update_position_container_optimized(write_snapshot);
+	food_manager_.update_position_data(write_snapshot.render);
+	cell_manager_.update_position_container(write_snapshot.render, visible_bounds);
 
 	fill_snapshot(write_snapshot);
 
@@ -197,44 +198,6 @@ sf::FloatRect World::calulcate_visible_range()
 	visible_bounds.size.y += max_rad * 2.f;
 
 	return visible_bounds;
-}
-
-void World::update_position_container_optimized(SimSnapshot& write_snapshot)
-{
-
-	RenderData& rend_data = write_snapshot.render;
-	auto& all_cells = cell_manager_.get_all_cells();
-
-	int current_vector_size = rend_data.positions.size();
-	int cell_count = cell_manager_.get_cell_count();
-	int resize_to = current_vector_size + cell_count;
-
-	for (const Cell* cell : all_cells)
-	{
-		Body* body = bodies_.at(cell->body_id_);
-		if (!visible_bounds.contains(body->position_))
-			continue;
-
-		sf::Color color_inner = !cell->is_alive() ? sf::Color(60, 60, 60, 180) : cell->get_inner_color();
-		sf::Color color_outer = !cell->is_alive() ? sf::Color(90, 90, 90, 160) : cell->get_outer_color();
-		
-		rend_data.outer_colors.push_back(color_outer);
-		rend_data.inner_colors.push_back(color_inner);
-		rend_data.positions.push_back(body->position_);
-		rend_data.velocities.push_back(body->velocity_);
-		rend_data.radii.push_back(cell->radius);
-	}
-
-	for (const CellMatter* matter : cell_manager_.get_all_cell_matter())
-	{
-		Body* body = bodies_.at(matter->body_id_);
-
-		rend_data.outer_colors.push_back(matter->outer_color());
-		rend_data.inner_colors.push_back(matter->inner_color());
-		rend_data.positions.push_back(body->position_);
-		rend_data.velocities.push_back(body->velocity_);
-		rend_data.radii.push_back(body->radius_);
-	}
 }
 
 void World::update_position_container(SimSnapshot& write_snapshot)

@@ -121,6 +121,7 @@ public:
 	// entries
 	void handle_cell_manager_event(SimCommand& cmd);
 	void update(int iterations);
+	void update_position_container(RenderData& rend_data, const sf::FloatRect& visible_bounds);
 	void update_protozoa_tracker();
 	void fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bounds);
 
@@ -176,6 +177,7 @@ private: // only functions this class can access
 	// updating
 	void update_springs();
 	void update_cells();
+	void update_cell_matter();
 	void update_cell(Cell* cell);
 	void update_new_born_cells();
 
