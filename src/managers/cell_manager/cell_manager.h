@@ -207,6 +207,6 @@ private: // only functions this class can access
 	// death
 	void handle_death();
 	void remove_cell(Cell* cell);
-	
+	void remove_cell_matter(CellMatter* matter);
 	
 };

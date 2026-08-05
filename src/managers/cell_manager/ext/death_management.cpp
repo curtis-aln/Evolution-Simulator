@@ -11,6 +11,13 @@ void CellManager::handle_death()
 			continue;
 		remove_cell(cell);
 	}
+
+	for (CellMatter* matter : all_cell_matter_)
+	{
+		if (!matter->dead || !bodies_->is_obj_active(matter->body_id_))
+			continue;
+		remove_cell_matter(matter);
+	}
 }
 
 void CellManager::remove_cell(Cell* cell)
@@ -20,4 +27,11 @@ void CellManager::remove_cell(Cell* cell)
 
     all_cells_.remove(cell);
     bodies_->remove(cell->body_id_);
+}
+
+void CellManager::remove_cell_matter(CellMatter* matter)
+{
+	if (matter == nullptr) return;
+	all_cell_matter_.remove(matter);
+	bodies_->remove(matter->body_id_);
 }

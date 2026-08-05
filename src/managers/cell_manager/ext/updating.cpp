@@ -13,7 +13,7 @@ void CellManager::add_new_cells_to_grid()
 
 	for (Cell* cell : all_cells_)
 	{
-		if (cell->internal_clock_ < 100)
+		if (cell->internal_clock_ < infant_time)
 		{
 			Body* body = bodies_->at(cell->body_id_);
 			new_born_cell_grid_.add_object(body->position_.x, body->position_.y, cell->id_);
@@ -31,9 +31,10 @@ void CellManager::update(int iterations)
 	}
 
 	// updating the cells and springs
-	if (iterations > 110)
+	if (iterations > infant_time)
 	{
 		add_new_cells_to_grid();
+	
 	}
 	update_springs();
 	update_cells();
@@ -80,7 +81,7 @@ void CellManager::update_new_born_cells()
 {
 	for (Cell* cell : all_cells_)
 	{
-		if (cell->internal_clock_ < 100 && cell->internal_clock_ % 30 == 0)
+		if (cell->internal_clock_ < infant_time && cell->internal_clock_ % infant_check_interval == 0)
 			try_connect_newborn_cell(cell);
 	}
 }
@@ -162,8 +163,7 @@ void CellManager::try_connect_newborn_cell(Cell* cell)
 		Cell* other_cell = all_cells_.at(other_cell_id);
 
 		float dist_sq = (body->position_ - bodies_->at(other_cell->body_id_)->position_).lengthSquared();
-		float combined_rad = (cell->radius + other_cell->radius) * 2;
-		if (dist_sq < combined_rad * combined_rad)
+		if (dist_sq < connection_range)
 		{
 			connection_requests.push_back(ConnectionRequest{ (int32_t)cell->id_, (int32_t)other_cell->id_ });
 		}
