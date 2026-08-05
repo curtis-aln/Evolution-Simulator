@@ -478,6 +478,7 @@ void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p
     ImGui::TextDisabled("Spring %d->%d", s.cell_A_id, s.cell_B_id);
 
     const float length_diff = s.rest_length - s.current_length;
+    ImGui::Text("age: %d", s.internal_clock_);
     ImGui::Text("Rest L:  %.1f, Real L: %.1f", s.rest_length, s.current_length);
     ImGui::Text("Length Diff:  %.2f", length_diff);
     ImGui::Text("Period        %d frames", period);

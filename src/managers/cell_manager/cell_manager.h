@@ -181,6 +181,8 @@ private: // only functions this class can access
 	void update_cell(Cell* cell);
 	void update_new_born_cells();
 
+	void convert_cells_to_matter();
+
 	void ensure_update_jobs_built();
 
 	// decaying objects

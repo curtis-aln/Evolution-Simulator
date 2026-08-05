@@ -71,11 +71,7 @@ public:
 
 	void break_spring()
 	{
-		// springs have a spawn immunity
-		if (internal_clock_ > 30)
-			broken = true;
-		else
-			broken = false;
+		broken = true;
 	}
 
 	bool is_spring_broken()
@@ -99,14 +95,17 @@ public:
 		if (length_squared > SPRING_BREAK_LENGTH * SPRING_BREAK_LENGTH)
 		{
 			break_spring();
+			movement_vector = { 0, 0 };
+			return;
 		}
+
+		// finding the rest length of the spring
+		rest_length = calculate_rest_length(internal_clock_);
 
 		current_length = fast_sqrt(length_squared);
 		const float length_diff = current_length - rest_length;
 		const float inv_length = 1.0f / current_length;
 
-		// finding the rest length of the spring
-		rest_length = calculate_rest_length(internal_clock_);
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
 		spring_force = genome.spring_const * (length_diff);

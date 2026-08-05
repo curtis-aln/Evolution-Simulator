@@ -140,8 +140,7 @@ void CellManager::apply_birth_requests()
 		// create the offspring by filling in its genetics and other properties based on the parent cell
 		parent_cell->create_offspring(offspring, parent_body, offspring_body, true);
 		parent_cell->turn_off_reproduction();
-
-
+		
 		// when we create this offspring we create a spring to it, the spring has a weak connection as it is made to break
 		// This is a temporary spring, it needs hold the new cell close to the parent cell until the real spring is made
 		// this is because if the two new cells are too far apart when the spring is made, the spring will break immediately and the offspring will die before it can reproduce
@@ -171,23 +170,6 @@ void CellManager::apply_birth_requests()
 }
 
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-//  apply_connection_requests
-//
-//  Creates the permanent spring between two offspring cells, completing the
-//  reproductive cycle. Spring genetics are inherited (and optionally mutated)
-//  from the spring that originally connected their parent cells.
-//
-//  Full reproductive cycle recap:
-//    1. parent pair has enough energy → cell.reproduce = true
-//    2. collect_reproduction_requests() queues BirthRequests
-//    3. apply_birth_requests() spawns offspring + temporary spring
-//    4. handle_reproduction() (in Spring) detects both offspring_indexes are set
-//    5. collect_reproduction_requests() queues ConnectionRequest
-//    6. apply_connection_requests() creates permanent spring → cycle complete
-//
-// ─────────────────────────────────────────────────────────────────────────────
 void CellManager::apply_connection_requests()
 {
 	for (const ConnectionRequest& req : connection_requests)
@@ -199,7 +181,14 @@ void CellManager::apply_connection_requests()
 		if (all_cells_.is_obj_active(cell->id_) == false || all_cells_.is_obj_active(other_cell->id_) == false)
 			continue;
 
-		uint32_t new_spring_id = create_spring(static_cast<uint32_t>(req.offspring_id), static_cast<uint32_t>(req.connect_to_id));
+		// if the distance is suspiciously large, print
+		const float dist = (bodies_->at(cell->body_id_)->position_ - bodies_->at(other_cell->body_id_)->position_).length();
+		if (dist > 800.f)
+		{
+			std::cout << "Warning: offspring cells are too far apart for spring connection (distance = " << dist << ")\n";
+		}
+
+		int32_t new_spring_id = create_spring(static_cast<uint32_t>(req.offspring_id), static_cast<uint32_t>(req.connect_to_id));
 		
 		if (new_spring_id == -1)
 			continue;
@@ -223,10 +212,13 @@ void CellManager::create_weak_offspring(uint32_t parent_id)
 		return;
 
 	Cell* parent = all_cells_.at(parent_id);
+	Body* parent_body = bodies_->at(parent->body_id_);
 	Cell* child = all_cells_.at(pair.cell_id);
+	Body* child_body = bodies_->at(pair.body_id);
 
 	// creating a child which doesnt grab on too much
-	parent->create_offspring(child, bodies_->at(parent->body_id_), bodies_->at(pair.body_id), true);
+	child_body->copy(parent_body);
+	child_body->position_ += Random::rand_vector(10.f, 50.f);
 	child->randomize();
 	child->amplitude = 0.2f;
 	child->vertical_shift = 0.5f;

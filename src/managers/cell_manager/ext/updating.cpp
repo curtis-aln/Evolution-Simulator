@@ -35,18 +35,19 @@ void CellManager::update(int iterations)
 	{
 		add_new_cells_to_grid();
 	}
-	update_cells();
 	update_springs();
+	update_cells();
 	update_new_born_cells();
 	update_cell_matter();
 	
 	// reproductive system
+	apply_connection_requests();
 	collect_reproduction_requests();
 	apply_birth_requests();
-	apply_connection_requests();
 
 	// death
 	handle_death();
+	convert_cells_to_matter();
 
 	update_statistics();
 }
@@ -79,13 +80,17 @@ void CellManager::update_new_born_cells()
 {
 	for (Cell* cell : all_cells_)
 	{
-		if (!cell->is_alive())
-			process_newly_decaying_cell(cell);
-
 		if (cell->internal_clock_ < 100 && cell->internal_clock_ % 30 == 0)
 			try_connect_newborn_cell(cell);
+	}
+}
 
-		
+void CellManager::convert_cells_to_matter()
+{
+	for (Cell* cell : all_cells_)
+	{
+		if (!cell->is_alive())
+			process_newly_decaying_cell(cell);
 	}
 }
 
@@ -153,25 +158,27 @@ void CellManager::try_connect_newborn_cell(Cell* cell)
 		cell_idx other_cell_id = nearby_cell_ids[i];
 		if (other_cell_id == cell->id_)
 			continue;
+
 		Cell* other_cell = all_cells_.at(other_cell_id);
 
 		float dist_sq = (body->position_ - bodies_->at(other_cell->body_id_)->position_).lengthSquared();
-		float combined_rad = (cell->radius + other_cell->radius) * 10;
+		float combined_rad = (cell->radius + other_cell->radius) * 2;
 		if (dist_sq < combined_rad * combined_rad)
 		{
-			connection_requests.push_back(ConnectionRequest{ (int)cell->id_, (int)other_cell->id_ });
+			connection_requests.push_back(ConnectionRequest{ (int32_t)cell->id_, (int32_t)other_cell->id_ });
 		}
 	}
 }
 
 void CellManager::update_springs()
 {
+	std::vector<int> to_remove;
 	for (Spring* spring : all_springs_)
 	{
 		// if the spring has broken on its own
 		if (spring->is_spring_broken())
 		{
-			all_springs_.remove(spring);
+			to_remove.push_back(spring->id_);
 			continue;
 		}
 
@@ -186,6 +193,11 @@ void CellManager::update_springs()
 		body_a->accelerate(spring->movement_vector);
 		body_b->accelerate(-spring->movement_vector);
 		spring->update_organics(*cell_a, *cell_b);
+	}
+
+	for (int spring_id : to_remove)
+	{
+		all_springs_.remove(spring_id);
 	}
 }
 
