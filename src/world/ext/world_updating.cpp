@@ -37,15 +37,16 @@ void World::update(SimSnapshot& write_snapshot)
 
 	cell_manager_.update_protozoa_tracker();
 
-	// We always update the position container, otherwise the simulation jitters when paused
-	food_manager_.update_position_data(write_snapshot.render);
-	cell_manager_.update_position_container(write_snapshot.render, visible_bounds);
+	// We always update the position container, otherwise the simulation jitters when paused// We always update the position container, otherwise the simulation jitters when paused
+	update_position_container(write_snapshot);
 
 	fill_snapshot(write_snapshot);
 
 	// This code allows up to step frame by frame through the update loop
 	if (toggles.m_tick_frame_time) toggles.m_tick_frame_time = false;
 }
+
+
 
 void World::ensure_update_jobs_built()
 {
@@ -202,26 +203,7 @@ sf::FloatRect World::calulcate_visible_range()
 
 void World::update_position_container(SimSnapshot& write_snapshot)
 {
-	RenderData& rend_data = write_snapshot.render;
-	int n = cell_manager_.get_cell_count();
-	rend_data.outer_colors.resize(n);
-	rend_data.inner_colors.resize(n);
-	rend_data.positions.resize(n);
-	rend_data.velocities.resize(n);
-	rend_data.radii.resize(n);
-
-	// updating render data
-	int i = 0;
-	for (const Cell* cell : cell_manager_.get_all_cells())
-	{
-		const Body* body = bodies_.at(cell->body_id_);
-
-		rend_data.outer_colors[i] = cell->get_outer_color();
-		rend_data.inner_colors[i] = cell->get_inner_color();
-		rend_data.positions[i] = body->position_;
-		rend_data.velocities[i] = body->velocity_;
-		rend_data.radii[i] = cell->radius;
-		i++;
-	}
-
+	if (!toggles.show_only_newborns)
+		food_manager_.update_position_data(write_snapshot.render);
+	cell_manager_.update_position_container(write_snapshot.render, visible_bounds, toggles.show_only_newborns);
 }

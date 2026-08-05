@@ -91,4 +91,6 @@ private:
     static bool can_food_reproduce(const Food* food) { return food->time_since_last_reproduced >= repro_cooldown && food->age >= reproductive_threshold;}
 
     bool  food_container_full() { return food_vector.size() >= max_food; }
+
+    void handle_food_death();
 };

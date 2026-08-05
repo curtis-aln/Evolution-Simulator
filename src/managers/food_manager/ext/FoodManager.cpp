@@ -14,38 +14,39 @@ void FoodManager::update()
 	let_food_reproduce();
 	update_food();
 	update_statistics();
+	handle_food_death();
+}
+
+void FoodManager::handle_food_death()
+{
+	for (Food* food : food_vector)
+	{
+		if (food->is_food_dead())
+			remove_food(food->id_);
+	}
 }
 
 void FoodManager::update_position_data(RenderData& food_data)
 {
 	int current_vector_size = food_data.positions.size();
 	int food_count = food_vector.size();
-	int resize_to = current_vector_size + food_count;
+	int reserve_to = current_vector_size + food_count;
 
-	food_data.positions.resize(resize_to);
-	food_data.radii.resize(resize_to);
-	food_data.inner_colors.resize(resize_to);
-	food_data.outer_colors.resize(resize_to);
-	food_data.velocities.resize(resize_to);
+	food_data.positions.reserve(reserve_to);
+	food_data.radii.reserve(reserve_to);
+	food_data.inner_colors.reserve(reserve_to);
+	food_data.outer_colors.reserve(reserve_to);
+	food_data.velocities.reserve(reserve_to);
 
-	int idx = current_vector_size;
 	for (Food* food : food_vector)
 	{
-		if (food->is_food_dead())
-		{
-
-			remove_food(food->id_);
-			continue;
-		}
-
 		Body* body = bodies_->at(food->body_id_);
 
-		food_data.positions[idx] = body->position_;
-		food_data.radii[idx] = body->radius_;
-		food_data.inner_colors[idx] = calc_food_color(food, idx);
-		food_data.outer_colors[idx] = calc_food_color(food, idx);
-		food_data.velocities[idx] = body->velocity_;
-		idx++;
+		food_data.positions.push_back(body->position_);
+		food_data.radii.push_back(body->radius_);
+		food_data.inner_colors.push_back(calc_food_color(food, food->id_));
+		food_data.outer_colors.push_back(calc_food_color(food, food->id_));
+		food_data.velocities.push_back(body->velocity_);
 	}
 }
 

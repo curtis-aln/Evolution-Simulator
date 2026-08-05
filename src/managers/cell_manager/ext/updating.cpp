@@ -109,7 +109,7 @@ void CellManager::process_newly_decaying_cell(Cell* cell)
 }
 
 
-void CellManager::update_position_container(RenderData& rend_data, const sf::FloatRect& visible_bounds)
+void CellManager::update_position_container(RenderData& rend_data, const sf::FloatRect& visible_bounds, const bool show_only_newborns)
 {
 	int current_vector_size = rend_data.positions.size();
 	int cell_count = get_cell_count();
@@ -119,6 +119,9 @@ void CellManager::update_position_container(RenderData& rend_data, const sf::Flo
 	{
 		Body* body = bodies_->at(cell->body_id_);
 		if (!visible_bounds.contains(body->position_))
+			continue;
+
+		if (show_only_newborns && cell->internal_clock_ >= infant_time)
 			continue;
 
 		sf::Color color_inner = !cell->is_alive() ? sf::Color(60, 60, 60, 180) : cell->get_inner_color();

@@ -33,6 +33,7 @@ struct WorldToggles
 	bool track_spatial_grids = false;  // gather spatial grid statistics each frame
 	bool  open_extinction_window = false; // whether to open the extinction confirmation popup
     bool run_physics_only = true;
+    bool show_only_newborns = false;
 
     // Mouse tool — written by UI, read by handle_left_click()
 

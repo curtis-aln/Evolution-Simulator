@@ -121,7 +121,7 @@ public:
 	// entries
 	void handle_cell_manager_event(SimCommand& cmd);
 	void update(int iterations);
-	void update_position_container(RenderData& rend_data, const sf::FloatRect& visible_bounds);
+	void update_position_container(RenderData& rend_data, const sf::FloatRect& visible_bounds, const bool show_only_newborns);
 	void update_protozoa_tracker();
 	void fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bounds);
 
