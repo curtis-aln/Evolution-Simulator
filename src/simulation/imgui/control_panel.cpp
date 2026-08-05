@@ -5,6 +5,7 @@
 #include "tabs/tagged_tab.h"
 #include "tabs/grid_tab.h"
 #include "tabs/o_vector_tab.h"
+#include "tabs/debug_tab.h"
 #include <imgui.h>
 #include <cstring>
 
@@ -21,6 +22,7 @@ ControlPanel::ControlPanel()
     m_tabs_.push_back(std::move(tagged));
     m_tabs_.push_back(std::make_unique<GridTab>());
     m_tabs_.push_back(std::make_unique<OVecDebugTab>());
+    m_tabs_.push_back(std::make_unique<DebugTab>());
 }
 
 void ControlPanel::select_tab(const char* label)

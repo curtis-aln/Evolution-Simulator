@@ -12,5 +12,5 @@ struct CellManagerSettings
 
 	inline static constexpr int infant_time = 450; // frames
 	inline static constexpr int infant_check_interval = 80; // frames
-	inline static float connection_range = CellInitialSpawnRanges::radius.max * 5.f; // pixels
+	inline static float connection_range = CellInitialSpawnRanges::radius.max * 8.5f; // pixels
 };
