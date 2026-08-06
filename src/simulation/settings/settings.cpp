@@ -54,7 +54,6 @@ static void load_cell_settings(toml::table& tbl)
 {
     REQUIRE(CellSettings::max_cells, tbl["cell"]["max_cells"]);              // "protozoa" -> "cell", NEW key
     REQUIRE(CellSettings::spawn_radius, tbl["cell"]["spawn_radius"]);        // "protozoa" -> "cell", NEW key
-    REQUIRE(CellSettings::energy_decay_rate, tbl["cell"]["energy_decay_rate"]);
     REQUIRE(CellSettings::repro_cooldown, tbl["cell"]["reproductive_cooldown"]);
     REQUIRE(CellSettings::initial_energy, tbl["cell"]["initial_energy"]);
     REQUIRE(CellSettings::wander_threshold, tbl["cell"]["wander_threshold"]);

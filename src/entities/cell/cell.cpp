@@ -19,13 +19,21 @@ void Cell::recreate()
 	immortal_ = false;
 }
 
-void Cell::eat(const float nutrients)
+bool Cell::eat(const float nutrients)
 {
+	if (time_since_last_ate_ < digestive_time)
+		return false;
+
+	if (nutrients > max_nutrients)
+		return false;
+
 	nutrients_ += nutrients;
-	//stomach_++; ToDO implement stomach
+	nutrients_ = std::min(nutrients_, max_nutrients);
 
 	time_since_last_ate_ = 0;
 	++total_food_eaten_;
+
+	return true;
 }
 
 bool  Cell::consume_food_check(const sf::Vector2f& cell_pos, const sf::Vector2f& food_pos, const float combined_rad)
@@ -103,13 +111,6 @@ void  Cell::update_statistics()
 
 void Cell::update_organics()
 {
-	if (dead_)
-	{
-		sinwave_current_friction_ = 0.3f;
-		integrity -= integrity_drain_rate;	
-		return;
-	}
-
 	sinwave_current_friction_ = calculate_friction();
 
 	// 1. Passive decay — base cost of being alive
@@ -124,7 +125,6 @@ void Cell::update_organics()
 	{
 		energy = 0.f;
 		dead_ = true;
-		integrity = std::max(0.f, integrity - integrity_drain_rate);
 		return;  // dead cells don't repair or reproduce
 	}
 

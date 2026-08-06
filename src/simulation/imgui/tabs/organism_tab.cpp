@@ -10,7 +10,6 @@ static constexpr float k_mini_bar_height = 8.f;
 
 // Placeholder upper bound for cell nutrients until a hard cap is added to
 // ProtozoaSettings. Used for progress-bar scaling only — not enforced here.
-static constexpr float k_max_nutrients = 500.f;
 static constexpr float k_summary_bar_height = 18.f;
 
 
@@ -553,8 +552,8 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
     for (const Cell& c : cells)
         total_integrity += c.integrity;
 
-    const float org_integrity_max = CellSettings::integrity * static_cast<float>(n);
-    const float org_nutrients_max = k_max_nutrients * static_cast<float>(n);
+    const float org_integrity_max = CellSettings::max_integrity * static_cast<float>(n);
+    const float org_nutrients_max = CellSettings::max_nutrients * static_cast<float>(n);
 
     // ── Set up 3 columns with explicit widths ─────────────────────────────
     const float total_w = ImGui::GetContentRegionAvail().x;
@@ -630,23 +629,23 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
         }
         // Nutrients bar
         {
-            const float f = std::clamp(c.nutrients_ / k_max_nutrients, 0.f, 1.f);
+            const float f = std::clamp(c.nutrients_ / CellSettings::max_nutrients, 0.f, 1.f);
             ImGui::TextDisabled("N"); ImGui::SameLine(0.f, 3.f);
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4{ 0.2f, 0.6f, 1.0f, 1.f });
             ImGui::ProgressBar(f, { k_mini_cell_box_width, k_mini_bar_height }, "");
             ImGui::PopStyleColor();
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Nutrients: %.2f  /  %.0f (cap)", c.nutrients_, k_max_nutrients);
+                ImGui::SetTooltip("Nutrients: %.2f  /  %.0f (cap)", c.nutrients_, CellSettings::max_nutrients);
         }
         // Integrity bar
         {
-            const float f = std::clamp(c.integrity / CellSettings::integrity, 0.f, 1.f);
+            const float f = std::clamp(c.integrity / CellSettings::max_integrity, 0.f, 1.f);
             ImGui::TextDisabled("I"); ImGui::SameLine(0.f, 3.f);
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4{ 0.85f, 0.8f, 0.25f, 1.f });
             ImGui::ProgressBar(f, { k_mini_cell_box_width, k_mini_bar_height }, "");
             ImGui::PopStyleColor();
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Integrity: %.2f  /  %.0f", c.integrity, CellSettings::integrity);
+                ImGui::SetTooltip("Integrity: %.2f  /  %.0f", c.integrity, CellSettings::max_integrity);
         }
 
         ImGui::EndGroup();
@@ -693,7 +692,6 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
     ImGui::BeginChild("EN_const", { -1.f, -1.f }, true);
     ImGui::TextDisabled("Conversion rates  (per frame, per cell)");
     ImGui::Separator();
-    ImGui::Text("Energy decay             %.5f", CellSettings::energy_decay_rate);
     ImGui::Text("Nutrients  ->  Energy    %.5f", CellSettings::nutrients_conversion_rate);
     ImGui::Text("Energy     ->  Integrity %.5f", CellSettings::integrity_conversion_rate);
     ImGui::Text("Energy share (springs)   %.5f", SpringSettings::energy_share_rate);
@@ -705,8 +703,8 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
     ImGui::Text("Initial energy           %.1f", CellSettings::initial_energy);
     ImGui::Text("Reproduce threshold      %.1f", CellSettings::repro_thresh_);
     ImGui::Text("Offspring energy cost    %.1f", CellSettings::offspring_energy_cost);
-    ImGui::Text("Integrity max            %.1f", CellSettings::integrity);
-    ImGui::Text("Nutrients cap (*)        %.1f", k_max_nutrients);
+    ImGui::Text("Integrity max            %.1f", CellSettings::max_integrity);
+    ImGui::Text("Nutrients cap (*)        %.1f", CellSettings::max_nutrients);
 
     ImGui::Spacing();
     ImGui::TextDisabled("(*) placeholder — replace once ProtozoaSettings::max_nutrients exists");

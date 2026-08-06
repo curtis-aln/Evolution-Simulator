@@ -108,7 +108,7 @@ public:
 	void update_statistics();
 	void update_organics();
 
-	void eat(const float nutrients);
+	[[nodiscard]] bool eat(const float nutrients);
 	void create_offspring(Cell* child, Body* parent_body, Body* child_body, const bool mutate);
 	static bool consume_food_check(const sf::Vector2f& cell_pos, const sf::Vector2f& food_pos, const float combined_rad);
 

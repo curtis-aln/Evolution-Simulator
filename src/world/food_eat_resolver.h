@@ -139,8 +139,9 @@ class FoodEatResolver: private FoodResolutionSettings
 
 			if (dist_sq < rel_rad_sq + 1.f)
 			{
-				cell->eat(CellSettings::bite_amount);
-				resolution.add(food_id);
+				bool ate = cell->eat(CellSettings::bite_amount);
+				if (ate)
+					resolution.add(food_id);
 			}
 		}
 	}
