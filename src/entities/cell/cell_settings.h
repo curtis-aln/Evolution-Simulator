@@ -11,7 +11,7 @@ struct CellSettings
 	inline static float repro_thresh_ = 200.f;
 	
 
-	inline static float bite_amount = 65.f;
+	inline static float bite_amount = 5.f;
 
 	inline static int max_cells;
 

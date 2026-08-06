@@ -105,13 +105,14 @@ class CellManager: protected CellManagerSettings
 	int  current_total_cells_ = 0;
 
 	// this spatial grid holds new born cells so that the they can form connections between other newly born cells
-	SimpleSpatialGrid new_born_cell_grid_{ WorldSettings::cells_x, WorldSettings::cells_y, WorldSettings::cell_max_capacity, WorldSettings::bounds_radius * 2.0f, WorldSettings::bounds_radius * 2.0f };
+	SimpleSpatialGrid new_born_cell_grid_{ WorldSettings::birth_cells_x, WorldSettings::birth_cells_y, WorldSettings::cell_max_capacity, WorldSettings::bounds_radius * 2.0f, WorldSettings::bounds_radius * 2.0f };
 	
 
 public:
 	uint16_t max_size = static_cast<uint16_t>(10000);
 	FixedSpan<cell_idx, uint16_t> select_indexes{ max_size };	
 
+	SpatialGridRenderer new_born_cell_grid_renderer_{ &new_born_cell_grid_ };
 
 public:
 	// Constructor
@@ -172,7 +173,6 @@ private: // only functions this class can access
 	void register_death_stat(const float lifetime, const bool had_offspring);
 	void register_birth_stat();
 	float calculate_average_generation() const;
-	void fill_render_data(RenderData& render_data, sf::FloatRect& visible_bounds);
 
 	// updating
 	void update_springs();

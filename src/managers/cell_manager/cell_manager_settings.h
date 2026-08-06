@@ -10,7 +10,7 @@ struct CellManagerSettings
 	inline static constexpr int max_evolutionary_iterations = 5;
 	inline static constexpr int desired_cell_count = 3;
 
-	inline static constexpr int infant_time = 450; // frames
-	inline static constexpr int infant_check_interval = 80; // frames
-	inline static float connection_range = CellInitialSpawnRanges::radius.max * 8.5f; // pixels
+	inline static constexpr int infant_time = 400; // frames
+	inline static constexpr int infant_check_interval = 100; // frames
+	inline static float connection_range = CellInitialSpawnRanges::radius.max * 3.6f; // pixels
 };

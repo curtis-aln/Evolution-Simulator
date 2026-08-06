@@ -17,6 +17,7 @@ World::World(sf::RenderWindow* window) : m_window_(window)
 void World::render(const SimSnapshot& snapshot, const sf::Vector2f mouse_pos)
 {
 	world_renderer_.render(snapshot, mouse_pos);
+	//cell_manager_.new_born_cell_grid_renderer_.render(*m_window_, mouse_pos, 800.f);
 }
 
 void World::reset_world()

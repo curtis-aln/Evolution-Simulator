@@ -134,6 +134,43 @@ void CellManager::update_position_container(RenderData& rend_data, const sf::Flo
 		rend_data.radii.push_back(cell->radius);
 	}
 
+	const int n = get_cell_count();
+
+	// now we handle springs, we can just store the indexes as then the renderer can read them from the positions container above
+	const int spring_count = static_cast<int>(all_springs_.size());
+	rend_data.spring_connections.clear();
+
+	for (Spring* spring : all_springs_)
+	{
+		Cell* cell_a = all_cells_.at(spring->cell_A_id);
+		Body* body_a = bodies_->at(cell_a->body_id_);
+		bool cell_a_visible = visible_bounds.contains({ body_a->position_.x, body_a->position_.y });
+
+		if (!cell_a_visible || (show_only_newborns && cell_a->internal_clock_ > infant_time)) 
+			continue;
+
+		Cell* cell_b = all_cells_.at(spring->cell_B_id);
+		Body* body_b = bodies_->at(cell_b->body_id_);
+		bool cell_b_visible = visible_bounds.contains({ body_b->position_.x, body_b->position_.y });
+
+		if (!cell_b_visible || (show_only_newborns && cell_b->internal_clock_ > infant_time)) 
+			continue;
+
+		const float min_dist = body_a->radius_ + body_b->radius_;
+
+		// The reason why we cant use indexing to fill this array is because we dont know how many bodies are not active,
+		// so it messes with the indexing and leads to null connections
+		rend_data.spring_connections.push_back({
+			get_cell_pos(spring->cell_A_id),
+			get_cell_pos(spring->cell_B_id),
+			min_dist,
+			min_dist * 2.f,
+			spring->stress });
+	}
+
+	if (show_only_newborns)
+		return;
+
 	for (const CellMatter* matter : all_cell_matter_)
 	{
 		Body* body = bodies_->at(matter->body_id_);
@@ -166,7 +203,7 @@ void CellManager::try_connect_newborn_cell(Cell* cell)
 		Cell* other_cell = all_cells_.at(other_cell_id);
 
 		float dist_sq = (body->position_ - bodies_->at(other_cell->body_id_)->position_).lengthSquared();
-		if (dist_sq < connection_range)
+		if (dist_sq < connection_range * connection_range)
 		{
 			connection_requests.push_back(ConnectionRequest{ (int32_t)cell->id_, (int32_t)other_cell->id_ });
 		}
@@ -251,42 +288,8 @@ void CellManager::fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bo
 	snapshot.protozoa_tracker = protozoa_tracker_;
 
 	snapshot.world_stats.highlighted_cells = select_indexes.count;
-
-	fill_render_data(snapshot.render, visible_bounds);
 }
 
-void CellManager::fill_render_data(RenderData& render_data, sf::FloatRect& visible_bounds)
-{
-	const int n = get_cell_count();
-
-	// now we handle springs, we can just store the indexes as then the renderer can read them from the positions container above
-	const int spring_count = static_cast<int>(all_springs_.size());
-	render_data.spring_connections.clear();
-
-	for (Spring* spring : all_springs_)
-	{
-		Body* body_a = get_cell_body(spring->cell_A_id);
-		bool cell_a_visible = visible_bounds.contains({ body_a->position_.x, body_a->position_.y });
-
-		if (!cell_a_visible) continue;
-
-		Body* body_b = get_cell_body(spring->cell_B_id);
-		bool cell_b_visible = visible_bounds.contains({ body_b->position_.x, body_b->position_.y });
-
-		if (!cell_b_visible) continue;
-		
-		const float min_dist = body_a->radius_ + body_b->radius_;
-
-		// The reason why we cant use indexing to fill this array is because we dont know how many bodies are not active,
-		// so it messes with the indexing and leads to null connections
-		render_data.spring_connections.push_back({ 
-			get_cell_pos(spring->cell_A_id), 
-			get_cell_pos(spring->cell_B_id),
-			min_dist,
-			min_dist * 2.f,
-			spring->stress });
-	}
-}
 
 const sf::Vector2f* CellManager::get_selected_protozoa_pos() const
 {
