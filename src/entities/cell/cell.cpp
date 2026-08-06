@@ -21,6 +21,9 @@ void Cell::recreate()
 
 bool Cell::eat(const float nutrients)
 {
+	// This function returns false if the cell has failed to eat the food
+	// and true if it has eaten the food
+
 	if (time_since_last_ate_ < digestive_time)
 		return false;
 
@@ -133,9 +136,14 @@ void Cell::update_organics()
 
 	// 5. Flag for reproduction — use assignment so it clears itself
 	//    when energy drops back below threshold
-	reproduce_ = (energy >= repro_thresh_);
-}
+	bool sufficient_energy = energy >= (birth_energy_thresh * max_energy);
+	bool sufficient_integrity = integrity >= (birth_integrity_thresh * max_integrity);
+	bool sufficient_nutrients = nutrients_ >= (birth_nutrients_thresh * max_nutrients);
+	bool ready_to_reproduce = repro_timer_ >= repro_cooldown;
 
+	if (sufficient_energy && sufficient_integrity && sufficient_nutrients && ready_to_reproduce)
+		reproduce_ = true;
+}
 
 void Cell::process_nutrients()
 {

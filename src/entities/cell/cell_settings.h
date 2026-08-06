@@ -3,9 +3,8 @@
 struct CellSettings
 {
 	inline static float offspring_energy_cost = 50.f;
-	inline static float repro_thresh_ = 100.f;
 
-	inline static float bite_amount = 5.f;
+	inline static float bite_amount = 25.f;
 
 	inline static int max_cells;
 	inline static float spawn_radius;

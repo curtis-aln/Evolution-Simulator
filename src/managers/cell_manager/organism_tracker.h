@@ -291,11 +291,11 @@ private:
             offspring_count += cell.offspring_count;
 			time_since_last_reproduced += cell.repro_timer_;
 
-            cells_ready_to_reproduce += cell.can_reproduce();
+            cells_ready_to_reproduce += cell.should_reproduce();
         }
 
         average_generation /= cell_count;
-        max_energy = cell_count * CellSettings::repro_thresh_;
+        max_energy = cell_count * CellSettings::max_energy;
         max_nutrients = max_energy;
         average_energy = total_energy / cell_count;
         frames_alive = frames_alive / cell_count;

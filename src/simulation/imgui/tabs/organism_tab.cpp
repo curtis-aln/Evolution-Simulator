@@ -402,7 +402,7 @@ void OrganismTab::draw_cell_detail(ImGuiContext& ctx, const Cell& c, const sf::V
     ImGui::Text("Mut R    %.4f  Rng %.4f", c.mutation_rate, c.mutation_range);
     ImGui::Text("Ate      %d  (%zu fr ago)", c.total_food_eaten_, c.time_since_last_ate_);
 
-    ImGui::Text("reproduce: %d", c.can_reproduce());
+    ImGui::Text("reproduce: %d", c.should_reproduce());
 
     // Digest cooldown bar
     const float digest_remaining = std::max(0.f,
@@ -618,14 +618,14 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
 
         // Energy bar
         {
-            const float f = std::clamp(c.energy / CellSettings::repro_thresh_, 0.f, 1.f);
+            const float f = std::clamp(c.energy / CellSettings::max_energy, 0.f, 1.f);
             ImGui::TextDisabled("E"); ImGui::SameLine(0.f, 3.f);
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, fraction_color(f));
             ImGui::ProgressBar(f, { k_mini_cell_box_width, k_mini_bar_height }, "");
             ImGui::PopStyleColor();
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Energy: %.2f  /  %.0f (repro thresh)",
-                    c.energy, CellSettings::repro_thresh_);
+                    c.energy, CellSettings::max_energy);
         }
         // Nutrients bar
         {
@@ -701,7 +701,7 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
     ImGui::TextDisabled("Thresholds  &  costs");
     ImGui::Separator();
     ImGui::Text("Initial energy           %.1f", CellSettings::initial_energy);
-    ImGui::Text("Reproduce threshold      %.1f", CellSettings::repro_thresh_);
+    ImGui::Text("Reproduce threshold      %.1f", CellSettings::max_energy);
     ImGui::Text("Offspring energy cost    %.1f", CellSettings::offspring_energy_cost);
     ImGui::Text("Integrity max            %.1f", CellSettings::max_integrity);
     ImGui::Text("Nutrients cap (*)        %.1f", CellSettings::max_nutrients);

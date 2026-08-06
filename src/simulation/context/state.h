@@ -95,6 +95,9 @@ struct WorldStatistics
 
 struct CellManagerStatistics
 {
+    float min_speed = 0.f;
+
+
     bool selected_a_cell = false;
 
     uint16_t longest_lived_ever = 0;

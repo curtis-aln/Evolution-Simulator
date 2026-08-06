@@ -42,6 +42,8 @@ enum class CommandType
     // CELL MANAGER EVENT  ──────────────────────────────────────────────────
 	ClearAllProtozoa,       // clears all protozoa from the simulation
 
+	SetMinSpeed,               // set the minimum speed of protozoa
+
     SetRadius,              // set radius of selected cell
 	SetAmplitude,           // set amplitude of selected cell
 	SetFrequency,           // set frequency of selected cell

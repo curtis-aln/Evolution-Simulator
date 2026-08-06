@@ -22,4 +22,16 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
 
 	ImGui::EndChild();
+
+	ImGui::BeginChild("Reproduction", { cw, ch }, true);
+
+	ImGui::SetNextItemWidth(-1.f);
+	float min_speed = snap.cell_manager_stats.min_speed; // sync with sim state
+	if (ImGui::SliderFloat("##min_speed", &min_speed, 0.f, 4.f, "Min Speed %.2f"))
+	{
+		SimCommand cmd{ .section = CommandSection::CellManagerEvent, .type = CommandType::SetMinSpeed, .float_val = min_speed };
+		ctx.push(cmd);
+	}
+
+	ImGui::EndChild();
 }

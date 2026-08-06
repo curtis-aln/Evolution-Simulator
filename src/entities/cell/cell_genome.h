@@ -205,12 +205,12 @@ static struct CellInitialSpawnRanges
 struct HardConstants
 {
     inline static float     add_cell_chance = 0.02f;
-    inline static float     add_spring_chance = 0.03f;
     inline static uint8_t   outer_transparency = 200;
     inline static uint8_t   inner_transparency = 100;
-    inline static float     colour_mutation_range = 0.025f;
+    inline static float     colour_mutation_range = 0.055f;
 
     inline static float radius_mutation_multiplier = 5.f;
+    inline static float newborn_search_radius_multiplier = 5.f;
     inline static float friction_multiplier = 0.5f;
 };
 
@@ -228,6 +228,8 @@ struct CellGenome : GenomeBase, HardConstants
     float connective_spring_spring_const = 0.1f;
     float connective_spring_damping = 0.1f;
 
+	float newborn_search_radius = 100.f;
+
     CellGenome() { randomize(); };
 
     void randomize()
@@ -243,6 +245,17 @@ struct CellGenome : GenomeBase, HardConstants
         rand_in_range(vertical_shift, Limit::vertical_shift);
 
         rand_in_range(radius, Limit::radius);
+          
+		rand_in_range(birth_energy_thresh, { 0.f, 1.f });
+		rand_in_range(birth_integrity_thresh, { 0.f, 1.f });
+		rand_in_range(birth_nutrients_thresh, { 0.f, 1.f });
+
+		rand_in_range(offspring_energy_to_give, { 0.f, 1.f });
+		rand_in_range(connective_spring_spring_const, SpringGeneticConstraints::spring_const);
+		rand_in_range(connective_spring_damping, SpringGeneticConstraints::damping);
+
+		rand_in_range(newborn_search_radius, { radius * newborn_search_radius_multiplier, radius * newborn_search_radius_multiplier * 2.f });
+
 
         outer_r = Random::rand_byte(); outer_g = Random::rand_byte(); outer_b = Random::rand_byte();
         inner_r = Random::rand_byte(); inner_g = Random::rand_byte(); inner_b = Random::rand_byte();
@@ -260,6 +273,17 @@ struct CellGenome : GenomeBase, HardConstants
         frequency = maybe_mutate(frequency, C.frequency, rate, range * friction_multiplier);
         offset = maybe_mutate(offset, C.offset, rate, range * friction_multiplier);
         vertical_shift = maybe_mutate(vertical_shift, C.vertical_shift, rate, range * friction_multiplier);
+
+		birth_energy_thresh = maybe_mutate(birth_energy_thresh, { 0.f, 1.f }, rate, range);
+		birth_integrity_thresh = maybe_mutate(birth_integrity_thresh, { 0.f, 1.f }, rate, range);
+		birth_nutrients_thresh = maybe_mutate(birth_nutrients_thresh, { 0.f, 1.f }, rate, range);
+
+		offspring_energy_to_give = maybe_mutate(offspring_energy_to_give, { 0.f, 1.f }, rate, range);
+
+		connective_spring_damping = maybe_mutate(connective_spring_damping, SpringGeneticConstraints::damping, rate, range);
+		connective_spring_spring_const = maybe_mutate(connective_spring_spring_const, SpringGeneticConstraints::spring_const, rate, range);
+
+		newborn_search_radius = maybe_mutate(newborn_search_radius, { radius * newborn_search_radius_multiplier, radius * newborn_search_radius_multiplier * 2.f }, rate, range);
 
         mutate_meta();
         mutate_colour(outer_r, outer_g, outer_b);

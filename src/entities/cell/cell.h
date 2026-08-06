@@ -94,7 +94,6 @@ public:
 	[[nodiscard]] bool can_die() const { return energy <= 0; }
 
 	[[nodiscard]] bool should_reproduce() const { return reproduce_; }
-	[[nodiscard]] bool can_reproduce() const { return energy >= repro_thresh_ && repro_timer_ >= repro_cooldown; }
 
 	[[nodiscard]] bool should_remove() const { return can_die() && (integrity <= 0); }
 
@@ -113,6 +112,8 @@ public:
 	static bool consume_food_check(const sf::Vector2f& cell_pos, const sf::Vector2f& food_pos, const float combined_rad);
 
 	void recreate();
+
+	void kill() { dead_ = true; }
 
 	void turn_off_reproduction();
 

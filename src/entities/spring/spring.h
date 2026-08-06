@@ -143,10 +143,7 @@ public:
 			update_integrity(cell_a.integrity, cell_b.integrity);
 		}
 
-		float transfer = transfer_nutrients(cell_a.nutrients_, cell_b.nutrients_);
-
-		cell_a.nutrients_ += transfer;
-		cell_b.nutrients_ -= transfer;
+		transfer_nutrients(cell_a.nutrients_, cell_b.nutrients_);
 
 		cell_a.energy -= work_done / 2.f; // Eventually springs will be their own organic systems with energy
 		cell_b.energy -= work_done / 2.f;
@@ -160,10 +157,38 @@ public:
 	}
 
 private:
-	// takes in the nutrients of cell a and cell b and reutrns the transfer amount
-	float transfer_nutrients(float nutrients_a, float nutrients_b)
+	// takes in the nutrients of cell a and cell b and transfers between them,
+// respecting max_nutrients caps and applying a fixed % loss per transfer
+	void transfer_nutrients(float& nutrients_a, float& nutrients_b)
 	{
-		return std::copysign(genome.nutrient_transfer_rate, nutrients_b - nutrients_a);
+		constexpr float loss_decimal = 0.04f; // 4% loss per transfer
+
+		// negative rate = cell can't transfer (floor at zero, don't reinterpret sign)
+		const float rate = std::max(genome.nutrient_transfer_rate, 0.0f);
+
+		if (rate <= 0.0f)
+			return;
+
+		if (nutrients_b > nutrients_a)
+		{
+			// b sends to a
+			const float send_amount = std::min(rate, nutrients_b);                    // can't send more than b has
+			const float receive_amount = std::min(send_amount * (1.0f - loss_decimal),
+				CellSettings::max_nutrients - nutrients_a);        // can't push a past cap
+
+			nutrients_b -= send_amount;
+			nutrients_a += receive_amount;
+		}
+		else if (nutrients_a > nutrients_b)
+		{
+			// a sends to b
+			const float send_amount = std::min(rate, nutrients_a);
+			const float receive_amount = std::min(send_amount * (1.0f - loss_decimal),
+				CellSettings::max_nutrients - nutrients_b);
+
+			nutrients_a -= send_amount;
+			nutrients_b += receive_amount;
+		}
 	}
 
 	float calculate_rest_length(const int internal_clock)

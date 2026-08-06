@@ -182,11 +182,6 @@ void CellManager::apply_connection_requests()
 			continue;
 
 		// if the distance is suspiciously large, print
-		const float dist = (bodies_->at(cell->body_id_)->position_ - bodies_->at(other_cell->body_id_)->position_).length();
-		if (dist > 800.f)
-		{
-			std::cout << "Warning: offspring cells are too far apart for spring connection (distance = " << dist << ")\n";
-		}
 
 		int32_t new_spring_id = create_spring(static_cast<uint32_t>(req.offspring_id), static_cast<uint32_t>(req.connect_to_id));
 		

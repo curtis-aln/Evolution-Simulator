@@ -450,6 +450,10 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		Spring::SPRING_WORK_CONST = cmd.float_val;
 		break;
 
+	case CommandType::SetMinSpeed:
+		statistics_.min_speed = cmd.float_val;
+		break;
+
 	case CommandType::SetRadius:
 		//    if (selected_protozoa)
 		//        selected_protozoa->get_cells()[cmd.cell_spring_idx].radius = cmd.float_val;
