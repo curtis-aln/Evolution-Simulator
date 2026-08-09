@@ -11,7 +11,7 @@ FoodManager::FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_
 
 void FoodManager::update()
 {
-	let_food_reproduce();
+	food_reproduction_function();
 	update_food();
 	update_statistics();
 	handle_food_death();
@@ -140,7 +140,7 @@ void FoodManager::handle_food_manager_event(SimCommand& cmd)
 		break;
 
 	case CommandType::SetRandomIntensity:
-		statistics_.food_random_spawn_intensity = cmd.float_val;
+		statistics_.food_random_spawn_intensity = cmd.int_val;
 		break;
 
 	case CommandType::SetMitosisIntensity:

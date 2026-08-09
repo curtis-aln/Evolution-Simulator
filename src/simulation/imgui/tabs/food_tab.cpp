@@ -4,7 +4,7 @@ void FoodTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
 	const float total = ImGui::GetContentRegionAvail().x;
 	const float sp = ImGui::GetStyle().ItemSpacing.x;
-	const float cw = (total - sp * 3.f) / 4.f;
+	const float cw = (total - sp * 2.f) / 3.f;
 	const float ch = -1.f;
 
 	ImGui::BeginChild("Food", { cw, ch }, true);
@@ -18,9 +18,9 @@ void FoodTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 	if (ctx.food_toggles.spawn_random_food)
 	{
 		ImGui::Indent();
-		float intensity = snap.food_manager_stats.food_random_spawn_intensity;
-		if (ImGui::SliderFloat("##random_intensity", &intensity, 0.f, 4.f, "intensity %.2f"))
-			ctx.push({ .section = CommandSection::FoodManagerEvent, .type = CommandType::SetRandomIntensity, .float_val = intensity });
+		int intensity = snap.food_manager_stats.food_random_spawn_intensity;
+		if (ImGui::SliderInt("##random_intensity", &intensity, 0, FoodManagerSettings::max_random_food_spawned_per_frame, "intensity %d"))
+			ctx.push({ .section = CommandSection::FoodManagerEvent, .type = CommandType::SetRandomIntensity, .int_val = intensity });
 		ImGui::Unindent();
 	}
 

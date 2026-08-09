@@ -366,13 +366,13 @@ public:
     // Initialising constructor — equivalent to default-construct then init().
     explicit OVecDebug(o_vector<Obj>& vec)
     {
-        init(vec);
+        create_food(vec);
     }
 
     // Bind this debugger to a vector. Safe to call once after default
     // construction. Resets all counters and history so the debugger starts
     // clean relative to the vector's current state.
-    void init(o_vector<Obj>& vec)
+    void create_food(o_vector<Obj>& vec)
     {
         vec_ = &vec;
         creation_time_ = Clock::now();

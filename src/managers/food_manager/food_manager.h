@@ -57,7 +57,7 @@ public:
 
 public:
     FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies);
-    void  init();
+    void  create_food(unsigned amount);
 
     void reset_cell_manager();
 
@@ -90,7 +90,7 @@ private:
     void ensure_update_jobs_built();
     void update_statistics();
     
-    void  let_food_reproduce();
+    void  food_reproduction_function();
     bool  reproduce_food(Food* food);
     
     float calculate_spawn_chance() const;

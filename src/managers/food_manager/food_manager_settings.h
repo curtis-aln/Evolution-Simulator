@@ -48,4 +48,8 @@ struct FoodManagerSettings
 
 	inline static constexpr float vibrate_freq = 0.0065f;
 
+
+	// Intensity Sliders
+	inline static int max_random_food_spawned_per_frame = 20;
+
 };

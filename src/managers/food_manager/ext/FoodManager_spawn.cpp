@@ -1,12 +1,17 @@
 #include "../food_manager.h"
 
-void FoodManager::let_food_reproduce()
+void FoodManager::food_reproduction_function()
 {
-	// this function runs a pass over all the food and checks if it can reproduce, if it can then it will spawn a new food 
-	// using the reproduction algorithm. new food start off small and with full transparency, they will grow to their full size and color over time.
+	// Food can either spawn out of nowhere, or split into two with mitosis
 
 	// dont do anything if the food container is full
 	if (food_container_full())
+		return;
+
+	if (toggles_.spawn_random_food)
+		create_food(statistics_.food_random_spawn_intensity);
+
+	if (!toggles_.food_mitosis)
 		return;
 
 	// Each food must pass the reproduce check and the spawn chance
@@ -21,6 +26,7 @@ void FoodManager::let_food_reproduce()
 			break; // there are no more body vectors left to use
 	}
 }
+
 
 float FoodManager::calculate_spawn_chance() const
 {

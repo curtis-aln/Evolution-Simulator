@@ -56,31 +56,17 @@ void FoodManager::ensure_update_jobs_built()
 }
 
 
-void FoodManager::init()
+void FoodManager::create_food(unsigned amount)
 {
-	std::cout << "Initializing food with " << initial_food << " food...\n";
-
-	for (int i = 0; i < max_food; ++i)
+	for (int i = 0; i < amount; ++i)
 	{
 		sf::Vector2f pos = world_bounds_->rand_pos();
 		FoodBodyPair food_body_pair = create_food(pos, true);
-		if (!food_body_pair.is_valid())
-		{
-			std::cerr << "Failed to create food at index " << i << ".\n";
-			continue;
-		}
 
 		Food* food = food_vector.at(food_body_pair.food_id);
 		food->color = Random::rand_color(food_darkest_color, food_lightest_color);
 		food->nutrients = Random::rand_range(initial_nutrients, initial_nutrients + 50.f);
 	}
-
-	for (int i = initial_food; i < max_food; ++i)
-	{
-		remove_food(food_vector.at(i)->id_);
-	}
-
-	std::cout << "Initialized " << initial_food << " food.\n";
 }
 
 
@@ -92,7 +78,7 @@ void FoodManager::reset_cell_manager()
 		food_vector.remove(food);
 	}
 
-	init();
+	create_food(initial_food);
 }
 
 

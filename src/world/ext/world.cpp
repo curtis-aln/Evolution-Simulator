@@ -9,7 +9,7 @@
 
 World::World(sf::RenderWindow* window) : m_window_(window)
 {
-    food_manager_.init();
+    food_manager_.create_food(food_manager_.initial_food);
     bound_bodies();
 }
 
