@@ -101,6 +101,7 @@ add_executable(ProjectARIA
     src/simulation/imgui/tabs/debug_tab.cpp
     src/simulation/imgui/tabs/tagged_tab.cpp
     src/simulation/imgui/tabs/o_vector_tab.cpp
+    src/simulation/imgui/tabs/food_tab.cpp
     
     src/world/collision_resolver/detection.cpp
     src/world/collision_resolver/init.cpp
@@ -137,7 +138,7 @@ add_executable(ProjectARIA
  "src/simulation/imgui/imgui_settings.h" 
  "src/Utils/o_vec/o_vec_debug.h" 
  "src/simulation/imgui/tabs/o_vector_tab.cpp" 
- "src/simulation/imgui/tabs/o_vector_tab.h" "src/Utils/o_vec/o_vec_snapshot.h" "src/world/world_renderer/world_renderer.h"  "src/world/food_eat_resolver.h" "src/entities/CellMatter.h" "src/simulation/imgui/tabs/debug_tab.h")
+ "src/simulation/imgui/tabs/o_vector_tab.h" "src/Utils/o_vec/o_vec_snapshot.h" "src/world/world_renderer/world_renderer.h"  "src/world/food_eat_resolver.h" "src/entities/CellMatter.h" "src/simulation/imgui/tabs/debug_tab.h" "src/simulation/imgui/tabs/food_tab.h")
 
  target_compile_definitions(ProjectARIA PRIVATE
     ARIA_SETTINGS_PATH="${CMAKE_SOURCE_DIR}/aria_settings.toml"

@@ -6,6 +6,7 @@
 #include "tabs/grid_tab.h"
 #include "tabs/o_vector_tab.h"
 #include "tabs/debug_tab.h"
+#include "tabs/food_tab.h"
 #include <imgui.h>
 #include <cstring>
 
@@ -23,6 +24,7 @@ ControlPanel::ControlPanel()
     m_tabs_.push_back(std::make_unique<GridTab>());
     m_tabs_.push_back(std::make_unique<OVecDebugTab>());
     m_tabs_.push_back(std::make_unique<DebugTab>());
+    m_tabs_.push_back(std::make_unique<FoodTab>());
 }
 
 void ControlPanel::select_tab(const char* label)
