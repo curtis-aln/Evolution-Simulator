@@ -148,12 +148,22 @@ void Cell::update_organics()
 void Cell::process_nutrients()
 {
 	if (nutrients_ <= 0.f)
+	{
+		nutrients_ = 0.f;
 		return;
+	}
 
-	// Convert a capped batch per tick — don't convert more than we have
-	const float converted = std::min(nutrients_, nutrients_conversion_rate);
-	energy += converted;
-	nutrients_ -= converted;
+	const float energy_capacity = max_energy - energy;
+	if (energy_capacity <= 0.f)
+	{
+		energy = max_energy;
+		return;
+	}
+
+	const float amount = std::min({ nutrients_, nutrients_conversion_rate, energy_capacity });
+
+	energy += amount;
+	nutrients_ -= amount;
 }
 
 

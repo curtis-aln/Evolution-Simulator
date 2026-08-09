@@ -15,7 +15,7 @@ void CellManager::handle_death()
 
 		if (is_too_slow)
 		{
-			cell->energy -= 0.7f;
+			cell->energy -= 0.4f;
 		}
 
 		if (cell->should_remove() || !bodies_->is_obj_active(cell->body_id_))

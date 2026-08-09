@@ -17,8 +17,8 @@ static struct BaseConstants
     static constexpr float mutation_rate_rate = 0.1f;
     static constexpr float mutation_rate_range = 0.01f;
 
-    inline static Range init_mutation_rate_spread = { 0.4f, 0.8f };
-    inline static Range init_mutation_range_spread = { 0.01f, 1.f };
+    inline static Range init_mutation_rate_spread = { 0.5f, 1.f };
+    inline static Range init_mutation_range_spread = { 0.05f, 1.f };
 };
 
 struct GenomeBase : protected BaseConstants
