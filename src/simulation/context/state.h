@@ -34,7 +34,7 @@ struct WorldToggles
 	bool  open_extinction_window = false; // whether to open the extinction confirmation popup
     bool run_physics_only = true;
     bool show_only_newborns = false;
-
+    
     // Mouse tool — written by UI, read by handle_left_click()
 
     bool  mouse_add_cells = true;
@@ -44,6 +44,12 @@ struct WorldToggles
     
 
 	bool show_influence_radius = false; // whether to show the influence radius of the mouse tool
+};
+
+struct FoodToggles
+{
+    bool spawn_random_food = true;
+    bool food_mitosis = true;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -144,6 +150,9 @@ struct CellManagerStatistics
 struct FoodManagerStatistics
 {
     int   food_count = 0;
+
+    float   food_random_spawn_intensity;
+    float   food_mitosis_spawn_intensity;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

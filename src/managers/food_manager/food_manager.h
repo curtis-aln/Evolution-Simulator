@@ -15,6 +15,9 @@
 
 #include <world/world_settings.h>
 
+#include "../../simulation/context/state.h"
+#include <simulation/context/sim_command.h>
+
 
 struct FoodBodyPair
 {
@@ -50,6 +53,8 @@ public:
 
     int frames = 0;
 
+    FoodToggles toggles_{};
+
 public:
     FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies);
     void  init();
@@ -64,6 +69,7 @@ public:
 
     int    get_size()               const;
     bool has_food_with_body_id(int body_id);
+    void handle_food_manager_event(SimCommand& cmd);
     const o_vector<Food>& get_food_vector() const;
     o_vector<Food>& get_food_vector();
     void update();

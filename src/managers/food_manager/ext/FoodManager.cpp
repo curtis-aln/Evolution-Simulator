@@ -130,3 +130,21 @@ bool FoodManager::has_food_with_body_id(int body_id)
 	}
 	return false;
 }
+
+void FoodManager::handle_food_manager_event(SimCommand& cmd)
+{
+	switch (cmd.type)
+	{
+	case CommandType::SetFoodToggles:
+		toggles_ = cmd.food_toggles;
+		break;
+
+	case CommandType::SetRandomIntensity:
+		statistics_.food_random_spawn_intensity = cmd.float_val;
+		break;
+
+	case CommandType::SetMitosisIntensity:
+		statistics_.food_mitosis_spawn_intensity = cmd.float_val;
+		break;
+	}
+}

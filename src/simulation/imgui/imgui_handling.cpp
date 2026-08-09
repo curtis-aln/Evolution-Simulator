@@ -18,7 +18,8 @@ void Simulation::handle_imGUI(const SimSnapshot& snap, float dt)
     ImGui::SFML::Update(m_window_, delta_time);
 
     WorldToggles toggles_copy = snap.toggles;
-    ImGuiContext ctx{ toggles_copy, m_cmd_mutex, m_commands };
+    FoodToggles food_toggles_copy = snap.food_toggles;
+    ImGuiContext ctx{ toggles_copy, food_toggles_copy, m_cmd_mutex, m_commands };
 
     m_control_panel_.draw(snap, ctx, dt);
 

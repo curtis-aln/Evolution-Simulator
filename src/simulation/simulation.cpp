@@ -99,6 +99,7 @@ void Simulation::resolve_modifications()
 
 			case CommandSection::FoodManagerEvent:
 				// Handle food manager-related commands
+                m_world_.get_food_manager()->handle_food_manager_event(cmd);
 				break;
             }
 

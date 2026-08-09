@@ -28,6 +28,7 @@ enum class CommandType
 
     // WORLD EVENT  ──────────────────────────────────────────────────
     SetWorldToggles,         // sets the world toggles
+    SetFoodToggles,
 	ResetSimulation,         // resets the simulation to its initial state
 
     SetInfluenceRadius,      // set the influence radius of the mouse tool
@@ -76,6 +77,9 @@ enum class CommandType
 
     // FOOD MANAGER EVENT  ──────────────────────────────────────────────────
 	ClearAllFood, // clears all food from the simulation
+
+    SetRandomIntensity,
+    SetMitosisIntensity
 };
 
 // Parameters for the MutateProtozoa command
@@ -92,6 +96,7 @@ struct SimCommand
 	CommandType  type; // identifies which of the following fields to read
     
     WorldToggles toggles{};
+    FoodToggles  food_toggles{};
     MutateParams mutate{};
 
     float        float_val = 0;
@@ -104,6 +109,7 @@ struct SimCommand
 struct ImGuiContext
 {
     WorldToggles& toggles;   // write toggles here freely
+    FoodToggles&  food_toggles;
     std::mutex& cmd_mutex;
     std::queue<SimCommand>& commands;
 

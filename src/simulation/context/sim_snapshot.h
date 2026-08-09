@@ -8,6 +8,7 @@
 struct SimSnapshot
 {
     WorldToggles toggles;
+    FoodToggles  food_toggles;
 
     // Statistics
     SimulationStatistics sim_stats;

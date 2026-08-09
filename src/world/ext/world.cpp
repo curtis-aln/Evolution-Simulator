@@ -133,6 +133,7 @@ void World::fill_snapshot(SimSnapshot& snapshot)
     snapshot.world_stats = get_statistics(); // simulation statistics
     snapshot.food_manager_stats = food_manager_.get_statistics();
     snapshot.toggles = toggles;
+    snapshot.food_toggles = food_manager_.toggles_;
 
 	copy_render_data_to_snapshot(snapshot); // render data
 
