@@ -8,11 +8,14 @@ void Cell::recreate()
 	internal_clock_ = 0;
 	generation = 0;
 	time_since_last_ate_ = 0;
+
 	nutrients_ = 0.f;
 	total_food_eaten_ = 0;
 	stomach_ = 0;
 	integrity = 100;
 	offspring_count = 0;
+
+	spring_genome.randomize();   // <-- clears stale genome from recycled pool slot
 
 	reproduce_ = false;
 	dead_ = false;
@@ -44,26 +47,41 @@ bool  Cell::consume_food_check(const sf::Vector2f& cell_pos, const sf::Vector2f&
 	return (food_pos - cell_pos).lengthSquared() < combined_rad * combined_rad;
 }
 
-
-void Cell::create_offspring(Cell* child, Body* parent_body, Body* child_body, const bool mutate)
+sf::Vector2f Cell::get_pos_nearby_min_max(const sf::Vector2f parent_pos, float min_radius, float max_radius)
 {
-	// dormant means the child cell will not tug or pull on the protozoa
-	// if dormant is false the child will take on the mutations of the parent
-	// if mutate is true then the child will go through mutation 
+	static thread_local std::mt19937 rng{ std::random_device{}() };
+	constexpr float inv_range = 1.0f / 4294967295.0f; // 1 / 2^32-1
+	constexpr float two_pi = 6.28318530718f;
 
-	// When creating an offspring, this is ran for every cell in the protozoa
-	child_body->mass_ = parent_body->mass_;
-	child_body->radius_ = parent_body->radius_;
+	const float angle = (rng() * inv_range) * two_pi;
+	const float radius = min_radius + (rng() * inv_range) * (max_radius - min_radius);
 
-	child_body->position_ = get_pos_nearby(parent_body, 2.f);
+	return parent_pos + sf::Vector2f(std::cos(angle) * radius, std::sin(angle) * radius);
+}
 
+void Cell::create_offspring(Body* this_body, Cell* child, Body* child_body, const bool mutate)
+{
+	// This function takes in blank child and child_body data and creates an offspring with it
+
+	child_body->copy(this_body); // copies the body 
+	float min_r = this_body->radius_ + child_body->radius_ + 1.f; // minimum distance between the two cells
+	child_body->position_ = get_pos_nearby_min_max(this_body->position_,  min_r, min_r * 2.f); // moves the position to somewhere near the parent
+
+	// Updating this cell's (parent)'s statistics
 	repro_timer_ = 0;
 	offspring_count++;
-	child->generation++;
 
-	energy /= 2;
-	child->energy /= 2;
+	// Updating the child cell's statistics
+	child->generation = generation++;
+	
+	// a fraction of the energy of the parent is given to the child
+	constexpr float energy_split = 0.25f; // fraction the parent retains; offspring gets the rest
+	const float total_energy = energy;    // snapshot parent's energy before splitting
 
+	energy = total_energy * energy_split;
+	child->energy = total_energy * (1.f - energy_split);
+
+	// Finally the genetics, we copy the cell and spring genetics and only mutate them if permissable
 	child->copy_genetics(*this);
 	child->spring_genome.copy_genetics(spring_genome);
 
@@ -73,7 +91,7 @@ void Cell::create_offspring(Cell* child, Body* parent_body, Body* child_body, co
 		child->spring_genome.mutate();
 	}
 
-	// setting the physical parameters of the childs body
+	// The radius is an evolutionary paramater that needs to be told to the body
 	child_body->radius_ = child->radius;
 
 }
@@ -127,6 +145,13 @@ void Cell::update_organics()
 	if (energy <= 0.f)
 	{
 		energy = 0.f;
+		dead_ = true;
+		return;  // dead cells don't repair or reproduce
+	}
+
+	if (integrity <= 0.f)
+	{
+		integrity = 0.f;
 		dead_ = true;
 		return;  // dead cells don't repair or reproduce
 	}

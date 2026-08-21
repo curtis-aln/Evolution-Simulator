@@ -95,8 +95,6 @@ public:
 
 	[[nodiscard]] bool should_reproduce() const { return reproduce_; }
 
-	[[nodiscard]] bool should_remove() const { return can_die() && (integrity <= 0); }
-
 	[[nodiscard]] sf::Color get_outer_color() const { return { outer_r, outer_g, outer_b, outer_transparency }; }
 	[[nodiscard]] sf::Color get_inner_color() const { return { inner_r, inner_g, inner_b, inner_transparency }; }
 
@@ -108,7 +106,7 @@ public:
 	void update_organics();
 
 	[[nodiscard]] bool eat(const float nutrients);
-	void create_offspring(Cell* child, Body* parent_body, Body* child_body, const bool mutate);
+	void create_offspring(Body* this_body, Cell* child, Body* child_body, const bool mutate);
 	static bool consume_food_check(const sf::Vector2f& cell_pos, const sf::Vector2f& food_pos, const float combined_rad);
 
 	void recreate();
@@ -122,4 +120,7 @@ private:
 	// Energy, Nutrient, and Integrity management
 	void process_nutrients();
 	void repair_integrity();
+
+	sf::Vector2f get_pos_nearby_min_max(const sf::Vector2f parent_pos, float min_radius, float max_radius);
+
 };

@@ -25,7 +25,7 @@ void CellManager::add_new_cells_to_grid()
 void CellManager::update(int iterations)
 {
 	// if we have a selected cell and it has died, we need to deselect it to avoid null errors
-	if (selected_cell_id_ == -1 || all_cells_.at(selected_cell_id_)->should_remove())
+	if (selected_cell_id_ == -1 || !all_cells_.at(selected_cell_id_)->is_alive())
 	{
 		deselect_cell();
 	}
@@ -38,17 +38,24 @@ void CellManager::update(int iterations)
 	}
 	update_springs();
 	update_cells();
-	update_new_born_cells();
-	update_cell_matter();
 	
-	// reproductive system
-	apply_connection_requests();
-	collect_reproduction_requests();
-	apply_birth_requests();
+	update_cell_matter();
 
 	// death
-	handle_death();
-	convert_cells_to_matter();
+	collect_cell_death_requests();
+	collect_matter_death_requests();
+
+	apply_cell_death_requests();
+	apply_matter_death_requests();
+	
+	// reproductive system
+	collect_connection_requests(); // Connection Requests are collected here, but not applied yet
+	apply_connection_requests();
+	
+	collect_reproduction_requests();
+	apply_reproduction_requests();
+
+	apply_matter_birth_requests();
 
 	update_statistics();
 }
@@ -75,37 +82,30 @@ void CellManager::update_cell(Cell* cell)
 	cell->update_statistics();
 	cell->update_organics();
 	body->velocity_ *= cell->sinwave_current_friction_;
+
+	speed_tax_cell(cell);
+	impulse_tax_cell(cell, body->impulse_);
 }
 
-void CellManager::update_new_born_cells()
+void CellManager::impulse_tax_cell(Cell* cell, const float impulse)
+{
+	constexpr float impulse_damage_thresh = 15.5f;
+	constexpr float impulse_damage_multiplier = 0.085f;
+
+	if (impulse > impulse_damage_thresh)
+	{
+		float damage = (impulse - impulse_damage_thresh) * impulse_damage_multiplier;
+		cell->integrity = std::max(0.f, cell->integrity - damage);
+	}
+}
+
+void CellManager::collect_connection_requests()
 {
 	for (Cell* cell : all_cells_)
 	{
 		if (cell->internal_clock_ < infant_time && cell->internal_clock_ % infant_check_interval == 0)
 			try_connect_newborn_cell(cell);
 	}
-}
-
-void CellManager::convert_cells_to_matter()
-{
-	for (Cell* cell : all_cells_)
-	{
-		if (!cell->is_alive())
-			process_newly_decaying_cell(cell);
-	}
-}
-
-void CellManager::process_newly_decaying_cell(Cell* cell)
-{
-	Body* body = bodies_->at(cell->body_id_);
-
-	// reusing the same body but changing the identity
-	CellMatter* cell_matter = all_cell_matter_.emplace(true, true);
-	cell_matter->cell_to_matter(body);
-
-	// removing the cell class from the world
-	all_cells_.remove(cell);
-
 }
 
 
@@ -124,11 +124,8 @@ void CellManager::update_position_container(RenderData& rend_data, const sf::Flo
 		if (show_only_newborns && cell->internal_clock_ >= infant_time)
 			continue;
 
-		sf::Color color_inner = !cell->is_alive() ? sf::Color(60, 60, 60, 180) : cell->get_inner_color();
-		sf::Color color_outer = !cell->is_alive() ? sf::Color(90, 90, 90, 160) : cell->get_outer_color();
-
-		rend_data.outer_colors.push_back(color_outer);
-		rend_data.inner_colors.push_back(color_inner);
+		rend_data.outer_colors.push_back(cell->get_outer_color());
+		rend_data.inner_colors.push_back(cell->get_inner_color());
 		rend_data.positions.push_back(body->position_);
 		rend_data.velocities.push_back(body->velocity_);
 		rend_data.radii.push_back(cell->radius);
@@ -404,7 +401,7 @@ void CellManager::remove_cells_in_radius(const sf::Vector2f& position, const flo
 	gather_food_in_radius(select_indexes, position, radius);
 
 	for (int i = 0; i < select_indexes.count; ++i)
-		remove_cell(all_cells_.at(select_indexes[i]));
+		remove_cell(select_indexes[i]);
 
 	for (Spring* spring : all_springs_)
 	{

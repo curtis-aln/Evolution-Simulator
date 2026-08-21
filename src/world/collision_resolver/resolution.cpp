@@ -37,6 +37,10 @@ void CollisionResolver::resolve_existing_detections()
 
 void CollisionResolver::handle_collision_resolutions()
 {
+
+	for (Body* body : *collision_bodies_)
+		body->impulse_ = 0.f;
+
 	//debug_collision_duplicates(); // debugging
 
 	for (CollisionVector& collision_vector : collision_indexes_)
@@ -116,6 +120,13 @@ void CollisionResolver::resolve_pair_collision(Body* particle_a, Body* particle_
 
 	particle_a->velocity_ -= resolution_a;
 	particle_b->velocity_ += resolution_b;
+
+	// Momentum actually transferred — equal magnitude for both bodies (Newton's third law:
+	// mass_a * resolution_a == mass_b * resolution_b). Accumulate; a body can take multiple
+	// hits per frame across different pairs.
+	const float impulse_magnitude = std::abs(impulse_scalar) * mass_a * mass_b * inv_total;
+	particle_a->impulse_ += impulse_magnitude;
+	particle_b->impulse_ += impulse_magnitude;
 }
 
 

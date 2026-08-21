@@ -220,7 +220,7 @@ struct CellGenome : GenomeBase, HardConstants
     uint8_t outer_r, outer_g, outer_b, inner_r, inner_g, inner_b;
 
     // reproductive genes
-    float birth_energy_thresh = 1.0f;
+    float birth_energy_thresh = 0.90f;
     float birth_integrity_thresh = 0.25f;
     float birth_nutrients_thresh = 0.0f;
 
@@ -283,7 +283,9 @@ struct CellGenome : GenomeBase, HardConstants
 		connective_spring_damping = maybe_mutate(connective_spring_damping, SpringGeneticConstraints::damping, rate, range);
 		connective_spring_spring_const = maybe_mutate(connective_spring_spring_const, SpringGeneticConstraints::spring_const, rate, range);
 
-		newborn_search_radius = maybe_mutate(newborn_search_radius, { radius * newborn_search_radius_multiplier, radius * newborn_search_radius_multiplier * 2.f }, rate, range);
+        const float multip = newborn_search_radius_multiplier;
+        const float r_max = CellGeneticConstraints::radius.max;
+		newborn_search_radius = maybe_mutate(newborn_search_radius, { 0, r_max * 5.f }, rate, range * multip);
 
         mutate_meta();
         mutate_colour(outer_r, outer_g, outer_b);
@@ -300,6 +302,16 @@ struct CellGenome : GenomeBase, HardConstants
 
         outer_r = parent.outer_r; outer_g = parent.outer_g; outer_b = parent.outer_b;
         inner_r = parent.inner_r; inner_g = parent.inner_g; inner_b = parent.inner_b;
+
+        birth_energy_thresh = parent.birth_energy_thresh;
+        birth_integrity_thresh = parent.birth_integrity_thresh;
+        birth_nutrients_thresh = parent.birth_nutrients_thresh;
+
+        offspring_energy_to_give = parent.offspring_energy_to_give;
+        connective_spring_spring_const = parent.connective_spring_spring_const;
+        connective_spring_damping = parent.connective_spring_damping;
+
+        newborn_search_radius = parent.newborn_search_radius;
 
         mutation_rate = parent.mutation_rate;
         mutation_range = parent.mutation_range;

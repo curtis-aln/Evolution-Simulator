@@ -139,7 +139,7 @@ class FoodEatResolver: private FoodResolutionSettings
 
 			if (dist_sq < rel_rad_sq + 1.f)
 			{
-				bool ate = cell->eat(CellSettings::bite_amount);
+				bool ate = cell->eat(std::min(CellSettings::bite_amount, food->nutrients));
 				if (ate)
 					resolution.add(food_id);
 			}
@@ -320,7 +320,7 @@ private:
 			for (obj_idx food_id : br)
 			{
 				Food* food = food_vector_->at(food_id);
-				float transfer = CellSettings::bite_amount;
+				float transfer = std::min( CellSettings::bite_amount, food->nutrients );
 				food->nutrients -= transfer;
 			}
 		}

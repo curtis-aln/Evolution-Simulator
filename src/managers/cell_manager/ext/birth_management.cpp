@@ -98,14 +98,12 @@ void CellManager::create_protozoa_from_pool(const sf::Vector2f position, const u
 // ─────────────────────────────────────────────────────────────────────────────
 void CellManager::collect_reproduction_requests()
 {
-	constexpr uint16_t OFFSPRING_CONNECTION_TIMEOUT = 100; // frames
-
 	for (Cell* cell : all_cells_)
 	{
 		if (cell->should_reproduce())
 		{
 			cell->turn_off_reproduction();
-			birth_requests.push_back({ cell->id_ });
+			cell_birth_requests.push_back({ cell->id_ });
 		}
 	}
 }
@@ -122,51 +120,51 @@ void CellManager::collect_reproduction_requests()
 //  heavy damping) — it just prevents the offspring from drifting out of
 //  range before the real spring is created.
 // ─────────────────────────────────────────────────────────────────────────────
-void CellManager::apply_birth_requests()
+void CellManager::apply_reproduction_requests()
 {
-	for (const BirthRequest& req : birth_requests)
+	for (const BirthRequest& req : cell_birth_requests)
 	{
 		CellBodyPair pair = create_cell();
 		if (!pair.is_valid)
 			break;
 
-		// retrieve the parent cell
+		// retrieve the parent cell and body
 		Cell* parent_cell = all_cells_.at(req.parent_cell_id);
 		Body* parent_body = bodies_->at(parent_cell->body_id_);
 
+		// retrieve the offspring cell and body
 		Body* offspring_body = bodies_->at(pair.body_id);
-		Cell* offspring = all_cells_.at(pair.cell_id);
+		Cell* offspring_cell = all_cells_.at(pair.cell_id);
 		
 		// create the offspring by filling in its genetics and other properties based on the parent cell
-		parent_cell->create_offspring(offspring, parent_body, offspring_body, true);
-		parent_cell->turn_off_reproduction();
+		parent_cell->create_offspring(parent_body, offspring_cell, offspring_body, true);
 		
-		// when we create this offspring we create a spring to it, the spring has a weak connection as it is made to break
-		// This is a temporary spring, it needs hold the new cell close to the parent cell until the real spring is made
-		// this is because if the two new cells are too far apart when the spring is made, the spring will break immediately and the offspring will die before it can reproduce
-
-		int32_t new_spring_id = create_spring(static_cast<uint32_t>(parent_cell->id_), static_cast<uint32_t>(offspring->id_));
-		if (new_spring_id == -1)
-			continue;
-		
-		Spring* spring = all_springs_.at(new_spring_id);
-
-		spring->genome.spring_const = 0.00005f;
-		spring->genome.amplitude = 0.4f;
-		spring->genome.damping = 0.0005;
-
-
-		const sf::Vector2f diff = parent_body->position_ - offspring_body->position_;
-		spring->rest_length = diff.length() * 3; // Todo redundant
+		// connecting the parent and childS
+		create_weak_spring_connection(parent_cell->id_, offspring_cell->id_);
 
 		// small random chance that this offspring has its own cell addition
-		if (Random::rand01_float() < offspring->add_cell_chance)
+		if (Random::rand01_float() < offspring_cell->add_cell_chance)
 		{
-			create_weak_offspring(offspring->id_);
+			create_weak_offspring(offspring_cell->id_);
 		}
 	}
 
-	birth_requests.clear(); 
+	cell_birth_requests.clear(); 
+}
+
+void CellManager::create_weak_spring_connection(const cell_idx parent_id, const cell_idx offspring_id)
+{
+	// A weak breakable connection between the parent and child is made to keep the child around
+	// for the full reproductive process
+	int32_t new_spring_id = create_spring(parent_id, offspring_id);
+	if (new_spring_id == -1)
+		return;
+	Spring* spring = all_springs_.at(new_spring_id);
+
+	// Setting the spring attributes
+	spring->genome.spring_const = 0.00005f;
+	spring->genome.amplitude = 0.4f;
+	spring->genome.damping = 0.0005;
 }
 
 
@@ -206,29 +204,44 @@ void CellManager::create_weak_offspring(uint32_t parent_id)
 	if (!pair.is_valid)
 		return;
 
-	Cell* parent = all_cells_.at(parent_id);
-	Body* parent_body = bodies_->at(parent->body_id_);
-	Cell* child = all_cells_.at(pair.cell_id);
+	Cell* parent_cell = all_cells_.at(parent_id);
+	Body* parent_body = bodies_->at(parent_cell->body_id_);
+	Cell* child_cell = all_cells_.at(pair.cell_id);
 	Body* child_body = bodies_->at(pair.body_id);
 
 	// creating a child which doesnt grab on too much
 	child_body->copy(parent_body);
 	child_body->position_ += Random::rand_vector(10.f, 50.f);
-	child->randomize();
-	child->amplitude = 0.2f;
-	child->vertical_shift = 0.5f;
+
+	// setting the child cell properties
+	child_cell->randomize();
+	child_cell->amplitude = 0.2f;
+	child_cell->vertical_shift = 0.5f;
 
 	int32_t spring_id = create_spring(parent_id, pair.cell_id);
-
 	if (spring_id < 0) // potential error here
 	{
 		std::cout << "bad call\n";
 		return;
 	}
-
 	Spring* spring = all_springs_.at(spring_id);
 
 	// creating a spring that is firm but doesnt oscilate mutch
 	spring->genome.randomize();
 	spring->genome.amplitude = 0.2f;
+}
+
+void CellManager::apply_matter_birth_requests()
+{
+	for (const MatterBirthRequest& req : matter_birth_requests)
+	{
+		Body* body = bodies_->emplace(true, true);
+		body->position_ = req.position;
+
+		CellMatter* cell_matter = all_cell_matter_.emplace(true, true); // TODO create a creation Function;
+		cell_matter->reset_cell_matter();
+		cell_matter->cell_to_matter(body);
+	}
+
+	matter_birth_requests.clear();
 }

@@ -34,7 +34,7 @@ struct CellMatter
 		dead = time_alive > max_time_to_live;
 	}
 
-	void reset_cell_manager()
+	void reset_cell_matter()
 	{
 		time_alive = 0;
 	}

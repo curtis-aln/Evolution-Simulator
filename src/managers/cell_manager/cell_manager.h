@@ -54,6 +54,12 @@ struct BirthRequest
 	uint32_t parent_cell_id;
 };
 
+struct MatterBirthRequest
+{
+	uint32_t parent_cell_id;
+	sf::Vector2f position;
+};
+
 struct ConnectionRequest
 {
 	int32_t offspring_id;
@@ -84,9 +90,14 @@ class CellManager: protected CellManagerSettings
 	std::vector<float> distribution_{}; // a vector storing the generation of all protozoa in the world, used to calculate average generation
 
 	// used to store requests for new protozoa to be created, and for new connections to be made between cells
-	std::vector<BirthRequest> birth_requests;
+	std::vector<BirthRequest> cell_birth_requests;
+	std::vector<MatterBirthRequest> matter_birth_requests;
 	std::vector<ConnectionRequest> connection_requests;
 	CellManagerStatistics statistics_{};
+
+	// death requests stop us from removing cells while we are iterating over them, we store the ids of the cells to be removed here and remove them after the iteration is done
+	std::vector<cell_idx> cell_death_requests_;
+	std::vector<cell_idx> matter_death_requests_;
 
 	// main body class is kept in the world class, we keep a pointer to it here so we can access it
 	o_vector<Body>* bodies_;
@@ -179,14 +190,10 @@ private: // only functions this class can access
 	void update_cells();
 	void update_cell_matter();
 	void update_cell(Cell* cell);
-	void update_new_born_cells();
-
-	void convert_cells_to_matter();
+	void impulse_tax_cell(Cell* cell, const float impulse);
+	void collect_connection_requests();
 
 	void ensure_update_jobs_built();
-
-	// decaying objects
-	void process_newly_decaying_cell(Cell* cell);
 
 	// newly born cells
 	void add_new_cells_to_grid();
@@ -195,6 +202,8 @@ private: // only functions this class can access
 	// birth - springs
 	int32_t create_spring(const uint32_t cell_a_id, const uint32_t cell_b_id);
 	void create_weak_offspring(uint32_t parent_id);
+	void create_weak_spring_connection(const cell_idx parent_id, const cell_idx offspring_id);
+	void apply_matter_birth_requests();
 	void apply_connection_requests();
 
 	// birth - cells
@@ -202,11 +211,18 @@ private: // only functions this class can access
 	void clone_selected_protozoa();
 	void create_protozoa_from_pool(const sf::Vector2f position, const unsigned max_cells, const unsigned max_springs);
 	void collect_reproduction_requests();
-	void apply_birth_requests();
-	
+	void apply_reproduction_requests();
+
 	// death
-	void handle_death();
-	void remove_cell(Cell* cell);
-	void remove_cell_matter(CellMatter* matter);
+	void collect_matter_death_requests();
+	void collect_cell_death_requests();
+	
+	void speed_tax_cell(Cell* cell);
+
+	void remove_cell(cell_idx cell_id);
+	void remove_cell_matter(cell_idx matter_id);
+
+	void apply_cell_death_requests();
+	void apply_matter_death_requests();
 	
 };

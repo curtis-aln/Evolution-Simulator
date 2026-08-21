@@ -8,8 +8,13 @@ CellManager::CellManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_
 	create_new_protozoa(CellManagerSettings::initial_protozoa, world_bounds);
 
 	// Reserve space for birth and connection requests to avoid frequent reallocations
-	birth_requests.reserve(100);
-	connection_requests.reserve(100);
+	constexpr size_t initial_request_capacity = 1000;
+
+	cell_birth_requests.reserve(initial_request_capacity);
+	connection_requests.reserve(initial_request_capacity);
+	cell_death_requests_.reserve(initial_request_capacity);
+	matter_death_requests_.reserve(initial_request_capacity);
+	matter_birth_requests.reserve(initial_request_capacity);
 
 	std::cout << "[INFO]: CellManager initialized with protozoa: " << all_cells_.size() << "\n";
 	if (window == nullptr)
@@ -63,7 +68,7 @@ void CellManager::ensure_update_jobs_built()
 
 void CellManager::reset_cell_manager()
 {
-	birth_requests.clear();
+	cell_birth_requests.clear();
 	connection_requests.clear();
 	recent_lifetimes_.clear();
 	distribution_.clear();

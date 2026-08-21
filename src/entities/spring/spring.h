@@ -56,6 +56,8 @@ public:
 		internal_clock_ = 0;
 		work_done = 0.f;
 		current_length = 0.f;
+		rest_length = 0.f;
+		stress = 0.f;
 		broken = false;
 		spring_force = 0.f;
 		damping_force = 0.f;
@@ -65,6 +67,9 @@ public:
 		genome.offset = 0.f;
 		genome.vertical_shift = 1.f;
 		genome.amplitude = 0.f;
+		genome.spring_const = 0.f;
+		genome.damping = 0.f;
+		genome.nutrient_transfer_rate = 0.f;   // <-- the actual leak
 
 		movement_vector = { 0, 0 };
 	}
@@ -161,34 +166,32 @@ private:
 // respecting max_nutrients caps and applying a fixed % loss per transfer
 	void transfer_nutrients(float& nutrients_a, float& nutrients_b)
 	{
-		constexpr float loss_decimal = 0.04f; // 4% loss per transfer
 
-		// negative rate = cell can't transfer (floor at zero, don't reinterpret sign)
+		constexpr float loss_decimal = 0.04f;
 		const float rate = std::max(genome.nutrient_transfer_rate, 0.0f);
 
 		if (rate <= 0.0f)
 			return;
 
-		if (nutrients_b > nutrients_a)
-		{
-			// b sends to a
-			const float send_amount = std::min(rate, nutrients_b);                    // can't send more than b has
-			const float receive_amount = std::min(send_amount * (1.0f - loss_decimal),
-				CellSettings::max_nutrients - nutrients_a);        // can't push a past cap
+		// figure out sender/receiver once, symmetrically
+		float& sender = (nutrients_b > nutrients_a) ? nutrients_b : nutrients_a;
+		float& receiver = (nutrients_b > nutrients_a) ? nutrients_a : nutrients_b;
 
-			nutrients_b -= send_amount;
-			nutrients_a += receive_amount;
-		}
-		else if (nutrients_a > nutrients_b)
-		{
-			// a sends to b
-			const float send_amount = std::min(rate, nutrients_a);
-			const float receive_amount = std::min(send_amount * (1.0f - loss_decimal),
-				CellSettings::max_nutrients - nutrients_b);
+		const float diff = sender - receiver;
+		if (diff <= 0.0f)
+			return; // equal, nothing to do
 
-			nutrients_a -= send_amount;
-			nutrients_b += receive_amount;
-		}
+		const float space = CellSettings::max_nutrients - receiver;
+		if (space <= 0.0f)
+			return; // receiver is full, nothing can arrive anyway
+
+		// don't send more than: the rate allows, what's needed to reach equilibrium,
+		// or what the receiver can actually hold once loss is applied
+		const float send_amount = std::min({ rate, sender, diff, space / (1.0f - loss_decimal) });
+		const float receive_amount = send_amount * (1.0f - loss_decimal);
+
+		sender -= send_amount;
+		receiver += receive_amount;
 	}
 
 	float calculate_rest_length(const int internal_clock)

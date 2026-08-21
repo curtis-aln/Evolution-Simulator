@@ -23,6 +23,8 @@ struct Body
 	float mass_;
 	float radius_;
 
+	float impulse_ = 0.f; // the impulse applied to this body, used to calculate the force applied to it
+
 	Body(BodyId id = 0)
 		: id_(id)
 	{
@@ -43,6 +45,7 @@ struct Body
 	{
 		velocity_ = { 0.f, 0.f };
 		nearby_ids_size_ = 0;
+		impulse_ = 0.f;
 	}
 
 	void copy(const Body* other)

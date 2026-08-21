@@ -4,7 +4,7 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
 	const float total = ImGui::GetContentRegionAvail().x;
 	const float sp = ImGui::GetStyle().ItemSpacing.x;
-	const float cw = (total - sp * 3.f) / 4.f;
+	const float cw = (total - sp * 2.f) / 3.f;
 	const float ch = -1.f;
 
 	// ── Playback ──────────────────────────────────────────────────────────────
@@ -27,7 +27,7 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
 	ImGui::SetNextItemWidth(-1.f);
 	float min_speed = snap.cell_manager_stats.min_speed; // sync with sim state
-	if (ImGui::SliderFloat("##min_speed", &min_speed, 0.f, 4.f, "Min Speed %.2f"))
+	if (ImGui::SliderFloat("##min_speed", &min_speed, 0.f, 2.f, "Min Speed %.3f"))
 	{
 		SimCommand cmd{ .section = CommandSection::CellManagerEvent, .type = CommandType::SetMinSpeed, .float_val = min_speed };
 		ctx.push(cmd);
