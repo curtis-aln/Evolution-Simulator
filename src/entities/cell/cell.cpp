@@ -11,7 +11,6 @@ void Cell::recreate()
 
 	nutrients_ = 0.f;
 	total_food_eaten_ = 0;
-	stomach_ = 0;
 	integrity = 100;
 	offspring_count = 0;
 
@@ -72,7 +71,7 @@ void Cell::create_offspring(Body* this_body, Cell* child, Body* child_body, cons
 	offspring_count++;
 
 	// Updating the child cell's statistics
-	child->generation = generation++;
+	child->generation = generation + 1;
 	
 	// a fraction of the energy of the parent is given to the child
 	constexpr float energy_split = 0.25f; // fraction the parent retains; offspring gets the rest
@@ -135,7 +134,7 @@ void Cell::update_organics()
 	sinwave_current_friction_ = calculate_friction();
 
 	// 1. Passive decay — base cost of being alive
-	energy -= (1 - sinwave_current_friction_) * 0.08f;
+	energy -= (1 - sinwave_current_friction_) * 0.0085f;
 
 	// 2. Digest nutrients → energy, BEFORE the death check
 	//    so a fed cell can survive a decay tick it otherwise couldn't
@@ -161,13 +160,7 @@ void Cell::update_organics()
 
 	// 5. Flag for reproduction — use assignment so it clears itself
 	//    when energy drops back below threshold
-	bool sufficient_energy = energy >= (birth_energy_thresh * max_energy);
-	bool sufficient_integrity = integrity >= (birth_integrity_thresh * max_integrity);
-	bool sufficient_nutrients = nutrients_ >= (birth_nutrients_thresh * max_nutrients);
-	bool ready_to_reproduce = repro_timer_ >= repro_cooldown;
-
-	if (sufficient_energy && sufficient_integrity && sufficient_nutrients && ready_to_reproduce)
-		reproduce_ = true;
+	reproduce_ = check_sufficient_energy() && check_sufficient_integrity() && check_sufficient_nutrients() && check_repro_cooldown();
 }
 
 void Cell::process_nutrients()

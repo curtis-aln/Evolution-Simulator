@@ -246,9 +246,9 @@ struct CellGenome : GenomeBase, HardConstants
 
         rand_in_range(radius, Limit::radius);
           
-		rand_in_range(birth_energy_thresh, { 0.f, 1.f });
-		rand_in_range(birth_integrity_thresh, { 0.f, 1.f });
-		rand_in_range(birth_nutrients_thresh, { 0.f, 1.f });
+		rand_in_range(birth_energy_thresh, { 0.8f, 1.f });
+		rand_in_range(birth_integrity_thresh, { 0.f, 0.1f });
+		rand_in_range(birth_nutrients_thresh, { 0.f, 0.f });
 
 		rand_in_range(offspring_energy_to_give, { 0.f, 1.f });
 		rand_in_range(connective_spring_spring_const, SpringGeneticConstraints::spring_const);

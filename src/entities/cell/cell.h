@@ -73,7 +73,6 @@ public:
 	uint16_t repro_timer_ = 0;
 	float nutrients_ = 0.f;
 	uint8_t total_food_eaten_ = 0;
-	uint8_t stomach_ = 0;
 	float integrity = 100.f;
 
 	float sinwave_current_friction_ = 0.f;
@@ -115,6 +114,22 @@ public:
 
 	void turn_off_reproduction();
 
+	// reproductive
+	bool check_sufficient_energy() const { return energy >= (birth_energy_thresh * max_energy); }
+	bool check_sufficient_integrity() const { return integrity >= (birth_integrity_thresh * max_integrity); }
+	bool check_sufficient_nutrients() const { return nutrients_ >= (birth_nutrients_thresh * max_nutrients); }
+	bool check_repro_cooldown() const { return repro_timer_ >= repro_cooldown; }
+
+	// ------------ Reproduction diagnostics (for debug UI) ------------
+	// [0,1] progress toward each requirement; 1.0 == threshold met
+	[[nodiscard]] float energy_progress()    const { return max_energy > 0.f ? std::clamp(energy / (birth_energy_thresh * max_energy), 0.f, 1.f) : 1.f; }
+	[[nodiscard]] float integrity_progress() const { return max_integrity > 0.f ? std::clamp(integrity / (birth_integrity_thresh * max_integrity), 0.f, 1.f) : 1.f; }
+	[[nodiscard]] float nutrients_progress() const { return max_nutrients > 0.f ? std::clamp(nutrients_ / (birth_nutrients_thresh * max_nutrients), 0.f, 1.f) : 1.f; }
+	[[nodiscard]] float cooldown_progress()  const { return repro_cooldown > 0 ? std::clamp(static_cast<float>(repro_timer_) / static_cast<float>(repro_cooldown), 0.f, 1.f) : 1.f; }
+
+	[[nodiscard]] float energy_threshold()    const { return birth_energy_thresh * max_energy; }
+	[[nodiscard]] float integrity_threshold() const { return birth_integrity_thresh * max_integrity; }
+	[[nodiscard]] float nutrients_threshold() const { return birth_nutrients_thresh * max_nutrients; }
 
 private:
 	// Energy, Nutrient, and Integrity management

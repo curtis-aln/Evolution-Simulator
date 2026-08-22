@@ -38,4 +38,7 @@ private:
     void draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p, const Spring& s);
     void draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap);
     void Brain();
+
+    void draw_cell_detail_cell_tab(const Cell& c, int period, float wave_min, float wave_max, float current_friction);
+    void draw_cell_detail_body_tab(ImGuiContext& ctx, const Cell& c, const sf::Vector2f& pos, float speed);
 };
