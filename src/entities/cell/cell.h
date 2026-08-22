@@ -113,6 +113,7 @@ public:
 	void kill() { dead_ = true; }
 
 	void turn_off_reproduction();
+	void force_reproduce() { reproduce_ = true; }
 
 	// reproductive
 	bool check_sufficient_energy() const { return energy >= (birth_energy_thresh * max_energy); }

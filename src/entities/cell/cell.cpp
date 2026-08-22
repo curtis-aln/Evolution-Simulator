@@ -160,7 +160,10 @@ void Cell::update_organics()
 
 	// 5. Flag for reproduction — use assignment so it clears itself
 	//    when energy drops back below threshold
-	reproduce_ = check_sufficient_energy() && check_sufficient_integrity() && check_sufficient_nutrients() && check_repro_cooldown();
+	if (check_sufficient_energy() && check_sufficient_integrity() && check_sufficient_nutrients() && check_repro_cooldown())
+	{
+		reproduce_ = true;
+	}
 }
 
 void Cell::process_nutrients()

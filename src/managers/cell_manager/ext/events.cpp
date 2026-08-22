@@ -126,13 +126,11 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		break;
 
 	case CommandType::KillProtozoa:
-		//if (selected_protozoa)
-		//    selected_protozoa->kill(); // todo
+		kill_selected_protozoa();
 		break;
 
 	case CommandType::ForceReproduce:
-		//if (selected_protozoa) // todo
-		//    selected_protozoa->force_reproduce();
+		force_reproduce_selected_protozoa();
 		break;
 
 	case CommandType::MakeImmortal:
@@ -189,6 +187,41 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		//}
 		break;
 
+	}
+}
+
+void CellManager::kill_selected_protozoa()
+{
+	// every cell and spring in the current selected protozoa is removed from the world
+	if (selected_cell_id_ == -1 || protozoa_tracker_.is_active == false)
+		return;
+
+	for (Cell& cell : protozoa_tracker_.cells)
+	{
+		remove_cell(cell.id_);
+	}
+
+	for (Spring& spring : protozoa_tracker_.springs)
+	{
+		all_springs_.remove(spring.id_);
+	}
+}
+
+void CellManager::force_reproduce_selected_protozoa()
+{
+	// every cell in the current selected protozoa is forced to reproduce by making their nutrients, energy, and integrity reach
+	// their minimum reproduction thresholds
+	if (selected_cell_id_ == -1 || protozoa_tracker_.is_active == false)
+		return;
+
+	for (Cell& fake_cell : protozoa_tracker_.cells)
+	{
+		Cell* cell = all_cells_.at(fake_cell.id_);
+		cell->nutrients_ = std::max(cell->nutrients_, cell->birth_nutrients_thresh * CellSettings::max_nutrients);
+		cell->energy = std::max(cell->energy, cell->birth_energy_thresh * CellSettings::max_energy);
+		cell->integrity = std::max(cell->integrity, cell->birth_integrity_thresh * CellSettings::max_integrity);
+		cell->repro_timer_ = std::max(cell->repro_timer_, uint16_t(cell->repro_cooldown));
+		cell->force_reproduce();
 	}
 }
 

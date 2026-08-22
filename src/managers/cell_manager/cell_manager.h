@@ -142,6 +142,8 @@ public:
 	void drag_selected_cell_to_point(const sf::Vector2f& target_position, const float move_fraction);
 	void remove_cells_in_radius(const sf::Vector2f& position, const float radius);
 	void influence_cell_velocities_in_radii(const sf::Vector2f& position, const float radius, const int intensity);
+	void kill_selected_protozoa();
+	void force_reproduce_selected_protozoa();
 
 	// data fetching
 	unsigned get_cell_count() const { return all_cells_.size(); }
