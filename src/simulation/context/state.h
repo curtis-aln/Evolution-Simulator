@@ -34,6 +34,8 @@ struct WorldToggles
 	bool  open_extinction_window = false; // whether to open the extinction confirmation popup
     bool run_physics_only = true;
     bool show_only_newborns = false;
+
+    bool show_newborn_grid = false;
     
     // Mouse tool — written by UI, read by handle_left_click()
 

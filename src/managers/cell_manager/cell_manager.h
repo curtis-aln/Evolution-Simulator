@@ -123,8 +123,6 @@ public:
 	uint16_t max_size = static_cast<uint16_t>(10000);
 	FixedSpan<cell_idx, uint16_t> select_indexes{ max_size };	
 
-	SpatialGridRenderer new_born_cell_grid_renderer_{ &new_born_cell_grid_ };
-
 public:
 	// Constructor
 	CellManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies);
@@ -164,6 +162,8 @@ public:
 
 	o_vector<Cell>& get_all_cells() { return all_cells_; }
 	o_vector<Spring>& get_all_springs() { return all_springs_; }
+
+	SimpleSpatialGrid* get_new_born_cell_grid() { return &new_born_cell_grid_; }
 	
 
 	// selected cell management

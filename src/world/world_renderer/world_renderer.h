@@ -22,8 +22,6 @@
 class WorldRenderer : public WorldSettings
 {
 	sf::RenderWindow* m_window_ = nullptr;
-	FoodManager* food_manager_ = nullptr;
-	CollisionResolver* collision_resolver_ = nullptr;
 
 	// this is used as a frame of reference to see how fast cells are moving
 	size_t _cells = static_cast<size_t>(CollisionResolver::cells_x / 4);
@@ -40,34 +38,36 @@ class WorldRenderer : public WorldSettings
 
 	ConnectionRenderer connection_renderer_{};
 
-	SpatialGridRenderer cell_grid_renderer_{ collision_resolver_->get_grid() };
-
+	SpatialGridRenderer collision_grid_renderer_;
+	SpatialGridRenderer food_grid_renderer_;
+	SpatialGridRenderer newborn_grid_renderer_;
 
 
 public:
 	// Constructor
-	WorldRenderer(sf::RenderWindow* window, FoodManager* food_manager, CollisionResolver* collision_resolver, sf::FloatRect& bounds_rect, WorldBorder& circular_bounds)
+	WorldRenderer(
+		sf::RenderWindow* window, 
+		SimpleSpatialGrid* collision_grid,
+		SimpleSpatialGrid* food_grid,
+		SimpleSpatialGrid* newborn_grid,
+		sf::FloatRect& bounds_rect, 
+		WorldBorder& circular_bounds)
 		: 
-		m_window_(window), food_manager_(food_manager), collision_resolver_(collision_resolver), visual_grid_(*m_window_, bounds_rect, _cells, 3, grid_color, grid_line_thickness),
-		world_border_renderer_(make_circle(circular_bounds.bounds_radius, circular_bounds.center_))
+		m_window_(window), 
+		visual_grid_(*m_window_, bounds_rect, _cells, 3, grid_color, grid_line_thickness),
+		world_border_renderer_(make_circle(circular_bounds.bounds_radius, circular_bounds.center_)),
+		collision_grid_renderer_(collision_grid),
+		food_grid_renderer_(food_grid),
+		newborn_grid_renderer_(newborn_grid)
 	{
 		init_circle_renderers();
 	}
 
 	void render(const SimSnapshot& snapshot, sf::Vector2f mouse_pos)
 	{
-		
-
 		render_visual_grid(snapshot);
-
-		//if (snapshot.toggles.draw_food_grid)
-		//	food_manager_->draw_food_grid(mouse_pos);
-
-		if (snapshot.toggles.draw_cell_grid)
-			cell_grid_renderer_.render(*m_window_, mouse_pos, 800.f);
-
+		render_spatial_grids(snapshot, mouse_pos);
 		render_protozoa(snapshot);
-
 		render_influence_radii(snapshot);
 
 		m_window_->draw(world_border_renderer_);
@@ -105,6 +105,8 @@ private:
 
 	void render_visual_grid(const SimSnapshot& snapshot)
 	{
+		// The visual grid is the faint grid that is drawn in the background of the simulation. 
+		// It is used to help visualize the scale of the simulation and to help with debugging.
 		float zoom = snapshot.sim_stats.camera_zoom;
 		float a = 1.f;
 		if (zoom < start_fading_zoom)
@@ -113,6 +115,19 @@ private:
 			a = std::clamp(a, 0.f, 1.f);
 		}
 		visual_grid_.draw(a);
+	}
+
+	void render_spatial_grids(const SimSnapshot& snapshot, const sf::Vector2f mouse_pos)
+	{
+		constexpr float query_radius = 500.f; 
+		if (snapshot.toggles.draw_food_grid)
+			food_grid_renderer_.render(*m_window_, mouse_pos, query_radius);
+
+		if (snapshot.toggles.draw_cell_grid)
+			collision_grid_renderer_.render(*m_window_, mouse_pos, query_radius);
+
+		if (snapshot.toggles.show_newborn_grid)
+			newborn_grid_renderer_.render(*m_window_, mouse_pos, query_radius);
 	}
 
 

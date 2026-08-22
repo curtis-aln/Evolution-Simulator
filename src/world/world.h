@@ -55,7 +55,13 @@ class World : public WorldSettings
         &food_manager_.get_food_vector(), &bodies_, &cell_manager_.get_all_cells(), 
         updating_threads, max_entities / updating_threads, bounds };
     
-    WorldRenderer world_renderer_{ m_window_, &food_manager_, &collision_resolver_, world_rect_bounds_, world_circular_bounds_ };
+    WorldRenderer world_renderer_{ 
+        m_window_, 
+        collision_resolver_.get_grid(), 
+        &food_eat_resolver_.get_spatial_grid(),
+        cell_manager_.get_new_born_cell_grid(),
+        world_rect_bounds_, 
+        world_circular_bounds_};
 
 
     std::vector<std::function<void()>> updating_bodies_;
