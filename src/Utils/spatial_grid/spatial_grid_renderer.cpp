@@ -45,7 +45,10 @@ void SpatialGridRenderer::render(sf::RenderWindow& window,
                     continue;
             }
 
-            const auto idx_1d = static_cast<cell_idx>(y * m_cells_x + x);
+            // SimpleSpatialGrid indexes its cells by Morton (Z-order) code, not
+            // row-major order — must match hash()/track_stats() or we read the
+            // occupancy of the wrong cell entirely.
+            const cell_idx idx_1d = calcZOrder(static_cast<uint16_t>(x), static_cast<uint16_t>(y));
             const int  obj_count = static_cast<int>(m_grid->cell_capacities[idx_1d]);
 
             const std::string info =

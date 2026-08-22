@@ -134,7 +134,6 @@ void OrganismTab::draw_overview(const SimSnapshot& snap, ImGuiContext& ctx, cons
     ImGui::Columns(2, nullptr, false);
 
     ImGui::TextDisabled("Identity");
-    ImGui::Text("Age     %u", protozoa.frames_alive);
     ImGui::Text("Cells   %d", protozoa.cell_count);
     ImGui::Text("Springs %d", protozoa.spring_count);
 
@@ -427,6 +426,7 @@ void OrganismTab::draw_cell_detail_cell_tab(const Cell& c, const int period,
     const float wave_min, const float wave_max, const float current_friction)
 {
     ImGui::Text("id %d  Gen %d", c.body_id_, c.generation);
+	ImGui::Text("age %zu fr", c.internal_clock_);
     ImGui::Text("Period   %d fr", period);
     ImGui::Text("Fric     min %.3f  max %.3f", wave_min, wave_max);
     ImGui::Text("Mut R    %.4f  Rng %.4f", c.mutation_rate, c.mutation_range);

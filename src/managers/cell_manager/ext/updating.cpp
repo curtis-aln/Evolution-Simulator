@@ -13,11 +13,13 @@ void CellManager::add_new_cells_to_grid()
 
 	for (Cell* cell : all_cells_)
 	{
-		if (cell->internal_clock_ < infant_time)
-		{
-			Body* body = bodies_->at(cell->body_id_);
-			new_born_cell_grid_.add_object(body->position_.x, body->position_.y, cell->id_);
-		}
+		bool is_newborn = cell->internal_clock_ < infant_time;
+		bool is_first_gen = cell->generation == 0; // we dont want the initial cells during the sim start to all tangle
+		if (!is_newborn || is_first_gen)
+			continue;
+		
+		Body* body = bodies_->at(cell->body_id_);
+		new_born_cell_grid_.add_object(body->position_.x, body->position_.y, cell->id_);
 	}
 }
 
@@ -31,11 +33,8 @@ void CellManager::update(int iterations)
 	}
 
 	// updating the cells and springs
-	if (iterations > infant_time)
-	{
-		add_new_cells_to_grid();
-	
-	}
+	add_new_cells_to_grid();
+
 	update_springs();
 	update_cells();
 	
@@ -105,8 +104,9 @@ void CellManager::collect_connection_requests()
 	{
 		bool is_newborn = cell->internal_clock_ < infant_time;
 		bool is_check_frame = cell->internal_clock_ % infant_check_interval == 0;
+		bool is_first_gen = cell->generation == 0;
 
-		if (is_newborn && is_check_frame)
+		if (is_newborn && is_check_frame && !is_first_gen)
 			try_connect_newborn_cell(cell);
 	}
 }
