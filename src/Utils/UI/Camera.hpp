@@ -68,6 +68,26 @@ public:
         update_window_view();
     }
 
+    // Instantly sets zoom (and optionally center) with no smoothing/animation.
+// Use this once, right after constructing the Camera, to establish the
+// starting view — zoom()/set_zoom() are both designed to animate over
+// subsequent update() calls, so calling them before your loop starts either
+// does nothing visible yet or produces a visible zoom-in on frame 1.
+    void set_initial_zoom(const float zoom_level, const std::optional<sf::Vector2f> center = std::nullopt)
+    {
+        m_current_zoom_ = zoom_level;
+        m_target_zoom_ = zoom_level;
+        m_zoom_anchor_is_mouse_ = false;
+        m_zoom_has_anchor_ = false;
+
+        m_view_.setSize(sf::Vector2f(m_window_->getSize()) / m_current_zoom_);
+
+        if (center)
+            m_view_.setCenter(*center);
+
+        update_window_view();
+    }
+
     void begin_pan() { m_is_panning_ = true; }
     void end_pan() { m_is_panning_ = false; }
 

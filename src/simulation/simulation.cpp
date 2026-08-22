@@ -7,8 +7,8 @@ Simulation::Simulation() : m_world_(&m_window_)
     m_window_.setVerticalSyncEnabled(vsync);
 
     const float rad = WorldSettings::bounds_radius;
-    camera_.m_view_.setCenter({ rad, rad });
-    camera_.update_window_view();
+
+    camera_.set_initial_zoom(0.1f, sf::Vector2f{ rad, rad });
 
     init_imGUI();
 

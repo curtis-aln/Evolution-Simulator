@@ -7,7 +7,7 @@ void load_settings(const std::string& path);
 
 struct SimulationSettings
 {
-	inline static constexpr int initial_frame_rate_updating = 0;
+	inline static constexpr int initial_frame_rate_updating = 60;
 	inline static constexpr int initial_frame_rate_rendering = 60;
 
 	inline static constexpr int frame_smoothing = 30;
