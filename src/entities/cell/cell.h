@@ -87,6 +87,9 @@ public:
 	std::array<uint32_t, 8> nearby_food_ids_{};
 	int nearby_food_ids_size_ = 0;
 
+	// This keeps track of how many connections this cell has made as a newborn so we can limit it
+	uint8_t new_connections_made = 0;
+
 
 public:
 	Cell(const uint32_t body_id = 0) { body_id_ = body_id; }

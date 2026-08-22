@@ -169,8 +169,6 @@ public:
 private:
 	[[nodiscard]] float get_spring_constant()
 	{
-		constexpr float fully_developed_age = 300.f; // arbitrary age at which the spring is considered fully developed
-
 		const float growth = std::clamp(static_cast<float>(internal_clock_) / fully_developed_age, 0.f, 1.f);
 		return genome.spring_const * growth;
 	}
@@ -180,8 +178,6 @@ private:
 // respecting max_nutrients caps and applying a fixed % loss per transfer
 	void transfer_nutrients(float& nutrients_a, float& nutrients_b)
 	{
-
-		constexpr float loss_decimal = 0.04f;
 		const float rate = std::max(genome.nutrient_transfer_rate, 0.0f);
 
 		if (rate <= 0.0f)
@@ -201,8 +197,8 @@ private:
 
 		// don't send more than: the rate allows, what's needed to reach equilibrium,
 		// or what the receiver can actually hold once loss is applied
-		const float send_amount = std::min({ rate, sender, diff, space / (1.0f - loss_decimal) });
-		const float receive_amount = send_amount * (1.0f - loss_decimal);
+		const float send_amount = std::min({ rate, sender, diff, space / (1.0f - nutrients_transfer_loss) });
+		const float receive_amount = send_amount * (1.0f - nutrients_transfer_loss);
 
 		sender -= send_amount;
 		receiver += receive_amount;

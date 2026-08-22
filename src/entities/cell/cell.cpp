@@ -17,6 +17,8 @@ void Cell::recreate()
 	cumulative_collision_damage_ = 0.f;
 	cumulative_spring_damage_ = 0.f;
 
+	new_connections_made = 0.f;
+
 	spring_genome.randomize();   // <-- clears stale genome from recycled pool slot
 
 	reproduce_ = false;
@@ -137,7 +139,7 @@ void Cell::update_organics()
 	sinwave_current_friction_ = calculate_friction();
 
 	// 1. Passive decay — base cost of being alive
-	energy -= (1 - sinwave_current_friction_) * 0.0085f;
+	energy -= (1 - sinwave_current_friction_) * friction_energy_loss_const;
 
 	// 2. Digest nutrients → energy, BEFORE the death check
 	//    so a fed cell can survive a decay tick it otherwise couldn't
@@ -194,7 +196,7 @@ void Cell::process_nutrients()
 // Renamed from update_energy — the old name was actively confusing
 void Cell::repair_integrity()
 {
-	if (integrity >= 100.f)
+	if (integrity >= max_integrity)
 		return;
 
 	// Don't spend energy we don't have — avoids draining below 0
@@ -203,5 +205,5 @@ void Cell::repair_integrity()
 		return;
 
 	energy -= integrity_conversion_rate;
-	integrity = std::min(100.f, integrity + integrity_conversion_rate);
+	integrity = std::min(max_integrity, integrity + integrity_conversion_rate);
 }

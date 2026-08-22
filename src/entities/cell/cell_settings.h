@@ -24,4 +24,7 @@ struct CellSettings
 
 	inline static float integrity_conversion_rate = 0.05f;
 	inline static float nutrients_conversion_rate = .185f;
+
+	inline static constexpr float friction_energy_loss_const = 0.0095f;
+	inline static const uint8_t max_cell_connections = 2;
 };

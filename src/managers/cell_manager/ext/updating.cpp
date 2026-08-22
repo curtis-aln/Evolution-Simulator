@@ -106,8 +106,9 @@ void CellManager::collect_connection_requests()
 		bool is_newborn = cell->internal_clock_ < infant_time;
 		bool is_check_frame = cell->internal_clock_ % infant_check_interval == 0;
 		bool is_first_gen = cell->generation == 0;
+		bool can_have_more_connections = cell->new_connections_made < cell->max_cell_connections;
 
-		if (is_newborn && is_check_frame && !is_first_gen)
+		if (is_newborn && is_check_frame && !is_first_gen && can_have_more_connections)
 			try_connect_newborn_cell(cell);
 	}
 }
@@ -209,6 +210,8 @@ void CellManager::try_connect_newborn_cell(Cell* cell)
 		if (dist_sq < cell->newborn_search_radius * cell->newborn_search_radius)
 		{
 			connection_requests.push_back(ConnectionRequest{ (int32_t)cell->id_, (int32_t)other_cell->id_ });
+			cell->new_connections_made++;
+			other_cell->new_connections_made++;
 		}
 	}
 }
