@@ -214,6 +214,33 @@ private:
 			draw_protozoa_bounding_box(protozoa.bounds, *m_window_);
 
 		draw_cell_physical_information(snapshot);
+		draw_newborn_connection_radius(protozoa);
+	}
+
+	void draw_newborn_connection_radius(const OrganismTracker& protozoa)
+	{
+		sf::CircleShape circle_outline;
+		circle_outline.setPointCount(30); // Reduce aliasing, set once
+		circle_outline.setFillColor({ 0, 0, 0, 0 });
+		circle_outline.setOutlineColor({ 255, 255, 255, 100 });
+		circle_outline.setOutlineThickness(10.f);
+		
+		int i = 0;
+		for (const Cell& cell : protozoa.cells)
+		{
+			if (cell.internal_clock_ >= CellManagerSettings::infant_time)
+				continue;
+
+			const Body& body = protozoa.bodies[i];
+			const sf::Vector2f pos = body.position_;
+			const float rad = cell.newborn_search_radius;
+
+			circle_outline.setRadius(rad);
+			circle_outline.setPosition(pos - sf::Vector2f{ rad, rad });
+
+			m_window_->draw(circle_outline);
+			i++;
+		}
 	}
 
 

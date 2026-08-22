@@ -103,7 +103,10 @@ void CellManager::collect_connection_requests()
 {
 	for (Cell* cell : all_cells_)
 	{
-		if (cell->internal_clock_ < infant_time && cell->internal_clock_ % infant_check_interval == 0)
+		bool is_newborn = cell->internal_clock_ < infant_time;
+		bool is_check_frame = cell->internal_clock_ % infant_check_interval == 0;
+
+		if (is_newborn && is_check_frame)
 			try_connect_newborn_cell(cell);
 	}
 }
@@ -190,17 +193,19 @@ void CellManager::try_connect_newborn_cell(Cell* cell)
 	// this cell is going to try to connect to other cells in its vicinity
 	nearby_cell_ids.clear();
 	new_born_cell_grid_.find(body->position_.x, body->position_.y, &nearby_cell_ids);
-
+	
 	for (int i = 0; i < nearby_cell_ids.count; ++i)
 	{
+		// we dont want to connect to ourselves
 		cell_idx other_cell_id = nearby_cell_ids[i];
 		if (other_cell_id == cell->id_)
 			continue;
-
 		Cell* other_cell = all_cells_.at(other_cell_id);
 
-		float dist_sq = (body->position_ - bodies_->at(other_cell->body_id_)->position_).lengthSquared();
-		if (dist_sq < connection_range * connection_range)
+		// calculating the distance between the two
+		sf::Vector2f dir = body->position_ - bodies_->at(other_cell->body_id_)->position_;
+		float dist_sq = dir.lengthSquared();
+		if (dist_sq < cell->newborn_search_radius * cell->newborn_search_radius)
 		{
 			connection_requests.push_back(ConnectionRequest{ (int32_t)cell->id_, (int32_t)other_cell->id_ });
 		}
