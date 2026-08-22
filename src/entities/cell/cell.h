@@ -58,6 +58,9 @@ private:
 	bool dead_ = false;      // signals that the cell is in its decaying state
 	bool immortal_ = false;  // cell is unaffected by death
 
+	float energy = initial_energy;
+	float integrity = max_integrity;
+
 public:
 	uint32_t id_ = 0;        // The unique identifier for this cell
 	uint32_t body_id_ = 0;   // Reference to the body 
@@ -66,20 +69,20 @@ public:
 	// will be average between the two cell's spring genomes
 	SpringGenome spring_genome{};
 
-	float energy = initial_energy;
-
 	// Stomach and food
 	uint16_t time_since_last_ate_ = 0;
 	uint16_t repro_timer_ = 0;
 	float nutrients_ = 0.f;
 	uint8_t total_food_eaten_ = 0;
-	float integrity = 100.f;
-
+	
 	float sinwave_current_friction_ = 0.f;
 
 	// Statistics information
 	uint16_t internal_clock_ = 0;
 	uint8_t  offspring_count = 0;
+
+	float cumulative_collision_damage_ = 0.f;
+	float cumulative_spring_damage_ = 0.f;
 
 	std::array<uint32_t, 8> nearby_food_ids_{};
 	int nearby_food_ids_size_ = 0;
@@ -100,6 +103,17 @@ public:
 	[[nodiscard]] sf::Vector2f get_pos_nearby(const Body* body, const float range) const;
 	[[nodiscard]] float calculate_friction() const;
 
+	[[nodiscard]] float get_integrity() const { return integrity; }
+	[[nodiscard]] float get_energy() const { return integrity; }
+
+	// ------------ Data setters ------------
+	void kill() { dead_ = true; }
+	void force_reproduce() { reproduce_ = true; }
+	void change_energy(const float amount) { energy += amount; }
+	void change_integrity(const float amount) { integrity += amount; integrity = std::max(float(0), integrity); }
+	void set_energy(const float amount) { energy = amount; }
+	void set_integrity(const float amount) { integrity = amount; }
+	
 	// ------------ Cell functionality ------------
 	void update_statistics();
 	void update_organics();
@@ -109,11 +123,7 @@ public:
 	static bool consume_food_check(const sf::Vector2f& cell_pos, const sf::Vector2f& food_pos, const float combined_rad);
 
 	void recreate();
-
-	void kill() { dead_ = true; }
-
 	void turn_off_reproduction();
-	void force_reproduce() { reproduce_ = true; }
 
 	// reproductive
 	bool check_sufficient_energy() const { return energy >= (birth_energy_thresh * max_energy); }

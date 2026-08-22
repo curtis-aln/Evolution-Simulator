@@ -14,6 +14,9 @@ void Cell::recreate()
 	integrity = 100;
 	offspring_count = 0;
 
+	cumulative_collision_damage_ = 0.f;
+	cumulative_spring_damage_ = 0.f;
+
 	spring_genome.randomize();   // <-- clears stale genome from recycled pool slot
 
 	reproduce_ = false;

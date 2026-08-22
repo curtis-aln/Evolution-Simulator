@@ -190,6 +190,8 @@ struct CellGeneticConstraints
     inline static Range frequency = { -1.f / 1.f,  1.f / 1.f };
     inline static Range offset = { -3.14159f,    3.14159f };
     inline static Range vertical_shift = { -0.6f,        0.6f };
+
+	inline static Range newborn_search = { 0.f, radius.max * 3.f };
 };
 
 static struct CellInitialSpawnRanges
@@ -228,7 +230,7 @@ struct CellGenome : GenomeBase, HardConstants
     float connective_spring_spring_const = 0.1f;
     float connective_spring_damping = 0.1f;
 
-	float newborn_search_radius = 100.f;
+	float newborn_search_radius = CellGeneticConstraints::newborn_search.max;
 
     CellGenome() { randomize(); };
 
@@ -239,6 +241,8 @@ struct CellGenome : GenomeBase, HardConstants
             };
 
         using Limit = CellInitialSpawnRanges;
+		using C_Const = CellGeneticConstraints;
+		using S_Const = SpringGeneticConstraints;
         rand_in_range(amplitude, Limit::amplitude);
         rand_in_range(frequency, Limit::frequency);
         rand_in_range(offset, Limit::offset);
@@ -251,10 +255,10 @@ struct CellGenome : GenomeBase, HardConstants
 		rand_in_range(birth_nutrients_thresh, { 0.f, 0.f });
 
 		rand_in_range(offspring_energy_to_give, { 0.f, 1.f });
-		rand_in_range(connective_spring_spring_const, SpringGeneticConstraints::spring_const);
-		rand_in_range(connective_spring_damping, SpringGeneticConstraints::damping);
+		rand_in_range(connective_spring_spring_const, S_Const::spring_const);
+		rand_in_range(connective_spring_damping, S_Const::damping);
 
-		rand_in_range(newborn_search_radius, { radius * newborn_search_radius_multiplier, radius * newborn_search_radius_multiplier * 2.f });
+        rand_in_range(newborn_search_radius, { C_Const::newborn_search.max * 0.9f, C_Const::newborn_search.max });
 
 
         outer_r = Random::rand_byte(); outer_g = Random::rand_byte(); outer_b = Random::rand_byte();
@@ -285,7 +289,7 @@ struct CellGenome : GenomeBase, HardConstants
 
         const float multip = newborn_search_radius_multiplier;
         const float r_max = CellGeneticConstraints::radius.max;
-		newborn_search_radius = maybe_mutate(newborn_search_radius, { 0, r_max * 5.f }, rate, range * multip);
+		newborn_search_radius = maybe_mutate(newborn_search_radius, CellGeneticConstraints::newborn_search, rate, range * multip);
 
         mutate_meta();
         mutate_colour(outer_r, outer_g, outer_b);

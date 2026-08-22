@@ -93,8 +93,9 @@ void CellManager::impulse_tax_cell(Cell* cell, const float impulse)
 
 	if (impulse > impulse_damage_thresh)
 	{
-		float damage = (impulse - impulse_damage_thresh) * impulse_damage_multiplier;
-		cell->integrity = std::max(0.f, cell->integrity - damage);
+		float damage = -(impulse - impulse_damage_thresh) * impulse_damage_multiplier;
+		cell->change_integrity(damage);
+		cell->cumulative_collision_damage_ += abs(damage);
 	}
 }
 

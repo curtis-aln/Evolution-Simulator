@@ -113,7 +113,7 @@ public:
 
 
 		// Calculating the spring force: Fs = K * (|B - A| - L)
-		spring_force = genome.spring_const * (length_diff);
+		spring_force = get_spring_constant() * length_diff;
 
 		// Calculating the damping force
 		const sf::Vector2f normalised_dir{ dir.x * inv_length, dir.y * inv_length};
@@ -145,23 +145,37 @@ public:
 
 		if (stress > SPRING_DAMAGE_THRESH)
 		{
-			update_integrity(cell_a.integrity, cell_b.integrity);
+			update_integrity(cell_a, cell_b);
 		}
 
 		transfer_nutrients(cell_a.nutrients_, cell_b.nutrients_);
 
-		cell_a.energy -= work_done / 2.f; // Eventually springs will be their own organic systems with energy
-		cell_b.energy -= work_done / 2.f;
+		float energy_cost = -work_done / 2.f;
+		cell_a.change_energy(energy_cost);
+		cell_b.change_energy(energy_cost);
 	}
 
-	void update_integrity(float& cell_a_integrity, float& cell_b_integrity)
+	void update_integrity(Cell& cell_a, Cell& cell_b)
 	{
 		float excess = stress - SPRING_DAMAGE_THRESH;
-		cell_a_integrity -= excess;
-		cell_b_integrity -= excess;
+		float damage = -excess / 2.f;
+
+		cell_a.change_integrity(damage);
+		cell_b.change_integrity(damage);
+		cell_a.cumulative_spring_damage_ += abs(damage);
+		cell_b.cumulative_spring_damage_ += abs(damage);
 	}
 
 private:
+	[[nodiscard]] float get_spring_constant()
+	{
+		constexpr float fully_developed_age = 300.f; // arbitrary age at which the spring is considered fully developed
+
+		const float growth = std::clamp(static_cast<float>(internal_clock_) / fully_developed_age, 0.f, 1.f);
+		return genome.spring_const * growth;
+	}
+
+
 	// takes in the nutrients of cell a and cell b and transfers between them,
 // respecting max_nutrients caps and applying a fixed % loss per transfer
 	void transfer_nutrients(float& nutrients_a, float& nutrients_b)

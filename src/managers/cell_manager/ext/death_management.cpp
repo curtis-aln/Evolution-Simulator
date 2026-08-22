@@ -31,9 +31,10 @@ void CellManager::speed_tax_cell(Cell* cell)
 
 	bool is_too_slow = speed_sq < min_speed_sq;
 
+	constexpr float speed_tax = -0.4f;
 	if (is_too_slow)
 	{
-		cell->energy -= 0.4f;
+		cell->change_energy(speed_tax);
 	}
 }
 

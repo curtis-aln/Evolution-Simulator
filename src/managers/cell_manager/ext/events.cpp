@@ -218,8 +218,10 @@ void CellManager::force_reproduce_selected_protozoa()
 	{
 		Cell* cell = all_cells_.at(fake_cell.id_);
 		cell->nutrients_ = std::max(cell->nutrients_, cell->birth_nutrients_thresh * CellSettings::max_nutrients);
-		cell->energy = std::max(cell->energy, cell->birth_energy_thresh * CellSettings::max_energy);
-		cell->integrity = std::max(cell->integrity, cell->birth_integrity_thresh * CellSettings::max_integrity);
+		
+		cell->set_energy(std::max(cell->get_energy(), cell->birth_energy_thresh * CellSettings::max_energy));
+		cell->set_integrity(std::max(cell->get_integrity(), cell->birth_integrity_thresh * CellSettings::max_integrity));
+		
 		cell->repro_timer_ = std::max(cell->repro_timer_, uint16_t(cell->repro_cooldown));
 		cell->force_reproduce();
 	}

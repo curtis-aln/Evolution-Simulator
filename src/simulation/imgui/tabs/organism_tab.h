@@ -33,7 +33,7 @@ private:
     void draw_overview(const SimSnapshot& snap, ImGuiContext& ctx, const OrganismTracker& protozoa);
     static void draw_no_selection();
     void draw_cells_springs_tab(const SimSnapshot& snap, ImGuiContext& ctx, const OrganismTracker& protozoa);
-    void draw_wave_panel(ImGuiContext& ctx, const char* child_id, const char* description, int frames_alive, int idx, const char* value_label, std::vector<float>& scratch_buf, const WaveParam& amplitude, const WaveParam& frequency, const WaveParam& offset, const WaveParam& vertical_shift);
+    void draw_wave_panel(ImGuiContext& ctx, const float current_friction, const char* child_id, const char* description, int frames_alive, int idx, const char* value_label, std::vector<float>& scratch_buf, const WaveParam& amplitude, const WaveParam& frequency, const WaveParam& offset, const WaveParam& vertical_shift);
     void draw_cell_detail(ImGuiContext& ctx, const Cell& c, const sf::Vector2f& pos, const sf::Vector2f& vel);
     void draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p, const Spring& s);
     void draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap);

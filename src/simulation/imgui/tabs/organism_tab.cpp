@@ -326,7 +326,7 @@ void OrganismTab::draw_cells_springs_tab(const SimSnapshot& snap, ImGuiContext& 
     ImGui::EndChild();
 }
 
-void OrganismTab::draw_wave_panel(ImGuiContext& ctx, const char* child_id,
+void OrganismTab::draw_wave_panel(ImGuiContext& ctx, const float current_friction, const char* child_id,
     const char* description, int frames_alive, int idx, const char* value_label,
     std::vector<float>& scratch_buf,
     const WaveParam& amplitude, const WaveParam& frequency,
@@ -344,6 +344,17 @@ void OrganismTab::draw_wave_panel(ImGuiContext& ctx, const char* child_id,
         amplitude.value, frequency.value, offset.value, vertical_shift.value, 0.f, 1.f);
     PlotUtils::sinwave_graph("##wave", scratch_buf.data(), display_size, head, 0.f, 1.f, { -1.f, 52.f });
     ImGui::Text("t=%-4d  %s = %.4f", head, value_label, scratch_buf[head]);
+
+    // Current friction
+    const float fric = current_friction;
+    const ImVec4 fc = { 1.f - fric, fric, 0.2f, 1.f };
+    ImGui::Spacing();
+    ImGui::TextDisabled("Friction");
+    ImGui::SameLine();
+    ImGui::PushStyleColor(ImGuiCol_Text, fc);
+    ImGui::Text("%.4f", fric);
+    ImGui::PopStyleColor();
+    colored_progress(fric, fc, "", { -1.f, 5.f });
 
     ImGui::Spacing();
     ImGui::SetNextItemWidth(-1.f);
@@ -412,7 +423,7 @@ void OrganismTab::draw_cell_detail(ImGuiContext& ctx, const Cell& c, const sf::V
 
     // ── Sin wave ───────────────────────────────────────────────────────────
     static std::vector<float> fric_buf;
-    draw_wave_panel(ctx, "CL_wave",
+    draw_wave_panel(ctx, current_friction, "CL_wave",
         "Friction  amplitude * sin(frequency * t + phase) + shift",
         frames_alive, c.body_id_, "friction", fric_buf,
         { c.amplitude,      CellGeneticConstraints::amplitude.min,      CellGeneticConstraints::amplitude.max,      "Amplitude = %.3f", CommandType::SetAmplitude },
@@ -432,6 +443,9 @@ void OrganismTab::draw_cell_detail_cell_tab(const Cell& c, const int period,
     ImGui::Text("Mut R    %.4f  Rng %.4f", c.mutation_rate, c.mutation_range);
     ImGui::Text("Ate      %d  (%zu fr ago)", c.total_food_eaten_, c.time_since_last_ate_);
 
+    ImGui::Text("Spring Damage %.2f", c.cumulative_spring_damage_);
+	ImGui::Text("Collision Damage %.2f", c.cumulative_collision_damage_);
+
     // Digest cooldown bar
     const float digest_remaining = std::max(0.f,
         CellSettings::digestive_time -
@@ -442,17 +456,6 @@ void OrganismTab::draw_cell_detail_cell_tab(const Cell& c, const int period,
     ImGui::TextDisabled("Digest cooldown");
     colored_progress(digest_f, fraction_color(digest_f),
         digest_f <= 0.f ? "Ready" : digest_lbl);
-
-    // Current friction
-    const float fric = current_friction;
-    const ImVec4 fc = { 1.f - fric, fric, 0.2f, 1.f };
-    ImGui::Spacing();
-    ImGui::TextDisabled("Friction");
-    ImGui::SameLine();
-    ImGui::PushStyleColor(ImGuiCol_Text, fc);
-    ImGui::Text("%.4f", fric);
-    ImGui::PopStyleColor();
-    colored_progress(fric, fc, "", { -1.f, 5.f });
 
     // reproduction settings
     ImGui::Spacing();
@@ -472,8 +475,8 @@ void OrganismTab::draw_cell_detail_cell_tab(const Cell& c, const int period,
             ImGui::Text("%s: %.1f / %.1f required   [%s]", label, current, threshold, met ? "OK" : "waiting");
         };
 
-    draw_requirement("Energy", c.energy_progress(), c.energy, c.energy_threshold(), c.check_sufficient_energy());
-    draw_requirement("Integrity", c.integrity_progress(), c.integrity, c.integrity_threshold(), c.check_sufficient_integrity());
+    draw_requirement("Energy", c.energy_progress(), c.get_energy(), c.energy_threshold(), c.check_sufficient_energy());
+    draw_requirement("Integrity", c.integrity_progress(), c.get_integrity(), c.integrity_threshold(), c.check_sufficient_integrity());
     draw_requirement("Nutrients", c.nutrients_progress(), c.nutrients_, c.nutrients_threshold(), c.check_sufficient_nutrients());
 
     ImGui::Spacing();
@@ -589,7 +592,7 @@ void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p
 
     // ── Sin wave ───────────────────────────────────────────────────────────
     static std::vector<float> ext_buf;
-    draw_wave_panel(ctx, "SL_wave",
+    draw_wave_panel(ctx, 0.f, "SL_wave",
         "Extension  amplitude * sin(frequency * t + phase) + shift  [0, 1]",
         static_cast<int>(p.frames_alive), s.id_, "ratio", ext_buf,
         { s.genome.amplitude,      0.f,                                          SpringGeneticConstraints::amplitude.max,      "Amplitude = %.3f", CommandType::SetSpringAmplitude },
@@ -614,7 +617,7 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
     // ── Aggregate totals not pre-computed by tracker ───────────────────────
     float total_integrity = 0.f;
     for (const Cell& c : cells)
-        total_integrity += c.integrity;
+        total_integrity += c.get_integrity();
 
     const float org_integrity_max = CellSettings::max_integrity * static_cast<float>(n);
     const float org_nutrients_max = CellSettings::max_nutrients * static_cast<float>(n);
@@ -682,14 +685,14 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
 
         // Energy bar
         {
-            const float f = std::clamp(c.energy / CellSettings::max_energy, 0.f, 1.f);
+            const float f = std::clamp(c.get_energy() / CellSettings::max_energy, 0.f, 1.f);
             ImGui::TextDisabled("E"); ImGui::SameLine(0.f, 3.f);
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, fraction_color(f));
             ImGui::ProgressBar(f, { k_mini_cell_box_width, k_mini_bar_height }, "");
             ImGui::PopStyleColor();
             if (ImGui::IsItemHovered())
                 ImGui::SetTooltip("Energy: %.2f  /  %.0f (repro thresh)",
-                    c.energy, CellSettings::max_energy);
+                    c.get_energy(), CellSettings::max_energy);
         }
         // Nutrients bar
         {
@@ -703,13 +706,13 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
         }
         // Integrity bar
         {
-            const float f = std::clamp(c.integrity / CellSettings::max_integrity, 0.f, 1.f);
+            const float f = std::clamp(c.get_integrity() / CellSettings::max_integrity, 0.f, 1.f);
             ImGui::TextDisabled("I"); ImGui::SameLine(0.f, 3.f);
             ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4{ 0.85f, 0.8f, 0.25f, 1.f });
             ImGui::ProgressBar(f, { k_mini_cell_box_width, k_mini_bar_height }, "");
             ImGui::PopStyleColor();
             if (ImGui::IsItemHovered())
-                ImGui::SetTooltip("Integrity: %.2f  /  %.0f", c.integrity, CellSettings::max_integrity);
+                ImGui::SetTooltip("Integrity: %.2f  /  %.0f", c.get_integrity(), CellSettings::max_integrity);
         }
 
         ImGui::EndGroup();

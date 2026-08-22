@@ -283,7 +283,7 @@ private:
 		time_since_last_reproduced = 0;
         for (const Cell& cell : cells)
         {
-            total_energy += cell.energy;
+            total_energy += cell.get_energy();
             total_nutrients += cell.nutrients_;
             frames_alive += cell.internal_clock_;
             total_food_eaten += cell.total_food_eaten_;

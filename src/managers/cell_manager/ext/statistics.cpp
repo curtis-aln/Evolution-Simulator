@@ -122,7 +122,7 @@ void CellManager::update_statistics()
 		statistics_.average_mutation_rate += cell->mutation_rate;
 		statistics_.average_mutation_range += cell->mutation_range;
 		statistics_.average_offspring_count += cell->offspring_count;
-		statistics_.average_energy += cell->energy;
+		statistics_.average_energy += cell->get_energy();
 		statistics_.average_generation += cell->generation;
 
 		statistics_.highest_generation_ever = std::max(cell->generation, statistics_.highest_generation_ever);
