@@ -78,69 +78,77 @@ add_executable(ProjectARIA
     src/pch/pch.cpp
 
     # ── Entities
-    "src/entities/cell/cell.cpp"
+    src/entities/body.h
+    src/entities/CellMatter.h
+    src/entities/cell/cell.cpp
+    src/entities/cell/cell_settings.h
+    src/entities/spring/spring_settings.h
 
-    # ── managers
-    "src/managers/food_manager/ext/FoodManager.cpp"
-    "src/managers/food_manager/ext/FoodManager_spawn.cpp"
-    "src/managers/food_manager/ext/FoodManager_update.cpp"
+    # ── Managers: cell_manager
+    src/managers/cell_manager/cell_manager_settings.h
+    src/managers/cell_manager/ext/birth_management.cpp
+    src/managers/cell_manager/ext/death_management.cpp
+    src/managers/cell_manager/ext/events.cpp
+    src/managers/cell_manager/ext/init.cpp
+    src/managers/cell_manager/ext/statistics.cpp
+    src/managers/cell_manager/ext/updating.cpp
+
+    # ── Managers: food_manager
+    src/managers/food_manager/food_manager_settings.h
+    src/managers/food_manager/ext/FoodManager.cpp
+    src/managers/food_manager/ext/FoodManager_spawn.cpp
+    src/managers/food_manager/ext/FoodManager_update.cpp
 
     # ── Simulation core
     src/simulation/events.cpp
     src/simulation/simulation.cpp
+    src/simulation/settings/settings.cpp
 
-    # ── ImGui control panel + tab implementations
+    # ── ImGui control panel + helpers
     src/simulation/imgui/control_panel.cpp
     src/simulation/imgui/imgui_handling.cpp
+    src/simulation/imgui/imgui_settings.h
     src/simulation/imgui/helpers/toast_system.cpp
-    
+
+    # ── ImGui tab implementations
+    src/simulation/imgui/tabs/debug_tab.cpp
+    src/simulation/imgui/tabs/debug_tab.h
+    src/simulation/imgui/tabs/food_tab.cpp
+    src/simulation/imgui/tabs/food_tab.h
     src/simulation/imgui/tabs/graphs_tab.cpp
     src/simulation/imgui/tabs/grid_tab.cpp
     src/simulation/imgui/tabs/organism_tab.cpp
-    src/simulation/imgui/tabs/simulation_tab.cpp
-    src/simulation/imgui/tabs/debug_tab.cpp
-    src/simulation/imgui/tabs/tagged_tab.cpp
     src/simulation/imgui/tabs/o_vector_tab.cpp
-    src/simulation/imgui/tabs/food_tab.cpp
-    
+    src/simulation/imgui/tabs/o_vector_tab.h
+    src/simulation/imgui/tabs/simulation_tab.cpp
+    src/simulation/imgui/tabs/tagged_tab.cpp
+
+    # ── World / collision resolver
     src/world/collision_resolver/detection.cpp
     src/world/collision_resolver/init.cpp
     src/world/collision_resolver/resolution.cpp
     src/world/collision_resolver/updating_grid.cpp
 
-    # ── Utilities
-    src/Utils/spatial_grid/spatial_grid_renderer.cpp
-    src/simulation/settings/settings.cpp
-
     # ── World / simulation update loop
+    src/world/ext/statistics_snapshot.cpp
     src/world/ext/world.cpp
     src/world/ext/world_updating.cpp
-    
+    src/world/food_eat_resolver.h
+    src/world/world_border.h
+    src/world/world_settings.h
+    src/world/world_renderer/world_renderer.h
+
+    # ── Utilities
+    src/Utils/o_vec/o_vec_debug.h
+    src/Utils/o_vec/o_vec_snapshot.h
+    src/Utils/spatial_grid/spatial_grid_renderer.cpp
 
     # ── ImPlot (header-only library — sources must be compiled as part of our target)
     ${implot_SOURCE_DIR}/implot.cpp
     ${implot_SOURCE_DIR}/implot_items.cpp
- "src/entities/cell/cell_settings.h" 
- "src/managers/food_manager/food_manager_settings.h" 
- "src/entities/spring/spring_settings.h" 
- "src/managers/cell_manager/ext/birth_management.cpp" 
- "src/managers/cell_manager/ext/death_management.cpp" 
- "src/managers/cell_manager/ext/updating.cpp" 
- "src/managers/cell_manager/cell_manager_settings.h" 
- "src/managers/cell_manager/ext/init.cpp" 
- "src/managers/cell_manager/ext/statistics.cpp" 
- "src/world/world_border.h" 
- "src/entities/cell/cell.cpp" 
- "src/world/world_settings.h" 
- "src/entities/body.h" 
-  
- "src/world/ext/statistics_snapshot.cpp" 
- "src/simulation/imgui/imgui_settings.h" 
- "src/Utils/o_vec/o_vec_debug.h" 
- "src/simulation/imgui/tabs/o_vector_tab.cpp" 
- "src/simulation/imgui/tabs/o_vector_tab.h" "src/Utils/o_vec/o_vec_snapshot.h" "src/world/world_renderer/world_renderer.h"  "src/world/food_eat_resolver.h" "src/entities/CellMatter.h" "src/simulation/imgui/tabs/debug_tab.h" "src/simulation/imgui/tabs/food_tab.h")
+)
 
- target_compile_definitions(ProjectARIA PRIVATE
+target_compile_definitions(ProjectARIA PRIVATE
     ARIA_SETTINGS_PATH="${CMAKE_SOURCE_DIR}/aria_settings.toml"
 )
 
