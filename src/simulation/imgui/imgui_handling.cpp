@@ -31,7 +31,7 @@ void Simulation::handle_imGUI(const SimSnapshot& snap, float dt)
 }
 
 
-void Simulation::extinction_popup()
+void Simulation::extinction_popup() // TODO: depricated
 {
     if (ImGui::BeginPopupModal("New Simulation", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {

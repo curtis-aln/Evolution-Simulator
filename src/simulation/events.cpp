@@ -2,6 +2,7 @@
 
 // ---- Mouse helpers ------------------------------------------------
 
+
 bool Simulation::try_select_protozoa(const sf::Vector2f& cam_pos)
 {
 	return m_world_.handle_mouse_click(cam_pos);
@@ -9,49 +10,22 @@ bool Simulation::try_select_protozoa(const sf::Vector2f& cam_pos)
 
 void Simulation::handle_left_click(const sf::Vector2f& cam_pos)
 {
-	// when a mouse button is pressed down it is either to pan the screen or to interact with an organism
-	float zoom = camera_.get_current_zoom();
-	if (zoom > 0.062 && try_select_protozoa(cam_pos))
-	{
-		left_mouse_pressed_event = true;
-		std::cout << "hi\n";
+	/* Select / Deselect protozoa / Camera pan */
+	if (camera_.get_current_zoom() > min_zoom_to_select_protozoa && try_select_protozoa(cam_pos))
 		m_control_panel_.select_tab("Organism");
-	}
-	else
-	{
-		if (m_world_.get_cell_manager()->get_selected_protozoa_pos() != nullptr)
-		{
-			m_control_panel_.select_tab("Simulation");
-			m_world_.get_cell_manager()->deselect_cell();
-		}
-		camera_.begin_pan();  // start pan only if we didn't click an organism
-	}
+	else if (m_world_.get_cell_manager()->deselect_cell())
+		m_control_panel_.select_tab("Simulation");
+
+	camera_.begin_pan();
 }
-
-void Simulation::handle_right_click(const sf::Vector2f& cam_pos)
-{
-	// right click allows you to drag protozoa around the screen
-	right_mouse_pressed_event = true;
-
-	// we should only drag a protozoa if our mouse is within the radius of one
-	//if (try_select_protozoa(cam_pos))
-	//{
-	//	m_world_.should_drag_protozoa_ = true;
-	//}
-}
-
-
 
 void Simulation::handle_left_release()
 {
-	//m_world_.deselect_protozoa();
-	left_mouse_pressed_event = false;
 	camera_.end_pan();
 }
 
 void Simulation::handle_right_release()
 {
-	right_mouse_pressed_event = false;
 	m_world_.dragging = false; // release the protozoa if we were dragging one
 	m_world_.get_cell_manager()->deselect_cell();
 }
@@ -60,12 +34,11 @@ void Simulation::handle_right_release()
 
 void Simulation::handle_pause_toggle()
 {
+	/* toggle flip paused */
 	m_world_.toggles.paused = !m_world_.toggles.paused;
 
 	if (!m_world_.toggles.paused)
-	{
 		m_world_.toggles.m_tick_frame_time = false;
-	}
 }
 
 void Simulation::handle_keyboard_events(const sf::Keyboard::Key& event_key_code)
@@ -107,8 +80,6 @@ void Simulation::dispatch_event(const sf::Event& event, const sf::Vector2f& cam_
 		{
 			if (mouse->button == sf::Mouse::Button::Left)
 				handle_left_click(cam_pos);
-			else if (mouse->button == sf::Mouse::Button::Right)
-				handle_right_click(cam_pos);
 		}
 	}
 	else if (const auto* mouse = event.getIf<sf::Event::MouseButtonReleased>())

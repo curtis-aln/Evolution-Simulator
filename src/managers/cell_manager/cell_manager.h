@@ -167,7 +167,7 @@ public:
 	
 
 	// selected cell management
-	void deselect_cell();
+	bool deselect_cell();
 	const Cell* get_selected_cell() const { return all_cells_.at(selected_cell_id_); }
 
 	// public statistics

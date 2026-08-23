@@ -1,9 +1,13 @@
 #include "../cell_manager.h"
 
-void CellManager::deselect_cell()
+bool CellManager::deselect_cell()
 {
+	if (selected_cell_id_ == -1)
+		return false;
 	selected_cell_id_ = -1;
 	protozoa_tracker_.is_active = false;
+
+	return true;
 }
 
 

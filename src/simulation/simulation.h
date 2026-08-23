@@ -18,6 +18,9 @@
 #include "../managers/cell_manager/organism_tracker.h"
 #include "context/state.h"
 
+inline static constexpr float max_simulation_time = 0.f; // seconds set to 0 for infinite
+inline static constexpr float min_zoom_to_select_protozoa = 0.062f; // if zoomed out more than this, clicking on protozoa is disabled
+
 
 class Simulation : SimulationSettings
 {
@@ -46,9 +49,6 @@ class Simulation : SimulationSettings
 
     bool  tracking = false;
     
-    bool  left_mouse_pressed_event = false;
-    bool  right_mouse_pressed_event = false;
-
     ImPlotColormap m_plot_colormap_{};
 
     // Multithreading
@@ -91,7 +91,6 @@ private:
     void handle_events();
     bool try_select_protozoa(const sf::Vector2f& cam_pos);
     void handle_left_click(const sf::Vector2f& cam_pos);
-    void handle_right_click(const sf::Vector2f& cam_pos);
     void handle_left_release();
     void handle_right_release();
     void handle_pause_toggle();

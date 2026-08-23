@@ -7,7 +7,6 @@ Simulation::Simulation() : m_world_(&m_window_)
     m_window_.setVerticalSyncEnabled(vsync);
 
     const float rad = WorldSettings::bounds_radius;
-
     camera_.set_initial_zoom(0.1f, sf::Vector2f{ rad, rad });
 
     init_imGUI();
@@ -37,10 +36,11 @@ void Simulation::run_simulation()
         manage_rendering_frame_rate();
         render();
 
-        if (sim_state_.total_time_elapsed > 60)
+		// If a maximum simulation time is set (non-zero), check if the total elapsed time has exceeded it. If so, stop the simulation.
+        if (max_simulation_time != 0.f && sim_state_.total_time_elapsed > max_simulation_time)
         {
-			//std::cout << "total iterations: " << m_world_.get_statistics().iterations_ << std::endl;
-            //running = false;
+			std::cout << "total iterations: " << m_world_.get_statistics().iterations_ << std::endl;
+            running = false;
         }
     }
 
@@ -113,7 +113,7 @@ void Simulation::resolve_modifications()
         auto* cell_manager = m_world_.get_cell_manager();
         WorldBorder bounds{ camera_.get_world_mouse_pos(), m_world_.get_statistics().mouse_radius };
 
-        if (right_mouse_pressed_event)
+        if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right))
             m_world_.handle_right_click(bounds);
     } // mutex released here
 }
