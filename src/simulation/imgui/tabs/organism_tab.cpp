@@ -82,7 +82,7 @@ void OrganismTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
     const OrganismTracker& protozoa = snap.protozoa_tracker;
 
-    if (!snap.cell_manager_stats.selected_a_cell)
+    if (snap.protozoa_tracker.selected_id == -1)
     {
 	    draw_no_selection(); 
     	return;

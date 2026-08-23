@@ -24,6 +24,10 @@
 #include "world_renderer/world_renderer.h"
 #include "food_eat_resolver.h"
 
+inline static constexpr float cell_drag_strength = 0.1f; // how strong the mouse drag is on a cell
+inline static constexpr float attraction_strength = 0.000000015f; // cells attraction to the world center
+inline static constexpr int tick_sim_multiplier = 25;  // how many times to tick the simulation per frame, this is used to speed up the simulation when paused
+inline static constexpr float cell_press_tollarance_factor = 1.2f; // how much bigger the cell press area is than the cell radius
 
 class World : public WorldSettings
 {
@@ -33,7 +37,6 @@ class World : public WorldSettings
 
     WorldBorder        world_circular_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
     sf::FloatRect world_rect_bounds_{ {0.f, 0.f}, {bounds_radius * 2.f, bounds_radius * 2.f} };
-    sf::FloatRect visible_bounds = world_rect_bounds_;
    
     WorldStatistics statistics_{}; // Statistics accumulated each tick by the update thread.
 
@@ -147,8 +150,14 @@ private:
 
     sf::FloatRect calulcate_visible_range();
 
-    void update_position_container(SimSnapshot& write_snapshot);
     void update_statistics();
 
     void resolve_food_interactions();
+
+    void drag_selected_cell_logic();
+    void tick_sim();
+
+    bool should_tick_sim();
+
+    void bound_bodies_in_range(int begin, int end);
 };

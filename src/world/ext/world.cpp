@@ -128,6 +128,14 @@ void World::handle_right_click(WorldBorder& spawn_area)
 
 void World::fill_snapshot(SimSnapshot& snapshot)
 {
+    sf::FloatRect visible_bounds = calulcate_visible_range();
+    snapshot.render.clear_render_data();
+
+    if (!toggles.show_only_newborns)
+        food_manager_.update_position_data(snapshot.render);
+    cell_manager_.update_position_container(snapshot.render, visible_bounds, toggles.show_only_newborns);
+
+
     /* Data that goes to both the renderer and the ImGUI panels */
     snapshot.cell_manager_stats = cell_manager_.get_statistics();
     snapshot.world_stats = get_statistics(); // simulation statistics
@@ -136,7 +144,6 @@ void World::fill_snapshot(SimSnapshot& snapshot)
     snapshot.food_toggles = food_manager_.toggles_;
 
 	copy_render_data_to_snapshot(snapshot); // render data
-
 
     snapshot.world_stats.highlighted_food = food_manager_.select_indexes.count;
 	cell_manager_.fill_snapshot(snapshot, visible_bounds); // protozoa data
@@ -149,13 +156,12 @@ void World::copy_render_data_to_snapshot(SimSnapshot& snapshot)
 {
     RenderData& render_data = snapshot.render;
 
-    const int n = cell_manager_.get_cell_count();
-    snapshot.cell_manager_stats.cell_count = n;
+    snapshot.cell_manager_stats.cell_count = cell_manager_.get_cell_count();
 
-    render_data.body_debug_snapshot = FillSnapshot<Body>(dbg_bodies_, "Body", sf::Color::White);
-    render_data.food_debug_snapshot = FillSnapshot<Food>(dbg_food_, "Food", sf::Color::White);
+    render_data.body_debug_snapshot   = FillSnapshot<Body>(dbg_bodies_, "Body", sf::Color::White);
+    render_data.food_debug_snapshot   = FillSnapshot<Food>(dbg_food_, "Food", sf::Color::White);
     render_data.spring_debug_snapshot = FillSnapshot<Spring>(dbg_springs_, "Spring", sf::Color::White);
-	render_data.cell_debug_snapshot = FillSnapshot<Cell>(dbg_cells_, "Cell", sf::Color::White);
+	render_data.cell_debug_snapshot   = FillSnapshot<Cell>(dbg_cells_, "Cell", sf::Color::White);
 }
 
 void World::copy_spatial_grids_to_snapshot(SimSnapshot& snapshot)
@@ -176,16 +182,15 @@ void World::copy_spatial_grids_to_snapshot(SimSnapshot& snapshot)
 
 int World::check_mouse_press(const OrganismTracker& protozoa, const sf::Vector2f mousePosition, const bool tolerance_check) const
 {
+    /* Check if the mouse is pressing on any cell returns -1 if no cell is pressed */
     for (const Cell& cell : protozoa.cells)
     {
         const Body* body = bodies_.at(cell.body_id_);
         const float dist_sq = (body->position_ - mousePosition).lengthSquared();
-        float tollarance_factor = 1.2f;
-        const float rad = cell.radius * tollarance_factor;
+      
+        const float rad = cell.radius * cell_press_tollarance_factor;
         if (dist_sq < rad * rad)
-        {
             return cell.body_id_;
-        }
     }
 
     return -1;

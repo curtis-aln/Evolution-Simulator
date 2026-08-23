@@ -105,9 +105,6 @@ struct CellManagerStatistics
 {
     float min_speed = 0.f;
 
-
-    bool selected_a_cell = false;
-
     uint16_t longest_lived_ever = 0;
 
     int   total_deaths = 0;  // increments whenever a cell dies
@@ -127,8 +124,6 @@ struct CellManagerStatistics
     float average_spring_count = 0.f;
     float energy_efficiency = 0.f;
     float average_lifetime = 0.f;
-
-    
 
     float spring_breaking_length = 0.f;
     float spring_breaking_force = 0.f;

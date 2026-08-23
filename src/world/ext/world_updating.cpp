@@ -1,52 +1,92 @@
 #include <algorithm>
 #include "../world.h"
 
-
 // This function is called by the simulation thread to update the world state
 // write_snapshot is written to so the renderer knows what to draw
 void World::update(SimSnapshot& write_snapshot)
 {
-	write_snapshot.render.clear_render_data();
-	visible_bounds = calulcate_visible_range();
-
 	// Sanity Check
 	if (get_entity_count() != bodies_.size())
 		std::cerr << "Warning: Entity count mismatch! bodies_.size() = " << bodies_.size() << ", get_entity_count() = " << get_entity_count() << std::endl;
-	
-	if (dragging)
-		cell_manager_.drag_selected_cell_to_point(m_window_->mapPixelToCoords(sf::Mouse::getPosition(*m_window_)), 0.1f);
 
-	if (toggles.m_tick_frame_time || !toggles.paused)
+	// Update function
+	if (should_tick_sim())
 	{
-		// updating the food and the cells in the world
-		food_manager_.update();
-		cell_manager_.update(statistics_.iterations_);
-		cell_manager_.update_100frame_stats(statistics_.iterations_);
-
-		update_entities();
-
-		if (statistics_.iterations_ % 30 == 0)
-			food_eat_resolver_.resolve();
-		else
-			food_eat_resolver_.resolve_existing_detections();
-
-		// once the iteration has been completed, we update the statistics for the next frame
-		if (toggles.track_statistics)
-			update_statistics();
+		for (int i = 0; i < tick_sim_multiplier; ++i)
+			tick_sim();
 	}
 
+	// selected cell logic
+	drag_selected_cell_logic();
 	cell_manager_.update_protozoa_tracker();
 
 	// We always update the position container, otherwise the simulation jitters when paused// We always update the position container, otherwise the simulation jitters when paused
-	update_position_container(write_snapshot);
-
 	fill_snapshot(write_snapshot);
+}
 
-	// This code allows up to step frame by frame through the update loop
-	if (toggles.m_tick_frame_time) toggles.m_tick_frame_time = false;
+bool World::should_tick_sim()
+{
+	/* This takes out some messy code from the main function, it just keeps the tick-by-tick update process working */
+	bool should = toggles.m_tick_frame_time || !toggles.paused;
+
+	if (toggles.m_tick_frame_time) // This code allows up to step frame by frame through the update loop
+		toggles.m_tick_frame_time = false;
+
+	return should;
+}
+
+void World::drag_selected_cell_logic()
+{
+	/* Drag the selected cell to the mouse world position */
+	if (!dragging)
+		return;
+
+	sf::Vector2i window_pos = sf::Mouse::getPosition(*m_window_);
+	sf::Vector2f world_pos = m_window_->mapPixelToCoords(window_pos);
+	cell_manager_.drag_selected_cell_to_point(world_pos, cell_drag_strength);
+}
+
+void World::tick_sim()
+{
+	/* This function runs one update cycle of the simulation, can be stacked */
+	
+	food_manager_.update();                              // updating the food in the world
+	cell_manager_.update(statistics_.iterations_);       // updating the cells, springs, and cell matter in the world
+	food_eat_resolver_.resolve(statistics_.iterations_); // updating the interation between cells and food
+
+	update_entities(); // updating the positions of all bodies, and handling collisions between them
+
+	// once the iteration has been completed, we update the statistics for the next frame
+	if (!toggles.track_statistics)
+		return;
+
+	update_statistics();
+	cell_manager_.update_100frame_stats(statistics_.iterations_);
 }
 
 
+// Splits `total` items evenly across `thread_count` threads and returns the
+// [begin, end) range owned by `thread_index`. Returns {0, 0} if there's nothing to do.
+static std::pair<int, int> compute_thread_range(int thread_index, int total, int thread_count)
+{
+	if (total == 0)
+		return { 0, 0 };
+
+	const int chunk_size = std::max(1, (total + thread_count - 1) / thread_count);
+	const int begin = std::min(thread_index * chunk_size, total);
+	const int end = std::min(begin + chunk_size, total);
+
+	return { begin, end };
+}
+
+void World::bound_bodies_in_range(int begin, int end)
+{
+	for (int k = begin; k < end; ++k)
+	{
+		Body* body = bodies_.at(bodies_.occupied_list[k]);
+		bound_body_to_world(body);
+	}
+}
 
 void World::ensure_update_jobs_built()
 {
@@ -56,52 +96,26 @@ void World::ensure_update_jobs_built()
 	updating_bodies_.clear();
 	updating_bodies_.reserve(updating_threads);
 
-	// For each of the threads
 	for (int t = 0; t < (int)updating_threads; ++t)
 	{
-		updating_bodies_.emplace_back([this, t] {
-			const int total_cells = current_total_bodies_;
-			if (total_cells == 0)
-				return;
-
-			const int chunk = std::max(1, (total_cells + (int)updating_threads - 1) / (int)updating_threads);
-			const int begin = t * chunk;
-			if (begin >= total_cells)
-				return;
-			const int end = std::min(begin + chunk, total_cells);
-
-			for (int k = begin; k < end; ++k)
+		updating_bodies_.emplace_back([this, t]
 			{
-				Body* body = bodies_.at(bodies_.occupied_list[k]);
-				bound_body_to_world(body);
-
-			}});
+				const auto [begin, end] = compute_thread_range(t, current_total_bodies_, (int)updating_threads);
+				bound_bodies_in_range(begin, end);
+			});
 	}
 
-	thread_pool_.set_jobs(updating_bodies_);   // only ever called this once
+	thread_pool_.set_jobs(updating_bodies_);   // only ever called once
 	update_jobs_built_ = true;
 }
 
 
 void World::update_entities()
 {
-	// filling the containers that go to the renderer and to the spatial grid
 	bound_bodies();
 
-	if (!toggles.toggle_collisions)
-		return;
-	
-	if (statistics_.iterations_ % 30 != 0)
-	{
-		collision_resolver_.resolve_existing_detections();
-		collision_resolver_.handle_collision_resolutions();
-	}
-	else
-	{
-		collision_resolver_.add_particles_to_grid();
-		collision_resolver_.run_collision_detection();
-		collision_resolver_.handle_collision_resolutions();
-	}
+	if (toggles.toggle_collisions)	
+		collision_resolver_.run(statistics_.iterations_);
 }
 
 
@@ -142,7 +156,7 @@ void World::bound_body_to_world(Body* body)
 	}
 
 	// very small attraction to the centre of the world
-	body->velocity_ += (world_circular_bounds_.center_ - body->position_) * 0.000000015f;
+	body->velocity_ += (world_circular_bounds_.center_ - body->position_) * attraction_strength;
 }
 
 
@@ -199,11 +213,4 @@ sf::FloatRect World::calulcate_visible_range()
 	visible_bounds.size.y += max_rad * 2.f;
 
 	return visible_bounds;
-}
-
-void World::update_position_container(SimSnapshot& write_snapshot)
-{
-	if (!toggles.show_only_newborns)
-		food_manager_.update_position_data(write_snapshot.render);
-	cell_manager_.update_position_container(write_snapshot.render, visible_bounds, toggles.show_only_newborns);
 }

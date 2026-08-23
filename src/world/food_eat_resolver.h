@@ -232,8 +232,15 @@ public:
 		quick_collision_jobs_built_ = true;
 	}
 
-	void resolve()
+	void resolve(const int iterations)
 	{
+		constexpr int food_resolution_interval = 30; // how often to resolve food bites, in iterations
+		if (iterations % 30 != 0)
+		{
+			resolve_existing_detections();
+			return;
+		}
+
 		add_food_to_grid();
 
 		current_total_cells_ = cell_vector_->occupied_count;
@@ -296,22 +303,20 @@ private:
 		resolve_bites_against_candidates(cell, body, tl_nearby_ids_, tl_nearby_ids_.count, resolution);
 	}
 
-	public:
-		void resolve_existing_detections()
-		{
-			clear_bite_resolutions();
+	void resolve_existing_detections()
+	{
+		clear_bite_resolutions();
 
-			current_total_cells_ = cell_vector_->occupied_count;
-			if (current_total_cells_ == 0)
-				return;
+		current_total_cells_ = cell_vector_->occupied_count;
+		if (current_total_cells_ == 0)
+			return;
 
-			ensure_quick_collision_jobs_built();
-			quick_collision_thread_pool_.run_and_wait();
+		ensure_quick_collision_jobs_built();
+		quick_collision_thread_pool_.run_and_wait();
 
-			food_bite_resolution();
-		}
+		food_bite_resolution();
+	}
 
-		private:
 	// This function will resolve the bites, by taking the appropriate amount of nutrients from the food and adding it to the cell
 	void food_bite_resolution()
 	{

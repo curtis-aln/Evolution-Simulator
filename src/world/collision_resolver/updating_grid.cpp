@@ -35,8 +35,3 @@ void CollisionResolver::add_particles_to_grid()
         ++i;
     }
 }
-
-void CollisionResolver::update_particles_grid_indexes()
-{
-  
-}

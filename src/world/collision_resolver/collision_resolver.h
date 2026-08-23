@@ -16,6 +16,9 @@ Modify the Settings struct to change the grid size, cell capacity, and collision
 
 #include "collision_vector.h" // To know what to resolve
 
+inline static constexpr int collision_resolution_interval = 30; // how often to run full collision detection, in iterations
+
+
 struct ResolutionSettings
 {
 	// 1, 2, 4, 8, 16, 32, 64, 128
@@ -68,6 +71,20 @@ public:
 	CollisionResolver(sf::Rect<float>* bounds, o_vector<Body>* entities, 
 		unsigned int init_thread_count, unsigned int max_collisions_per_thread, unsigned int max_particles);
 
+	void run(const int iterations)
+	{
+		if (iterations % collision_resolution_interval != 0)
+		{
+			resolve_existing_detections();
+			handle_collision_resolutions();
+			return;
+		}
+		
+		add_particles_to_grid();
+		run_collision_detection();
+		handle_collision_resolutions();
+	}
+
 	void ensure_quick_collision_jobs_built()
 	{
 		if (quick_collision_jobs_built_)
@@ -114,8 +131,6 @@ public:
 
 	void resolve_existing_detections();
 
-	// This function goes through each cell and updates their position in the grid rather than clearing the grid and re-adding all particles, this is more efficient
-	void update_particles_grid_indexes();
 
 	// This clears the grid and re-adds all particles to the grid, this is less efficient than update_particles_grid_indexes but is simpler and 
 	// faster if the particles move a lot
