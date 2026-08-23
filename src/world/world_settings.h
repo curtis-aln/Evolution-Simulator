@@ -9,8 +9,8 @@ struct WorldSettings
 	inline static uint32_t cells_y;
 	inline static uint8_t cell_max_capacity;
 
-	inline static uint32_t birth_cells_x = 128;
-	inline static uint32_t birth_cells_y = 128;
+	inline static uint32_t birth_cells_x = 64;
+	inline static uint32_t birth_cells_y = 64;
 
 	inline static float border_repulsion_magnitude; // how strong it is repelled from the border
 	inline static unsigned int updating_threads = 16;

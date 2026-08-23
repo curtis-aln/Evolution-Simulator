@@ -267,13 +267,3 @@ out of selection acting on the same handful of numbers.
   whose cell has died can detect it in O(1) and self-remove rather than relying on any
   external cleanup pass.
 
-
-
-
-
-
-
-
-
-  18,000
-  18,204

@@ -31,31 +31,34 @@ void CellManager::update(int iterations)
 	{
 		deselect_cell();
 	}
+	// NOTE:
+	// the order MUST be reproduction -> death -> updating
+	// if any bugs involving stray connections arise in the future, it is likely due to this order being changed
 
-	// updating the cells and springs
-	add_new_cells_to_grid();
-
-	update_springs();
-	update_cells();
-	
-	update_cell_matter();
-
-	// death
-	collect_cell_death_requests();
-	collect_matter_death_requests();
-
-	apply_cell_death_requests();
-	apply_matter_death_requests();
-	
-	// reproductive system
+	// --------------- reproductive system ---------------
 	collect_connection_requests(); // Connection Requests are collected here, but not applied yet
 	apply_connection_requests();
-	
+
 	collect_reproduction_requests();
 	apply_reproduction_requests();
 
 	apply_matter_birth_requests();
 
+	// --------------- death management ---------------
+	collect_cell_death_requests();
+	collect_matter_death_requests();
+
+	apply_cell_death_requests();
+	apply_matter_death_requests();
+
+	// --------------- updating cells and matter ---------------
+	add_new_cells_to_grid();
+
+	update_springs();
+	update_cells();
+	update_cell_matter();
+
+	// --------------- statistics ---------------
 	update_statistics();
 }
 
@@ -146,16 +149,22 @@ void CellManager::update_position_container(RenderData& rend_data, const sf::Flo
 	{
 		Cell* cell_a = all_cells_.at(spring->cell_A_id);
 		Body* body_a = bodies_->at(cell_a->body_id_);
-		bool cell_a_visible = visible_bounds.contains({ body_a->position_.x, body_a->position_.y });
+		bool cell_a_visible = visible_bounds.contains(body_a->position_);
+		bool cell_a_newborn = cell_a->internal_clock_ < infant_time;
 
-		if (!cell_a_visible || (show_only_newborns && cell_a->internal_clock_ > infant_time)) 
+		if (show_only_newborns && cell_a_newborn)
 			continue;
 
 		Cell* cell_b = all_cells_.at(spring->cell_B_id);
 		Body* body_b = bodies_->at(cell_b->body_id_);
-		bool cell_b_visible = visible_bounds.contains({ body_b->position_.x, body_b->position_.y });
 
-		if (!cell_b_visible || (show_only_newborns && cell_b->internal_clock_ > infant_time)) 
+		bool cell_b_visible = visible_bounds.contains(body_b->position_);
+		bool cell_b_newborn = cell_b->internal_clock_ < infant_time;
+
+		if (show_only_newborns && cell_b_newborn)
+			continue;
+
+		if (!cell_a_visible && !cell_b_visible)
 			continue;
 
 		const float min_dist = body_a->radius_ + body_b->radius_;
@@ -221,15 +230,17 @@ void CellManager::update_springs()
 	std::vector<int> to_remove;
 	for (Spring* spring : all_springs_)
 	{
+		Cell* cell_a = all_cells_.at(spring->cell_A_id);
+		Cell* cell_b = all_cells_.at(spring->cell_B_id);
+
+		spring->update_organics(*cell_a, *cell_b);
+
 		// if the spring has broken on its own
 		if (spring->is_spring_broken())
 		{
 			to_remove.push_back(spring->id_);
 			continue;
 		}
-
-		Cell* cell_a = all_cells_.at(spring->cell_A_id);
-		Cell* cell_b = all_cells_.at(spring->cell_B_id);
 
 		// otherwise we update the spring physics and organics
 		Body* body_a = bodies_->at(cell_a->body_id_);
@@ -238,11 +249,14 @@ void CellManager::update_springs()
 		spring->update_physics(body_a->position_, body_a->velocity_, body_b->position_, body_b->velocity_);
 		body_a->accelerate(spring->movement_vector);
 		body_b->accelerate(-spring->movement_vector);
-		spring->update_organics(*cell_a, *cell_b);
+		
 	}
 
+	// Remove the broken springs
 	for (int spring_id : to_remove)
 	{
+		Spring* spring = all_springs_.at(spring_id);
+		spring->reset_cell_manager();
 		all_springs_.remove(spring_id);
 	}
 }

@@ -189,6 +189,7 @@ private: // only functions this class can access
 
 	// updating
 	void update_springs();
+	void check_for_spring_death();
 	void update_cells();
 	void update_cell_matter();
 	void update_cell(Cell* cell);

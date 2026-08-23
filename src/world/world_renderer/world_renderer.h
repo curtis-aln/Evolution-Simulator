@@ -206,7 +206,7 @@ private:
 	void render_springs(const SimSnapshot& snapshot)
 	{
 		const float zoom = snapshot.sim_stats.camera_zoom;
-		if (zoom < 0.012f)
+		if (zoom < 0.012f || snapshot.toggles.show_only_newborns)
 			return;
 
 		bool no_curves = zoom < 0.08f;

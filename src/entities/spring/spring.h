@@ -53,6 +53,9 @@ public:
 
 	void reset_cell_manager()
 	{
+		cell_A_id = 0;
+		cell_B_id = 0;
+
 		internal_clock_ = 0;
 		work_done = 0.f;
 		current_length = 0.f;
@@ -141,7 +144,10 @@ public:
 	void update_organics(Cell& cell_a, Cell& cell_b)
 	{
 		if (!cell_a.is_alive() || !cell_b.is_alive())
+		{
 			broken = true;
+			return;
+		}
 
 		if (stress > SPRING_DAMAGE_THRESH)
 		{

@@ -92,7 +92,11 @@ public:
 
 
 public:
-	Cell(const uint32_t body_id = 0) { body_id_ = body_id; }
+	Cell(const uint32_t body_id = 0) 
+	{ 
+		body_id_ = body_id;
+		spring_genome.randomize();
+	}
 
 	// ------------ Data accessors ------------
 	[[nodiscard]] bool is_alive() const { return !dead_; }

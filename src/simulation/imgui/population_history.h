@@ -57,7 +57,7 @@ struct PopulationHistory
     // ── Tunables — everything that shapes sampling/eviction lives here ────
     static constexpr size_t k_max_samples = 38192; // samples kept before eviction
     static constexpr size_t k_evict_chunk = 512;   // amortises erase cost to O(1)/push
-    static constexpr int    k_frame_stride = 30;    // record 1 sample every N sim frames
+    static constexpr int    k_frame_stride = 150;    // record 1 sample every N sim frames
     static constexpr int    k_spike_delta = 20;    // protozoa Δ that creates an event
     static constexpr float  k_event_cooldown_frames = 3000.f; // min frames between auto-events
     // ^ tune to taste: frames = seconds * your sim's tick rate, not wall-clock seconds.
