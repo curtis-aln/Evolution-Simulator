@@ -1,4 +1,5 @@
 #include "debug_tab.h"
+#include <managers/cell_manager/cell_manager_settings.h>
 
 void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
@@ -31,6 +32,7 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 		SimCommand cmd{ .section = CommandSection::CellManagerEvent, .type = CommandType::SetMinSpeed, .float_val = min_speed };
 		ctx.push(cmd);
 	}
+	ImGui::Text("delta min speed (DMS): %.3f", CellManagerSettings::delta_min_speed);
 
 	ImGui::EndChild();
 }

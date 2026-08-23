@@ -4,7 +4,7 @@
 struct CellMatter
 {
 	static constexpr float    friction = 0.85f;
-	static constexpr uint16_t max_time_to_live = 2000; // frames
+	static constexpr uint16_t max_time_to_live = 8'000; // frames
 
 	static constexpr uint8_t max_radius = 70;
 	static constexpr uint8_t min_radius = 40;

@@ -29,13 +29,8 @@ void CellManager::speed_tax_cell(Cell* cell)
 	float speed_sq = vel.lengthSquared();
 	float min_speed_sq = statistics_.min_speed * statistics_.min_speed;
 
-	bool is_too_slow = speed_sq < min_speed_sq;
-
-	constexpr float speed_tax = -0.4f;
-	if (is_too_slow)
-	{
-		cell->change_energy(speed_tax);
-	}
+	if (speed_sq < min_speed_sq)
+		cell->change_energy(speed_energy_tax);
 }
 
 void CellManager::remove_cell(cell_idx cell_id)

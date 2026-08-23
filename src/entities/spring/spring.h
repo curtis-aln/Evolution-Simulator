@@ -5,6 +5,8 @@
 #include "../cell/cell.h"
 #include "spring_settings.h"
 
+inline static constexpr float stress_damage_const = 0.095f;
+
 struct SpringResult { float work_done; float force_magnitude; bool broken; };
 
 struct Spring : SpringSettings
@@ -93,14 +95,14 @@ public:
 	}
 
 	// returns a movement vector
-	void update_physics(const sf::Vector2f& pos_a, const sf::Vector2f& vel_a, const sf::Vector2f& pos_b, const sf::Vector2f& vel_b)
+	void update_physics(const sf::Vector2f& pos_a, const sf::Vector2f& vel_a, const sf::Vector2f& pos_b, const sf::Vector2f& vel_b, bool immune)
 	{
 		internal_clock_++;
 
 		const sf::Vector2f dir = pos_b - pos_a;
 		const float length_squared = dir.x * dir.x + dir.y * dir.y;
 
-		if (length_squared > SPRING_BREAK_LENGTH * SPRING_BREAK_LENGTH)
+		if (length_squared > SPRING_BREAK_LENGTH * SPRING_BREAK_LENGTH && !immune)
 		{
 			break_spring();
 			movement_vector = { 0, 0 };
@@ -137,11 +139,11 @@ public:
 		stress = force_magnitude / SPRING_BREAK_FORCE;
 
 		// Force-based break (complements your existing length-based break)
-		if (force_magnitude > SPRING_BREAK_FORCE)
+		if (force_magnitude > SPRING_BREAK_FORCE && !immune)
 			break_spring();
 	}
 
-	void update_organics(Cell& cell_a, Cell& cell_b)
+	void update_organics(Cell& cell_a, Cell& cell_b, bool is_immune)
 	{
 		if (!cell_a.is_alive() || !cell_b.is_alive())
 		{
@@ -149,7 +151,7 @@ public:
 			return;
 		}
 
-		if (stress > SPRING_DAMAGE_THRESH)
+		if (stress > SPRING_DAMAGE_THRESH && !is_immune)
 		{
 			update_integrity(cell_a, cell_b);
 		}
@@ -164,7 +166,7 @@ public:
 	void update_integrity(Cell& cell_a, Cell& cell_b)
 	{
 		float excess = stress - SPRING_DAMAGE_THRESH;
-		float damage = -excess / 2.f;
+		float damage = -excess / 2.f * stress_damage_const;
 
 		cell_a.change_integrity(damage);
 		cell_b.change_integrity(damage);

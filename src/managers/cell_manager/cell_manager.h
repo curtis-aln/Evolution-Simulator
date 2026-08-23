@@ -66,9 +66,6 @@ struct ConnectionRequest
 	int32_t connect_to_id;
 };
 
-inline static constexpr size_t max_lifetime_samples_ = 500;
-inline static constexpr int survival_rate_window_size_ = 100;
-
 
 // A Class which handles all protozoa related stuff in the world. updating, collisions, reproduction, etc.
 class CellManager: protected CellManagerSettings
@@ -93,6 +90,7 @@ class CellManager: protected CellManagerSettings
 	std::vector<BirthRequest> cell_birth_requests;
 	std::vector<MatterBirthRequest> matter_birth_requests;
 	std::vector<ConnectionRequest> connection_requests;
+	std::vector<uint32_t> springs_to_remove_;
 	CellManagerStatistics statistics_{};
 
 	// death requests stop us from removing cells while we are iterating over them, we store the ids of the cells to be removed here and remove them after the iteration is done
@@ -118,10 +116,13 @@ class CellManager: protected CellManagerSettings
 	// this spatial grid holds new born cells so that the they can form connections between other newly born cells
 	SimpleSpatialGrid new_born_cell_grid_{ WorldSettings::birth_cells_x, WorldSettings::birth_cells_y, WorldSettings::cell_max_capacity, WorldSettings::bounds_radius * 2.0f, WorldSettings::bounds_radius * 2.0f };
 	
+	bool spawn_immune = false;
 
 public:
 	uint16_t max_size = static_cast<uint16_t>(10000);
-	FixedSpan<cell_idx, uint16_t> select_indexes{ max_size };	
+	FixedSpan<cell_idx, uint16_t> select_indexes{ max_size };
+	
+	bool extinction_event = false;
 
 public:
 	// Constructor
@@ -188,7 +189,7 @@ private: // only functions this class can access
 	float calculate_average_generation() const;
 
 	// updating
-	void update_springs();
+	void update_springs(bool immune);
 	void check_for_spring_death();
 	void update_cells();
 	void update_cell_matter();

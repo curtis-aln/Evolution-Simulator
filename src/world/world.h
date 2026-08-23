@@ -26,7 +26,7 @@
 
 inline static constexpr float cell_drag_strength = 0.1f; // how strong the mouse drag is on a cell
 inline static constexpr float attraction_strength = 0.000000015f; // cells attraction to the world center
-inline static constexpr int tick_sim_multiplier = 25;  // how many times to tick the simulation per frame, this is used to speed up the simulation when paused
+inline static constexpr int tick_sim_multiplier = 50;  // how many times to tick the simulation per frame, this is used to speed up the simulation when paused
 inline static constexpr float cell_press_tollarance_factor = 1.2f; // how much bigger the cell press area is than the cell radius
 
 class World : public WorldSettings
@@ -110,17 +110,17 @@ public:
     const FoodManager* get_food_manager() const { return &food_manager_; }
     const CellManager* get_cell_manager() const { return &cell_manager_; }
     CellManager* get_cell_manager() { return &cell_manager_; }
-	int get_entity_count() const { return cell_manager_.get_cell_count() + food_manager_.get_size() + cell_manager_.get_matter_count(); }
+	
+    int get_entity_count() const { return cell_manager_.get_cell_count() + food_manager_.get_size() + cell_manager_.get_matter_count(); }
+	int get_cell_count() const { return cell_manager_.get_cell_count(); }
+	int get_food_count() const { return food_manager_.get_size(); }
 
     // world.h
     static SpatialGridData get_grid_data(SimpleSpatialGrid* grid);
     void calculate_spatial_grid_statistics(SimpleSpatialGrid* grid, SpatialGridData& data);
 
-    
-
     // ── Statistics getters — read by ImGui from snapshot ─────────────────────
     WorldStatistics& get_statistics()  { return statistics_; }
-    int   get_food_count()                   const { return food_manager_.get_size(); }
 
     void render_springs(const SimSnapshot& snapshot);
 

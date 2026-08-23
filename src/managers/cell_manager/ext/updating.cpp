@@ -30,6 +30,9 @@ void CellManager::add_new_cells_to_grid()
 
 void CellManager::update(int iterations)
 {
+	if (extinction_event)
+		return;
+
 	// if we have a selected cell and it has died, we need to deselect it to avoid null errors
 	if (selected_cell_id_ == -1 || !all_cells_.at(selected_cell_id_)->is_alive())
 	{
@@ -56,11 +59,15 @@ void CellManager::update(int iterations)
 	apply_matter_death_requests();
 
 	// --------------- updating cells and matter ---------------
+	spawn_immune = iterations < sim_death_immunity_frames;
+
 	add_new_cells_to_grid();
 
-	update_springs();
+	update_springs(spawn_immune);
 	update_cells();
 	update_cell_matter();
+
+	check_for_extinction_event();
 
 	// --------------- statistics ---------------
 	update_statistics();
@@ -86,7 +93,7 @@ void CellManager::update_cell(Cell* cell)
 {
 	Body* body = bodies_->at(cell->body_id_);
 	cell->update_statistics();
-	cell->update_organics();
+	cell->update_organics(spawn_immune);
 	body->velocity_ *= cell->sinwave_current_friction_;
 
 	speed_tax_cell(cell);
@@ -95,15 +102,12 @@ void CellManager::update_cell(Cell* cell)
 
 void CellManager::impulse_tax_cell(Cell* cell, const float impulse)
 {
-	constexpr float impulse_damage_thresh = 15.5f;
-	constexpr float impulse_damage_multiplier = 0.085f;
-
-	if (impulse > impulse_damage_thresh)
-	{
-		float damage = -(impulse - impulse_damage_thresh) * impulse_damage_multiplier;
-		cell->change_integrity(damage);
-		cell->cumulative_collision_damage_ += abs(damage);
-	}
+	if (impulse < impulse_damage_thresh || spawn_immune)
+		return;
+	
+	float damage = -(impulse - impulse_damage_thresh) * impulse_damage_multiplier;
+	cell->change_integrity(damage);
+	cell->cumulative_collision_damage_ += abs(damage);
 }
 
 void CellManager::collect_connection_requests()
@@ -229,20 +233,20 @@ void CellManager::try_connect_newborn_cell(Cell* cell)
 	}
 }
 
-void CellManager::update_springs()
+void CellManager::update_springs(bool immune)
 {
-	std::vector<int> to_remove;
+	springs_to_remove_.clear();
 	for (Spring* spring : all_springs_)
 	{
 		Cell* cell_a = all_cells_.at(spring->cell_A_id);
 		Cell* cell_b = all_cells_.at(spring->cell_B_id);
 
-		spring->update_organics(*cell_a, *cell_b);
+		spring->update_organics(*cell_a, *cell_b, immune);
 
 		// if the spring has broken on its own
 		if (spring->is_spring_broken())
 		{
-			to_remove.push_back(spring->id_);
+			springs_to_remove_.push_back(spring->id_);
 			continue;
 		}
 
@@ -250,14 +254,14 @@ void CellManager::update_springs()
 		Body* body_a = bodies_->at(cell_a->body_id_);
 		Body* body_b = bodies_->at(cell_b->body_id_);
 
-		spring->update_physics(body_a->position_, body_a->velocity_, body_b->position_, body_b->velocity_);
+		spring->update_physics(body_a->position_, body_a->velocity_, body_b->position_, body_b->velocity_, immune);
 		body_a->accelerate(spring->movement_vector);
 		body_b->accelerate(-spring->movement_vector);
 		
 	}
 
 	// Remove the broken springs
-	for (int spring_id : to_remove)
+	for (uint32_t spring_id : springs_to_remove_)
 	{
 		Spring* spring = all_springs_.at(spring_id);
 		spring->reset_cell_manager();
@@ -269,16 +273,13 @@ void CellManager::update_springs()
 void CellManager::check_for_extinction_event()
 {
 	// if protozoas are still alivee or if auto reset on extinction is disabled, we dont need to do anything
-	if (all_cells_.size() > 0 || !auto_reset_on_extinction)
+	if (all_cells_.size() > extincion_threshold)
 		return;
 
-	std::cout << "Extinction event occurred, respawning initial protozoa...\n";
+	// printing statistics about the simulation
+	std::cout << "Extinction event occurred\n";
 
-	//for (unsigned i = 0; i < initial_protozoa; ++i)
-	//{
-	//	Protozoa* protozoa = all_protozoa_.add();
-	//	build_protozoa(*protozoa, world_bounds, false);
-	//}
+	extinction_event = true;
 }
 
 

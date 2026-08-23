@@ -111,7 +111,7 @@ public:
 	[[nodiscard]] float calculate_friction() const;
 
 	[[nodiscard]] float get_integrity() const { return integrity; }
-	[[nodiscard]] float get_energy() const { return integrity; }
+	[[nodiscard]] float get_energy() const { return energy; }
 
 	// ------------ Data setters ------------
 	void kill() { dead_ = true; }
@@ -123,7 +123,7 @@ public:
 	
 	// ------------ Cell functionality ------------
 	void update_statistics();
-	void update_organics();
+	void update_organics(bool immune);
 
 	[[nodiscard]] bool eat(const float nutrients);
 	void create_offspring(Body* this_body, Cell* child, Body* child_body, const bool mutate);

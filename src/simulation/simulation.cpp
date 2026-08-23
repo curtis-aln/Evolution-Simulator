@@ -36,17 +36,32 @@ void Simulation::run_simulation()
         manage_rendering_frame_rate();
         render();
 
-		// If a maximum simulation time is set (non-zero), check if the total elapsed time has exceeded it. If so, stop the simulation.
-        if (max_simulation_time != 0.f && sim_state_.total_time_elapsed > max_simulation_time)
-        {
-			std::cout << "total iterations: " << m_world_.get_statistics().iterations_ << std::endl;
-            running = false;
-        }
+        check_end_of_sim_conditions();
     }
+
+    print_end_of_sim_conditions();
 
     m_sim_thread_.join();
     ImGui::SFML::Shutdown();
     ImPlot::DestroyContext();
+}
+
+void Simulation::check_end_of_sim_conditions()
+{
+    // If a maximum simulation time is set (non-zero), check if the total elapsed time has exceeded it. If so, stop the simulation.
+    bool time_stop_condition = (max_simulation_time != 0.f && sim_state_.total_time_elapsed > max_simulation_time);
+    bool frame_stop_condition = (max_iterations != 0 && m_world_.get_statistics().iterations_ >= max_iterations);
+    if (time_stop_condition || frame_stop_condition)
+        running = false;
+}
+
+void Simulation::print_end_of_sim_conditions()
+{
+    std::cout << "End of Sim Statistics\n";
+    std::cout << "total time elapsed: " << sim_state_.total_time_elapsed << " seconds" << std::endl;
+    std::cout << "total iterations: " << m_world_.get_statistics().iterations_ << std::endl;
+    std::cout << "Cells " << m_world_.get_cell_count() << std::endl;
+    std::cout << "Food " << m_world_.get_food_count() << std::endl;
 }
 
 void Simulation::update_one_frame()
@@ -66,6 +81,11 @@ void Simulation::update_one_frame()
 	m_sim_buffer_.publish(); // Publish the filled snapshot to make it available for rendering.
 
     camera_follow_selected_protozoa(); 
+
+    if (m_world_.get_cell_manager()->extinction_event)
+    {
+        running = false;
+    }
 }
 
 

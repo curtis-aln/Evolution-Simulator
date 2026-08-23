@@ -20,7 +20,7 @@
 
 inline static constexpr float max_simulation_time = 0.f; // seconds set to 0 for infinite
 inline static constexpr float min_zoom_to_select_protozoa = 0.062f; // if zoomed out more than this, clicking on protozoa is disabled
-
+inline static constexpr int max_iterations = 100000; // Set a maximum number of iterations for the simulation
 
 class Simulation : SimulationSettings
 {
@@ -73,6 +73,10 @@ public:
         }
     }
     void run_simulation();
+
+    void check_end_of_sim_conditions();
+
+    void print_end_of_sim_conditions();
 
 private:
     void init_imGUI();

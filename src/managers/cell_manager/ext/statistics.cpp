@@ -93,9 +93,9 @@ void CellManager::update_protozoa_tracker()
 
 void CellManager::update_statistics()
 {
-	// Selected cell Logic
-	
+	statistics_.min_speed += delta_min_speed;
 
+	// Selected cell Logic
 	statistics_.average_generation = calculate_average_generation();
 
 

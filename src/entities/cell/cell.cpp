@@ -134,8 +134,13 @@ void  Cell::update_statistics()
 }
 
 
-void Cell::update_organics()
+void Cell::update_organics(bool immune)
 {
+	if (immune)
+	{
+		integrity = 100.f;
+		dead_ = false;
+	}
 	sinwave_current_friction_ = calculate_friction();
 
 	// 1. Passive decay — base cost of being alive

@@ -15,6 +15,7 @@ CellManager::CellManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_
 	cell_death_requests_.reserve(initial_request_capacity);
 	matter_death_requests_.reserve(initial_request_capacity);
 	matter_birth_requests.reserve(initial_request_capacity);
+	springs_to_remove_.reserve(initial_request_capacity);
 
 	std::cout << "[INFO]: CellManager initialized with protozoa: " << all_cells_.size() << "\n";
 	if (window == nullptr)
@@ -112,7 +113,7 @@ void CellManager::create_new_protozoa(int count, WorldBorder* spawn_area)
 	for (int i = 0; i < count; i++)
 	{
 		sf::Vector2f pos = spawn_area->rand_pos();
-		int cell_count = Random::rand_range(2, 5);
+		int cell_count = Random::rand_range(2, 3);
 		create_protozoa_from_pool(pos, cell_count, cell_count * 1.5);
 	}
 	
