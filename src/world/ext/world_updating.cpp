@@ -27,10 +27,10 @@ void World::update(SimSnapshot& write_snapshot)
 bool World::should_tick_sim()
 {
 	/* This takes out some messy code from the main function, it just keeps the tick-by-tick update process working */
-	bool should = toggles.m_tick_frame_time || !toggles.paused;
+	bool should = world_toggles.m_tick_frame_time || !world_toggles.paused;
 
-	if (toggles.m_tick_frame_time) // This code allows up to step frame by frame through the update loop
-		toggles.m_tick_frame_time = false;
+	if (world_toggles.m_tick_frame_time) // This code allows up to step frame by frame through the update loop
+		world_toggles.m_tick_frame_time = false;
 
 	return should;
 }
@@ -57,7 +57,7 @@ void World::tick_sim()
 	update_entities(); // updating the positions of all bodies, and handling collisions between them
 
 	// once the iteration has been completed, we update the statistics for the next frame
-	if (!toggles.track_statistics)
+	if (!world_toggles.track_statistics)
 		return;
 
 	update_statistics();
@@ -114,7 +114,7 @@ void World::update_entities()
 {
 	bound_bodies();
 
-	if (toggles.toggle_collisions)	
+	if (world_toggles.toggle_collisions)	
 		collision_resolver_.run(statistics_.iterations_);
 }
 

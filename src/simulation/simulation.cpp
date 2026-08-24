@@ -128,7 +128,7 @@ void Simulation::resolve_modifications()
 
     
         const auto& stats = m_world_.get_statistics();
-        const auto t = m_world_.toggles;
+        const auto t = m_world_.world_toggles;
 
         auto* cell_manager = m_world_.get_cell_manager();
         WorldBorder bounds{ camera_.get_world_mouse_pos(), m_world_.get_statistics().mouse_radius };
@@ -175,7 +175,7 @@ void Simulation::render()
     sim_state_.total_time_elapsed += dt;
 
     m_window_.clear(bg_color_);
-    if (m_world_.toggles.m_rendering_)
+    if (toggles_.m_rendering_)
     {
         const sf::Vector2f pos = camera_.get_world_mouse_pos();
         m_world_.render(snap, pos);
@@ -185,7 +185,7 @@ void Simulation::render()
 
     m_sim_buffer_.end_read();
 
-    if (!m_world_.toggles.hide_panels)
+    if (!toggles_.hide_panels)
         ImGui::SFML::Render(m_window_);
     m_window_.display();
 }
@@ -209,6 +209,7 @@ void Simulation::manage_updating_frame_rate()
 
 void Simulation::fill_snapshot(SimSnapshot& snap)
 {
+	snap.sim_toggles = toggles_;
     sim_state_.camera_zoom = camera_.get_current_zoom();
     
 	sf::Vector2f mouse_pos = camera_.get_world_mouse_pos();

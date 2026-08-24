@@ -180,7 +180,7 @@ void Cell::flush_deltas()
 	energy = std::clamp(energy + delta_energy, 0.f, max_energy);
 	delta_energy = 0.f;
 
-	//integrity = std::clamp(integrity + delta_integrity, 0.f, max_integrity);
+	integrity = std::clamp(integrity + delta_integrity, 0.f, max_integrity);
 	delta_integrity = 0.f;
 }
 

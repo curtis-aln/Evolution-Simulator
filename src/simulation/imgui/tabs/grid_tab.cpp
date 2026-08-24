@@ -11,13 +11,13 @@ void GridTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
     // ── Protozoa Grid ─────────────────────────────────────────────────────────
     ImGui::BeginChild("GR_cell", { cw, ch }, true);
-    draw_grid_info("Protozoa Grid", snap.cell_grid, snap.toggles.track_spatial_grids);
+    draw_grid_info("Protozoa Grid", snap.cell_grid, snap.world_toggles.track_spatial_grids);
     ImGui::EndChild();
     ImGui::SameLine();
 
     // ── Food Grid ─────────────────────────────────────────────────────────────
     ImGui::BeginChild("GR_food", { cw, ch }, true);
-    draw_grid_info("Food Grid", snap.food_grid, snap.toggles.track_spatial_grids);
+    draw_grid_info("Food Grid", snap.food_grid, snap.world_toggles.track_spatial_grids);
     ImGui::EndChild();
     ImGui::SameLine();
 

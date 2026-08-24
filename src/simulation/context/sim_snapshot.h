@@ -7,7 +7,9 @@
 
 struct SimSnapshot
 {
-    WorldToggles toggles;
+	SimulationToggles sim_toggles;
+	CellManagerToggles cell_toggles;  
+    WorldToggles world_toggles;
     FoodToggles  food_toggles;
 
     // Statistics

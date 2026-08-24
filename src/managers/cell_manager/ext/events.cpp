@@ -52,6 +52,9 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 {
 	switch (cmd.type)
 	{
+	case CommandType::SetCellToggles:
+		toggles_ = cmd.cell_toggles;
+
 		// Spring Natual Selection Modifier
 	case CommandType::SetSpringBreakingForce:
 		Spring::SPRING_BREAK_FORCE = cmd.float_val;

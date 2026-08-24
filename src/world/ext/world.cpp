@@ -29,7 +29,7 @@ void World::reset_world()
 
 	// Resetting the world information and Statistics
 	statistics_ = WorldStatistics{};
-	toggles = WorldToggles{};
+	world_toggles = WorldToggles{};
 }
 
 bool World::handle_mouse_click(const sf::Vector2f mouse_position)
@@ -39,43 +39,40 @@ bool World::handle_mouse_click(const sf::Vector2f mouse_position)
 
 void World::keyboardEvents(const sf::Keyboard::Key& event_key_code)
 {
+	CellManagerToggles& cell_toggles = cell_manager_.toggles_;
     switch (event_key_code)
     {
 	case sf::Keyboard::Key::G: // Toggle the drawing of the cell grid
-        toggles.draw_cell_grid = !toggles.draw_cell_grid;
+        world_toggles.draw_collision_grid = !world_toggles.draw_collision_grid;
         break;
 
 	case sf::Keyboard::Key::C: // Show collisions if not in debug mode else show connections between cells
-        if (toggles.debug_mode)
-            toggles.show_connections = !toggles.show_connections;
+        if (world_toggles.debug_mode)
+            cell_toggles.show_connections = !cell_toggles.show_connections;
         else
-            toggles.toggle_collisions = !toggles.toggle_collisions;
+            world_toggles.toggle_collisions = !world_toggles.toggle_collisions;
         break;
 
 	case sf::Keyboard::Key::F: // Toggle the drawing of the food grid
-        toggles.draw_food_grid = !toggles.draw_food_grid;
-        break;
-
-	case sf::Keyboard::Key::S: // only draw one of the two graphical representations of the cells (outer or inner circles)
-        toggles.simple_mode = !toggles.simple_mode;
+        world_toggles.draw_food_grid = !world_toggles.draw_food_grid;
         break;
 
 	case sf::Keyboard::Key::D: // Toggle debug mode
-        toggles.debug_mode = !toggles.debug_mode;
+        world_toggles.debug_mode = !world_toggles.debug_mode;
         break;
 
 	case sf::Keyboard::Key::T: // Toggle the tracking of statistics, in some cases can speed up simulation
-        toggles.track_statistics = !toggles.track_statistics;
+        world_toggles.track_statistics = !world_toggles.track_statistics;
         break;
 
     case sf::Keyboard::Key::K: // This hides the graphical circles of the selected organism but still shows stats on its body
-        if (toggles.debug_mode)
-            toggles.skeleton_mode = !toggles.skeleton_mode;
+        if (world_toggles.debug_mode)
+            cell_toggles.skeleton_mode = !cell_toggles.skeleton_mode;
         break;
 
 	case sf::Keyboard::Key::B: // Toggle the drawing of bounding boxes around protozoa, only works in debug mode
-        if (toggles.debug_mode)
-            toggles.show_bounding_boxes = !toggles.show_bounding_boxes;
+        if (world_toggles.debug_mode)
+            cell_toggles.show_bounding_boxes = !cell_toggles.show_bounding_boxes;
         break;
 
     default:
@@ -88,8 +85,8 @@ void World::handle_right_click(WorldBorder& spawn_area)
     const auto& center = spawn_area.center_;
     const float rad = statistics_.mouse_radius;
     const float intensity = statistics_.mouse_intensity;
-    const bool  do_cells = toggles.mouse_rem_cells;
-    const bool  do_food = toggles.mouse_rem_food;
+    const bool  do_cells = world_toggles.mouse_rem_cells;
+    const bool  do_food = world_toggles.mouse_rem_food;
 
 
     switch (statistics_.mouse_mode)
@@ -131,17 +128,19 @@ void World::fill_snapshot(SimSnapshot& snapshot)
     sf::FloatRect visible_bounds = calulcate_visible_range();
     snapshot.render.clear_render_data();
 
-    if (!toggles.show_only_newborns)
+    if (!cell_manager_.toggles_.show_only_newborns)
         food_manager_.update_position_data(snapshot.render);
-    cell_manager_.update_position_container(snapshot.render, visible_bounds, toggles.show_only_newborns);
+    cell_manager_.update_position_container(snapshot.render, visible_bounds, cell_manager_.toggles_.show_only_newborns);
 
 
     /* Data that goes to both the renderer and the ImGUI panels */
     snapshot.cell_manager_stats = cell_manager_.get_statistics();
     snapshot.world_stats = get_statistics(); // simulation statistics
     snapshot.food_manager_stats = food_manager_.get_statistics();
-    snapshot.toggles = toggles;
+   
+    snapshot.world_toggles = world_toggles;
     snapshot.food_toggles = food_manager_.toggles_;
+    snapshot.cell_toggles = cell_manager_.toggles_;
 
 	copy_render_data_to_snapshot(snapshot); // render data
 
@@ -173,7 +172,7 @@ void World::copy_spatial_grids_to_snapshot(SimSnapshot& snapshot)
     snapshot.food_grid = get_grid_data(food_grid);
     snapshot.cell_grid = get_grid_data(cell_grid);
 
-    if (toggles.track_spatial_grids)
+    if (world_toggles.track_spatial_grids)
     {
         calculate_spatial_grid_statistics(food_grid, snapshot.food_grid);
         calculate_spatial_grid_statistics(cell_grid, snapshot.cell_grid);
@@ -201,7 +200,7 @@ void World::handle_world_event(SimCommand& cmd)
     switch (cmd.type)
     {
         case CommandType::SetWorldToggles:
-            toggles = cmd.toggles;
+            world_toggles = cmd.world_toggles;
             break;
 
         case CommandType::ResetSimulation:

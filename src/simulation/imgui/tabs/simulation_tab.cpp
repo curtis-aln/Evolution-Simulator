@@ -41,19 +41,19 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::Text("Updating FPS %.1f", snap.sim_stats.updating_frame_rate);
 
     const float bw = (ImGui::GetContentRegionAvail().x - sp) * 0.5f;
-    if (ImGui::Button(snap.toggles.paused ? "Resume [Spc]" : "Pause  [Spc]", { bw, 0.f }))
+    if (ImGui::Button(snap.world_toggles.paused ? "Resume [Spc]" : "Pause  [Spc]", { bw, 0.f }))
     {
-		SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = ctx.toggles };
-		ctx.toggles.paused = !snap.toggles.paused;
+		SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .world_toggles = ctx.world_toggles };
+		ctx.world_toggles.paused = !snap.world_toggles.paused;
 		ctx.push(cmd);
     }
 
     ImGui::SameLine();
     if (ImGui::Button("Step [O]", { -1.f, 0.f }))
     {
-		SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = ctx.toggles };
-		ctx.toggles.m_tick_frame_time = true;
-		ctx.toggles.paused = true; // stepping implies pausing
+		SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .world_toggles = ctx.world_toggles };
+		ctx.world_toggles.m_tick_frame_time = true;
+		ctx.world_toggles.paused = true; // stepping implies pausing
 		ctx.push(cmd);
     }
 
@@ -104,7 +104,7 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::TextDisabled("UI & Camera");
     ImGui::Separator();
 
-    toggle(snap, ctx, "Hide Panels", &WorldToggles::hide_panels, "Q");
+    toggle(snap, ctx, "Hide Panels", &SimulationToggles::hide_panels, "Q");
 
     ImGui::SetNextItemWidth(-1.f);
     if (ImGui::SliderFloat("##uiscale", &m_ui_scale_, 50.f, 200.f, "UI Scale %.0f%%"))
@@ -150,8 +150,8 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
                 SimCommand cmd{ .section = CommandSection::SimulationEvent, .type = CommandType::SetMouseMode, .int_val = m_mouse_mode_ };
                 ctx.push(cmd);
 
-                ctx.toggles.show_influence_radius = (m_mouse_mode_ != -1);
-                SimCommand toggle_cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = ctx.toggles };
+                ctx.world_toggles.show_influence_radius = (m_mouse_mode_ != -1);
+                SimCommand toggle_cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .world_toggles = ctx.world_toggles };
                 ctx.push(toggle_cmd);
             }
 
@@ -178,17 +178,17 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
     if (ImGui::Checkbox("Cells##shared", &m_cells_))
     {
-        SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = ctx.toggles };
-        ctx.toggles.mouse_add_cells = m_cells_;
-        ctx.toggles.mouse_rem_cells = m_cells_;
+        SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .world_toggles = ctx.world_toggles };
+        ctx.world_toggles.mouse_add_cells = m_cells_;
+        ctx.world_toggles.mouse_rem_cells = m_cells_;
         ctx.push(cmd);
     }
     ImGui::SameLine();
     if (ImGui::Checkbox("Food##shared", &m_food_))
     {
-        SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = ctx.toggles };
-        ctx.toggles.mouse_add_food = m_food_;
-        ctx.toggles.mouse_rem_food = m_food_;
+        SimCommand cmd{ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .world_toggles = ctx.world_toggles };
+        ctx.world_toggles.mouse_add_food = m_food_;
+        ctx.world_toggles.mouse_rem_food = m_food_;
         ctx.push(cmd);
     }
 
@@ -264,13 +264,12 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
     ImGui::Columns(2, nullptr, false);
 
     toggle(snap, ctx, "Collisions", &WorldToggles::toggle_collisions, "C");
-    toggle(snap, ctx, "Rendering", &WorldToggles::m_rendering_, "R");
-    toggle(snap, ctx, "Simple Mode", &WorldToggles::simple_mode, "S");
+    toggle(snap, ctx, "Rendering", &SimulationToggles::m_rendering_, "R");
     toggle(snap, ctx, "Debug Mode", &WorldToggles::debug_mode, "D");
 
     ImGui::NextColumn();
 
-    toggle(snap, ctx, "Cell Grid", &WorldToggles::draw_cell_grid, "G");
+    toggle(snap, ctx, "Cell Grid", &WorldToggles::draw_collision_grid, "G");
     toggle(snap, ctx, "Food Grid", &WorldToggles::draw_food_grid, "F");
     toggle(snap, ctx, "Track Stats", &WorldToggles::track_statistics, "T");
 

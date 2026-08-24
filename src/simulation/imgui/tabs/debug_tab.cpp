@@ -14,11 +14,11 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 	ImGui::TextDisabled("Rendering");
 	ImGui::Separator();
 
-	if (ImGui::Checkbox("show only newborns", &ctx.toggles.show_only_newborns))
-		ctx.push({ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = ctx.toggles });
+	if (ImGui::Checkbox("show only newborns", &ctx.cell_toggles.show_only_newborns))
+		ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetCellToggles, .cell_toggles = ctx.cell_toggles });
 	
-	if (ImGui::Checkbox("show grid", &ctx.toggles.show_newborn_grid))
-		ctx.push({ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = ctx.toggles });
+	if (ImGui::Checkbox("show grid", &ctx.cell_toggles.show_newborn_grid))
+		ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetCellToggles, .cell_toggles = ctx.cell_toggles });
 
 
 	ImGui::EndChild();

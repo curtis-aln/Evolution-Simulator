@@ -10,6 +10,15 @@
 #include "world/connection_renderer.h"
 
 
+struct SimulationToggles
+{
+    bool  m_rendering_ = true; // whether to render the simulation (for debugging)
+
+    // Imgui
+    bool  hide_panels = false; // whether to hide ImGui panels (for recording clean screenshots)
+};
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  WorldToggles
 //  Owned by the main thread (ImGui writes, update thread reads).
@@ -17,35 +26,46 @@
 // ─────────────────────────────────────────────────────────────────────────────
 struct WorldToggles
 {
-    bool simple_mode = false;  // only render outer circles of cells
     bool debug_mode = false;  // show per-cell debug info
-    bool skeleton_mode = false;  // only render springs, no cell bodies
     bool paused = true;  // pause the simulation update loop
-    bool draw_cell_grid = false;  // render the cell spatial hash grid
+    
+    bool draw_collision_grid = false;  // render the bodies spatial hash grid
     bool draw_food_grid = false;  // render the food spatial hash grid
-    bool toggle_collisions = true;   // enable/disable cell collision handling
-    bool show_connections = true;   // show spring connections between cells
-    bool show_bounding_boxes = true;  // show protozoa bounding boxes
-    bool track_statistics = true;   // gather per-frame statistics
-	bool m_tick_frame_time = false;  // whether to advance the simulation by one tick (for debugging)
-	bool  m_rendering_ = true; // whether to render the simulation (for debugging)
-	bool  hide_panels = false; // whether to hide ImGui panels (for recording clean screenshots)
-	bool track_spatial_grids = false;  // gather spatial grid statistics each frame
-	bool  open_extinction_window = false; // whether to open the extinction confirmation popup
-    bool run_physics_only = true;
-    bool show_only_newborns = false;
+    
+	// debugging
+    bool m_tick_frame_time = false;  // whether to advance the simulation by one tick (for debugging)
 
-    bool show_newborn_grid = false;
+    // statistics
+    bool track_statistics = true;   // gather per-frame statistics
+    bool track_spatial_grids = false;  // gather spatial grid statistics each frame
+
+    // physics
+    bool run_physics_only = true;
+    bool toggle_collisions = true;   // enable/disable cell collision handling
     
     // Mouse tool — written by UI, read by handle_left_click()
-
     bool  mouse_add_cells = true;
     bool  mouse_add_food = false;
     bool  mouse_rem_cells = true;
     bool  mouse_rem_food = false;
     
-
 	bool show_influence_radius = false; // whether to show the influence radius of the mouse tool
+};
+
+struct CellManagerToggles
+{
+    // integrity damage conditions
+    bool collision_integrity_damage = false;
+    bool spring_stress_integrity_damage = false;
+
+    // newborns
+    bool show_only_newborns = false;
+    bool show_newborn_grid = false;
+
+    // debugging
+    bool skeleton_mode = false;  // only render springs, no cell bodies
+    bool show_connections = true;   // show spring connections between cells
+    bool show_bounding_boxes = true;  // show protozoa bounding boxes
 };
 
 struct FoodToggles

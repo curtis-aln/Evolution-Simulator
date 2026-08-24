@@ -15,6 +15,7 @@ enum class CommandSection
 enum class CommandType
 {
     // SIMULATION EVENT  ──────────────────────────────────────────────────
+    SetSimToggles,
     SetUpdatingFrameRate,    // Sets the frame rate for the updating thread
 	SetRenderingFrameRate,   // Sets the frame rate for the rendering thread
 	SetMouseMode,            // The mouse mode (add, remove, attract, repel)
@@ -28,7 +29,6 @@ enum class CommandType
 
     // WORLD EVENT  ──────────────────────────────────────────────────
     SetWorldToggles,         // sets the world toggles
-    SetFoodToggles,
 	ResetSimulation,         // resets the simulation to its initial state
 
     SetInfluenceRadius,      // set the influence radius of the mouse tool
@@ -41,6 +41,7 @@ enum class CommandType
 
 
     // CELL MANAGER EVENT  ──────────────────────────────────────────────────
+    SetCellToggles,
 	ClearAllProtozoa,       // clears all protozoa from the simulation
 
 	SetMinSpeed,               // set the minimum speed of protozoa
@@ -76,6 +77,7 @@ enum class CommandType
 	SetSpringWorkConst,        // set the spring work constant of a specific spring
 
     // FOOD MANAGER EVENT  ──────────────────────────────────────────────────
+    SetFoodToggles,
 	ClearAllFood, // clears all food from the simulation
 
     SetRandomIntensity,
@@ -95,8 +97,11 @@ struct SimCommand
     CommandSection section;
 	CommandType  type; // identifies which of the following fields to read
     
-    WorldToggles toggles{};
-    FoodToggles  food_toggles{};
+    SimulationToggles sim_toggles;
+    CellManagerToggles cell_toggles;
+    WorldToggles world_toggles;
+    FoodToggles  food_toggles;
+
     MutateParams mutate{};
 
     float        float_val = 0;
@@ -108,8 +113,11 @@ struct SimCommand
 
 struct ImGuiContext
 {
-    WorldToggles& toggles;   // write toggles here freely
+    SimulationToggles& sim_toggles;
+    CellManagerToggles& cell_toggles;
+    WorldToggles& world_toggles;
     FoodToggles&  food_toggles;
+
     std::mutex& cmd_mutex;
     std::queue<SimCommand>& commands;
 

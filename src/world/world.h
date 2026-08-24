@@ -83,7 +83,7 @@ public:
     // ── Toggles — written by ImGui (main thread), read by update thread ──────
     // Safe to read/write without locking while the threads are not simultaneously
     // accessing them; copy into SharedState before handing to the update thread.
-    WorldToggles toggles;
+    WorldToggles world_toggles;
 
     bool dragging = false;
 

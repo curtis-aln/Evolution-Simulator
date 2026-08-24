@@ -11,23 +11,36 @@ void Simulation::init_imGUI()
     std::cout << "ImGUI initialised\n";
 }
 
+template <typename ToggleT>
+void push_if_changed(ImGuiContext& ctx, const ToggleT& copy, const ToggleT& original,
+    CommandSection section, CommandType type, ToggleT SimCommand::* cmd_field)
+{
+    if (std::memcmp(&copy, &original, sizeof(ToggleT)) != 0)
+    {
+        SimCommand cmd{ .section = section, .type = type };
+        cmd.*cmd_field = copy;
+        ctx.push(cmd);
+    }
+}
+
 
 void Simulation::handle_imGUI(const SimSnapshot& snap, float dt)
 {
     sf::Time delta_time = sf::seconds(static_cast<float>(dt));
     ImGui::SFML::Update(m_window_, delta_time);
 
-    WorldToggles toggles_copy = snap.toggles;
+	SimulationToggles  sim_toggles_copy = snap.sim_toggles;
+    WorldToggles world_toggles_copy = snap.world_toggles;
     FoodToggles food_toggles_copy = snap.food_toggles;
-    ImGuiContext ctx{ toggles_copy, food_toggles_copy, m_cmd_mutex, m_commands };
+	CellManagerToggles cell_toggles_copy = snap.cell_toggles;
+    ImGuiContext ctx{ sim_toggles_copy, cell_toggles_copy, world_toggles_copy, food_toggles_copy, m_cmd_mutex, m_commands };
 
     m_control_panel_.draw(snap, ctx, dt);
 
-    if (std::memcmp(&toggles_copy, &snap.toggles, sizeof(WorldToggles)) != 0)
-        ctx.push({ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = toggles_copy });
-
-    if (toggles_copy.open_extinction_window)
-        ImGui::OpenPopup("New Simulation");
+    push_if_changed(ctx, world_toggles_copy, snap.world_toggles, CommandSection::WorldEvent, CommandType::SetWorldToggles, &SimCommand::world_toggles);
+    push_if_changed(ctx, cell_toggles_copy, snap.cell_toggles, CommandSection::CellManagerEvent, CommandType::SetCellToggles, &SimCommand::cell_toggles);
+    push_if_changed(ctx, food_toggles_copy, snap.food_toggles, CommandSection::FoodManagerEvent, CommandType::SetFoodToggles, &SimCommand::food_toggles);
+    push_if_changed(ctx, sim_toggles_copy, snap.sim_toggles, CommandSection::SimulationEvent, CommandType::SetSimToggles, &SimCommand::sim_toggles);
 }
 
 

@@ -119,6 +119,8 @@ class CellManager: protected CellManagerSettings
 	bool spawn_immune = false;
 
 public:
+	CellManagerToggles toggles_{};
+
 	uint16_t max_size = static_cast<uint16_t>(10000);
 	FixedSpan<cell_idx, uint16_t> select_indexes{ max_size };
 	

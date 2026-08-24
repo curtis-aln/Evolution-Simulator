@@ -35,10 +35,10 @@ void Simulation::handle_right_release()
 void Simulation::handle_pause_toggle()
 {
 	/* toggle flip paused */
-	m_world_.toggles.paused = !m_world_.toggles.paused;
+	m_world_.world_toggles.paused = !m_world_.world_toggles.paused;
 
-	if (!m_world_.toggles.paused)
-		m_world_.toggles.m_tick_frame_time = false;
+	if (!m_world_.world_toggles.paused)
+		m_world_.world_toggles.m_tick_frame_time = false;
 }
 
 void Simulation::handle_keyboard_events(const sf::Keyboard::Key& event_key_code)
@@ -47,11 +47,11 @@ void Simulation::handle_keyboard_events(const sf::Keyboard::Key& event_key_code)
 	{
 	case sf::Keyboard::Key::Escape: running = false;              break;
 	case sf::Keyboard::Key::Space:  handle_pause_toggle();        break;
-	case sf::Keyboard::Key::R:      m_world_.toggles.m_rendering_ = !m_world_.toggles.m_rendering_; break;
-	case sf::Keyboard::Key::Q:      m_world_.toggles.hide_panels = !m_world_.toggles.hide_panels; break;
+	case sf::Keyboard::Key::R:      toggles_.m_rendering_ = !toggles_.m_rendering_; break;
+	case sf::Keyboard::Key::Q:      toggles_.hide_panels = !toggles_.hide_panels; break;
 	case sf::Keyboard::Key::O:      
-		m_world_.toggles.m_tick_frame_time = true;
-		m_world_.toggles.paused = true;
+		m_world_.world_toggles.m_tick_frame_time = true;
+		m_world_.world_toggles.paused = true;
 		break;
 	default: break;
 	}
@@ -109,6 +109,7 @@ void Simulation::handle_events()
 
 void Simulation::handle_simulation_event(SimCommand& cmd)
 {
+	std::cout << "Simulation::handle_simulation_event runs\n";
 	switch (cmd.type)
 	{
 	case CommandType::SetUpdatingFrameRate:
@@ -131,7 +132,7 @@ void Simulation::handle_simulation_event(SimCommand& cmd)
 		break;
 
 	case CommandType::SetWorldToggles:
-		m_world_.toggles = cmd.toggles;
+		m_world_.world_toggles = cmd.world_toggles;
 		break;
 
 	case CommandType::SetToSimulationTab:

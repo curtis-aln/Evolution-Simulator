@@ -173,7 +173,7 @@ void OrganismTab::draw_overview(const SimSnapshot& snap, ImGuiContext& ctx, cons
     ImGui::Separator();
 
 	toggle(snap, ctx,"Debug Mode", &WorldToggles::debug_mode, "D");
-    toggle(snap, ctx, "Bounding Boxes", &WorldToggles::show_bounding_boxes, "B");
+    toggle(snap, ctx, "Bounding Boxes", &CellManagerToggles::show_bounding_boxes, "B");
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -77,7 +77,7 @@ private:
 	void render_influence_radii(const SimSnapshot& snapshot)
 	{
 		// renders a circle around the mouse to show its influence radius when adding or removing entities
-		if (!snapshot.toggles.show_influence_radius)
+		if (!snapshot.world_toggles.show_influence_radius)
 			return;
 
 		sf::Vector2f mouse_pos = {snapshot.sim_stats.mouse_pos_x, snapshot.sim_stats.mouse_pos_y};
@@ -120,13 +120,13 @@ private:
 	void render_spatial_grids(const SimSnapshot& snapshot, const sf::Vector2f mouse_pos)
 	{
 		constexpr float query_radius = 500.f; 
-		if (snapshot.toggles.draw_food_grid)
+		if (snapshot.world_toggles.draw_food_grid)
 			food_grid_renderer_.render(*m_window_, mouse_pos, query_radius);
 
-		if (snapshot.toggles.draw_cell_grid)
+		if (snapshot.world_toggles.draw_collision_grid)
 			collision_grid_renderer_.render(*m_window_, mouse_pos, query_radius);
 
-		if (snapshot.toggles.show_newborn_grid)
+		if (snapshot.cell_toggles.show_newborn_grid)
 			newborn_grid_renderer_.render(*m_window_, mouse_pos, query_radius);
 	}
 
@@ -152,51 +152,8 @@ private:
 			inner_circle_renderer_.render();
 		}
 
-		// Cells are made from two circles, an inner circle and an outer circle. The Outer circle is only rendered if simple mode is disabled.
-		if (!snapshot.toggles.simple_mode) // 0.05
-		{
-			outer_radii_.resize(size);
-			outer_positions_.resize(size);
-
-			for (int i = 0; i < size; ++i)
-			{
-				auto pos = snapshot.render.positions[i];
-				auto vel = snapshot.render.velocities[i];
-				const float base_radius = snapshot.render.radii[i];
-				const float rad = base_radius * GraphicalSettings::cell_outline_thickness;
-				const float margin = rad - base_radius; // available slack in the outline ring
-
-				// Ease-out: strong response near the centre (t≈0), tapering to zero
-				// additional movement as the offset nears the outer edge of the ring (t≈1).
-				auto ease_out = [margin](float v) -> float
-					{
-						if (margin <= 0.f)
-							return 0.f;
-
-						const float sign = (v < 0.f) ? -1.f : 1.f;
-						const float t = std::clamp(std::abs(v) / margin, 0.f, 1.f);
-						const float eased = 1.f - (1.f - t) * (1.f - t); // 1 - (1-t)^2
-						return sign * eased * margin;
-					};
-
-				const float scaled_x = ease_out(vel.x);
-				const float scaled_y = ease_out(vel.y);
-
-				outer_positions_[i] = pos - sf::Vector2f{ scaled_x, scaled_y };
-				outer_radii_[i] = rad;
-			}
-
-			outer_circle_renderer_.set_size(size);
-			outer_circle_renderer_.set_colors(snapshot.render.outer_colors);
-			outer_circle_renderer_.set_positions(outer_positions_);
-			outer_circle_renderer_.set_radii(outer_radii_);
-
-			outer_circle_renderer_.update();
-			outer_circle_renderer_.render();
-		}
-
 		// If a protozoa is selected and debug mode is enabled, draw additional debug information for the selected protozoa.
-		if (snapshot.protozoa_tracker.is_active && snapshot.toggles.debug_mode)
+		if (snapshot.protozoa_tracker.is_active && snapshot.world_toggles.debug_mode)
 		{
 			draw_protozoa_debug(snapshot);
 		}
@@ -206,7 +163,7 @@ private:
 	void render_springs(const SimSnapshot& snapshot)
 	{
 		const float zoom = snapshot.sim_stats.camera_zoom;
-		if (zoom < 0.012f || snapshot.toggles.show_only_newborns)
+		if (zoom < 0.012f || snapshot.cell_toggles.show_only_newborns)
 			return;
 
 		bool no_curves = zoom < 0.08f;
@@ -221,11 +178,12 @@ private:
 		if (protozoa.is_active == false)
 			return;
 
-		if (snapshot.toggles.skeleton_mode)
+		if (snapshot.cell_toggles.skeleton_mode)
 			draw_cell_outlines(protozoa);
 
 
-		if (snapshot.toggles.show_bounding_boxes)
+
+		if (snapshot.cell_toggles.show_bounding_boxes)
 			draw_protozoa_bounding_box(protozoa.bounds, *m_window_);
 
 		draw_cell_physical_information(snapshot);

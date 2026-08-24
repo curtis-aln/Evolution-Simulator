@@ -1,6 +1,7 @@
 #pragma once
 #include "../../context/sim_snapshot.h"
 #include "../../context/sim_command.h"
+#include <optional>
 
 
 struct ITab
@@ -11,26 +12,38 @@ struct ITab
     // toggles is a mutable COPY you can write into freely
     virtual void draw(const SimSnapshot& snap, ImGuiContext& ctx) = 0;
 
+    // ── Toggle checkboxes, one overload per toggle struct ──────────────────
+    // Overload resolution picks the right one from the type of `field`
+    // (e.g. &WorldToggles::paused vs &FoodToggles::food_mitosis), so call
+    // sites don't need to know or care which one they're hitting.
+
     void toggle(const SimSnapshot& snap, ImGuiContext& ctx, const char* label, bool WorldToggles::* field, const char* shortcut = nullptr)
     {
-        bool val = snap.toggles.*field;
-        if (ImGui::Checkbox(label, &val))
-        {
-            WorldToggles new_toggles = snap.toggles;
-            new_toggles.*field = val;
-            ctx.push({ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .toggles = new_toggles });
-        }
-        if (shortcut)
-        {
-            ImGui::SameLine();
-            ImGui::TextDisabled("[%s]", shortcut);
-        }
+        if (auto updated = checkbox_toggle(snap.world_toggles, label, field, shortcut))
+            ctx.push({ .section = CommandSection::WorldEvent, .type = CommandType::SetWorldToggles, .world_toggles = *updated });
     }
 
+    void toggle(const SimSnapshot& snap, ImGuiContext& ctx, const char* label, bool CellManagerToggles::* field, const char* shortcut = nullptr)
+    {
+        if (auto updated = checkbox_toggle(snap.cell_toggles, label, field, shortcut))
+            ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetCellToggles, .cell_toggles = *updated });
+    }
+
+    void toggle(const SimSnapshot& snap, ImGuiContext& ctx, const char* label, bool FoodToggles::* field, const char* shortcut = nullptr)
+    {
+        if (auto updated = checkbox_toggle(snap.food_toggles, label, field, shortcut))
+            ctx.push({ .section = CommandSection::FoodManagerEvent, .type = CommandType::SetFoodToggles, .food_toggles = *updated });
+    }
+
+    void toggle(const SimSnapshot& snap, ImGuiContext& ctx, const char* label, bool SimulationToggles::* field, const char* shortcut = nullptr)
+    {
+        if (auto updated = checkbox_toggle(snap.sim_toggles, label, field, shortcut))
+            ctx.push({ .section = CommandSection::SimulationEvent, .type = CommandType::SetSimToggles, .sim_toggles = *updated });
+    }
 
     // Draws a single button that is visually "pressed" when current_value == option_value,
-// and on click pushes a SimCommand carrying option_value in the given SimCommand field.
-// ValueT must match the type of `field` (int, float, bool, or a scoped enum stored as int).
+    // and on click pushes a SimCommand carrying option_value in the given SimCommand field.
+    // ValueT must match the type of `field` (int, float, bool, or a scoped enum stored as int).
     template <typename ValueT>
     bool mode_button(ImGuiContext& ctx, CommandSection section, CommandType type,
         ValueT SimCommand::* field, const char* label,
@@ -88,16 +101,39 @@ struct ITab
 
     void slider_float_cmd(ImGuiContext& ctx, const char* label, float current, float min, float max,
         const char* fmt, CommandSection section, CommandType type)
+    {
+        float val = current;
+        if (ImGui::SliderFloat(label, &val, min, max, fmt))
         {
-            float val = current;
-            if (ImGui::SliderFloat(label, &val, min, max, fmt))
-            {
-                SimCommand cmd;
-                cmd.section = section;
-                cmd.type = type;
-                cmd.float_val = val;
-                ctx.push(cmd);
-            }
-        };
+            SimCommand cmd;
+            cmd.section = section;
+            cmd.type = type;
+            cmd.float_val = val;
+            ctx.push(cmd);
+        }
+    };
 
+private:
+    // Shared checkbox+shortcut logic for all four toggle() overloads.
+    // Returns the updated struct only if the checkbox was actually clicked,
+    // so callers can tell "no change" apart from "changed to false".
+    template <typename ToggleT>
+    std::optional<ToggleT> checkbox_toggle(const ToggleT& current, const char* label, bool ToggleT::* field, const char* shortcut)
+    {
+        bool val = current.*field;
+        const bool changed = ImGui::Checkbox(label, &val);
+
+        if (shortcut)
+        {
+            ImGui::SameLine();
+            ImGui::TextDisabled("[%s]", shortcut);
+        }
+
+        if (!changed)
+            return std::nullopt;
+
+        ToggleT updated = current;
+        updated.*field = val;
+        return updated;
+    }
 };

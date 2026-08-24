@@ -24,6 +24,8 @@ inline static constexpr int max_iterations = 100000; // Set a maximum number of 
 
 class Simulation : SimulationSettings
 {
+	SimulationToggles toggles_{};
+
 	sf::Color bg_color_ = Random::rand_val_in_vector(bg_colors);
     static sf::VideoMode getAdjustedVideoMode()
     {
