@@ -102,12 +102,15 @@ void CellManager::update_cell(Cell* cell)
 
 void CellManager::impulse_tax_cell(Cell* cell, const float impulse)
 {
-	if (impulse < impulse_damage_thresh || spawn_immune)
+	static constexpr float max_single_hit_integrity_fraction = 0.3f;
+	if (impulse < impulse_damage_thresh || spawn_immune || !toggles_.collision_integrity_damage_)
 		return;
-	
+
 	float damage = -(impulse - impulse_damage_thresh) * impulse_damage_multiplier;
+	damage = std::max(damage, -cell->get_integrity() * max_single_hit_integrity_fraction);
+
 	cell->change_integrity(damage);
-	cell->cumulative_collision_damage_ += abs(damage);
+	cell->cumulative_collision_damage_ += std::abs(damage);
 }
 
 void CellManager::collect_connection_requests()
@@ -179,7 +182,7 @@ void CellManager::update_position_container(RenderData& rend_data, const sf::Flo
 
 		// The reason why we cant use indexing to fill this array is because we dont know how many bodies are not active,
 		// so it messes with the indexing and leads to null connections
-		rend_data.spring_connections.push_back({
+ 		rend_data.spring_connections.push_back({
 			get_cell_pos(spring->cell_A_id),
 			get_cell_pos(spring->cell_B_id),
 			min_dist,
@@ -249,7 +252,8 @@ void CellManager::update_springs(bool immune)
 		Cell* cell_a = all_cells_.at(spring->cell_A_id);
 		Cell* cell_b = all_cells_.at(spring->cell_B_id);
 
-		spring->update_organics(*cell_a, *cell_b, immune);
+		bool true_immune = immune || !toggles_.spring_stress_integrity_damage;
+		spring->update_organics(*cell_a, *cell_b, true_immune);
 
 		// if the spring has broken on its own
 		if (spring->is_spring_broken())
@@ -262,7 +266,9 @@ void CellManager::update_springs(bool immune)
 		Body* body_a = bodies_->at(cell_a->body_id_);
 		Body* body_b = bodies_->at(cell_b->body_id_);
 
-		spring->update_physics(body_a->position_, body_a->velocity_, body_b->position_, body_b->velocity_, immune);
+		bool  disable_length_breakage = immune || !toggles_.spring_too_long_breakage;
+		bool   disable_force_breakage = immune || !toggles_.spring_too_much_force_breakage;
+		spring->update_physics(body_a->position_, body_a->velocity_, body_b->position_, body_b->velocity_, disable_length_breakage, disable_force_breakage);
 		body_a->accelerate(spring->movement_vector);
 		body_b->accelerate(-spring->movement_vector);
 		

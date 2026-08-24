@@ -12,7 +12,7 @@ struct SpringResult { float work_done; float force_magnitude; bool broken; };
 struct Spring : SpringSettings
 {
 	// These parameters determine the organics of the spring
-	inline static float SPRING_BREAK_FORCE = 0.f;
+	inline static float SPRING_BREAK_FORCE = 100000.f;
 	inline static float SPRING_BREAK_LENGTH = 0.f;
 	inline static float SPRING_DAMAGE_THRESH = 0.f;
 	inline static float SPRING_WORK_CONST = 0.f;
@@ -32,6 +32,7 @@ public:
 	uint32_t cell_B_id{};
 
 	uint16_t internal_clock_{};
+	float death_chance_ = 0.f; // zero means no chance of breaking, 1 means guaranteed breakage on the first frame
 
 	float work_done = 0.f;
 	float rest_length = 0.f;
@@ -74,9 +75,11 @@ public:
 		genome.amplitude = 0.f;
 		genome.spring_const = 0.f;
 		genome.damping = 0.f;
-		genome.nutrient_transfer_rate = 0.f;   // <-- the actual leak
+		genome.nutrient_transfer_rate = 0.f;
 
 		movement_vector = { 0, 0 };
+
+		death_chance_ = 0.f;
 	}
 
 	void break_spring()
@@ -95,14 +98,17 @@ public:
 	}
 
 	// returns a movement vector
-	void update_physics(const sf::Vector2f& pos_a, const sf::Vector2f& vel_a, const sf::Vector2f& pos_b, const sf::Vector2f& vel_b, bool immune)
+	void update_physics(
+		const sf::Vector2f& pos_a, const sf::Vector2f& vel_a, 
+		const sf::Vector2f& pos_b, const sf::Vector2f& vel_b, 
+		bool disable_length_breakage, bool disable_force_breakage)
 	{
 		internal_clock_++;
 
 		const sf::Vector2f dir = pos_b - pos_a;
 		const float length_squared = dir.x * dir.x + dir.y * dir.y;
 
-		if (length_squared > SPRING_BREAK_LENGTH * SPRING_BREAK_LENGTH && !immune)
+		if (length_squared > SPRING_BREAK_LENGTH * SPRING_BREAK_LENGTH && !disable_length_breakage)
 		{
 			break_spring();
 			movement_vector = { 0, 0 };
@@ -139,24 +145,30 @@ public:
 		stress = force_magnitude / SPRING_BREAK_FORCE;
 
 		// Force-based break (complements your existing length-based break)
-		if (force_magnitude > SPRING_BREAK_FORCE && !immune)
+		if (force_magnitude > SPRING_BREAK_FORCE && !disable_force_breakage)
 			break_spring();
 	}
 
-	void update_organics(Cell& cell_a, Cell& cell_b, bool is_immune)
+	void update_organics(Cell& cell_a, Cell& cell_b, bool disable_stress_damage)
 	{
+		if (Random::rand01_float() < death_chance_)
+		{
+			broken = true;
+			return;
+		}
+
 		if (!cell_a.is_alive() || !cell_b.is_alive())
 		{
 			broken = true;
 			return;
 		}
 
-		if (stress > SPRING_DAMAGE_THRESH && !is_immune)
+		if (stress > SPRING_DAMAGE_THRESH && !disable_stress_damage)
 		{
 			update_integrity(cell_a, cell_b);
 		}
 
-		transfer_nutrients(cell_a.nutrients_, cell_b.nutrients_);
+		transfer_nutrients(cell_a, cell_b);
 
 		float energy_cost = -work_done / 2.f;
 		cell_a.change_energy(energy_cost);
@@ -184,32 +196,68 @@ private:
 
 	// takes in the nutrients of cell a and cell b and transfers between them,
 // respecting max_nutrients caps and applying a fixed % loss per transfer
-	void transfer_nutrients(float& nutrients_a, float& nutrients_b)
+	// transfer_nutrients() — full new body
+	void transfer_nutrients(Cell& cell_a, Cell& cell_b)
 	{
 		const float rate = std::max(genome.nutrient_transfer_rate, 0.0f);
 
 		if (rate <= 0.0f)
 			return;
 
-		// figure out sender/receiver once, symmetrically
-		float& sender = (nutrients_b > nutrients_a) ? nutrients_b : nutrients_a;
-		float& receiver = (nutrients_b > nutrients_a) ? nutrients_a : nutrients_b;
+		float& nutrients_a = cell_a.nutrients_;
+		float& nutrients_b = cell_b.nutrients_;
 
-		const float diff = sender - receiver;
-		if (diff <= 0.0f)
-			return; // equal, nothing to do
+		// "recently reproduced" == still inside its post-reproduction cooldown window
+		const bool a_reproduced = !cell_a.check_repro_cooldown();
+		const bool b_reproduced = !cell_b.check_repro_cooldown();
 
-		const float space = CellSettings::max_nutrients - receiver;
+		float* sender;
+		float* receiver;
+		bool priority_transfer = false;
+
+		if (a_reproduced != b_reproduced)
+		{
+			// exactly one cell has recently reproduced -> prioritise nutrients toward the one that hasn't
+			float* desired_sender = a_reproduced ? &nutrients_a : &nutrients_b;
+			float* desired_receiver = a_reproduced ? &nutrients_b : &nutrients_a;
+
+			// what would the plain nutrient-gradient logic pick?
+			float* gradient_sender = (nutrients_b > nutrients_a) ? &nutrients_b : &nutrients_a;
+
+			sender = desired_sender;
+			receiver = desired_receiver;
+
+			// if gradient logic isn't already sending this way, we're overriding it -
+			// skip the diff>0 gradient check below, since the reproduced cell may well
+			// have fewer nutrients than the cell we're prioritising
+			priority_transfer = (gradient_sender != desired_sender);
+		}
+		else
+		{
+			sender = (nutrients_b > nutrients_a) ? &nutrients_b : &nutrients_a;
+			receiver = (nutrients_b > nutrients_a) ? &nutrients_a : &nutrients_b;
+		}
+
+		const float diff = *sender - *receiver;
+		if (diff <= 0.0f && !priority_transfer)
+			return;
+
+		const float space = CellSettings::max_nutrients - *receiver;
 		if (space <= 0.0f)
-			return; // receiver is full, nothing can arrive anyway
+			return;
 
-		// don't send more than: the rate allows, what's needed to reach equilibrium,
-		// or what the receiver can actually hold once loss is applied
-		const float send_amount = std::min({ rate, sender, diff, space / (1.0f - nutrients_transfer_loss) });
+		// never drain the sender below the protected floor - this is what lets the priority
+		// transfer above run without starving whichever cell just reproduced
+		const float sendable = *sender;
+		
+		const float send_amount = priority_transfer
+			? std::min({ rate, sendable, space / (1.0f - nutrients_transfer_loss) })
+			: std::min({ rate, sendable, diff, space / (1.0f - nutrients_transfer_loss) });
+
 		const float receive_amount = send_amount * (1.0f - nutrients_transfer_loss);
 
-		sender -= send_amount;
-		receiver += receive_amount;
+		*sender -= send_amount;
+		*receiver += receive_amount;
 	}
 
 	float calculate_rest_length(const int internal_clock)

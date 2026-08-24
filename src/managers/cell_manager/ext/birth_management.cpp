@@ -140,7 +140,7 @@ void CellManager::apply_reproduction_requests()
 		parent_cell->create_offspring(parent_body, offspring_cell, offspring_body, true);
 		
 		// connecting the parent and childS
-		create_weak_spring_connection(parent_cell->id_, offspring_cell->id_);
+		create_temporary_spring_connection(parent_cell->id_, offspring_cell->id_);
 
 		// small random chance that this offspring has its own cell addition
 		if (Random::rand01_float() < offspring_cell->add_cell_chance)
@@ -152,7 +152,7 @@ void CellManager::apply_reproduction_requests()
 	cell_birth_requests.clear(); 
 }
 
-void CellManager::create_weak_spring_connection(const cell_idx parent_id, const cell_idx offspring_id)
+void CellManager::create_temporary_spring_connection(const cell_idx parent_id, const cell_idx offspring_id)
 {
 	// A weak breakable connection between the parent and child is made to keep the child around
 	// for the full reproductive process
@@ -161,10 +161,21 @@ void CellManager::create_weak_spring_connection(const cell_idx parent_id, const 
 		return;
 	Spring* spring = all_springs_.at(new_spring_id);
 
-	// Setting the spring attributes
-	spring->genome.spring_const = 0.00005f;
-	spring->genome.amplitude = 0.4f;
-	spring->genome.damping = 0.0005;
+	// Setting the spring attributes - it should keep a near constant length with no oscillation
+	constexpr float spring_death_chance = 1.f / 300.f; // 1 in 300 chance of breaking per frame
+	constexpr float temporary_spring_const = 0.1f;
+	constexpr float  temporary_spring_damping = 0.5f;
+	constexpr float temporary_spring_nutrient_rate = 0.f;
+
+	spring->death_chance_ = spring_death_chance;
+	
+	spring->genome.frequency = 0.f;      // no oscillation
+	spring->genome.amplitude = 0.f;      // no oscillation -> vertical_shift alone sets rest_length
+	spring->genome.vertical_shift = 0.2f;
+	spring->genome.spring_const = temporary_spring_const;
+	spring->genome.damping = temporary_spring_damping;   
+
+	spring->genome.nutrient_transfer_rate = temporary_spring_nutrient_rate;
 }
 
 
@@ -239,6 +250,9 @@ void CellManager::apply_matter_birth_requests()
 		body->position_ = req.position;
 
 		CellMatter* cell_matter = all_cell_matter_.emplace(true, true); // TODO create a creation Function;
+		if (cell_matter == nullptr)
+			std::cout << "Failed to create cell matter for birth request\n";
+		
 		cell_matter->reset_cell_matter();
 		cell_matter->cell_to_matter(body);
 	}

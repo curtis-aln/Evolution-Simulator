@@ -10,7 +10,7 @@ void FoodManager::food_reproduction_function()
 
 	if (toggles_.spawn_random_food)
 	{
-		if (Random::rand01_float() < 0.35f)
+		if (Random::rand01_float() < 0.25f)
 			create_food(statistics_.food_random_spawn_intensity);
 	}
 

@@ -33,6 +33,12 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 		ctx.push(cmd);
 	}
 	ImGui::Text("delta min speed (DMS): %.3f", CellManagerSettings::delta_min_speed);
+	ImGui::Spacing();
+	ImGui::Separator();
+	toggle(snap, ctx, "collision integrity damage", &CellManagerToggles::collision_integrity_damage_);
+	toggle(snap, ctx, "spring stress integrity damage", &CellManagerToggles::spring_stress_integrity_damage);
+	toggle(snap, ctx, "spring too long breakage", &CellManagerToggles::spring_too_long_breakage);
+	toggle(snap, ctx, "spring too much force breakage", &CellManagerToggles::spring_too_much_force_breakage);
 
 	ImGui::EndChild();
 }

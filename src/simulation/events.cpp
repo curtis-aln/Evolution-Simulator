@@ -109,7 +109,6 @@ void Simulation::handle_events()
 
 void Simulation::handle_simulation_event(SimCommand& cmd)
 {
-	std::cout << "Simulation::handle_simulation_event runs\n";
 	switch (cmd.type)
 	{
 	case CommandType::SetUpdatingFrameRate:

@@ -25,12 +25,12 @@ void CellManager::collect_cell_death_requests()
 
 void CellManager::speed_tax_cell(Cell* cell)
 {
-	sf::Vector2f vel = bodies_->at(cell->body_id_)->velocity_;
-	float speed_sq = vel.lengthSquared();
-	float min_speed_sq = statistics_.min_speed * statistics_.min_speed;
-
-	if (speed_sq < min_speed_sq)
-		cell->change_energy(speed_energy_tax);
+	float speed = bodies_->at(cell->body_id_)->velocity_.length();
+	if (speed < statistics_.min_speed)
+	{
+		float deficit_ratio = 1.f - (speed / statistics_.min_speed); // 0 at threshold, 1 at rest
+		cell->change_energy(speed_energy_tax * deficit_ratio);
+	}
 }
 
 void CellManager::remove_cell(cell_idx cell_id)
@@ -59,7 +59,7 @@ void CellManager::apply_cell_death_requests()
 	{
 		sf::Vector2f pos = get_cell_pos(cell_id);
 		
-		matter_birth_requests.push_back({cell_id, pos});
+		matter_birth_requests.push_back({pos});
 		remove_cell(cell_id);
 	}
 	cell_death_requests_.clear();

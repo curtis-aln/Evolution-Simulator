@@ -16,10 +16,10 @@ static struct BaseConstants
 {
     static constexpr float mutation_rate_range = 0.075f;
 
-    inline static Range init_mutation_range_spread = { 0.02f, 0.3f };
+    inline static Range init_mutation_range_spread = { 0.01f, 0.2f };
 
     inline static Range gaussian_const_limits = { 0.05f, 1.5f };   // hard evolutionary bounds
-    inline static Range init_gaussian_const_spread = { 0.15f, 0.5f };  // spawn range
+    inline static Range init_gaussian_const_spread = { 0.05f, 0.15f };  // spawn range
 };
 
 struct GenomeBase : protected BaseConstants
@@ -235,7 +235,7 @@ struct HardConstants
 
     inline static float radius_mutation_multiplier = 5.f;
     inline static float newborn_search_radius_multiplier = 5.f;
-    inline static float friction_multiplier = 0.5f;
+    inline static float friction_multiplier = 0.95f;
 };
 
 struct CellGenome : GenomeBase, HardConstants
@@ -246,7 +246,7 @@ struct CellGenome : GenomeBase, HardConstants
     // reproductive genes
     float birth_energy_thresh = 0.90f;
     float birth_integrity_thresh = 0.25f;
-    float birth_nutrients_thresh = 0.0f;
+    float birth_nutrients_thresh = 0.1f;
 
     float offspring_energy_to_give = 0.25f;
     float connective_spring_spring_const = 0.1f;
@@ -272,9 +272,9 @@ struct CellGenome : GenomeBase, HardConstants
 
         rand_in_range(radius, Limit::radius);
           
-		rand_in_range(birth_energy_thresh, { 0.8f, 1.f });
+		rand_in_range(birth_energy_thresh, { 0.8f, .85f });
 		rand_in_range(birth_integrity_thresh, { 0.f, 0.1f });
-		rand_in_range(birth_nutrients_thresh, { 0.f, 0.f });
+		rand_in_range(birth_nutrients_thresh, { 0.f, 0.1f });
 
 		rand_in_range(offspring_energy_to_give, { 0.f, 1.f });
 		rand_in_range(connective_spring_spring_const, S_Const::spring_const);

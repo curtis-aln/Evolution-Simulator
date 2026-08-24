@@ -137,7 +137,7 @@ private:
 
 		// The springs are rendered first, so they appear behind the cells in the rendering order.
 		render_springs(snapshot);
-
+		
 		const float zoom = snapshot.sim_stats.camera_zoom;
 		bool simplify_colors = zoom < 0.05f;
 

@@ -3,8 +3,8 @@
 
 struct CellMatter
 {
-	static constexpr float    friction = 0.85f;
-	static constexpr uint16_t max_time_to_live = 8'000; // frames
+	static constexpr float    friction = 0.8f;
+	static constexpr uint16_t max_time_to_live = 13'000; // frames
 
 	static constexpr uint8_t max_radius = 70;
 	static constexpr uint8_t min_radius = 40;
@@ -37,6 +37,7 @@ struct CellMatter
 	void reset_cell_matter()
 	{
 		time_alive = 0;
+		dead = false;
 	}
 
 	void cell_to_matter(Body* body)

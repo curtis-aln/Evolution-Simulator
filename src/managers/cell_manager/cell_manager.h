@@ -56,7 +56,6 @@ struct BirthRequest
 
 struct MatterBirthRequest
 {
-	uint32_t parent_cell_id;
 	sf::Vector2f position;
 };
 
@@ -208,7 +207,7 @@ private: // only functions this class can access
 	// birth - springs
 	int32_t create_spring(const uint32_t cell_a_id, const uint32_t cell_b_id);
 	void create_weak_offspring(uint32_t parent_id);
-	void create_weak_spring_connection(const cell_idx parent_id, const cell_idx offspring_id);
+	void create_temporary_spring_connection(const cell_idx parent_id, const cell_idx offspring_id);
 	void apply_matter_birth_requests();
 	void apply_connection_requests();
 

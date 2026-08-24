@@ -55,8 +55,11 @@ struct WorldToggles
 struct CellManagerToggles
 {
     // integrity damage conditions
-    bool collision_integrity_damage = false;
-    bool spring_stress_integrity_damage = false;
+    bool collision_integrity_damage_ = true;
+    bool spring_stress_integrity_damage = true;
+
+	bool spring_too_long_breakage = true;
+	bool spring_too_much_force_breakage = false;
 
     // newborns
     bool show_only_newborns = false;
