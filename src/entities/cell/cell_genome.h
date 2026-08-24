@@ -14,21 +14,22 @@ struct Range
 // ---------------------------------------------------------------------------
 static struct BaseConstants
 {
-    static constexpr float mutation_rate_rate = 0.1f;
-    static constexpr float mutation_rate_range = 0.01f;
+    static constexpr float mutation_rate_range = 0.075f;
 
-    inline static Range init_mutation_rate_spread = { 0.5f, 1.f };
-    inline static Range init_mutation_range_spread = { 0.05f, 1.f };
+    inline static Range init_mutation_range_spread = { 0.02f, 0.3f };
+
+    inline static Range gaussian_const_limits = { 0.05f, 1.5f };   // hard evolutionary bounds
+    inline static Range init_gaussian_const_spread = { 0.15f, 0.5f };  // spawn range
 };
 
 struct GenomeBase : protected BaseConstants
 {
-    float mutation_rate, mutation_range;
+    float guassian_const, mutation_range;
     uint32_t generation = 0;
 
     GenomeBase()
     {
-        rand_in_range(mutation_rate, init_mutation_rate_spread);
+        rand_in_range(guassian_const, init_gaussian_const_spread);
         rand_in_range(mutation_range, init_mutation_range_spread);
     }
 
@@ -40,21 +41,43 @@ protected:
         return limits.clamp(val + Random::rand_range(-range, range));
     }
 
+    // ES-style Gaussian mutation. Unlike maybe_mutate, this never "skips" —
+    // it always perturbs val, drawing the offset from a normal distribution
+    // with std-dev = range * gaussian_const, instead of a uniform draw gated by rate.
+    // Most nudges land close to 0; large jumps are rare but not impossible.
+    float maybe_mutate_gaussian(float val, Range limits, float range, float gaussian_const) const
+    {
+        const float sigma = range * gaussian_const;
+        if (sigma <= 0.f)
+            return val;
+
+        return limits.clamp(val + sample_gaussian() * sigma);
+    }
+
     void mutate_meta()
     {
         auto nudge = [](float v, float range) {
-            return v + Random::rand_range(-range, range);
-            };
+            return v + Random::rand_range(-range, range);};
 
-        if (Random::rand01_float() < mutation_rate_rate)
-            mutation_rate = nudge(mutation_rate, mutation_rate_range);
-        if (Random::rand01_float() < mutation_rate_rate)
-            mutation_range = nudge(mutation_range, mutation_rate_range);
+        guassian_const = nudge(guassian_const, mutation_rate_range);
+        mutation_range = nudge(mutation_range, mutation_rate_range);
     }
 
     void rand_in_range(float& val, const Range& range)
     {
         val = Random::rand_range(range.min, range.max);
+    }
+
+
+private:
+    // Box-Muller transform: converts two uniform [0,1) samples into one
+    // standard-normal sample (mean 0, std-dev 1).
+    static float sample_gaussian()
+    {
+        const float u1 = std::max(Random::rand01_float(), 1e-7f); // avoid log(0)
+        const float u2 = Random::rand01_float();
+        constexpr float two_pi = 6.28318530718f;
+        return std::sqrt(-2.f * std::log(u1)) * std::cos(two_pi * u2);
     }
 };
 
@@ -74,13 +97,13 @@ struct SpringGeneticConstraints
 
 struct SpringInitialSpawnRanges
 {
-    inline static Range amplitude = { 0.3f,         0.5f };
-    inline static Range frequency = { 1.f / 30.f,  1.f / 2.f };
+    inline static Range amplitude = { 0.1f,         0.7f };
+    inline static Range frequency = { 1.f / 60.f,  1.f / 2.f };
     inline static Range offset = SpringGeneticConstraints::offset;
     inline static Range vertical_shift = { 0.7f,          0.7f };
 
     inline static Range spring_const = { 0.01f, 0.3f };
-    inline static Range damping = { 0.2f, 0.8f };
+    inline static Range damping = { 0.01f, 0.1f };
 
     inline static Range nutrient_transfer_rate = { -0.1f, 0.5f };
 };
@@ -108,22 +131,21 @@ struct SpringGenome : GenomeBase
         rand_in_range(nutrient_transfer_rate, Limit::nutrient_transfer_rate);
     }
 
-    void mutate(float rate = 0.f, float range = 0.f)
+    void mutate(float range = 0.f)
     {
-        rate = rate > 0.f ? rate : mutation_rate;
         range = range > 0.f ? range : mutation_range;
 
         const auto& C = SpringGeneticConstraints{};
 
-        amplitude = maybe_mutate(amplitude, C.amplitude, rate, range);
-        frequency = maybe_mutate(frequency, C.frequency, rate, range);
-        offset = maybe_mutate(offset, C.offset, rate, range);
-        vertical_shift = maybe_mutate(vertical_shift, C.vertical_shift, rate, range);
+		amplitude = maybe_mutate_gaussian(amplitude, C.amplitude, range, guassian_const);
+        frequency = maybe_mutate_gaussian(frequency, C.frequency, range, guassian_const);
+        offset = maybe_mutate_gaussian(offset, C.offset, range, guassian_const);
+        vertical_shift = maybe_mutate_gaussian(vertical_shift, C.vertical_shift, range, guassian_const);
 
-        nutrient_transfer_rate = maybe_mutate(nutrient_transfer_rate, C.nutrient_transfer_rate, rate, range);
+        nutrient_transfer_rate = maybe_mutate_gaussian(nutrient_transfer_rate, C.nutrient_transfer_rate, range, guassian_const);
 
-        spring_const = maybe_mutate(spring_const, C.spring_const, rate, range);
-        damping = maybe_mutate(damping, C.damping, rate, range);
+        spring_const = maybe_mutate_gaussian(spring_const, C.spring_const, range, guassian_const);
+        damping = maybe_mutate_gaussian(damping, C.damping, range, guassian_const);
 
         mutate_meta();
     }
@@ -140,7 +162,7 @@ struct SpringGenome : GenomeBase
 
         nutrient_transfer_rate = parent.nutrient_transfer_rate;
 
-        mutation_rate = parent.mutation_rate;
+        guassian_const = parent.guassian_const;
         mutation_range = parent.mutation_range;
     }
 
@@ -150,9 +172,9 @@ struct SpringGenome : GenomeBase
 
         // Inherit mutation_rate/mutation_range the same way genes are inherited below,
         // so the rate used to mutate this child's genes reflects its own lineage.
-        mutation_rate = cross_mutate
-            ? (Random::rand01_float() < 0.5f ? parentA.mutation_rate : parentB.mutation_rate)
-            : (parentA.mutation_rate + parentB.mutation_rate) * 0.5f;
+        guassian_const = cross_mutate
+            ? (Random::rand01_float() < 0.5f ? parentA.guassian_const : parentB.guassian_const)
+            : (parentA.guassian_const + parentB.guassian_const) * 0.5f;
 
         mutation_range = cross_mutate
             ? (Random::rand01_float() < 0.5f ? parentA.mutation_range : parentB.mutation_range)
@@ -165,7 +187,7 @@ struct SpringGenome : GenomeBase
             const float value = cross_mutate
                 ? (Random::rand01_float() < 0.5f ? a : b)
                 : (a + b) * 0.5f;
-            return maybe_mutate(value, limit, mutation_rate, mutation_range);
+            return maybe_mutate_gaussian(value, limit, mutation_range, guassian_const);
             };
 
         amplitude = inherit(parentA.amplitude, parentB.amplitude, C.amplitude);
@@ -265,31 +287,30 @@ struct CellGenome : GenomeBase, HardConstants
         inner_r = Random::rand_byte(); inner_g = Random::rand_byte(); inner_b = Random::rand_byte();
     }
 
-    void mutate(float rate = 0.f, float range = 0.f)
+    void mutate(float range = 0.f)
     {
-        rate = rate > 0.f ? rate : mutation_rate;
         range = range > 0.f ? range : mutation_range;
 
         const auto& C = CellGeneticConstraints{};
 
-        radius = maybe_mutate(radius, C.radius, rate, range * radius_mutation_multiplier);
-        amplitude = maybe_mutate(amplitude, C.amplitude, rate, range * friction_multiplier);
-        frequency = maybe_mutate(frequency, C.frequency, rate, range * friction_multiplier);
-        offset = maybe_mutate(offset, C.offset, rate, range * friction_multiplier);
-        vertical_shift = maybe_mutate(vertical_shift, C.vertical_shift, rate, range * friction_multiplier);
+        radius = maybe_mutate_gaussian(radius, C.radius, range * radius_mutation_multiplier, guassian_const);
+        amplitude = maybe_mutate_gaussian(amplitude, C.amplitude, range * friction_multiplier, guassian_const);
+        frequency = maybe_mutate_gaussian(frequency, C.frequency, range * friction_multiplier, guassian_const);
+        offset = maybe_mutate_gaussian(offset, C.offset, range * friction_multiplier, guassian_const);
+        vertical_shift = maybe_mutate_gaussian(vertical_shift, C.vertical_shift, range * friction_multiplier, guassian_const);
 
-		birth_energy_thresh = maybe_mutate(birth_energy_thresh, { 0.f, 1.f }, rate, range);
-		birth_integrity_thresh = maybe_mutate(birth_integrity_thresh, { 0.f, 1.f }, rate, range);
-		birth_nutrients_thresh = maybe_mutate(birth_nutrients_thresh, { 0.f, 1.f }, rate, range);
+		birth_energy_thresh = maybe_mutate_gaussian(birth_energy_thresh, { 0.f, 1.f }, range, guassian_const);
+		birth_integrity_thresh = maybe_mutate_gaussian(birth_integrity_thresh, { 0.f, 1.f }, range, guassian_const);
+		birth_nutrients_thresh = maybe_mutate_gaussian(birth_nutrients_thresh, { 0.f, 1.f }, range, guassian_const);
 
-		offspring_energy_to_give = maybe_mutate(offspring_energy_to_give, { 0.f, 1.f }, rate, range);
+		offspring_energy_to_give = maybe_mutate_gaussian(offspring_energy_to_give, { 0.f, 1.f }, range, guassian_const);
 
-		connective_spring_damping = maybe_mutate(connective_spring_damping, SpringGeneticConstraints::damping, rate, range);
-		connective_spring_spring_const = maybe_mutate(connective_spring_spring_const, SpringGeneticConstraints::spring_const, rate, range);
+		connective_spring_damping = maybe_mutate_gaussian(connective_spring_damping, SpringGeneticConstraints::damping, range, guassian_const);
+		connective_spring_spring_const = maybe_mutate_gaussian(connective_spring_spring_const, SpringGeneticConstraints::spring_const, range, guassian_const);
 
         const float multip = newborn_search_radius_multiplier;
         const float r_max = CellGeneticConstraints::radius.max;
-		newborn_search_radius = maybe_mutate(newborn_search_radius, CellGeneticConstraints::newborn_search, rate, range * multip);
+		newborn_search_radius = maybe_mutate_gaussian(newborn_search_radius, CellGeneticConstraints::newborn_search, range * multip, guassian_const);
 
         mutate_meta();
         mutate_colour(outer_r, outer_g, outer_b);
@@ -317,7 +338,7 @@ struct CellGenome : GenomeBase, HardConstants
 
         newborn_search_radius = parent.newborn_search_radius;
 
-        mutation_rate = parent.mutation_rate;
+        guassian_const = parent.guassian_const;
         mutation_range = parent.mutation_range;
     }
 

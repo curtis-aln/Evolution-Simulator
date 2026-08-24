@@ -440,7 +440,7 @@ void OrganismTab::draw_cell_detail_cell_tab(const Cell& c, const int period,
 	ImGui::Text("age %zu fr", c.internal_clock_);
     ImGui::Text("Period   %d fr", period);
     ImGui::Text("Fric     min %.3f  max %.3f", wave_min, wave_max);
-    ImGui::Text("Mut R    %.4f  Rng %.4f", c.mutation_rate, c.mutation_range);
+    ImGui::Text("Mut R    %.4f  Rng %.4f", c.guassian_const, c.mutation_range);
     ImGui::Text("Ate      %d  (%zu fr ago)", c.total_food_eaten_, c.time_since_last_ate_);
 
     ImGui::Text("Spring Damage %.2f", c.cumulative_spring_damage_);
@@ -549,7 +549,7 @@ void OrganismTab::draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p
     ImGui::Text("Length Diff:  %.2f", length_diff);
     ImGui::Text("Period        %d frames", period);
     ImGui::Text("Extension min %.0f  max %.0f", ext_min, ext_max);
-    ImGui::Text("Mutation R    %.4f  Rng %.4f", s.genome.mutation_rate, s.genome.mutation_range);
+    ImGui::Text("Mutation R    %.4f  Rng %.4f", s.genome.guassian_const, s.genome.mutation_range);
 
     ImGui::Spacing();
     ImGui::TextDisabled("Forces");

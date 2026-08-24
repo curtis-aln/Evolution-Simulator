@@ -205,30 +205,38 @@ void CellManager::update_position_container(RenderData& rend_data, const sf::Flo
 	}
 }
 
+// updating.cpp
 void CellManager::try_connect_newborn_cell(Cell* cell)
 {
 	Body* body = bodies_->at(cell->body_id_);
 
-	// this cell is going to try to connect to other cells in its vicinity
 	nearby_cell_ids.clear();
 	new_born_cell_grid_.find(body->position_.x, body->position_.y, &nearby_cell_ids);
-	
+
 	for (int i = 0; i < nearby_cell_ids.count; ++i)
 	{
-		// we dont want to connect to ourselves
 		cell_idx other_cell_id = nearby_cell_ids[i];
 		if (other_cell_id == cell->id_)
 			continue;
+
+		// Canonical ordering: only the lower-id cell in a pair ever issues
+		// the request. Both cells sit in the same grid and would otherwise
+		// discover each other independently -> two requests, two springs.
+		if (cell->id_ > other_cell_id)
+			continue;
+
 		Cell* other_cell = all_cells_.at(other_cell_id);
 
-		// calculating the distance between the two
+		if (cell->already_connected_to(other_cell_id))
+			continue;
+
 		sf::Vector2f dir = body->position_ - bodies_->at(other_cell->body_id_)->position_;
 		float dist_sq = dir.lengthSquared();
 		if (dist_sq < cell->newborn_search_radius * cell->newborn_search_radius)
 		{
 			connection_requests.push_back(ConnectionRequest{ (int32_t)cell->id_, (int32_t)other_cell->id_ });
-			cell->new_connections_made++;
-			other_cell->new_connections_made++;
+			cell->register_connection(other_cell_id);
+			other_cell->register_connection(cell->id_);
 		}
 	}
 }

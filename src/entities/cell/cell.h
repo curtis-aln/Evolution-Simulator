@@ -61,6 +61,9 @@ private:
 	float energy = initial_energy;
 	float integrity = max_integrity;
 
+	float delta_energy = 0.f;
+	float delta_integrity = 0.f;
+
 public:
 	uint32_t id_ = 0;        // The unique identifier for this cell
 	uint32_t body_id_ = 0;   // Reference to the body 
@@ -92,6 +95,24 @@ public:
 
 
 public:
+
+	// cell.h, public section
+	std::array<uint32_t, max_cell_connections> connected_partner_ids_{};
+
+	[[nodiscard]] bool already_connected_to(uint32_t other_id) const
+	{
+		for (uint8_t i = 0; i < new_connections_made; ++i)
+			if (connected_partner_ids_[i] == other_id)
+				return true;
+		return false;
+	}
+
+	void register_connection(uint32_t other_id)
+	{
+		if (new_connections_made < max_cell_connections)
+			connected_partner_ids_[new_connections_made++] = other_id;
+	}
+
 	Cell(const uint32_t body_id = 0) 
 	{ 
 		body_id_ = body_id;
@@ -116,8 +137,8 @@ public:
 	// ------------ Data setters ------------
 	void kill() { dead_ = true; }
 	void force_reproduce() { reproduce_ = true; }
-	void change_energy(const float amount) { energy += amount; }
-	void change_integrity(const float amount) { integrity += amount; integrity = std::max(float(0), integrity); }
+	void change_energy(const float amount) { delta_energy += amount; }
+	void change_integrity(const float amount) { delta_integrity += amount; }
 	void set_energy(const float amount) { energy = amount; }
 	void set_integrity(const float amount) { integrity = amount; }
 	
@@ -150,7 +171,13 @@ public:
 	[[nodiscard]] float nutrients_threshold() const { return birth_nutrients_thresh * max_nutrients; }
 
 private:
-	// Energy, Nutrient, and Integrity management
+	// ------------ Organics sub-steps, run in this order by update_organics ------------
+	void apply_immunity();
+	void apply_passive_decay();
+	void flush_deltas();
+	[[nodiscard]] bool check_death();       // returns true (and sets dead_) if energy or integrity hit 0
+	void update_reproduction_flag();
+
 	void process_nutrients();
 	void repair_integrity();
 

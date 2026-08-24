@@ -115,7 +115,7 @@ void CellManager::update_statistics()
 	// collecting data
 	for (Cell* cell : all_cells_)
 	{
-		statistics_.average_mutation_rate += cell->mutation_rate;
+		statistics_.average_mutation_rate += cell->guassian_const;
 		statistics_.average_mutation_range += cell->mutation_range;
 		statistics_.average_offspring_count += cell->offspring_count;
 		statistics_.average_energy += cell->get_energy();

@@ -4,21 +4,34 @@
 
 void Cell::recreate()
 {
+	// Energy, Integrity, And Nutrients
 	energy = initial_energy;
-	internal_clock_ = 0;
-	generation = 0;
-	time_since_last_ate_ = 0;
+	delta_energy = 0.f;
+
+	integrity = initial_integrity;
+	delta_integrity = 0.f;
 
 	nutrients_ = 0.f;
-	total_food_eaten_ = 0;
-	integrity = 100;
-	offspring_count = 0;
 
+	// genome
+	generation = 0;
+
+	// stats
+	internal_clock_ = 0;
+	time_since_last_ate_ = 0;
+	total_food_eaten_ = 0;
+	offspring_count = 0;
+	
 	cumulative_collision_damage_ = 0.f;
 	cumulative_spring_damage_ = 0.f;
 
 	new_connections_made = 0.f;
 
+	repro_timer_ = 0;
+
+	nearby_food_ids_size_ = 0;
+
+	randomize();
 	spring_genome.randomize();   // <-- clears stale genome from recycled pool slot
 
 	reproduce_ = false;
@@ -31,10 +44,7 @@ bool Cell::eat(const float nutrients)
 	// This function returns false if the cell has failed to eat the food
 	// and true if it has eaten the food
 
-	if (time_since_last_ate_ < digestive_time)
-		return false;
-
-	if (nutrients > max_nutrients)
+	if (time_since_last_ate_ < digestive_time || nutrients_ >= max_nutrients)
 		return false;
 
 	nutrients_ += nutrients;
@@ -137,43 +147,63 @@ void  Cell::update_statistics()
 void Cell::update_organics(bool immune)
 {
 	if (immune)
-	{
-		integrity = 100.f;
-		dead_ = false;
-	}
-	sinwave_current_friction_ = calculate_friction();
+		apply_immunity();
 
-	// 1. Passive decay — base cost of being alive
-	energy -= (1 - sinwave_current_friction_) * friction_energy_loss_const;
-
-	// 2. Digest nutrients → energy, BEFORE the death check
-	//    so a fed cell can survive a decay tick it otherwise couldn't
+	apply_passive_decay();
 	process_nutrients();
 
-	// 3. Death check — no energy left
+	if (check_death())
+		return; // dead cells don't repair or reproduce
+
+	repair_integrity();
+	update_reproduction_flag();
+
+	flush_deltas();
+}
+
+void Cell::apply_immunity()
+{
+	integrity = max_integrity; // was hardcoded 100.f — desyncs if max_integrity is ever tuned
+	dead_ = false;
+}
+
+void Cell::apply_passive_decay()
+{
+	sinwave_current_friction_ = calculate_friction();
+	delta_energy -= (1.f - sinwave_current_friction_) * friction_energy_loss_const;
+}
+
+// Applies accumulated change_energy()/change_integrity() calls from this tick
+// (springs, impulse damage, etc.) in one clamped step.
+void Cell::flush_deltas()
+{
+	energy = std::clamp(energy + delta_energy, 0.f, max_energy);
+	delta_energy = 0.f;
+
+	//integrity = std::clamp(integrity + delta_integrity, 0.f, max_integrity);
+	delta_integrity = 0.f;
+}
+
+bool Cell::check_death()
+{
 	if (energy <= 0.f)
 	{
 		energy = 0.f;
 		dead_ = true;
-		return;  // dead cells don't repair or reproduce
 	}
-
-	if (integrity <= 0.f)
+	else if (integrity <= 0.f)
 	{
 		integrity = 0.f;
 		dead_ = true;
-		return;  // dead cells don't repair or reproduce
 	}
+	return dead_;
+}
 
-	// 4. Spend energy to repair integrity
-	repair_integrity();
-
-	// 5. Flag for reproduction — use assignment so it clears itself
-	//    when energy drops back below threshold
-	if (check_sufficient_energy() && check_sufficient_integrity() && check_sufficient_nutrients() && check_repro_cooldown())
-	{
-		reproduce_ = true;
-	}
+void Cell::update_reproduction_flag()
+{
+	// Assignment (not |=) so it clears itself once energy drops back below threshold
+	reproduce_ = check_sufficient_energy() && check_sufficient_integrity()
+		&& check_sufficient_nutrients() && check_repro_cooldown();
 }
 
 void Cell::process_nutrients()
@@ -192,23 +222,18 @@ void Cell::process_nutrients()
 	}
 
 	const float amount = std::min({ nutrients_, nutrients_conversion_rate, energy_capacity });
-
-	energy += amount;
+	delta_energy += amount;
 	nutrients_ -= amount;
 }
 
-
-// Renamed from update_energy — the old name was actively confusing
 void Cell::repair_integrity()
 {
 	if (integrity >= max_integrity)
 		return;
 
-	// Don't spend energy we don't have — avoids draining below 0
-	// and triggering the death check on the next frame for free
 	if (energy < integrity_conversion_rate)
-		return;
+		return; // don't drain below 0 and trigger death for free next frame
 
-	energy -= integrity_conversion_rate;
-	integrity = std::min(max_integrity, integrity + integrity_conversion_rate);
+	delta_energy -= integrity_conversion_rate;
+	delta_integrity += integrity_conversion_rate;
 }

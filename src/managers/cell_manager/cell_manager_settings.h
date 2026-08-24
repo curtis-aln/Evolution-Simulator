@@ -21,7 +21,7 @@ struct CellManagerSettings
 
 	inline static constexpr float speed_energy_tax = -0.4f;
 
-	inline static constexpr float delta_min_speed = 1.f / 1'000'000.f;
+	inline static constexpr float delta_min_speed = 1.f / 2'000'000.f;
 
 	inline static constexpr int extincion_threshold = 10; // if there are less than this number of protozoas, we consider it an extinction event
 
