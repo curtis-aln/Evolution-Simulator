@@ -3,6 +3,9 @@
 
 struct CellMatter
 {
+	static constexpr float transparency_outer = 175.f;
+	static constexpr float transparency_inner = 150.f;
+
 	static constexpr float    friction = 0.8f;
 	static constexpr uint16_t max_time_to_live = 13'000; // frames
 
@@ -23,8 +26,8 @@ struct CellMatter
 	uint8_t  outer_gray_ = 0;
 	uint16_t time_alive = 0;
 
-	sf::Color inner_color() const { return sf::Color(inner_gray_, inner_gray_, inner_gray_); }
-	sf::Color outer_color() const { return sf::Color(outer_gray_, outer_gray_, outer_gray_); }
+	sf::Color inner_color() const { return sf::Color(inner_gray_, inner_gray_, inner_gray_, transparency_inner); }
+	sf::Color outer_color() const { return sf::Color(outer_gray_, outer_gray_, outer_gray_, transparency_outer); }
 
 	void update(Body* body)
 	{

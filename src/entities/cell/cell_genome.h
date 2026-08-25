@@ -256,8 +256,8 @@ static struct CellInitialSpawnRanges
 struct HardConstants
 {
     inline static float     add_cell_chance = 0.02f;
-    inline static uint8_t   outer_transparency = 200;
-    inline static uint8_t   inner_transparency = 100;
+    inline static uint8_t   outer_transparency = 150;
+    inline static uint8_t   inner_transparency = 125;
 
     inline static float radius_mutation_multiplier = 5.f;
     inline static float newborn_search_radius_multiplier = 5.f;

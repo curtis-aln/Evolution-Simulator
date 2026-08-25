@@ -44,36 +44,40 @@ void FoodManager::update_position_data(RenderData& food_data)
 
 		food_data.positions.push_back(body->position_);
 		food_data.radii.push_back(body->radius_);
-		food_data.inner_colors.push_back(calc_food_color(food, food->id_));
-		food_data.outer_colors.push_back(calc_food_color(food, food->id_));
 		food_data.velocities.push_back(body->velocity_);
+
+		// handling color
+		sf::Color inner_col_copy = food->color_inner;
+		sf::Color outer_col_copy = food->color_outer;
+		set_foods_color_transparency(inner_col_copy, food->inner_transparency, food->nutrients, food->age);
+		set_foods_color_transparency(outer_col_copy, food->outer_transparency, food->nutrients, food->age);
+		food_data.inner_colors.push_back(inner_col_copy);
+		food_data.outer_colors.push_back(outer_col_copy);
+
 	}
 }
 
-sf::Color FoodManager::calc_food_color(const Food* food, int food_id) const
+void FoodManager::set_foods_color_transparency(sf::Color& color_to_change, 
+	const float transparency, const float nutrients, const float age) const
 {
-	sf::Color c = food->color;
-
-	const bool is_dying = food->age >= death_age;
+	const bool is_dying = age >= death_age;
 
 	if (!is_dying)
 	{
 		// Fade in over the first kFoodVisibilityRampFrames frames
-		const float t = std::min(static_cast<float>(food->age) / kFoodVisibilityRampFrames, 1.f);
-		c.a = static_cast<uint8_t>(t * kFoodMaxAlpha);
+		const float t = std::min(static_cast<float>(age) / kFoodVisibilityRampFrames, 1.f);
+		color_to_change.a = static_cast<uint8_t>(t * transparency);
 	}
 	else
 	{
 		// Fade out as nutrients fall from fade_start_nutrients down to initial_nutrients
 		const float range = fade_start_nutrients - initial_nutrients;
 		const float t = std::clamp(
-			(food->nutrients - initial_nutrients) / range,
+			(nutrients - initial_nutrients) / range,
 			0.f, 1.f
 		);
-		c.a = static_cast<uint8_t>(t * kFoodMaxAlpha);
+		color_to_change.a = static_cast<uint8_t>(t * transparency);
 	}
-
-	return c;
 }
 
 // world interacting with the food

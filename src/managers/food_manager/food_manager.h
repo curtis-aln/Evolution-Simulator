@@ -75,7 +75,7 @@ public:
     void update();
 
     void update_position_data(RenderData& food_data);
-    sf::Color calc_food_color(const Food* food, int food_id) const;
+    void set_foods_color_transparency(sf::Color& color_to_change, const float transparency, const float nutrients, const float age) const;
     void   remove_food(int food_id);
     Food* at(int idx);
     const Food* at(int idx) const;

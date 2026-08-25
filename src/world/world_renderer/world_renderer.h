@@ -1,43 +1,53 @@
 #pragma once
 
+#include <SFML/Graphics/RenderWindow.hpp>
+
 #include "../world_settings.h"
-#include "../../Utils/Graphics/SFML_Grid.h"
-#include "../../Utils/utility_SFML.h"
-#include "../collision_resolver/collision_resolver.h"
-#include "../../Utils/Graphics/CircleBatchRenderer.h"
 #include "../connection_renderer.h"
 #include "../world_border.h"
+
+#include "../../Utils/Graphics/SFML_Grid.h"
+#include "../../Utils/Graphics/CircleBatchRenderer.h"
+#include "../../Utils/Graphics/font_renderer.hpp"
+
+#include "../../Utils/utility_SFML.h"
+
+#include "../collision_resolver/collision_resolver.h"
+
 #include "../../managers/cell_manager/cell_manager_settings.h"
 #include "../../managers/food_manager/food_manager.h"
+
 #include "../../simulation/context/sim_snapshot.h"
-
-#include "../world_settings.h"
-
-
-#include <SFML/Graphics/RenderWindow.hpp>
-#include "../../Utils/Graphics/font_renderer.hpp"
 #include "../..//simulation/settings/settings.h"
 
+inline static constexpr int cells_div_value = 4; // cells_x / cells_div_value is the number of cells in the visual grid
+inline static constexpr float world_border_thickness = 68.f; // thickness of the circular world border
+inline static const sf::Color border_color = { 170, 200, 255, 100 }; // color of the circular world border
+inline static constexpr int border_point_count = 256;
 
+/* This class renders pretty much the entire simulation, including the world, cells, and other entities. */
 class WorldRenderer : public WorldSettings
 {
 	sf::RenderWindow* m_window_ = nullptr;
 
 	// this is used as a frame of reference to see how fast cells are moving
-	size_t _cells = static_cast<size_t>(CollisionResolver::cells_x / 4);
+	size_t cells_along_axis_ = static_cast<size_t>(CollisionResolver::cells_x / cells_div_value);
 	SFML_Grid visual_grid_;
 
 	// This is the circular world border that is drawn on the screen
-	sf::VertexArray world_border_renderer_{};
+	sf::CircleShape world_border_renderer_{};
 
+	// Rendering the Cells, Food, and Cell matter
 	CircleBatchRenderer outer_circle_renderer_{};
 	CircleBatchRenderer inner_circle_renderer_{};
 	std::vector<float>  outer_radii_{};
 	std::vector<sf::Vector2f>  outer_positions_{};
 	std::vector<sf::Color>  colors_{};
 
+	// rendering the springs
 	ConnectionRenderer connection_renderer_{};
 
+	// rendering the spatial grids
 	SpatialGridRenderer collision_grid_renderer_;
 	SpatialGridRenderer food_grid_renderer_;
 	SpatialGridRenderer newborn_grid_renderer_;
@@ -54,23 +64,23 @@ public:
 		WorldBorder& circular_bounds)
 		: 
 		m_window_(window), 
-		visual_grid_(*m_window_, bounds_rect, _cells, 3, grid_color, grid_line_thickness),
-		world_border_renderer_(make_circle(circular_bounds.bounds_radius, circular_bounds.center_)),
+		visual_grid_(*m_window_, bounds_rect, cells_along_axis_, 3, grid_color, grid_line_thickness),
 		collision_grid_renderer_(collision_grid),
 		food_grid_renderer_(food_grid),
 		newborn_grid_renderer_(newborn_grid)
 	{
 		init_circle_renderers();
+		init_world_border_renderer(circular_bounds);
 	}
 
-	void render(const SimSnapshot& snapshot, sf::Vector2f mouse_pos)
+	void render(const SimSnapshot& snapshot, const sf::Vector2f mouse_pos)
 	{
-		render_visual_grid(snapshot);
-		render_spatial_grids(snapshot, mouse_pos);
-		render_protozoa(snapshot);
-		render_influence_radii(snapshot);
+		render_visual_grid(snapshot);              // renders the faint grid in the background of the simulation
+		render_spatial_grids(snapshot, mouse_pos); // renders the spatial grids for food, collision, and newborn cells if enabled
+		render_protozoa(snapshot);                 // renders the protozoa (cells) and their springs
+		render_influence_radii(snapshot);          // renders a circle around the mouse to show its influence radius when adding or removing entities
 
-		m_window_->draw(world_border_renderer_);
+		m_window_->draw(world_border_renderer_);  
 	}
 
 private:
@@ -96,11 +106,19 @@ private:
 
 	void init_circle_renderers()
 	{
-		float texture_radius = 120;
+		/* Initialize the circle renderers for the outer and inner circles. */
+		constexpr float texture_radius = 120.f;
 		outer_circle_renderer_.init(m_window_, texture_radius, CellManagerSettings::max_protozoa);
 		inner_circle_renderer_.init(m_window_, texture_radius, CellManagerSettings::max_protozoa);
+	}
 
-		const int max_entities = CellManagerSettings::max_protozoa + FoodManagerSettings::max_food;
+	void init_world_border_renderer(const WorldBorder& circular_bounds)
+	{
+		world_border_renderer_.setRadius(circular_bounds.bounds_radius);
+		world_border_renderer_.setFillColor(sf::Color(0, 0, 0, 0));
+		world_border_renderer_.setPointCount(border_point_count);
+		world_border_renderer_.setOutlineColor(border_color);
+		world_border_renderer_.setOutlineThickness(world_border_thickness);
 	}
 
 	void render_visual_grid(const SimSnapshot& snapshot)
@@ -315,3 +333,5 @@ private:
 		}
 	}
 };
+
+// 319 lines

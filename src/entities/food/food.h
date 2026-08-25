@@ -22,7 +22,8 @@ struct Food : FoodManagerSettings
 
 	float nutrients = initial_nutrients;
 
-	sf::Color color{};
+	sf::Color color_inner{};
+	sf::Color color_outer{};
 
 	bool active = true;
 
@@ -35,7 +36,12 @@ struct Food : FoodManagerSettings
 		age = 0;
 		time_since_last_reproduced = 0;
 		nutrients = initial_nutrients;
-		color = Random::rand_color(food_darkest_color, food_lightest_color);
+
+		color_inner = Random::rand_color(food_darkest_color, food_lightest_color);
+		color_outer = Random::rand_color(food_darkest_color, food_lightest_color);
+		color_inner.a = inner_transparency;
+		color_outer.a = outer_transparency;
+
 		active = true;
 		vibration_x = 0.f;
 		vibration_y = 0.f;
