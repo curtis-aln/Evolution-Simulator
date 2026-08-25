@@ -152,6 +152,45 @@ private:
 			inner_circle_renderer_.render();
 		}
 
+		outer_radii_.resize(size);
+		outer_positions_.resize(size);
+
+		for (int i = 0; i < size; ++i)
+		{
+			auto pos = snapshot.render.positions[i];
+			auto vel = snapshot.render.velocities[i];
+			const float base_radius = snapshot.render.radii[i];
+			const float rad = base_radius * GraphicalSettings::cell_outline_thickness;
+			const float margin = rad - base_radius; // available slack in the outline ring
+
+			// Ease-out: strong response near the centre (t≈0), tapering to zero
+			// additional movement as the offset nears the outer edge of the ring (t≈1).
+			auto ease_out = [margin](float v) -> float
+				{
+					if (margin <= 0.f)
+						return 0.f;
+
+					const float sign = (v < 0.f) ? -1.f : 1.f;
+					const float t = std::clamp(std::abs(v) / margin, 0.f, 1.f);
+					const float eased = 1.f - (1.f - t) * (1.f - t); // 1 - (1-t)^2
+					return sign * eased * margin;
+				};
+
+			const float scaled_x = ease_out(vel.x);
+			const float scaled_y = ease_out(vel.y);
+
+			outer_positions_[i] = pos - sf::Vector2f{ scaled_x, scaled_y };
+			outer_radii_[i] = rad;
+		}
+
+		outer_circle_renderer_.set_size(size);
+		outer_circle_renderer_.set_colors(snapshot.render.outer_colors);
+		outer_circle_renderer_.set_positions(outer_positions_);
+		outer_circle_renderer_.set_radii(outer_radii_);
+
+		outer_circle_renderer_.update();
+		outer_circle_renderer_.render();
+
 		// If a protozoa is selected and debug mode is enabled, draw additional debug information for the selected protozoa.
 		if (snapshot.protozoa_tracker.is_active && snapshot.world_toggles.debug_mode)
 		{

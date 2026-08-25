@@ -15,8 +15,6 @@ struct FoodManagerSettings
 	inline static float food_radius;
 	inline static float friction;
 
-	inline static sf::Vector3i food_darkest_color = { 0, 160, 0 };
-	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
 	inline static float vibration_strength;
 
 	inline static float kFoodVisibilityRampFrames;
@@ -38,7 +36,7 @@ struct FoodManagerSettings
 	inline static float food_initial_radius = 6;
 	inline static size_t food_growth_frames = 100;
 
-	inline static float nutrients_to_radius_scale = 2.45f; // radius = nutrients * this constant
+	inline static float nutrients_to_radius_scale = 1.45f; // radius = nutrients * this constant
 	inline static float fade_start_nutrients = 30.0f;       // nutrients level at which fading begins
 
 	inline static float food_launch_strength = 50.f;
@@ -47,6 +45,9 @@ struct FoodManagerSettings
 	inline static const float spawn_immunity = 20;
 
 	inline static constexpr float vibrate_freq = 0.0065f;
+
+	inline static sf::Vector3i food_darkest_color = { 0, 160, 0 };
+	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
 
 
 	// Intensity Sliders

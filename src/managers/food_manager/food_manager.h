@@ -49,7 +49,7 @@ class FoodManager : public FoodManagerSettings
     int  current_total_food_ = 0;
 
 public:
-    FixedSpan<cell_idx, uint16_t> select_indexes{ static_cast<uint16_t>(10000) };
+    FixedSpan<cell_idx, uint16_t> selected_cells_indexes_{ static_cast<uint16_t>(10000) };
 
     int frames = 0;
 
@@ -59,7 +59,7 @@ public:
     FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies);
     void  create_food(unsigned amount);
 
-    void reset_cell_manager();
+    void reset_food_manager();
 
     void remove_food_in_area(const sf::Vector2f& center, float radius);
 
@@ -80,7 +80,7 @@ public:
     Food* at(int idx);
     const Food* at(int idx) const;
 
-    FoodBodyPair create_food(const sf::Vector2f& position, bool random_genetics);
+    FoodBodyPair create_food(const sf::Vector2f& position);
 
 	FoodManagerStatistics& get_statistics() { return statistics_; }
 

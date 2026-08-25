@@ -25,6 +25,8 @@ public:
     int selected_id = -1;
     bool is_active = false;
 
+    int original_selected_cell_id = -1;
+
     sf::FloatRect bounds{};
 
     sf::Vector2f position{};
@@ -77,6 +79,8 @@ public:
     {
         if (selected_cell_id == -1)
             return;
+
+		original_selected_cell_id = selected_cell_id;
 
 		const Cell* selected_cell = all_cells.at(selected_cell_id);
 		if (selected_cell == nullptr)

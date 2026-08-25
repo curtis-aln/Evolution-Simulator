@@ -18,6 +18,8 @@ struct Food : FoodManagerSettings
 	uint16_t age = 0;
 	uint16_t time_since_last_reproduced = 0;
 
+	uint16_t fully_grown_age = nutrient_development_time;
+
 	float nutrients = initial_nutrients;
 
 	sf::Color color{};
@@ -27,16 +29,17 @@ struct Food : FoodManagerSettings
 	float vibration_x = 0.f;
 	float vibration_y = 0.f;
 
-	void reset_cell_manager()
+	void reset()
 	{
 		body_id_ = 0;
 		age = 0;
 		time_since_last_reproduced = 0;
 		nutrients = initial_nutrients;
-		color = {};
+		color = Random::rand_color(food_darkest_color, food_lightest_color);
 		active = true;
 		vibration_x = 0.f;
 		vibration_y = 0.f;
+		fully_grown_age = nutrient_development_time;
 	}
 
 	void update()
@@ -65,7 +68,7 @@ struct Food : FoodManagerSettings
 private:
 	void update_food_nutrients()
 	{
-		// Nutrients develop from initial_nutrients toward final_nutrients over nutrient_development_time frames.
+		// Nutrients develop from initial_nutrients toward final_nutrients over fully_grown_age frames.
 		// Once the target is reached, no further change is applied.
 		// When the food is old enough to die, nutrients start dropping back down instead.
 
@@ -75,11 +78,15 @@ private:
 		{
 			// Drain nutrients at the same rate they developed, until hitting initial_nutrients
 			const float drain_rate = (final_nutrients - initial_nutrients)
-				/ static_cast<float>(nutrient_development_time);
+				/ static_cast<float>(fully_grown_age);
 
 			nutrients -= drain_rate;
 			return;
 		}
+
+		// nutrients only develop after birth, no regeneration from damage
+		if (age > fully_grown_age)
+			return;
 
 		// Normal development toward final_nutrients
 		const float diff = final_nutrients - initial_nutrients;

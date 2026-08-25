@@ -1,30 +1,38 @@
 #include "../cell_manager.h"
 
-void CellManager::gather_food_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, const sf::Vector2f& position, const float radius)
+template<typename T>
+void CellManager::gather_objects_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, const o_vector<T>& objects, const sf::Vector2f& position, const float radius)
 {
 	indexes.clear();
 
-	for (Cell* cell : all_cells_)
+	for (T* object : objects)
 	{
-		Body* body = bodies_->at(cell->body_id_);
+		Body* body = bodies_->at(object->body_id_);
 		float dist_sq = (body->position_ - position).lengthSquared();
+		
 		if (dist_sq < radius * radius)
-		{
-			indexes.add(cell->id_);
-		}
+			indexes.add(object->id_);
 	}
 }
 
 void CellManager::remove_cells_in_radius(const sf::Vector2f& position, const float radius)
 {
-	gather_food_in_radius(select_indexes, position, radius);
+	gather_objects_in_radius(selected_cells_indexes_, all_cells_, position, radius);
+	gather_objects_in_radius(selected_matter_indexes_, all_cell_matter_, position, radius);
 
-	for (int i = 0; i < select_indexes.count; ++i)
-		remove_cell(select_indexes[i]);
+	for (int i = 0; i < selected_cells_indexes_.count; ++i)
+		remove_cell(selected_cells_indexes_[i]);
+	for (int i = 0; i < selected_matter_indexes_.count; ++i)
+		remove_cell_matter(selected_matter_indexes_[i]);
 
+	check_for_dangling_springs();
+}
+
+void CellManager::check_for_dangling_springs()
+{
+	/* Check for springs that are connected to cells that have been removed */
 	for (Spring* spring : all_springs_)
 	{
-		// making sure we remove the springs that are connected to the cells that have been removed
 		Cell* cell_a = all_cells_.at(spring->cell_A_id);
 		Cell* cell_b = all_cells_.at(spring->cell_B_id);
 		if (all_cells_.is_obj_active(cell_a->id_) == false || all_cells_.is_obj_active(cell_b->id_) == false)
@@ -36,12 +44,23 @@ void CellManager::remove_cells_in_radius(const sf::Vector2f& position, const flo
 
 void CellManager::influence_cell_velocities_in_radii(const sf::Vector2f& position, const float radius, const int intensity)
 {
-	gather_food_in_radius(select_indexes, position, radius);
+	/* This function changes the velocity of cells and cell matter in a given radius */
+	gather_objects_in_radius(selected_cells_indexes_, all_cells_, position, radius);
+	gather_objects_in_radius(selected_matter_indexes_, all_cell_matter_, position, radius);
 
-	for (int i = 0; i < select_indexes.count; ++i)
+	for (int i = 0; i < selected_cells_indexes_.count; ++i)
 	{
-		Cell* cell = all_cells_.at(select_indexes[i]);
+		Cell* cell = all_cells_.at(selected_cells_indexes_[i]);
 		Body* body = bodies_->at(cell->body_id_);
+
+		sf::Vector2f direction = (position - body->position_).normalized();
+		body->velocity_ += direction * (float)intensity;
+	}
+
+	for (int i = 0; i < selected_matter_indexes_.count; ++i)
+	{
+		CellMatter* matter = all_cell_matter_.at(selected_matter_indexes_[i]);
+		Body* body = bodies_->at(matter->body_id_);
 
 		sf::Vector2f direction = (position - body->position_).normalized();
 		body->velocity_ += direction * (float)intensity;
@@ -100,18 +119,17 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		break;
 
 	case CommandType::MutateProtozoa:
-		//if (selected_protozoa)
-	   //     selected_protozoa->mutate(cmd.mutate.mut_rate, cmd.mutate.mut_range);
+		mutate_selected_protozoa();
 		break;
 
 	case CommandType::AddCell:
-		//if (selected_protozoa)
-		//    selected_protozoa->add_cell();
+		if (protozoa_tracker_.is_active == true)
+			create_weak_offspring(protozoa_tracker_.original_selected_cell_id);
 		break;
 
 	case CommandType::RemoveCell:
-		//if (selected_protozoa)
-		//    selected_protozoa->remove_cell();
+		if (protozoa_tracker_.is_active == true)
+			remove_cell(protozoa_tracker_.original_selected_cell_id);
 		break;
 
 	case CommandType::AddSpring:
@@ -125,8 +143,7 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		break;
 
 	case CommandType::InjectProtozoa:
-		//if (selected_protozoa)
-		//    m_world_.inject_protozoa(selected_protozoa, cmd.float_val);
+		inject_selected_protozoa(cmd.bool_val, cmd.float_val);
 		break;
 
 	case CommandType::KillProtozoa:
@@ -138,8 +155,8 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		break;
 
 	case CommandType::MakeImmortal:
-		//if (selected_protozoa) // todo
-		//    selected_protozoa->immortal = cmd.bool_val;
+		if (protozoa_tracker_.is_active == true)
+			all_cells_.at(protozoa_tracker_.original_selected_cell_id)->immortal_ = true;
 		break;
 
 	case CommandType::CloneProtozoa:
@@ -191,6 +208,36 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		//}
 		break;
 
+	}
+}
+
+void CellManager::mutate_selected_protozoa()
+{
+	if (selected_cell_id_ == -1 || protozoa_tracker_.is_active == false)
+		return;
+
+	for (Cell& fake_cell : protozoa_tracker_.cells)
+	{
+		Cell* cell = all_cells_.at(fake_cell.id_);
+		cell->mutate();
+	}
+}
+
+void CellManager::inject_selected_protozoa(bool is_energy, float amount)
+{
+	if (selected_cell_id_ == -1 || protozoa_tracker_.is_active == false)
+		return;
+
+	const float per_cell = amount / protozoa_tracker_.cells.size();
+
+	for (Cell& fake_cell : protozoa_tracker_.cells)
+	{
+		Cell* cell = all_cells_.at(fake_cell.id_);
+
+		if (is_energy)
+			cell->change_energy(per_cell);
+		else
+			cell->nutrients_ += per_cell;
 	}
 }
 

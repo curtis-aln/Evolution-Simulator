@@ -76,7 +76,7 @@ reproductive_threshold          = 300
 
 # nutrients
 initial_nutrients             = 4.0
-final_nutrients                = 30.0
+final_nutrients                = 50.0
 nutrient_development_time       = 300
 
 # death

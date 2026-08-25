@@ -100,10 +100,9 @@ void CellManager::update_statistics()
 
 
 	// Peak population
-	const int p_count = static_cast<int>(all_cells_.size());
-	statistics_.peak_protozoa_ever = std::max(p_count, statistics_.peak_protozoa_ever);
-
-	const int count = statistics_.cell_count;
+	const int count = static_cast<int>(all_cells_.size());
+	statistics_.peak_protozoa_ever = std::max(count, statistics_.peak_protozoa_ever);
+	statistics_.cell_count = count;
 
 	// resetting averages
 	statistics_.average_offspring_count = 0.f;

@@ -23,7 +23,7 @@ void World::render(const SimSnapshot& snapshot, const sf::Vector2f mouse_pos)
 void World::reset_world()
 {
 	// Resetting the food manager
-    food_manager_.reset_cell_manager();
+    food_manager_.reset_food_manager();
 	// Resetting the cell manager
     cell_manager_.reset_cell_manager();
 
@@ -101,7 +101,7 @@ void World::handle_right_click(WorldBorder& spawn_area)
         for (int i = 0; i < static_cast<int>(intensity); i++)
         {
             if (do_cells) cell_manager_.create_new_protozoa(1, &spawn_area);
-            if (do_food)  food_manager_.create_food(spawn_area.rand_pos(), true);
+            if (do_food)  food_manager_.create_food(spawn_area.rand_pos());
         }
         break;
 
@@ -144,7 +144,7 @@ void World::fill_snapshot(SimSnapshot& snapshot)
 
 	copy_render_data_to_snapshot(snapshot); // render data
 
-    snapshot.world_stats.highlighted_food = food_manager_.select_indexes.count;
+    snapshot.world_stats.highlighted_food = food_manager_.selected_cells_indexes_.count;
 	cell_manager_.fill_snapshot(snapshot, visible_bounds); // protozoa data
 
     copy_spatial_grids_to_snapshot(snapshot);

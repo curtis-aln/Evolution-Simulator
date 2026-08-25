@@ -4,7 +4,7 @@ struct CellSettings
 {
 	inline static float offspring_energy_cost = 50.f;
 
-	inline static float bite_amount = 25.f;
+	inline static float bite_amount = 10.f;
 
 	inline static int max_cells;
 	inline static float spawn_radius;
@@ -25,6 +25,6 @@ struct CellSettings
 	inline static float integrity_conversion_rate = 0.05f;
 	inline static float nutrients_conversion_rate = .185f;
 
-	inline static constexpr float friction_energy_loss_const = 0.0095f;
+	inline static constexpr float friction_energy_loss_const = 0.08f;
 	inline static const uint8_t max_cell_connections = 2;
 };

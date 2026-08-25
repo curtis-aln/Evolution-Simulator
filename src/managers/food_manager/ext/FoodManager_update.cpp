@@ -61,17 +61,16 @@ void FoodManager::create_food(unsigned amount)
 	for (int i = 0; i < amount; ++i)
 	{
 		sf::Vector2f pos = world_bounds_->rand_pos();
-		FoodBodyPair food_body_pair = create_food(pos, true);
+		FoodBodyPair food_body_pair = create_food(pos);
 
 		Food* food = food_vector.at(food_body_pair.food_id);
-		food->color = Random::rand_color(food_darkest_color, food_lightest_color);
-		food->nutrients = initial_nutrients;
 		food->age = Random::rand_range(0, 1500);
+		food->fully_grown_age = food->age + nutrient_development_time;
 	}
 }
 
 
-void FoodManager::reset_cell_manager()
+void FoodManager::reset_food_manager()
 {
 	for (Food* food : food_vector)
 	{
@@ -85,10 +84,10 @@ void FoodManager::reset_cell_manager()
 
 void FoodManager::remove_food_in_area(const sf::Vector2f& center, float radius)
 {
-	gather_food_in_radius(select_indexes, center, radius);
+	gather_food_in_radius(selected_cells_indexes_, center, radius);
 
-	for (int i = 0; i < select_indexes.count; ++i)
-		remove_food(food_vector.at(select_indexes[i])->id_);
+	for (int i = 0; i < selected_cells_indexes_.count; ++i)
+		remove_food(food_vector.at(selected_cells_indexes_[i])->id_);
 }
 
 void FoodManager::gather_food_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, const sf::Vector2f& position, const float radius)
@@ -109,11 +108,11 @@ void FoodManager::gather_food_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, 
 
 void FoodManager::influence_food_velocities_in_radii(const sf::Vector2f& position, const float radius, const int intensity)
 {
-	gather_food_in_radius(select_indexes, position, radius);
+	gather_food_in_radius(selected_cells_indexes_, position, radius);
 
-	for (int i = 0; i < select_indexes.count; ++i)
+	for (int i = 0; i < selected_cells_indexes_.count; ++i)
 	{
-		Food* food = food_vector.at(select_indexes[i]);
+		Food* food = food_vector.at(selected_cells_indexes_[i]);
 		Body* body = bodies_->at(food->body_id_);
 
 		sf::Vector2f direction = (position - body->position_).normalized();

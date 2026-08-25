@@ -35,7 +35,9 @@ float FoodManager::calculate_spawn_chance() const
 {
 	// This function calculates the chance of a food reproducing based on how much food is in the world
 	float spawn_chance = 1.f - static_cast<float>(food_vector.size()) / static_cast<float>(max_food);
-	return std::clamp(spawn_chance * spawn_proportionality_constant, 0.f, 1.f);
+	float scaled = spawn_chance * spawn_proportionality_constant * 0.7f;
+	float clamped = std::clamp(scaled, 0.f, 1.f);
+	return clamped;
 }
 
 
@@ -50,7 +52,7 @@ bool FoodManager::reproduce_food(Food* parent_food)
 	sf::Vector2f parent_pos = parent_body->position_;
 
 	// Creating a new food body pair and linking them together
-	FoodBodyPair pair = create_food(parent_pos, true);
+	FoodBodyPair pair = create_food(parent_pos);
 	if (pair.is_valid() == false)
 		return true;
 
@@ -76,7 +78,7 @@ bool FoodManager::reproduce_food(Food* parent_food)
 	return false;
 }
 
-FoodBodyPair FoodManager::create_food(const sf::Vector2f& position, bool random_genetics)
+FoodBodyPair FoodManager::create_food(const sf::Vector2f& position)
 {
 	// This is the safest way to create a food with a body, all creation events Must go through this function to ensure that the food and body are linked correctly.
 	// if there are not any already avalable foods in the o_vector we create a new one
@@ -97,7 +99,7 @@ FoodBodyPair FoodManager::create_food(const sf::Vector2f& position, bool random_
 	}
 
 	// connecting the two
-	food->reset_cell_manager();
+	food->reset();
 	food->body_id_ = body->id_;
 	body->position_ = position;
 	body->radius_ = food_initial_radius;

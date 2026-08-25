@@ -326,7 +326,7 @@ void CellManager::fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bo
 {
 	snapshot.protozoa_tracker = protozoa_tracker_;
 
-	snapshot.world_stats.highlighted_cells = select_indexes.count;
+	snapshot.world_stats.highlighted_cells = selected_cells_indexes_.count;
 }
 
 

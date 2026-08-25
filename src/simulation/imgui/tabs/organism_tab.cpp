@@ -280,11 +280,18 @@ void OrganismTab::draw_cells_springs_tab(const SimSnapshot& snap, ImGuiContext& 
     ImGui::TextDisabled("Structure");
     ImGui::Separator();
     ImGui::Columns(2, nullptr, false);
-    if (ImGui::Button("Add Cell", { -1.f, 0.f })) ctx.push({ .type = CommandType::AddCell });
-    if (ImGui::Button("Remove Cell", { -1.f, 0.f })) ctx.push({ .type = CommandType::RemoveCell });
+    if (ImGui::Button("Add Cell", { -1.f, 0.f })) 
+        ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::AddCell });
+
+    if (ImGui::Button("Remove Cell", { -1.f, 0.f })) 
+        ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::RemoveCell });
+
     ImGui::NextColumn();
-    if (ImGui::Button("Add Spring", { -1.f, 0.f })) ctx.push({ .type = CommandType::AddSpring });
-    if (ImGui::Button("Remove Spring", { -1.f, 0.f })) ctx.push({ .type = CommandType::RemoveSpring });
+    if (ImGui::Button("Add Spring", { -1.f, 0.f })) 
+        ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::AddSpring });
+
+    if (ImGui::Button("Remove Spring", { -1.f, 0.f })) 
+        ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::RemoveSpring });
 
     ImGui::Columns(1);
 
@@ -300,10 +307,10 @@ void OrganismTab::draw_cells_springs_tab(const SimSnapshot& snap, ImGuiContext& 
         &SimCommand::int_val, kStructureModes, snap.world_stats.structure_mode,
         ImVec4{ 0.4f, 0.4f, 0.4f, 1.f }, 20);
 
-    bool immortal_ = false;
+    bool immortal_ = protozoa.cells[0].immortal_;
     if (ImGui::Checkbox("Immortal##org", &immortal_))
     {
-        SimCommand cmd{ .type = CommandType::MakeImmortal };
+        SimCommand cmd{ .section=CommandSection::CellManagerEvent, .type = CommandType::MakeImmortal };
         cmd.bool_val = immortal_;
         ctx.push(cmd);
     }
@@ -436,6 +443,9 @@ void OrganismTab::draw_cell_detail(ImGuiContext& ctx, const Cell& c, const sf::V
 void OrganismTab::draw_cell_detail_cell_tab(const Cell& c, const int period,
     const float wave_min, const float wave_max, const float current_friction)
 {
+	if (c.immortal_)
+		ImGui::TextColored({ 0.3f, 0.8f, 0.3f, 1.f }, "Immortal");
+
     ImGui::Text("id %d  Gen %d", c.body_id_, c.generation);
 	ImGui::Text("age %zu fr", c.internal_clock_);
     ImGui::Text("Period   %d fr", period);
@@ -445,6 +455,9 @@ void OrganismTab::draw_cell_detail_cell_tab(const Cell& c, const int period,
 
     ImGui::Text("Spring Damage %.2f", c.cumulative_spring_damage_);
 	ImGui::Text("Collision Damage %.2f", c.cumulative_collision_damage_);
+	ImGui::Text("delta energy: %.2f", c.delta_energy);
+	ImGui::Text("delta integrity: %.2f", c.delta_integrity);
+
 
     // Digest cooldown bar
     const float digest_remaining = std::max(0.f,
@@ -740,14 +753,10 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
     ImGui::Spacing();
     if (ImGui::Button("Inject##en_inject", { -1.f, 0.f }))
     {
-        // Distributed evenly across all cells via the command handler.
-        //const CommandType type = (m_feed_mode_ == 0)
-        //    ? CommandType::InjectProtozoa
-        //    : CommandType::InjectNutrients;
-
-        //SimCommand cmd{ type };
-        //cmd.float_val = m_feed_amount_;
-        //ctx.push(cmd);
+        SimCommand cmd{ .section = CommandSection::CellManagerEvent, .type = CommandType::InjectProtozoa };
+        cmd.float_val = m_feed_amount_;
+		cmd.bool_val = (m_feed_mode_ == 0);
+        ctx.push(cmd);
     }
     ImGui::EndChild();
 

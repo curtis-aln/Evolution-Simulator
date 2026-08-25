@@ -65,6 +65,7 @@ struct ConnectionRequest
 	int32_t connect_to_id;
 };
 
+inline static constexpr uint16_t max_mouse_selection_count = static_cast<uint16_t>(10000);
 
 // A Class which handles all protozoa related stuff in the world. updating, collisions, reproduction, etc.
 class CellManager: protected CellManagerSettings
@@ -120,8 +121,9 @@ class CellManager: protected CellManagerSettings
 public:
 	CellManagerToggles toggles_{};
 
-	uint16_t max_size = static_cast<uint16_t>(10000);
-	FixedSpan<cell_idx, uint16_t> select_indexes{ max_size };
+	// These two are used for when the mouse wants to manipulate cells and matter inside of a certain radius
+	FixedSpan<cell_idx, uint16_t> selected_cells_indexes_{ max_mouse_selection_count };
+	FixedSpan<cell_idx, uint16_t> selected_matter_indexes_{ max_mouse_selection_count };
 	
 	bool extinction_event = false;
 
@@ -132,6 +134,7 @@ public:
 
 	// entries
 	void handle_cell_manager_event(SimCommand& cmd);
+	void mutate_selected_protozoa();
 	void update(int iterations);
 	void update_position_container(RenderData& rend_data, const sf::FloatRect& visible_bounds, const bool show_only_newborns);
 	void update_protozoa_tracker();
@@ -181,8 +184,12 @@ public:
 
 private: // only functions this class can access
 	// Utility
-	void gather_food_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, const sf::Vector2f& position, const float radius);
+
+	template<typename T>
+	void gather_objects_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, const o_vector<T>& objects, const sf::Vector2f& position, const float radius);
+	
 	void check_for_extinction_event();
+	void inject_selected_protozoa(bool is_energy, float amount);
 
 	// statistics 
 	void register_death_stat(const float lifetime, const bool had_offspring);
@@ -229,5 +236,7 @@ private: // only functions this class can access
 
 	void apply_cell_death_requests();
 	void apply_matter_death_requests();
+
+	void check_for_dangling_springs();
 	
 };

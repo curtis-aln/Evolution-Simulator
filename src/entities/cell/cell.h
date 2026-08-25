@@ -56,17 +56,16 @@ struct Cell : public CellGenome, CellSettings
 private:
 	bool reproduce_ = false; // signals to the protozoa manager that this cell needs an offspring index set
 	bool dead_ = false;      // signals that the cell is in its decaying state
-	bool immortal_ = false;  // cell is unaffected by death
+	
 
 	float energy = initial_energy;
 	float integrity = max_integrity;
 
-	float delta_energy = 0.f;
-	float delta_integrity = 0.f;
-
 public:
 	uint32_t id_ = 0;        // The unique identifier for this cell
 	uint32_t body_id_ = 0;   // Reference to the body 
+
+	bool immortal_ = false;  // cell is unaffected by death
 
 	// when a spring is created between this cell and other, the springs properties
 	// will be average between the two cell's spring genomes
@@ -95,6 +94,8 @@ public:
 
 
 public:
+	float delta_energy = 0.f;
+	float delta_integrity = 0.f;
 
 	// cell.h, public section
 	std::array<uint32_t, max_cell_connections> connected_partner_ids_{};
@@ -135,7 +136,11 @@ public:
 	[[nodiscard]] float get_energy() const { return energy; }
 
 	// ------------ Data setters ------------
-	void kill() { dead_ = true; }
+	void kill() 
+	{ 
+		if (!immortal_)
+			dead_ = true; 
+	}
 	void force_reproduce() { reproduce_ = true; }
 	void change_energy(const float amount) { delta_energy += amount; }
 	void change_integrity(const float amount) { delta_integrity += amount; }
