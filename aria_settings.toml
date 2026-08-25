@@ -29,7 +29,7 @@ cell_max_capacity           = 14
 # ── Cell Manager ─────────────────────────────────────────────────────────
 [cell_manager]
 max_protozoa                = 220000     
-initial_protozoa            = 250     
+initial_protozoa            = 450     
 auto_reset_on_extinction    = true
 
 # ── Cell ─────────────────────────────────────────────────────────────────
@@ -76,7 +76,7 @@ reproductive_threshold          = 300
 
 # nutrients
 initial_nutrients             = 4.0
-final_nutrients                = 50.0
+final_nutrients                = 80.0
 nutrient_development_time       = 300
 
 # death

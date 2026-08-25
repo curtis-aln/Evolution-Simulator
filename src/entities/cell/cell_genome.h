@@ -14,11 +14,12 @@ struct Range
 // ---------------------------------------------------------------------------
 static struct BaseConstants
 {
-    static constexpr float mutation_rate_range = 0.075f;
+    inline static float     colour_mutation_range = 0.055f;
+    static constexpr float mutation_rate_range = 0.015f;
 
-    inline static Range init_mutation_range_spread = { 0.01f, 0.2f };
+    inline static Range init_mutation_range_spread = { 0.01f, 0.13f };
 
-    inline static Range gaussian_const_limits = { 0.05f, 1.5f };   // hard evolutionary bounds
+    inline static Range gaussian_const_limits = { 0.05f, 0.5f };   // hard evolutionary bounds
     inline static Range init_gaussian_const_spread = { 0.05f, 0.15f };  // spawn range
 };
 
@@ -27,10 +28,20 @@ struct GenomeBase : protected BaseConstants
     float guassian_const, mutation_range;
     uint32_t generation = 0;
 
+    uint8_t outer_r, outer_g, outer_b, inner_r, inner_g, inner_b;
+
     GenomeBase()
+    {
+        randomize_base();
+    }
+
+    void randomize_base()
     {
         rand_in_range(guassian_const, init_gaussian_const_spread);
         rand_in_range(mutation_range, init_mutation_range_spread);
+
+        outer_r = Random::rand_byte(); outer_g = Random::rand_byte(); outer_b = Random::rand_byte();
+        inner_r = Random::rand_byte(); inner_g = Random::rand_byte(); inner_b = Random::rand_byte();
     }
 
 protected:
@@ -61,6 +72,9 @@ protected:
 
         guassian_const = nudge(guassian_const, mutation_rate_range);
         mutation_range = nudge(mutation_range, mutation_rate_range);
+
+        mutate_colour(outer_r, outer_g, outer_b);
+        mutate_colour(inner_r, inner_g, inner_b);
     }
 
     void rand_in_range(float& val, const Range& range)
@@ -78,6 +92,17 @@ private:
         const float u2 = Random::rand01_float();
         constexpr float two_pi = 6.28318530718f;
         return std::sqrt(-2.f * std::log(u1)) * std::cos(two_pi * u2);
+    }
+
+    void mutate_colour(uint8_t& r, uint8_t& g, uint8_t& b) const
+    {
+        auto shift = [](uint8_t ch, float range) -> uint8_t {
+            const int delta = static_cast<int>(Random::rand_range(-range * 255.f, range * 255.f));
+            return static_cast<uint8_t>(std::clamp(static_cast<int>(ch) + delta, 0, 255));
+            };
+        r = shift(r, colour_mutation_range);
+        g = shift(g, colour_mutation_range);
+        b = shift(b, colour_mutation_range);
     }
 };
 
@@ -118,6 +143,8 @@ struct SpringGenome : GenomeBase
 
     void randomize()
     {
+        randomize_base();
+
         using Limit = SpringInitialSpawnRanges;
 
         rand_in_range(amplitude, Limit::amplitude);
@@ -221,7 +248,7 @@ static struct CellInitialSpawnRanges
     inline static Range radius = { 25.f,          85.f };
 
     inline static Range amplitude = { 0.01f,          0.08f };
-    inline static Range frequency = { 1.f / 40.f,   1.f / 2.f };
+    inline static Range frequency = { 1.f / 90.f,   1.f / 30.f };
     inline static Range offset = CellGeneticConstraints::offset;
     inline static Range vertical_shift = { 0.965f,           0.99f };
 };
@@ -231,7 +258,6 @@ struct HardConstants
     inline static float     add_cell_chance = 0.02f;
     inline static uint8_t   outer_transparency = 200;
     inline static uint8_t   inner_transparency = 100;
-    inline static float     colour_mutation_range = 0.055f;
 
     inline static float radius_mutation_multiplier = 5.f;
     inline static float newborn_search_radius_multiplier = 5.f;
@@ -241,7 +267,6 @@ struct HardConstants
 struct CellGenome : GenomeBase, HardConstants
 {
     float radius, amplitude, frequency, offset, vertical_shift;
-    uint8_t outer_r, outer_g, outer_b, inner_r, inner_g, inner_b;
 
     // reproductive genes
     float birth_energy_thresh = 0.90f;
@@ -258,6 +283,8 @@ struct CellGenome : GenomeBase, HardConstants
 
     void randomize()
     {
+        randomize_base();
+
         auto rand_in_range = [](float& val, const Range& range) {
             val = Random::rand_range(range.min, range.max);
             };
@@ -281,10 +308,6 @@ struct CellGenome : GenomeBase, HardConstants
 		rand_in_range(connective_spring_damping, S_Const::damping);
 
         rand_in_range(newborn_search_radius, { C_Const::newborn_search.max * 0.9f, C_Const::newborn_search.max });
-
-
-        outer_r = Random::rand_byte(); outer_g = Random::rand_byte(); outer_b = Random::rand_byte();
-        inner_r = Random::rand_byte(); inner_g = Random::rand_byte(); inner_b = Random::rand_byte();
     }
 
     void mutate(float range = 0.f)
@@ -313,8 +336,6 @@ struct CellGenome : GenomeBase, HardConstants
 		newborn_search_radius = maybe_mutate_gaussian(newborn_search_radius, CellGeneticConstraints::newborn_search, range * multip, guassian_const);
 
         mutate_meta();
-        mutate_colour(outer_r, outer_g, outer_b);
-        mutate_colour(inner_r, inner_g, inner_b);
     }
 
     void copy_genetics(const CellGenome& parent)
@@ -342,15 +363,4 @@ struct CellGenome : GenomeBase, HardConstants
         mutation_range = parent.mutation_range;
     }
 
-private:
-    void mutate_colour(uint8_t& r, uint8_t& g, uint8_t& b) const
-    {
-        auto shift = [](uint8_t ch, float range) -> uint8_t {
-            const int delta = static_cast<int>(Random::rand_range(-range * 255.f, range * 255.f));
-            return static_cast<uint8_t>(std::clamp(static_cast<int>(ch) + delta, 0, 255));
-            };
-        r = shift(r, colour_mutation_range);
-        g = shift(g, colour_mutation_range);
-        b = shift(b, colour_mutation_range);
-    }
 };

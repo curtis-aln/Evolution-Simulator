@@ -61,6 +61,9 @@ struct CellManagerToggles
 	bool spring_too_long_breakage = true;
 	bool spring_too_much_force_breakage = false;
 
+    bool disable_work_done_energy = false;
+    bool disable_friction_energy_loss;
+
     // newborns
     bool show_only_newborns = false;
     bool show_newborn_grid = false;

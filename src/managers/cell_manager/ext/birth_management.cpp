@@ -2,7 +2,7 @@
 
 void CellManager::create_protozoa_from_pool(const sf::Vector2f position, const unsigned max_cells, const unsigned max_springs)
 {
-	float spawn_radius = CellSettings::spawn_radius * 10.f;
+	float spawn_radius = CellSettings::spawn_radius * 5.f;
 
 	std::vector<uint32_t> cell_indexes;
 	cell_indexes.reserve(max_cells);

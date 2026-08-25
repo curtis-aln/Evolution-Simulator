@@ -93,7 +93,7 @@ void CellManager::update_cell(Cell* cell)
 {
 	Body* body = bodies_->at(cell->body_id_);
 	cell->update_statistics();
-	cell->update_organics(spawn_immune);
+	cell->update_organics(spawn_immune, toggles_.disable_friction_energy_loss);
 	body->velocity_ *= cell->sinwave_current_friction_;
 
 	speed_tax_cell(cell);
@@ -185,6 +185,7 @@ void CellManager::update_position_container(RenderData& rend_data, const sf::Flo
  		rend_data.spring_connections.push_back({
 			get_cell_pos(spring->cell_A_id),
 			get_cell_pos(spring->cell_B_id),
+			spring->genome.outer_r, spring->genome.outer_g, spring->genome.outer_b,
 			min_dist,
 			min_dist * 2.f,
 			spring->stress });
@@ -253,7 +254,7 @@ void CellManager::update_springs(bool immune)
 		Cell* cell_b = all_cells_.at(spring->cell_B_id);
 
 		bool true_immune = immune || !toggles_.spring_stress_integrity_damage;
-		spring->update_organics(*cell_a, *cell_b, true_immune);
+		spring->update_organics(*cell_a, *cell_b, true_immune, toggles_.disable_work_done_energy);
 
 		// if the spring has broken on its own
 		if (spring->is_spring_broken())

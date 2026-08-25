@@ -149,7 +149,7 @@ public:
 	
 	// ------------ Cell functionality ------------
 	void update_statistics();
-	void update_organics(bool immune);
+	void update_organics(bool immune, bool disable_friction_energy_loss);
 
 	[[nodiscard]] bool eat(const float nutrients);
 	void create_offspring(Body* this_body, Cell* child, Body* child_body, const bool mutate);

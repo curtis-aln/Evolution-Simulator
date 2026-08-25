@@ -40,5 +40,10 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 	toggle(snap, ctx, "spring too long breakage", &CellManagerToggles::spring_too_long_breakage);
 	toggle(snap, ctx, "spring too much force breakage", &CellManagerToggles::spring_too_much_force_breakage);
 
+	ImGui::Spacing();
+	ImGui::TextDisabled("Energy Tax");
+	toggle(snap, ctx, "disable work done energy", &CellManagerToggles::disable_work_done_energy);
+	toggle(snap, ctx, "disable friction energy loss", &CellManagerToggles::disable_friction_energy_loss);
+
 	ImGui::EndChild();
 }

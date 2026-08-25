@@ -26,7 +26,7 @@ struct CellManagerSettings
 
 	// DAMAGE
 	inline static constexpr float impulse_damage_thresh = 50.0f;
-	inline static constexpr float impulse_damage_multiplier = 0.002f;
+	inline static constexpr float impulse_damage_multiplier = 0.0004f;
 	
 
 	// ENERGY TAX

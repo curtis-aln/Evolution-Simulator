@@ -35,6 +35,8 @@ struct Connection
 	sf::Vector2f pos_a;
 	sf::Vector2f pos_b;
 
+	uint8_t col_r, col_g, col_b;
+
 	float min_dist;
 	float max_dist;
 
@@ -132,7 +134,8 @@ private:
 		const float thickness = ConnectionSettings::min_thickness +
 			(ConnectionSettings::max_thickness - ConnectionSettings::min_thickness) * t;
 
-		const sf::Color color = lerp_color(ConnectionSettings::min_color, ConnectionSettings::max_color, conn.tension);
+		sf::Color color = { conn.col_r, conn.col_g, conn.col_b, 155 };
+		//const sf::Color color = lerp_color(ConnectionSettings::min_color, ConnectionSettings::max_color, conn.tension);
 
 		sf::Vector2f normal{ 0.f, 0.f };
 		if (dist > 0.0001f)
