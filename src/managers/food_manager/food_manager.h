@@ -18,6 +18,8 @@
 #include "../../simulation/context/state.h"
 #include <simulation/context/sim_command.h>
 
+#include "../../Utils/Graphics/pheromone_grid.h"
+
 
 struct FoodBodyPair
 {
@@ -47,6 +49,8 @@ class FoodManager : public FoodManagerSettings
     BarrierThreadPool thread_pool_{ (int)WorldSettings::updating_threads };
 	bool update_jobs_built_ = false;
     int  current_total_food_ = 0;
+
+    PheromoneGrid pheromone_grid;
 
 public:
     FixedSpan<cell_idx, uint16_t> selected_cells_indexes_{ static_cast<uint16_t>(10000) };
@@ -83,6 +87,8 @@ public:
     FoodBodyPair create_food(const sf::Vector2f& position);
 
 	FoodManagerStatistics& get_statistics() { return statistics_; }
+
+	PheromoneGrid* get_pheromone_grid() { return &pheromone_grid; }
 
 private:
     void  update_food();

@@ -20,10 +20,40 @@
 #include "../../simulation/context/sim_snapshot.h"
 #include "../..//simulation/settings/settings.h"
 
+#include "../../Utils/Graphics/pheromone_grid.h"
+
+
 inline static constexpr int cells_div_value = 4; // cells_x / cells_div_value is the number of cells in the visual grid
 inline static constexpr float world_border_thickness = 68.f; // thickness of the circular world border
 inline static const sf::Color border_color = { 170, 200, 255, 100 }; // color of the circular world border
 inline static constexpr int border_point_count = 256;
+inline static constexpr float spatial_grid_query_radius = 500.f;
+
+
+// Ease - out: strong response near the centre(t≈0), tapering to zero
+// additional movement as the offset nears the outer edge of the ring (t≈1).
+inline float ease_out(float margin, float v)
+{
+	if (margin <= 0.f)
+		return 0.f;
+
+	const float sign = (v < 0.f) ? -1.f : 1.f;
+	const float t = std::clamp(std::abs(v) / margin, 0.f, 1.f);
+	const float eased = 1.f - (1.f - t) * (1.f - t); // 1 - (1-t)^2
+	return sign * eased * margin;
+}
+
+inline void utilise_circle_renderer(CircleBatchRenderer& circle_renderer, 
+	const std::vector<sf::Color>& colors, const std::vector<sf::Vector2f>& positions, const std::vector<float>& radii)
+{
+	circle_renderer.set_size(colors.size());
+	circle_renderer.set_colors(colors);
+	circle_renderer.set_positions(positions);
+	circle_renderer.set_radii(radii);
+
+	circle_renderer.update();
+	circle_renderer.render();
+}
 
 /* This class renders pretty much the entire simulation, including the world, cells, and other entities. */
 class WorldRenderer : public WorldSettings
@@ -52,6 +82,9 @@ class WorldRenderer : public WorldSettings
 	SpatialGridRenderer food_grid_renderer_;
 	SpatialGridRenderer newborn_grid_renderer_;
 
+	// rendering the pheromones
+	PheromoneGrid* food_pheromone_grid_ = nullptr;
+
 
 public:
 	// Constructor
@@ -60,6 +93,7 @@ public:
 		SimpleSpatialGrid* collision_grid,
 		SimpleSpatialGrid* food_grid,
 		SimpleSpatialGrid* newborn_grid,
+		PheromoneGrid* food_pheromone_grid,
 		sf::FloatRect& bounds_rect, 
 		WorldBorder& circular_bounds)
 		: 
@@ -67,7 +101,8 @@ public:
 		visual_grid_(*m_window_, bounds_rect, cells_along_axis_, 3, grid_color, grid_line_thickness),
 		collision_grid_renderer_(collision_grid),
 		food_grid_renderer_(food_grid),
-		newborn_grid_renderer_(newborn_grid)
+		newborn_grid_renderer_(newborn_grid),
+		food_pheromone_grid_(food_pheromone_grid)
 	{
 		init_circle_renderers();
 		init_world_border_renderer(circular_bounds);
@@ -75,12 +110,15 @@ public:
 
 	void render(const SimSnapshot& snapshot, const sf::Vector2f mouse_pos)
 	{
+		//food_pheromone_grid_->render()
+
 		render_visual_grid(snapshot);              // renders the faint grid in the background of the simulation
 		render_spatial_grids(snapshot, mouse_pos); // renders the spatial grids for food, collision, and newborn cells if enabled
+		render_springs(snapshot);                  // renders the springs that connect the cells together
 		render_protozoa(snapshot);                 // renders the protozoa (cells) and their springs
 		render_influence_radii(snapshot);          // renders a circle around the mouse to show its influence radius when adding or removing entities
 
-		m_window_->draw(world_border_renderer_);  
+		m_window_->draw(world_border_renderer_);   // renders the circular world border
 	}
 
 private:
@@ -92,13 +130,15 @@ private:
 
 		sf::Vector2f mouse_pos = {snapshot.sim_stats.mouse_pos_x, snapshot.sim_stats.mouse_pos_y};
 		float influence_radius = snapshot.world_stats.mouse_radius;
+		float outline_thickness = 2.f + influence_radius / 150.f; // scales with the zoom out of the camera
+		const sf::Color influence_color = { 200, 215, 255, 100 };
 
 		sf::CircleShape influence_circle;
-		influence_circle.setPointCount(60);
+		influence_circle.setPointCount(90);
 		influence_circle.setRadius(influence_radius);
 		influence_circle.setFillColor(sf::Color(0, 0, 0, 0));
-		influence_circle.setOutlineColor(sf::Color(255, 255, 255, 100));
-		influence_circle.setOutlineThickness(2.f + influence_radius / 150.f);
+		influence_circle.setOutlineColor(influence_color);
+		influence_circle.setOutlineThickness(outline_thickness);
 		influence_circle.setPosition(mouse_pos - sf::Vector2f(influence_radius, influence_radius));
 
 		m_window_->draw(influence_circle);
@@ -126,54 +166,44 @@ private:
 		// The visual grid is the faint grid that is drawn in the background of the simulation. 
 		// It is used to help visualize the scale of the simulation and to help with debugging.
 		float zoom = snapshot.sim_stats.camera_zoom;
-		float a = 1.f;
+		float alpha_value = 1.f;
 		if (zoom < start_fading_zoom)
 		{
-			a = (zoom - start_fading_zoom) / fade_zoom_dist;
-			a = std::clamp(a, 0.f, 1.f);
+			alpha_value = (zoom - start_fading_zoom) / fade_zoom_dist;
+			alpha_value = std::clamp(alpha_value, 0.f, 1.f);
 		}
-		visual_grid_.draw(a);
+		visual_grid_.draw(alpha_value);
 	}
 
 	void render_spatial_grids(const SimSnapshot& snapshot, const sf::Vector2f mouse_pos)
 	{
-		constexpr float query_radius = 500.f; 
-		if (snapshot.world_toggles.draw_food_grid)
-			food_grid_renderer_.render(*m_window_, mouse_pos, query_radius);
+		if (snapshot.world_toggles.draw_food_grid) // renders the food grid if the toggle is enabled
+			food_grid_renderer_.render(*m_window_, mouse_pos, spatial_grid_query_radius);
 
-		if (snapshot.world_toggles.draw_collision_grid)
-			collision_grid_renderer_.render(*m_window_, mouse_pos, query_radius);
+		if (snapshot.world_toggles.draw_collision_grid) // renders the collision grid if the toggle is enabled
+			collision_grid_renderer_.render(*m_window_, mouse_pos, spatial_grid_query_radius);
 
-		if (snapshot.cell_toggles.show_newborn_grid)
-			newborn_grid_renderer_.render(*m_window_, mouse_pos, query_radius);
+		if (snapshot.cell_toggles.show_newborn_grid) // remders the newborn grid if the toggle is enabled
+			newborn_grid_renderer_.render(*m_window_, mouse_pos, spatial_grid_query_radius);
 	}
 
 
 	void render_protozoa(const SimSnapshot& snapshot)
 	{
-		int size = snapshot.render.positions.size();
-
-		// The springs are rendered first, so they appear behind the cells in the rendering order.
-		render_springs(snapshot);
-		
+		// Data Fetching
+		const int container_size = snapshot.render.positions.size();
 		const float zoom = snapshot.sim_stats.camera_zoom;
-		bool simplify_colors = zoom < 0.05f;
 
-		if (!simplify_colors)
-		{
-			inner_circle_renderer_.set_size(size);
-			inner_circle_renderer_.set_colors(simplify_colors ? colors_ : snapshot.render.inner_colors);
-			inner_circle_renderer_.set_positions(snapshot.render.positions);
-			inner_circle_renderer_.set_radii(snapshot.render.radii);
+		// This determines if the colors of the protozoa should be simplified based on the zoom level
+		if (bool simplify_colors = zoom < 0.05f; !simplify_colors)
+			utilise_circle_renderer(inner_circle_renderer_, simplify_colors ? colors_ : snapshot.render.inner_colors, 
+				snapshot.render.positions, snapshot.render.radii);
+		
+		// This is the outer circle renderer, which is used to render the outline of the protozoa. The outline is scaled based on the velocity of the protozoa, so that faster moving protozoa have a larger outline.
+		outer_radii_.resize(container_size);
+		outer_positions_.resize(container_size);
 
-			inner_circle_renderer_.update();
-			inner_circle_renderer_.render();
-		}
-
-		outer_radii_.resize(size);
-		outer_positions_.resize(size);
-
-		for (int i = 0; i < size; ++i)
+		for (int i = 0; i < container_size; ++i)
 		{
 			auto pos = snapshot.render.positions[i];
 			auto vel = snapshot.render.velocities[i];
@@ -181,76 +211,55 @@ private:
 			const float rad = base_radius * GraphicalSettings::cell_outline_thickness;
 			const float margin = rad - base_radius; // available slack in the outline ring
 
-			// Ease-out: strong response near the centre (t≈0), tapering to zero
-			// additional movement as the offset nears the outer edge of the ring (t≈1).
-			auto ease_out = [margin](float v) -> float
-				{
-					if (margin <= 0.f)
-						return 0.f;
-
-					const float sign = (v < 0.f) ? -1.f : 1.f;
-					const float t = std::clamp(std::abs(v) / margin, 0.f, 1.f);
-					const float eased = 1.f - (1.f - t) * (1.f - t); // 1 - (1-t)^2
-					return sign * eased * margin;
-				};
-
-			const float scaled_x = ease_out(vel.x);
-			const float scaled_y = ease_out(vel.y);
+			const float scaled_x = ease_out(margin, vel.x);
+			const float scaled_y = ease_out(margin, vel.y);
 
 			outer_positions_[i] = pos - sf::Vector2f{ scaled_x, scaled_y };
 			outer_radii_[i] = rad;
 		}
 
-		outer_circle_renderer_.set_size(size);
-		outer_circle_renderer_.set_colors(snapshot.render.outer_colors);
-		outer_circle_renderer_.set_positions(outer_positions_);
-		outer_circle_renderer_.set_radii(outer_radii_);
-
-		outer_circle_renderer_.update();
-		outer_circle_renderer_.render();
+		// This draws the outer circle renderer, which is used to render the outline of the protozoa. The outline is scaled based on the velocity of the protozoa, so that faster moving protozoa have a larger outline.
+		utilise_circle_renderer(outer_circle_renderer_, snapshot.render.outer_colors, outer_positions_, outer_radii_);
 
 		// If a protozoa is selected and debug mode is enabled, draw additional debug information for the selected protozoa.
 		if (snapshot.protozoa_tracker.is_active && snapshot.world_toggles.debug_mode)
-		{
 			draw_protozoa_debug(snapshot);
-		}
 	}
 
 
 	void render_springs(const SimSnapshot& snapshot)
 	{
+		// We dont render springs if the camera is zoomed out too far
 		const float zoom = snapshot.sim_stats.camera_zoom;
 		if (zoom < 0.012f || snapshot.cell_toggles.show_only_newborns)
 			return;
 
-		bool no_curves = zoom < 0.08f;
+		bool no_curves = zoom < 0.08f; // optimization, if you cant see the curves, dont render them
 		connection_renderer_.update(snapshot.render.spring_connections, no_curves);
 		connection_renderer_.draw(*m_window_);
 	}
 
 	void draw_protozoa_debug(const SimSnapshot& snapshot)
 	{
+		/* When the user has selected a protozoa we can draw more specific information on and around it */
 		const OrganismTracker& protozoa = snapshot.protozoa_tracker;
-
 		if (protozoa.is_active == false)
 			return;
 
 		if (snapshot.cell_toggles.skeleton_mode)
 			draw_cell_outlines(protozoa);
 
-
-
 		if (snapshot.cell_toggles.show_bounding_boxes)
 			draw_protozoa_bounding_box(protozoa.bounds, *m_window_);
 
-		draw_cell_physical_information(snapshot);
 		draw_newborn_connection_radius(protozoa);
 	}
 
 	void draw_newborn_connection_radius(const OrganismTracker& protozoa)
 	{
+		/* the radii at which newborn cells can connect */
 		sf::CircleShape circle_outline;
-		circle_outline.setPointCount(30); // Reduce aliasing, set once
+		circle_outline.setPointCount(30);
 		circle_outline.setFillColor({ 0, 0, 0, 0 });
 		circle_outline.setOutlineColor({ 255, 255, 255, 100 });
 		circle_outline.setOutlineThickness(10.f);
@@ -299,39 +308,4 @@ private:
 			i++;
 		}
 	}
-
-
-	void draw_cell_physical_information(const SimSnapshot& snapshot) const
-	{
-		const OrganismTracker& protozoa = snapshot.protozoa_tracker;
-
-		// for each cell we draw its bounding box
-		int i = 0;
-		for (const Cell& cell : protozoa.cells)
-		{
-			const sf::Vector2f& pos = protozoa.bodies[i].position_;
-			const sf::Vector2f& vel = protozoa.bodies[i].velocity_;
-			const float speed = vel.length();
-			const float rad = cell.radius;
-
-			// rendering the bounding boxes
-			const sf::FloatRect rect = { {pos.x - rad, pos.y - rad}, {rad * 2, rad * 2} };
-			draw_protozoa_bounding_box(rect, *m_window_);
-
-			// drawing the direction of the cell
-			const float arrow_length = std::min(rad * 4, speed * rad);
-			draw_direction(*m_window_, pos, vel, arrow_length, 6, 10,
-				{ 200, 220, 200 }, { 190, 200, 190 });
-
-			// drawing cell stats
-			const auto top_left = rect.position;
-			//const auto spacing = font->get_text_size("0").y;
-			//const sf::Vector2f offset = { 0, spacing };
-			//font->draw(top_left, "id: " + std::to_string(cell.body_id_), false);
-
-			i++;
-		}
-	}
 };
-
-// 319 lines

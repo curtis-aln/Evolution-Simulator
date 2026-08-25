@@ -3,7 +3,8 @@
 
 
 FoodManager::FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies)
-	: world_bounds_(world_bounds), bodies_(bodies)
+	: world_bounds_(world_bounds), bodies_(bodies),
+	pheromone_grid(100, 100, WorldSettings::bounds_radius, WorldSettings::bounds_radius)
 {
 
 }

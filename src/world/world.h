@@ -63,7 +63,8 @@ class World : public WorldSettings
         collision_resolver_.get_grid(), 
         &food_eat_resolver_.get_spatial_grid(),
         cell_manager_.get_new_born_cell_grid(),
-        world_rect_bounds_, 
+        food_manager_.get_pheromone_grid(),
+        world_rect_bounds_,
         world_circular_bounds_};
 
 
