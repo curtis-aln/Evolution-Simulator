@@ -78,6 +78,9 @@ struct FoodToggles
 {
     bool spawn_random_food = true;
     bool food_mitosis = false;
+
+    bool update_pheromone_grid = true;
+    bool render_pheromone_grid = true;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────

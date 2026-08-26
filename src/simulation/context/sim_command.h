@@ -81,7 +81,13 @@ enum class CommandType
 	ClearAllFood, // clears all food from the simulation
 
     SetRandomIntensity,
-    SetMitosisIntensity
+    SetMitosisIntensity,
+
+    SetPheromoneUpdatingSteps,
+	SetPheromoneDecayRate,
+	SetPheromoneDiffusionRate,
+    SetPheromoneDepositAmount,
+    SetPheromoneMaxPheromone
 };
 
 // Parameters for the MutateProtozoa command

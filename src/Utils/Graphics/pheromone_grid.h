@@ -10,13 +10,13 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-struct PheromoneGridSettings
+static struct PheromoneGridSettings
 {
-    float decay_rate = 0.0015f;  // fraction of pheromone lost per step
-    float diffuse_rate = 0.20f;  // blend toward weighted neighbour average per step
-    float deposit_amount = 10.0f;  // default amount added per add_pheromone call
-    float max_pheromone = 100.0f; // clamp ceiling, also used to normalise heatmap colour
-    uint32_t substeps = 2;      // diffusion sub-iterations per step() call — higher = smoother spread, costs more per tick
+    inline static float decay_rate = 0.0015f;  // fraction of pheromone lost per step
+    inline static float diffuse_rate = 0.20f;  // blend toward weighted neighbour average per step
+    inline static float deposit_amount = 10.0f;  // default amount added per add_pheromone call
+    inline static float max_pheromone = 100.0f; // clamp ceiling, also used to normalise heatmap colour
+    inline static uint32_t substeps = 2;      // diffusion sub-iterations per step() call — higher = smoother spread, costs more per tick
 };
 
 // Dense full-grid diffusion, not a sparse query structure — plain row-major storage with a
@@ -24,14 +24,12 @@ struct PheromoneGridSettings
 // separable 1-2-1 kernel (two 3-tap passes instead of one 9-tap 2D kernel), and linear memory
 // access the compiler can auto-vectorize. Rendering uploads the grid as a texture and draws
 // one sprite instead of rebuilding a per-cell triangle mesh every frame.
-class PheromoneGrid
+class PheromoneGrid : PheromoneGridSettings
 {
 public:
     explicit PheromoneGrid(uint32_t cells_x, uint32_t cells_y,
-        float world_width, float world_height,
-        PheromoneGridSettings settings = {})
-        : settings(settings)
-        , CellsX(cells_x), CellsY(cells_y)
+        float world_width, float world_height)
+        : CellsX(cells_x), CellsY(cells_y)
         , PaddedW(cells_x + 2), PaddedH(cells_y + 2)
         , world_width(world_width), world_height(world_height)
     {
@@ -81,9 +79,9 @@ public:
 
     void add_pheromone_at_index(const uint32_t index, float amount = -1.f)
     {
-        if (amount < 0.f) amount = settings.deposit_amount;
+        if (amount < 0.f) amount = deposit_amount;
         float& v = front[index];
-        v = std::min(v + amount, settings.max_pheromone);
+        v = std::min(v + amount, max_pheromone);
     }
 
     float sample(const float x, const float y) const
@@ -106,9 +104,9 @@ public:
     // at roughly a third of the reads), then decays. Call once per sim tick.
     void step()
     {
-        const uint32_t n = std::max(1u, settings.substeps);
-        const float step_diffuse = settings.diffuse_rate / static_cast<float>(n);
-        const float step_decay = settings.decay_rate / static_cast<float>(n);
+        const uint32_t n = std::max(1u, substeps);
+        const float step_diffuse = diffuse_rate / static_cast<float>(n);
+        const float step_decay = decay_rate / static_cast<float>(n);
 
         for (uint32_t s = 0; s < n; ++s)
         {
@@ -159,7 +157,7 @@ public:
 
             for (uint32_t cx = 0; cx < CellsX; ++cx)
             {
-                const float t = std::clamp(row[cx] / settings.max_pheromone, 0.f, 1.f);
+                const float t = std::clamp(row[cx] / max_pheromone, 0.f, 1.f);
                 const float g = 0.35f + t * 0.65f;
 
                 px[0] = 0;
@@ -199,11 +197,9 @@ public:
         ImGui::Text("Total     %.1f", total);
         ImGui::Text("Avg/cell  %.3f", tc > 0.f ? total / tc : 0.f);
         ImGui::Text("Max cell  %.2f  (%.0f%%)", max_v,
-            settings.max_pheromone > 0.f ? max_v * 100.f / settings.max_pheromone : 0.f);
+            max_pheromone > 0.f ? max_v * 100.f / max_pheromone : 0.f);
         ImGui::Text("Active    %d  (%.1f%%)", active, tc > 0.f ? active * 100.f / tc : 0.f);
     }
-
-    PheromoneGridSettings settings;
 
     sf::Texture get_texture() const { return heat_texture; }
 	sf::Sprite  get_sprite() const { return heat_sprite; }

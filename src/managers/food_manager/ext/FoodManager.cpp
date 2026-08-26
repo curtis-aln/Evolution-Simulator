@@ -26,10 +26,13 @@ void FoodManager::handle_food_death()
 			remove_food(food->id_);
 
 		sf::Vector2f pos = bodies_->at(food->body_id_)->position_;
-		pheromone_grid.add_pheromone(pos.x, pos.y, 10.f);
+
+		if (toggles_.update_pheromone_grid)
+			pheromone_grid.add_pheromone(pos.x, pos.y, 10.f);
 	}
 
-	pheromone_grid.step();
+	if (toggles_.update_pheromone_grid)
+		pheromone_grid.step();
 }
 
 void FoodManager::update_position_data(RenderData& food_data)
@@ -44,8 +47,11 @@ void FoodManager::update_position_data(RenderData& food_data)
 	food_data.outer_colors.reserve(reserve_to);
 	food_data.velocities.reserve(reserve_to);
 
-	pheromone_grid.render();
-	food_data.pheromone_texture = pheromone_grid.get_texture();
+	if (toggles_.render_pheromone_grid)
+	{
+		pheromone_grid.render();
+		food_data.pheromone_texture = pheromone_grid.get_texture();
+	}
 
 	for (Food* food : food_vector)
 	{
@@ -158,6 +164,26 @@ void FoodManager::handle_food_manager_event(SimCommand& cmd)
 
 	case CommandType::SetMitosisIntensity:
 		statistics_.food_mitosis_spawn_intensity = cmd.float_val;
+		break;
+
+	case CommandType::SetPheromoneUpdatingSteps:
+		PheromoneGridSettings::substeps = cmd.int_val;
+		break;
+
+	case CommandType::SetPheromoneDecayRate:
+		PheromoneGridSettings::decay_rate = cmd.float_val;
+		break;
+
+	case CommandType::SetPheromoneDiffusionRate:
+		PheromoneGridSettings::diffuse_rate = cmd.float_val;
+		break;
+
+	case CommandType::SetPheromoneDepositAmount:
+		PheromoneGridSettings::deposit_amount = cmd.float_val;
+		break;
+
+	case CommandType::SetPheromoneMaxPheromone:
+		PheromoneGridSettings::max_pheromone = cmd.float_val;
 		break;
 	}
 }

@@ -66,6 +66,7 @@ class WorldRenderer : public WorldSettings
 
 	// This is the circular world border that is drawn on the screen
 	sf::CircleShape world_border_renderer_{};
+	sf::CircleShape border_mask_renderer_{}; // opaque ring hiding the square grids' corners
 
 	// Rendering the Cells, Food, and Cell matter
 	CircleBatchRenderer outer_circle_renderer_{};
@@ -118,12 +119,21 @@ public:
 		render_protozoa(snapshot);                 // renders the protozoa (cells) and their springs
 		render_influence_radii(snapshot);          // renders a circle around the mouse to show its influence radius when adding or removing entities
 
-		m_window_->draw(world_border_renderer_);   // renders the circular world border
+		render_world_border();                     // renders the circular world border
 	}
 
 private:
+	void render_world_border()
+	{
+		m_window_->draw(border_mask_renderer_);   // paints over anything the square grids drew past the circle
+		m_window_->draw(world_border_renderer_);  // the glowing border ring, now sitting on a solid backdrop
+	}
+
 	void render_pheromone_grid(const SimSnapshot& snapshot)
 	{
+		if (!snapshot.food_toggles.render_pheromone_grid)
+			return;
+
 		pheromone_sprite_.setTexture(snapshot.render.pheromone_texture, true);
 		const sf::Vector2f size = {
 			static_cast<float>(snapshot.food_manager_stats.pheromone_grid_cells_x),
@@ -171,6 +181,17 @@ private:
 		world_border_renderer_.setPointCount(border_point_count);
 		world_border_renderer_.setOutlineColor(border_color);
 		world_border_renderer_.setOutlineThickness(world_border_thickness);
+
+		// The square spatial grids are 2*bounds_radius per side and inscribe the circle, so their
+		// corners poke out by up to (sqrt(2)-1)*bounds_radius. Cover that leftover area.
+		constexpr float sqrt2_minus_1 = 0.41421356f;
+		const float mask_thickness = circular_bounds.bounds_radius * sqrt2_minus_1 * 1.05f; // 5% safety margin
+
+		border_mask_renderer_.setRadius(circular_bounds.bounds_radius);
+		border_mask_renderer_.setPointCount(border_point_count);
+		border_mask_renderer_.setFillColor(sf::Color(0, 0, 0, 0));
+		border_mask_renderer_.setOutlineColor(SimulationSettings::bg_colors[0]);
+		border_mask_renderer_.setOutlineThickness(mask_thickness);
 	}
 
 	void render_visual_grid(const SimSnapshot& snapshot)
