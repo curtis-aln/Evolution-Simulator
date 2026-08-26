@@ -187,7 +187,7 @@ void CellManager::update_position_container(RenderData& rend_data, const sf::Flo
 			get_cell_pos(spring->cell_B_id),
 			spring->genome.outer_r, spring->genome.outer_g, spring->genome.outer_b,
 			min_dist,
-			min_dist * 2.f,
+			min_dist * 3.f,
 			spring->stress });
 	}
 

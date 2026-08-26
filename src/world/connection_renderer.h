@@ -17,8 +17,8 @@ no_curves: when the zoom is low, the lines are rendered as straight lines betwee
 
 struct ConnectionSettings
 {
-	inline static float min_thickness = 20.f;
-	inline static float max_thickness = 50.f;
+	inline static float min_thickness = 70.f;
+	inline static float max_thickness = 100.f;
 
 	inline static sf::Color min_color = { 122, 168, 88, 170 };   // moss green
 	inline static sf::Color max_color = { 180, 240, 50, 170 };    // burnt rust
@@ -129,18 +129,14 @@ private:
 	{
 		const sf::Vector2f diff = conn.pos_b - conn.pos_a;
 		const float dist = std::sqrt(diff.x * diff.x + diff.y * diff.y);
-
 		const float t = distance_ratio(dist, conn.min_dist, conn.max_dist);
 		const float thickness = ConnectionSettings::min_thickness +
-			(ConnectionSettings::max_thickness - ConnectionSettings::min_thickness) * t;
-
+			(ConnectionSettings::max_thickness - ConnectionSettings::min_thickness) * (1.f - t);
 		sf::Color color = { conn.col_r, conn.col_g, conn.col_b, 155 };
 		//const sf::Color color = lerp_color(ConnectionSettings::min_color, ConnectionSettings::max_color, conn.tension);
-
 		sf::Vector2f normal{ 0.f, 0.f };
 		if (dist > 0.0001f)
 			normal = { -diff.y / dist, diff.x / dist };
-
 		return { thickness, color, normal };
 	}
 
