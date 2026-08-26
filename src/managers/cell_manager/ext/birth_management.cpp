@@ -254,7 +254,7 @@ void CellManager::apply_matter_birth_requests()
 			std::cout << "Failed to create cell matter for birth request\n";
 		
 		cell_matter->reset_cell_matter();
-		cell_matter->cell_to_matter(body);
+		cell_matter->cell_to_matter(body, req.inner_color, req.outer_color);
 	}
 
 	matter_birth_requests.clear();

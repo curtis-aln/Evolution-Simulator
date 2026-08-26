@@ -57,6 +57,8 @@ struct BirthRequest
 struct MatterBirthRequest
 {
 	sf::Vector2f position;
+	sf::Color inner_color;
+	sf::Color  outer_color;
 };
 
 struct ConnectionRequest

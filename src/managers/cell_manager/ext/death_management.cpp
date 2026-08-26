@@ -58,8 +58,8 @@ void CellManager::apply_cell_death_requests()
 	for (cell_idx cell_id : cell_death_requests_)
 	{
 		sf::Vector2f pos = get_cell_pos(cell_id);
-		
-		matter_birth_requests.push_back({pos});
+		Cell* cell = all_cells_.at(cell_id);
+		matter_birth_requests.push_back({pos, cell->get_inner_color(), cell->get_outer_color()});
 		remove_cell(cell_id);
 	}
 	cell_death_requests_.clear();
