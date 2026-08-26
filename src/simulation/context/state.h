@@ -176,6 +176,9 @@ struct FoodManagerStatistics
 
     float   food_random_spawn_intensity = 1.f;
     float   food_mitosis_spawn_intensity;
+
+	float pheromone_grid_cells_x = 0;
+	float pheromone_grid_cells_y = 0;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -192,8 +195,9 @@ struct RenderData
     alignas(64) std::vector<sf::Color>    inner_colors;
     alignas(64) std::vector<float>        radii;
 
-
 	std::vector<Connection> spring_connections;
+
+    sf::Texture pheromone_texture;
 
     OVecDebugImGuiSnapshot cell_debug_snapshot;
     OVecDebugImGuiSnapshot food_debug_snapshot;

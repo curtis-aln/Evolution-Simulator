@@ -6,35 +6,43 @@
 #include <algorithm>
 #include <vector>
 #include <Imgui.h>
-#include "../spatial_grid/simple_spatial_grid.h" // calcZOrder, mortonToX/Y, mortonNeighbours3x3, isPow2, cell_idx — adjust path if named differently
+#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 
 struct PheromoneGridSettings
 {
-    float decay_rate = 0.02f;  // fraction of pheromone lost per step
-    float diffuse_rate = 0.15f;  // blend toward 3x3 neighbour average per step
+    float decay_rate = 0.0015f;  // fraction of pheromone lost per step
+    float diffuse_rate = 0.20f;  // blend toward weighted neighbour average per step
     float deposit_amount = 10.0f;  // default amount added per add_pheromone call
     float max_pheromone = 100.0f; // clamp ceiling, also used to normalise heatmap colour
+    uint32_t substeps = 2;      // diffusion sub-iterations per step() call — higher = smoother spread, costs more per tick
 };
 
+// Dense full-grid diffusion, not a sparse query structure — plain row-major storage with a
+// 1-cell clamp-to-edge border beats Morton indexing here: no per-cell encode/decode, a fully
+// separable 1-2-1 kernel (two 3-tap passes instead of one 9-tap 2D kernel), and linear memory
+// access the compiler can auto-vectorize. Rendering uploads the grid as a texture and draws
+// one sprite instead of rebuilding a per-cell triangle mesh every frame.
 class PheromoneGrid
 {
 public:
     explicit PheromoneGrid(uint32_t cells_x, uint32_t cells_y,
         float world_width, float world_height,
         PheromoneGridSettings settings = {})
-        : CellsX(cells_x), CellsY(cells_y)
+        : settings(settings)
+        , CellsX(cells_x), CellsY(cells_y)
+        , PaddedW(cells_x + 2), PaddedH(cells_y + 2)
         , world_width(world_width), world_height(world_height)
-        , settings(settings)
     {
-        // Same constraint as SimpleSpatialGrid — Morton indexing needs power-of-2 dims.
-        assert(isPow2(cells_x) && "CellsX must be a power of 2 for Morton indexing");
-        assert(isPow2(cells_y) && "CellsY must be a power of 2 for Morton indexing");
+        assert(cells_x > 0 && cells_y > 0);
 
-        const uint32_t total = mortonTableSize(cells_x, cells_y);
-        front.assign(total, 0.f);
-        back.assign(total, 0.f);
+        front.assign(static_cast<size_t>(PaddedW) * PaddedH, 0.f);
+        back.assign(static_cast<size_t>(PaddedW) * PaddedH, 0.f);
+        h_pass.assign(static_cast<size_t>(CellsX) * PaddedH, 0.f);
 
         update_cell_dimensions();
+        resize_render_texture();
     }
 
     void update_cell_dimensions()
@@ -45,21 +53,25 @@ public:
 
     void change_cell_dimensions(uint32_t new_cells_x, uint32_t new_cells_y)
     {
-        assert(isPow2(new_cells_x) && isPow2(new_cells_y));
+        assert(new_cells_x > 0 && new_cells_y > 0);
         CellsX = new_cells_x;
         CellsY = new_cells_y;
+        PaddedW = CellsX + 2;
+        PaddedH = CellsY + 2;
         update_cell_dimensions();
 
-        const uint32_t total = mortonTableSize(CellsX, CellsY);
-        front.assign(total, 0.f);
-        back.assign(total, 0.f);
+        front.assign(static_cast<size_t>(PaddedW) * PaddedH, 0.f);
+        back.assign(static_cast<size_t>(PaddedW) * PaddedH, 0.f);
+        h_pass.assign(static_cast<size_t>(CellsX) * PaddedH, 0.f);
+
+        resize_render_texture();
     }
 
-    cell_idx inline hash(const float x, const float y) const
+    uint32_t hash(const float x, const float y) const
     {
-        const auto cell_x = static_cast<uint16_t>(x / cell_width);
-        const auto cell_y = static_cast<uint16_t>(y / cell_height);
-        return calcZOrder(cell_x, cell_y);
+        const uint32_t cx = std::min(static_cast<uint32_t>(x / cell_width), CellsX - 1);
+        const uint32_t cy = std::min(static_cast<uint32_t>(y / cell_height), CellsY - 1);
+        return (cy + 1) * PaddedW + (cx + 1);
     }
 
     void add_pheromone(const float x, const float y, float amount = -1.f)
@@ -67,7 +79,7 @@ public:
         add_pheromone_at_index(hash(x, y), amount);
     }
 
-    void add_pheromone_at_index(const cell_idx index, float amount = -1.f)
+    void add_pheromone_at_index(const uint32_t index, float amount = -1.f)
     {
         if (amount < 0.f) amount = settings.deposit_amount;
         float& v = front[index];
@@ -79,7 +91,7 @@ public:
         return front[hash(x, y)];
     }
 
-    float sample_at_index(const cell_idx index) const
+    float sample_at_index(const uint32_t index) const
     {
         return front[index];
     }
@@ -90,66 +102,78 @@ public:
         std::memset(back.data(), 0, back.size() * sizeof(float));
     }
 
-    // Diffuses toward the 3x3 neighbour average, then decays. Call once per sim tick.
+    // Diffuses via a separable 1-2-1 kernel (equivalent to the 1-2-1/2-4-2/1-2-1 2D kernel
+    // at roughly a third of the reads), then decays. Call once per sim tick.
     void step()
     {
-        for (uint32_t cy = 0; cy < CellsY; ++cy)
+        const uint32_t n = std::max(1u, settings.substeps);
+        const float step_diffuse = settings.diffuse_rate / static_cast<float>(n);
+        const float step_decay = settings.decay_rate / static_cast<float>(n);
+
+        for (uint32_t s = 0; s < n; ++s)
         {
-            for (uint32_t cx = 0; cx < CellsX; ++cx)
+            replicate_border();
+
+            // Horizontal pass: front (padded) -> h_pass (interior columns, all padded rows)
+            for (uint32_t y = 0; y < PaddedH; ++y)
             {
-                const cell_idx idx = calcZOrder(static_cast<uint16_t>(cx), static_cast<uint16_t>(cy));
+                const float* __restrict row = &front[static_cast<size_t>(y) * PaddedW];
+                float* __restrict out = &h_pass[static_cast<size_t>(y) * CellsX];
 
-                uint32_t neighbours[9];
-                mortonNeighbours3x3(idx, neighbours);
-
-                float sum = 0.f;
-                int   valid = 0;
-
-                // Same edge handling as SimpleSpatialGrid::find_from_index — decode
-                // and bounds-check rather than skip via signed arithmetic.
-                for (int i = 0; i < 9; ++i)
-                {
-                    const uint32_t nx = mortonToX(neighbours[i]);
-                    const uint32_t ny = mortonToY(neighbours[i]);
-                    if (nx >= CellsX || ny >= CellsY) continue;
-
-                    sum += front[neighbours[i]];
-                    ++valid;
-                }
-
-                const float avg = valid > 0 ? sum / static_cast<float>(valid) : front[idx];
-                float v = front[idx] + (avg - front[idx]) * settings.diffuse_rate;
-                v *= (1.f - settings.decay_rate);
-
-                back[idx] = v < 0.01f ? 0.f : v; // floor tiny residuals to zero
+                for (uint32_t x = 0; x < CellsX; ++x)
+                    out[x] = (row[x] + 2.f * row[x + 1] + row[x + 2]) * 0.25f;
             }
-        }
 
-        std::swap(front, back);
+            // Vertical pass + blend + decay: h_pass -> back (padded interior)
+            for (uint32_t y = 0; y < CellsY; ++y)
+            {
+                const float* __restrict h_top = &h_pass[static_cast<size_t>(y) * CellsX];
+                const float* __restrict h_mid = &h_pass[static_cast<size_t>(y + 1) * CellsX];
+                const float* __restrict h_bot = &h_pass[static_cast<size_t>(y + 2) * CellsX];
+                const float* __restrict orig = &front[static_cast<size_t>(y + 1) * PaddedW + 1];
+                float* __restrict out = &back[static_cast<size_t>(y + 1) * PaddedW + 1];
+
+                for (uint32_t x = 0; x < CellsX; ++x)
+                {
+                    const float avg = (h_top[x] + 2.f * h_mid[x] + h_bot[x]) * 0.25f;
+                    float v = orig[x] + (avg - orig[x]) * step_diffuse;
+                    v *= (1.f - step_decay);
+                    out[x] = v < 0.01f ? 0.f : v;
+                }
+            }
+
+            std::swap(front, back);
+        }
     }
 
-    size_t get_total_cells() const { return CellsX * CellsY; }
+    size_t get_total_cells() const { return static_cast<size_t>(CellsX) * CellsY; }
 
-    // Heatmap renderer — call inside an ImGui window with an active draw list.
-    // origin is the top-left screen position of the grid; px_per_unit converts world -> screen.
-    void render(ImDrawList* draw_list, ImVec2 origin, float px_per_unit) const
+    // Writes the grid into a texture and draws one sprite — no per-cell geometry, one draw call.
+    // setSmooth(true) on the texture also gets hardware bilinear filtering between cells for free.
+    void render(sf::RenderWindow* window = nullptr)
     {
         for (uint32_t cy = 0; cy < CellsY; ++cy)
         {
+            const float* __restrict row = &front[static_cast<size_t>(cy + 1) * PaddedW + 1];
+            uint8_t* __restrict px = &pixel_buffer[static_cast<size_t>(cy) * CellsX * 4];
+
             for (uint32_t cx = 0; cx < CellsX; ++cx)
             {
-                const cell_idx idx = calcZOrder(static_cast<uint16_t>(cx), static_cast<uint16_t>(cy));
-                const float v = front[idx];
-                if (v <= 0.f) continue;
+                const float t = std::clamp(row[cx] / settings.max_pheromone, 0.f, 1.f);
+                const float g = 0.35f + t * 0.65f;
 
-                const ImVec2 p0(origin.x + cx * cell_width * px_per_unit,
-                    origin.y + cy * cell_height * px_per_unit);
-                const ImVec2 p1(p0.x + cell_width * px_per_unit,
-                    p0.y + cell_height * px_per_unit);
-
-                draw_list->AddRectFilled(p0, p1, heatmap_color(v));
+                px[0] = 0;
+                px[1] = static_cast<uint8_t>(g * 255.f);
+                px[2] = 0;
+                px[3] = static_cast<uint8_t>((0.15f + t * 0.6f) * 255.f);
+                px += 4;
             }
         }
+
+        heat_texture.update(pixel_buffer.data());
+
+		if (window != nullptr)
+            window->draw(heat_sprite);
     }
 
     void track_stats()
@@ -159,9 +183,10 @@ public:
 
         for (uint32_t cy = 0; cy < CellsY; ++cy)
         {
+            const float* row = &front[static_cast<size_t>(cy + 1) * PaddedW + 1];
             for (uint32_t cx = 0; cx < CellsX; ++cx)
             {
-                const float v = front[calcZOrder(static_cast<uint16_t>(cx), static_cast<uint16_t>(cy))];
+                const float v = row[cx];
                 total += v;
                 if (v > max_v) max_v = v;
                 if (v > 0.f)   ++active;
@@ -180,27 +205,45 @@ public:
 
     PheromoneGridSettings settings;
 
+    sf::Texture get_texture() const { return heat_texture; }
+	sf::Sprite  get_sprite() const { return heat_sprite; }
+	sf::Vector2i get_cell_dimensions() const { return { static_cast<int>(CellsX), static_cast<int>(CellsY) }; }
+	sf::Vector2f get_grid_size() const { return { cell_width, cell_height }; }
+
 private:
-    // Blue -> cyan -> yellow -> red ramp, alpha scaling with intensity so empty cells stay invisible.
-    ImU32 heatmap_color(float v) const
+    // Replicates edge cells into the 1-cell border so the diffusion kernel never bounds-checks.
+    void replicate_border()
     {
-        const float t = std::clamp(v / settings.max_pheromone, 0.f, 1.f);
-        float r, g, b;
-        if (t < 0.5f) { r = 0.f;              g = t * 2.f;              b = 1.f - t * 2.f; }
-        else { r = (t - 0.5f) * 2.f; g = 1.f - (t - 0.5f) * 2.f; b = 0.f; }
-        return ImGui::ColorConvertFloat4ToU32(ImVec4(r, g, b, 0.15f + t * 0.6f));
+        for (uint32_t y = 1; y <= CellsY; ++y)
+        {
+            front[y * PaddedW] = front[y * PaddedW + 1];
+            front[y * PaddedW + PaddedW - 1] = front[y * PaddedW + CellsX];
+        }
+        for (uint32_t x = 0; x < PaddedW; ++x)
+        {
+            front[x] = front[PaddedW + x];
+            front[(PaddedH - 1) * PaddedW + x] = front[CellsY * PaddedW + x];
+        }
     }
 
-    // Same rationale as SimpleSpatialGrid::mortonTableSize — allocate to the highest
-    // Morton index actually reachable, not CellsX*CellsY.
-    static uint32_t mortonTableSize(uint32_t cx, uint32_t cy)
+    void resize_render_texture()
     {
-        return calcZOrder(static_cast<uint16_t>(cx - 1),
-            static_cast<uint16_t>(cy - 1)) + 1;
+        // SFML 3 renamed Texture::create to Texture::resize — swap back to create({w,h})
+        // if you're still on SFML 2.
+        heat_texture.resize({ CellsX, CellsY });
+        heat_texture.setSmooth(true);
+        heat_sprite.setTexture(heat_texture, true); // true = reset texture rect to the new size
+        heat_sprite.setScale({ cell_width, cell_height });
+        heat_sprite.setPosition({ 0.f, 0.f });
+
+        pixel_buffer.assign(static_cast<size_t>(CellsX) * CellsY * 4, 0);
     }
+
 
     uint32_t CellsX = 0;
     uint32_t CellsY = 0;
+    uint32_t PaddedW = 0;
+    uint32_t PaddedH = 0;
 
     float cell_width = 0;
     float cell_height = 0;
@@ -209,4 +252,9 @@ private:
 
     alignas(64) std::vector<float> front{};
     alignas(64) std::vector<float> back{};
+    alignas(64) std::vector<float> h_pass{}; // scratch buffer for the horizontal diffusion pass
+
+    sf::Texture heat_texture{};
+    sf::Sprite  heat_sprite{ heat_texture };
+    std::vector<uint8_t> pixel_buffer{};
 };

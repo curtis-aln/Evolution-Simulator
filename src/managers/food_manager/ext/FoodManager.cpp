@@ -4,7 +4,7 @@
 
 FoodManager::FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies)
 	: world_bounds_(world_bounds), bodies_(bodies),
-	pheromone_grid(100, 100, WorldSettings::bounds_radius, WorldSettings::bounds_radius)
+	pheromone_grid(512, 512, WorldSettings::bounds_radius * 2.f, WorldSettings::bounds_radius * 2.f)
 {
 
 }
@@ -24,7 +24,12 @@ void FoodManager::handle_food_death()
 	{
 		if (food->is_food_dead())
 			remove_food(food->id_);
+
+		sf::Vector2f pos = bodies_->at(food->body_id_)->position_;
+		pheromone_grid.add_pheromone(pos.x, pos.y, 10.f);
 	}
+
+	pheromone_grid.step();
 }
 
 void FoodManager::update_position_data(RenderData& food_data)
@@ -38,6 +43,9 @@ void FoodManager::update_position_data(RenderData& food_data)
 	food_data.inner_colors.reserve(reserve_to);
 	food_data.outer_colors.reserve(reserve_to);
 	food_data.velocities.reserve(reserve_to);
+
+	pheromone_grid.render();
+	food_data.pheromone_texture = pheromone_grid.get_texture();
 
 	for (Food* food : food_vector)
 	{

@@ -83,7 +83,8 @@ class WorldRenderer : public WorldSettings
 	SpatialGridRenderer newborn_grid_renderer_;
 
 	// rendering the pheromones
-	PheromoneGrid* food_pheromone_grid_ = nullptr;
+	sf::Texture heat_texture{};
+	sf::Sprite pheromone_sprite_{ heat_texture };
 
 
 public:
@@ -101,8 +102,7 @@ public:
 		visual_grid_(*m_window_, bounds_rect, cells_along_axis_, 3, grid_color, grid_line_thickness),
 		collision_grid_renderer_(collision_grid),
 		food_grid_renderer_(food_grid),
-		newborn_grid_renderer_(newborn_grid),
-		food_pheromone_grid_(food_pheromone_grid)
+		newborn_grid_renderer_(newborn_grid)
 	{
 		init_circle_renderers();
 		init_world_border_renderer(circular_bounds);
@@ -110,7 +110,7 @@ public:
 
 	void render(const SimSnapshot& snapshot, const sf::Vector2f mouse_pos)
 	{
-		//food_pheromone_grid_->render()
+		render_pheromone_grid(snapshot);              // renders the pheromones that are left behind by the cells
 
 		render_visual_grid(snapshot);              // renders the faint grid in the background of the simulation
 		render_spatial_grids(snapshot, mouse_pos); // renders the spatial grids for food, collision, and newborn cells if enabled
@@ -122,6 +122,18 @@ public:
 	}
 
 private:
+	void render_pheromone_grid(const SimSnapshot& snapshot)
+	{
+		pheromone_sprite_.setTexture(snapshot.render.pheromone_texture, true);
+		const sf::Vector2f size = {
+			static_cast<float>(snapshot.food_manager_stats.pheromone_grid_cells_x),
+			static_cast<float>(snapshot.food_manager_stats.pheromone_grid_cells_y) };
+		pheromone_sprite_.setScale(size);
+		pheromone_sprite_.setPosition({ 0.f, 0.f });
+
+		m_window_->draw(pheromone_sprite_, sf::RenderStates());
+	}
+
 	void render_influence_radii(const SimSnapshot& snapshot)
 	{
 		// renders a circle around the mouse to show its influence radius when adding or removing entities

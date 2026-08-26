@@ -148,6 +148,12 @@ void World::fill_snapshot(SimSnapshot& snapshot)
 	cell_manager_.fill_snapshot(snapshot, visible_bounds); // protozoa data
 
     copy_spatial_grids_to_snapshot(snapshot);
+
+	// Pheromone grid data
+	const PheromoneGrid* pheromone_grid = food_manager_.get_pheromone_grid();
+	sf::Vector2f grid_size = pheromone_grid->get_grid_size();
+	snapshot.food_manager_stats.pheromone_grid_cells_x = grid_size.x;
+	snapshot.food_manager_stats.pheromone_grid_cells_y = grid_size.y;
 }
 
 
