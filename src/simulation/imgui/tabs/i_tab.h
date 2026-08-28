@@ -3,6 +3,54 @@
 #include "../../context/sim_command.h"
 #include <optional>
 
+// Horizontal progress bar with a colour override and an overlay string.
+static void colored_bar(const float fraction, const ImVec4& color,
+    const char* overlay, const ImVec2 size = { -1.f, 10.f })
+{
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
+    ImGui::ProgressBar(fraction, size, overlay);
+    ImGui::PopStyleColor();
+}
+
+
+static void labeled_bar(const char* prefix, const float fraction,
+    const ImVec4& color, const char* overlay, float k_summary_bar_height)
+{
+    ImGui::TextDisabled("%s", prefix);
+    ImGui::SameLine();
+    colored_bar(fraction, color, overlay, { -1.f, k_summary_bar_height });
+}
+
+// Safe period in frames for a given frequency.
+static int safe_time_period(const float frequency, int k_max_wave_buf)
+{
+    if (std::abs(frequency) < 1e-6f) return 120;
+    return std::clamp(static_cast<int>(1.f / std::abs(frequency)), 1, k_max_wave_buf);
+}
+
+// Analytical min/max of A*sin(...)+D clamped to [lo, hi].
+// sin ranges over [-1, 1] so the wave spans [D-|A|, D+|A|].
+static void wave_range(const float A, const float D, const float lo, const float hi,
+    float& out_min, float& out_max)
+{
+    out_min = std::clamp(D - std::abs(A), lo, hi);
+    out_max = std::clamp(D + std::abs(A), lo, hi);
+}
+
+// Green-to-red gradient: green at f=1, red at f=0.
+static ImVec4 fraction_color(const float f)
+{
+    return f > 0.5f ? ImVec4{ 2.f * (1.f - f), 1.f, 0.2f, 1.f }
+    : ImVec4{ 1.f, 2.f * f,     0.2f, 1.f };
+}
+
+static void colored_progress(const float fraction, const ImVec4 color,
+    const char* label, const ImVec2 size = { -1.f, 10.f })
+{
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, color);
+    ImGui::ProgressBar(fraction, size, label);
+    ImGui::PopStyleColor();
+}
 
 struct ITab
 {

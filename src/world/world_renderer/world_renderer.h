@@ -3,7 +3,7 @@
 #include <SFML/Graphics/RenderWindow.hpp>
 
 #include "../world_settings.h"
-#include "../connection_renderer.h"
+#include "connection_renderer.h"
 #include "../world_border.h"
 
 #include "../../Utils/Graphics/SFML_Grid.h"

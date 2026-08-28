@@ -1,5 +1,27 @@
 #pragma once
-#include "i_tab.h"
+#include "../i_tab.h"
+
+
+// Visual dimensions for the per-cell mini bars in the Energy tab.
+static constexpr float k_mini_cell_box_width = 130.f;
+static constexpr float k_mini_bar_height = 8.f;
+
+// Placeholder upper bound for cell nutrients until a hard cap is added to
+// ProtozoaSettings. Used for progress-bar scaling only — not enforced here.
+static constexpr float k_summary_bar_height = 18.f;
+
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Internal helpers
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Hard cap on sinwave buffer to prevent OOM when frequency is near zero.
+static constexpr int k_max_wave_buf = 2048;
+
+// Design constants
+inline static constexpr ImVec4 nutrients_bar_col = { 0.35f, 0.75f, 0.35f, 1.f };
+inline static constexpr ImVec4 selector_color = { 0.2, 0.2, 0.8, 1.0 };
+inline static constexpr ImVec2 spring_cell_box_size = { 300.f, -1.f };
 
 // One genetic sine parameter: its current value, valid range, display format,
 // and the SimCommand type that updates it.
@@ -33,6 +55,7 @@ private:
     void draw_overview(const SimSnapshot& snap, ImGuiContext& ctx, const OrganismTracker& protozoa);
     static void draw_no_selection();
     void draw_cells_springs_tab(const SimSnapshot& snap, ImGuiContext& ctx, const OrganismTracker& protozoa);
+    void draw_mutation_controls(const SimSnapshot& snap, ImGuiContext& ctx, const OrganismTracker& protozoa);
     void draw_wave_panel(ImGuiContext& ctx, const float current_friction, const char* child_id, const char* description, int frames_alive, int idx, const char* value_label, std::vector<float>& scratch_buf, const WaveParam& amplitude, const WaveParam& frequency, const WaveParam& offset, const WaveParam& vertical_shift);
     void draw_cell_detail(ImGuiContext& ctx, const Cell& c, const sf::Vector2f& pos, const sf::Vector2f& vel);
     void draw_spring_detail(ImGuiContext& ctx, const OrganismTracker& p, const Spring& s);

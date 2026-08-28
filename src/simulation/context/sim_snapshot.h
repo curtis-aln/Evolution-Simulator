@@ -1,7 +1,7 @@
 #pragma once
 
 #include "state.h"
-#include "simulation/imgui/population_history.h"
+#include "simulation/imgui/tabs/graphs/population_history.h"
 #include "../../managers/cell_manager/organism_tracker.h"
 
 

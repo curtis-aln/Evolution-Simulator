@@ -1,7 +1,7 @@
 #pragma once
 #include "settings/settings.h"
 #include "../world/world.h"
-#include "imgui/population_history.h"
+#include "imgui/tabs/graphs/population_history.h"
 #include "imgui/control_panel.h"
 
 #include "../Utils/custom_clock.h"

@@ -7,7 +7,7 @@
 #include "../../entities/food/food.h"
 #include "../../entities/body.h"
 #include "../../entities/spring/spring.h"
-#include "world/connection_renderer.h"
+#include "world/world_renderer/connection_renderer.h"
 
 
 struct SimulationToggles

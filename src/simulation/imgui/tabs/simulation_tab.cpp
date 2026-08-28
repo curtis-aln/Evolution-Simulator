@@ -1,9 +1,8 @@
 #include "simulation_tab.h"
-#include "../helpers/plot_utils.h"
+#include "graphs/plot_utils.h"
 #include <imgui.h>
 
 #include "world/world_settings.h"
-#include "../helpers/confirm_button.h"
 
 
 void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
@@ -275,12 +274,12 @@ void SimulationTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
     ImGui::Columns(1);
 
-    if (ConfirmButton::draw("Clear all food##tools", { -1.f, 0.f }))
-    { /* TODO: ctx.world.get_food_manager()->clear_all() */
-    }
-    if (ConfirmButton::draw("Clear all protozoa##tools", { -1.f, 0.f }))
-    { /* TODO: ctx.world.clear_all_protozoa() */
-    }
+    //if (ConfirmButton::draw("Clear all food##tools", { -1.f, 0.f }))
+    ///{ /* TODO: ctx.world.get_food_manager()->clear_all() */
+   //}
+    //if (ConfirmButton::draw("Clear all protozoa##tools", { -1.f, 0.f }))
+    //{ /* TODO: ctx.world.clear_all_protozoa() */
+    //}
 
     ImGui::EndChild();
     ImGui::SameLine();

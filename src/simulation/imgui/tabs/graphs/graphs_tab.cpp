@@ -1,5 +1,5 @@
 #include "graphs_tab.h"
-#include "../population_history.h"
+#include "population_history.h"
 #include <imgui.h>
 #include <implot.h>
 #include <numeric>

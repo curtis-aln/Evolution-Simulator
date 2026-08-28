@@ -1,10 +1,9 @@
 #include "control_panel.h"
 #include "tabs/simulation_tab.h"
-#include "tabs/graphs_tab.h"
-#include "tabs/organism_tab.h"
-#include "tabs/tagged_tab.h"
+#include "tabs/graphs/graphs_tab.h"
+#include "tabs/organism/organism_tab.h"
 #include "tabs/grid_tab.h"
-#include "tabs/o_vector_tab.h"
+#include "tabs/o_vector/o_vector_tab.h"
 #include "tabs/debug_tab.h"
 #include "tabs/food_tab.h"
 #include <imgui.h>
@@ -14,13 +13,9 @@
 
 ControlPanel::ControlPanel()
 {
-    auto tagged = std::make_unique<TaggedTab>();
-    m_tagged_tab_ = tagged.get();
-
     m_tabs_.push_back(std::make_unique<SimulationTab>());
     m_tabs_.push_back(std::make_unique<GraphsTab>());
     m_tabs_.push_back(std::make_unique<OrganismTab>());
-    m_tabs_.push_back(std::move(tagged));
     m_tabs_.push_back(std::make_unique<GridTab>());
     m_tabs_.push_back(std::make_unique<OVecDebugTab>());
     m_tabs_.push_back(std::make_unique<DebugTab>());
@@ -34,7 +29,6 @@ void ControlPanel::select_tab(const char* label)
 
 void ControlPanel::draw(const SimSnapshot& snap, ImGuiContext& ctx, float dt)
 {
-    m_tagged_tab_->draw_toasts(dt);
     ImGui::SetNextWindowPos({ 10.f, 10.f }, ImGuiCond_FirstUseEver);
     ImGui::SetNextWindowSize({ 520.f, 640.f }, ImGuiCond_FirstUseEver);
 

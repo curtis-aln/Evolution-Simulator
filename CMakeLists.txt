@@ -108,20 +108,26 @@ add_executable(ProjectARIA
     src/simulation/imgui/control_panel.cpp
     src/simulation/imgui/imgui_handling.cpp
     src/simulation/imgui/imgui_settings.h
-    src/simulation/imgui/helpers/toast_system.cpp
 
     # ── ImGui tab implementations
     src/simulation/imgui/tabs/debug_tab.cpp
     src/simulation/imgui/tabs/debug_tab.h
     src/simulation/imgui/tabs/food_tab.cpp
     src/simulation/imgui/tabs/food_tab.h
-    src/simulation/imgui/tabs/graphs_tab.cpp
+    src/simulation/imgui/tabs/graphs/graphs_tab.cpp
     src/simulation/imgui/tabs/grid_tab.cpp
-    src/simulation/imgui/tabs/organism_tab.cpp
-    src/simulation/imgui/tabs/o_vector_tab.cpp
-    src/simulation/imgui/tabs/o_vector_tab.h
+    src/simulation/imgui/tabs/organism/organism_tab.cpp
+    src/simulation/imgui/tabs/organism/brain_widget.cpp
+    src/simulation/imgui/tabs/organism/cell_details.cpp
+    src/simulation/imgui/tabs/organism/spring_details.cpp
+    src/simulation/imgui/tabs/organism/energy_subtab.cpp
+    src/simulation/imgui/tabs/o_vector/capacity.cpp
+    src/simulation/imgui/tabs/o_vector/churn.cpp
+    src/simulation/imgui/tabs/o_vector/integrity.cpp
+    src/simulation/imgui/tabs/o_vector/overview.cpp
+    src/simulation/imgui/tabs/o_vector/snapshots.cpp
+    src/simulation/imgui/tabs/o_vector/o_vector_tab.h
     src/simulation/imgui/tabs/simulation_tab.cpp
-    src/simulation/imgui/tabs/tagged_tab.cpp
 
     # ── World / collision resolver
     src/world/collision_resolver/detection.cpp
