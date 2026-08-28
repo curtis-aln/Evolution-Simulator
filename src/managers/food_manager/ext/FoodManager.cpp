@@ -185,5 +185,33 @@ void FoodManager::handle_food_manager_event(SimCommand& cmd)
 	case CommandType::SetPheromoneMaxPheromone:
 		PheromoneGridSettings::max_pheromone = cmd.float_val;
 		break;
+
+	case CommandType::SetFoodNutrients:
+		FoodManagerSettings::final_nutrients = cmd.float_val;
+		break;
+
+	case  CommandType::SetFoodNutrientsDevelopmentTime:
+		FoodManagerSettings::nutrient_development_time = static_cast<size_t>(cmd.float_val);
+		break;
+
+	case  CommandType::SetFoodFriction:
+		FoodManagerSettings::friction = cmd.float_val;
+		break;
+
+	case  CommandType::SetFoodVibrationStrength:
+		FoodManagerSettings::vibration_strength = cmd.float_val;
+		break;
+
+	case CommandType::SetFoodReproductiveCooldown:
+		FoodManagerSettings::repro_cooldown = static_cast<size_t>(cmd.float_val);
+		break;
+
+	case  CommandType::SetFoodDeathAge:
+		FoodManagerSettings::death_age = cmd.float_val;
+		break;
+
+	case  CommandType::SetFoodReproductiveThreshold:
+		FoodManagerSettings::reproductive_threshold = cmd.float_val;
+		break;
 	}
 }

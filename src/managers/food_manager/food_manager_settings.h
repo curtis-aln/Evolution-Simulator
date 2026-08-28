@@ -34,7 +34,6 @@ struct FoodManagerSettings
 	inline static float death_age_chance; // every frame past its death age gives it this chance of dying
 
 	inline static float food_initial_radius = 6;
-	inline static size_t food_growth_frames = 100;
 
 	inline static float nutrients_to_radius_scale = .56f; // radius = nutrients * this constant
 	inline static float fade_start_nutrients = 30.0f;       // nutrients level at which fading begins

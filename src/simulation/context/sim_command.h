@@ -87,7 +87,15 @@ enum class CommandType
 	SetPheromoneDecayRate,
 	SetPheromoneDiffusionRate,
     SetPheromoneDepositAmount,
-    SetPheromoneMaxPheromone
+    SetPheromoneMaxPheromone,
+
+    SetFoodNutrients,
+	SetFoodNutrientsDevelopmentTime,
+    SetFoodFriction,
+	SetFoodVibrationStrength,
+    SetFoodReproductiveCooldown,
+    SetFoodDeathAge,
+	SetFoodReproductiveThreshold,
 };
 
 // Parameters for the MutateProtozoa command
