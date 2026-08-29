@@ -22,16 +22,14 @@ static void load_simulation_settings(toml::table& tbl)
 {
     REQUIRE(SimulationSettings::full_screen, tbl["simulation"]["full_screen"]);
     REQUIRE(SimulationSettings::vsync, tbl["simulation"]["vsync"]);
-    REQUIRE(SimulationSettings::max_fps, tbl["simulation"]["max_fps"]);
-    REQUIRE(SimulationSettings::ui_scale_percent, tbl["simulation"]["ui_scale_percent"]);
-}
 
-static void load_graphical_settings(toml::table& tbl)
-{
-    REQUIRE(GraphicalSettings::spring_outline_thickness, tbl["graphical"]["spring_outline_thickness"]);
-    REQUIRE(GraphicalSettings::spring_thickness, tbl["graphical"]["spring_thickness"]);
-    REQUIRE(GraphicalSettings::cell_outline_thickness, tbl["graphical"]["cell_outline_thickness"]);
-    REQUIRE(GraphicalSettings::food_transparency, tbl["graphical"]["food_transparency"]);
+    REQUIRE(SimulationSettings::initial_frame_rate_updating, tbl["simulation"]["max_fps_updating"]);
+    REQUIRE(SimulationSettings::initial_frame_rate_rendering, tbl["simulation"]["max_fps_rendering"]);
+
+	REQUIRE(SimulationSettings::max_iterations, tbl["simulation"]["max_iterations"]);
+    REQUIRE(SimulationSettings::max_simulation_time, tbl["simulation"]["max_runtime"]);
+
+    REQUIRE(SimulationSettings::ui_scale_percent, tbl["simulation"]["ui_scale_percent"]);
 }
 
 static void load_world_settings(toml::table& tbl)
@@ -41,11 +39,14 @@ static void load_world_settings(toml::table& tbl)
     REQUIRE(WorldSettings::cells_x, tbl["world"]["cells_x"]);
     REQUIRE(WorldSettings::cells_y, tbl["world"]["cells_y"]);
     REQUIRE(WorldSettings::cell_max_capacity, tbl["world"]["cell_max_capacity"]);
+
+	REQUIRE(WorldSettings::updating_threads, tbl["world"]["updating_threads"]);
+	REQUIRE(WorldSettings::tick_sim_multiplier, tbl["world"]["tick_sim_multiplier"]);
 }
 
 static void load_cell_manager_settings(toml::table& tbl)
 {
-    REQUIRE(CellManagerSettings::max_protozoa, tbl["cell_manager"]["max_protozoa"]);
+    REQUIRE(CellManagerSettings::max_cells, tbl["cell_manager"]["max_protozoa"]);
     REQUIRE(CellManagerSettings::initial_protozoa, tbl["cell_manager"]["initial_protozoa"]);
     REQUIRE(CellManagerSettings::auto_reset_on_extinction, tbl["cell_manager"]["auto_reset_on_extinction"]); // NEW
 }
@@ -121,7 +122,6 @@ void load_settings(const std::string& path)
 
 
     load_simulation_settings(tbl);
-    load_graphical_settings(tbl);
     load_world_settings(tbl);
     load_cell_settings(tbl);
 	load_spring_settings(tbl);

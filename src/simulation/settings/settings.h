@@ -7,45 +7,28 @@ void load_settings(const std::string& path);
 
 struct SimulationSettings
 {
-	inline static constexpr int initial_frame_rate_updating = 0; // set to zero to run the simulation as fast as possible
-	inline static constexpr int initial_frame_rate_rendering = 60;
+	inline static int max_iterations;
+	inline static float max_simulation_time;
 
-	inline static constexpr int frame_smoothing = 30;
-	inline static constexpr double resize_shrinkage = 0.95;
+	inline static double initial_frame_rate_updating; // set to zero to run the simulation as fast as possible
+	inline static double initial_frame_rate_rendering;
+
+	inline static constexpr int frame_smoothing = 60;
+	inline static constexpr double window_resize_shrinkage = 0.95;
+
 	inline static const std::string simulation_name = "Project A.R.I.A";
 	inline static const std::string settings_file_location = "media/aria_settings.toml";
 
 	inline static constexpr float camera_lerp_factor = 0.04f; // how quickly the camera follows the selected protozoa
 
-	inline static const std::vector<sf::Color> bg_colors = {
-		{0, 5, 40}
-	};
+	inline static const std::vector<sf::Color> bg_colors = {{0, 5, 40}};
+	inline static const sf::Color window_color = { 0, 0, 0 };
 
 	inline static bool full_screen;
 	inline static bool vsync;
 
-	inline static unsigned max_fps;
-
 	inline static float ui_scale_percent;
-};
 
-struct GraphicalSettings
-{
-	inline static const sf::Color window_color = { 0, 0, 0 };
+	inline static constexpr float min_zoom_to_select_protozoa = 0.062f; // if zoomed out more than this, clicking on protozoa is disabled
 
-
-	inline static float spring_thickness;
-	inline static float spring_outline_thickness;
-
-	inline static float cell_outline_thickness; // relative to the size of the cell
-
-	inline static std::uint8_t food_transparency;
-
-	inline static const std::vector<sf::Color> food_fill_colors = {
-		{200, 30, 30}
-	};
-
-	inline static const std::vector<sf::Color> food_outline_colors = {
-		{250, 60, 60}
-	};
 };

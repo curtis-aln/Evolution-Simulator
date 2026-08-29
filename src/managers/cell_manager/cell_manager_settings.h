@@ -3,7 +3,7 @@
 
 struct CellManagerSettings
 {
-	inline static unsigned max_protozoa;
+	inline static unsigned max_cells;
 	inline static unsigned initial_protozoa;
 	inline static bool auto_reset_on_extinction;
 
@@ -23,6 +23,8 @@ struct CellManagerSettings
 	inline static constexpr int extincion_threshold = 10; // if there are less than this number of protozoas, we consider it an extinction event
 
 	inline static constexpr int sim_death_immunity_frames = 400;
+
+	inline static constexpr float cell_outline_thickness = 1.3f;
 
 	// DAMAGE
 	inline static constexpr float impulse_damage_thresh = 50.0f;

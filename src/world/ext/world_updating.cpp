@@ -95,6 +95,7 @@ void World::ensure_update_jobs_built()
 
 	updating_bodies_.clear();
 	updating_bodies_.reserve(updating_threads);
+	std::cout << "Building update jobs for " << updating_threads << " threads." << std::endl;
 
 	for (int t = 0; t < (int)updating_threads; ++t)
 	{
@@ -156,7 +157,7 @@ void World::bound_body_to_world(Body* body)
 	}
 
 	// very small attraction to the centre of the world
-	body->velocity_ += (world_circular_bounds_.center_ - body->position_) * attraction_strength;
+	body->velocity_ += (world_circular_bounds_.center_ - body->position_) * border_repulsion_magnitude;
 }
 
 

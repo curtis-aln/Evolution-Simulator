@@ -22,6 +22,7 @@ int main()
 
     // Globally available settings loaded from toml file
 	load_settings(ARIA_SETTINGS_PATH);
+	std::cout << WorldSettings::updating_threads << " threads will be used for updating the simulation.\n";
 
     // Custom Debugger
     //CrashLogger::set_exception_translator(); todo

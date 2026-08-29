@@ -60,7 +60,6 @@
 template<std::size_t Resolution = 100, typename Clock = std::chrono::steady_clock>
 class CustomClock
 {
-    static_assert(Resolution > 0, "CustomClock: Resolution must be greater than 0");
 
 public:
     /// @param target_fps Desired frame-rate cap for limit_frame_rate().

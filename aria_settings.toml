@@ -6,25 +6,24 @@
 
 # ── Simulation / Window ─────────────────────────────────────────────────
 [simulation]
-vsync                    = false
-full_screen               = false
-ui_scale_percent          = 100.0
-max_fps                   = 0            # 0 = uncapped
+vsync             = false
+full_screen       = false
+ui_scale_percent  = 100.0
+max_fps_rendering = 144    # 0 = uncapped
+max_fps_updating  = 60
+max_runtime = 0 # simulation ends after this many seconds have passed, 0 = infinite
+max_iterations = 0 # simulation ends after this many iterations, 0 = infinite
 
-# ── Graphical ────────────────────────────────────────────────────────────
-[graphical]
-spring_thickness           = 9.0
-spring_outline_thickness   = 6.0
-cell_outline_thickness     = 1.3         # relative to cell radius
-food_transparency          = 200         # 0-255
 
 # ── World ────────────────────────────────────────────────────────────────
 [world]
-bounds_radius               = 13000
-border_repulsion_magnitude  = 0.001
-cells_x                     = 64    
-cells_y                     = 64
+bounds_radius               = 18000
+border_repulsion_magnitude  = 0.000000085
+cells_x                     = 128  
+cells_y                     = 128
 cell_max_capacity           = 14
+updating_threads = 16
+tick_sim_multiplier = 1
 
 # ── Cell Manager ─────────────────────────────────────────────────────────
 [cell_manager]

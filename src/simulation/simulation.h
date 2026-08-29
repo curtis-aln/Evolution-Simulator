@@ -18,9 +18,6 @@
 #include "../managers/cell_manager/organism_tracker.h"
 #include "context/state.h"
 
-inline static constexpr float max_simulation_time = 0.f; // seconds set to 0 for infinite
-inline static constexpr float min_zoom_to_select_protozoa = 0.062f; // if zoomed out more than this, clicking on protozoa is disabled
-inline static constexpr int max_iterations = 0;// 100000; // Set a maximum number of iterations for the simulation
 
 class Simulation : SimulationSettings
 {
@@ -30,8 +27,8 @@ class Simulation : SimulationSettings
     static sf::VideoMode getAdjustedVideoMode()
     {
         sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-        return sf::VideoMode({ (unsigned)(desktop.size.x * resize_shrinkage),
-                               (unsigned)(desktop.size.y * resize_shrinkage) });
+        return sf::VideoMode({ (unsigned)(desktop.size.x * window_resize_shrinkage),
+                               (unsigned)(desktop.size.y * window_resize_shrinkage) });
     }
 
     sf::VideoMode   videoMode = full_screen ? sf::VideoMode::getDesktopMode() : getAdjustedVideoMode();
@@ -54,7 +51,7 @@ class Simulation : SimulationSettings
     ImPlotColormap m_plot_colormap_{};
 
     // Multithreading
-    int max = static_cast<int>(CellManagerSettings::max_protozoa);
+    int max = static_cast<int>(CellManagerSettings::max_cells);
 	TripleBuffer<SimSnapshot> m_sim_buffer_{ max }; // sim -> render (lock-free)
 
     // render → sim  (low frequency, mutex protected)

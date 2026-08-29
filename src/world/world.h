@@ -24,14 +24,9 @@
 #include "world_renderer/world_renderer.h"
 #include "food_eat_resolver.h"
 
-inline static constexpr float cell_drag_strength = 0.1f; // how strong the mouse drag is on a cell
-inline static constexpr float attraction_strength = 0.000000085f; // cells attraction to the world center
-inline static constexpr int tick_sim_multiplier = 1;  // how many times to tick the simulation per frame, this is used to speed up the simulation when paused
-inline static constexpr float cell_press_tollarance_factor = 1.2f; // how much bigger the cell press area is than the cell radius
-
 class World : public WorldSettings
 {
-    unsigned max_entities = CellManagerSettings::max_protozoa + FoodManagerSettings::max_food;
+    unsigned max_entities = CellManagerSettings::max_cells + FoodManagerSettings::max_food;
 
     sf::RenderWindow* m_window_ = nullptr;
 

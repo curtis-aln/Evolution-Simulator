@@ -170,8 +170,8 @@ private:
 	{
 		/* Initialize the circle renderers for the outer and inner circles. */
 		constexpr float texture_radius = 120.f;
-		outer_circle_renderer_.init(m_window_, texture_radius, CellManagerSettings::max_protozoa);
-		inner_circle_renderer_.init(m_window_, texture_radius, CellManagerSettings::max_protozoa);
+		outer_circle_renderer_.init(m_window_, texture_radius, CellManagerSettings::max_cells);
+		inner_circle_renderer_.init(m_window_, texture_radius, CellManagerSettings::max_cells);
 	}
 
 	void init_world_border_renderer(const WorldBorder& circular_bounds)
@@ -241,7 +241,7 @@ private:
 			auto pos = snapshot.render.positions[i];
 			auto vel = snapshot.render.velocities[i];
 			const float base_radius = snapshot.render.radii[i];
-			const float rad = base_radius * GraphicalSettings::cell_outline_thickness;
+			const float rad = base_radius * CellManagerSettings::cell_outline_thickness;
 			const float margin = rad - base_radius; // available slack in the outline ring
 
 			const float scaled_x = ease_out(margin, vel.x);
@@ -279,9 +279,6 @@ private:
 		if (protozoa.is_active == false)
 			return;
 
-		if (snapshot.cell_toggles.skeleton_mode)
-			draw_cell_outlines(protozoa);
-
 		if (snapshot.cell_toggles.show_bounding_boxes)
 			draw_protozoa_bounding_box(protozoa.bounds, *m_window_);
 
@@ -311,33 +308,6 @@ private:
 			circle_outline.setPosition(pos - sf::Vector2f{ rad, rad });
 
 			m_window_->draw(circle_outline);
-			i++;
-		}
-	}
-
-
-	void draw_cell_outlines(const OrganismTracker& protozoa)
-	{
-		sf::CircleShape circle_outline;
-		circle_outline.setPointCount(30); // Reduce aliasing, set once
-		int i = 0;
-		for (const Cell& cell : protozoa.cells)
-		{
-			const Body& body = protozoa.bodies[i];
-
-			const sf::Vector2f pos = body.position_;
-			const float rad = cell.radius + GraphicalSettings::cell_outline_thickness;
-
-			circle_outline.setRadius(rad);
-			circle_outline.setFillColor({ 0, 0, 0 });
-			circle_outline.setPosition(pos - sf::Vector2f{ rad, rad });
-			m_window_->draw(circle_outline);
-
-			circle_outline.setFillColor({ 255, 0, 255 });
-			circle_outline.setRadius(rad / 3);
-			circle_outline.setPosition(pos - sf::Vector2f{ rad / 3, rad / 3 });
-			m_window_->draw(circle_outline);
-
 			i++;
 		}
 	}
