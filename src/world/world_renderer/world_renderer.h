@@ -55,13 +55,24 @@ inline void utilise_circle_renderer(CircleBatchRenderer& circle_renderer,
 	circle_renderer.render();
 }
 
+// Returns the number of cells per side needed to keep each cell approximately
+// `target_cell_size` wide as `world_size` changes, rounded up to the next
+// power of two (required for Morton indexing in SimpleSpatialGrid).
+inline uint32_t compute_grid_cell_count(float world_size, float target_cell_size)
+{
+	target_cell_size = std::max(target_cell_size, 1.f); // guard div-by-zero / negative sizes
+
+	const uint32_t raw_cells = static_cast<uint32_t>(std::ceil(world_size / target_cell_size));
+	return std::bit_ceil(std::max(raw_cells, 1u)); // next power of 2, min 1
+}
+
 /* This class renders pretty much the entire simulation, including the world, cells, and other entities. */
 class WorldRenderer : public WorldSettings
 {
 	sf::RenderWindow* m_window_ = nullptr;
 
 	// this is used as a frame of reference to see how fast cells are moving
-	size_t cells_along_axis_ = static_cast<size_t>(CollisionResolver::cells_x / cells_div_value);
+	size_t cells_along_axis_ = compute_grid_cell_count(WorldSettings::bounds_radius, WorldSettings::target_visual_cell_size);
 	SFML_Grid visual_grid_;
 
 	// This is the circular world border that is drawn on the screen

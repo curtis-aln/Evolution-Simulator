@@ -116,7 +116,8 @@ class CellManager: protected CellManagerSettings
 	int  current_total_cells_ = 0;
 
 	// this spatial grid holds new born cells so that the they can form connections between other newly born cells
-	SimpleSpatialGrid new_born_cell_grid_{ WorldSettings::birth_cells_x, WorldSettings::birth_cells_y, WorldSettings::cell_max_capacity, WorldSettings::bounds_radius * 2.0f, WorldSettings::bounds_radius * 2.0f };
+	uint32_t cells_x = 2 << WorldSettings::birth_cell_power;
+	SimpleSpatialGrid new_born_cell_grid_{ cells_x, cells_x, WorldSettings::birth_max_capacity, WorldSettings::bounds_radius * 2.0f, WorldSettings::bounds_radius * 2.0f };
 	
 	bool spawn_immune = false;
 

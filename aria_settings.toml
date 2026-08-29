@@ -19,31 +19,46 @@ max_iterations = 0 # simulation ends after this many iterations, 0 = infinite
 [world]
 bounds_radius               = 18000
 border_repulsion_magnitude  = 0.000000085
-cells_x                     = 128  
-cells_y                     = 128
-cell_max_capacity           = 14
 updating_threads = 16
 tick_sim_multiplier = 1
 
+# 5 = 32, 6 = 64, 7 = 128, 8 = 256, 9 = 512, 10 = 1024, 11 = 2048
+# each of these is used to calculate the size of a square spatial grid using the formula: 2^n
+collision_grid_power = 8          # The grid used to handle collisions between all bodies
+food_resolution_cell_power = 8    # the grid used to handle cell food interactions
+birth_cell_power = 6              # The grid used to let newborns connect with eachover
+
+# Max Capacities for each aswell 
+collision_grid_max_capacity           = 14
+food_resolution_grid_max_capacity     = 14
+birth_grid_max_capacity               = 4
+
 # ── Cell Manager ─────────────────────────────────────────────────────────
 [cell_manager]
-max_protozoa                = 220000     
-initial_protozoa            = 450     
+max_cells                = 220000  # maximum number of cells in the simulation
+initial_protozoa            = 450  # seeds to create the initial population of cells  
 auto_reset_on_extinction    = true
+infant_time = 500 # time in ticks that a cell is considered an infant and can form connections
+speed_energy_tax = -0.4 # The Tax for not traveling fast enough
 
 # ── Cell ─────────────────────────────────────────────────────────────────
 [cell]
-max_cells                  = 500000     
-spawn_radius                = 50.0   
-energy_decay_rate           = 0.03
-wander_threshold             = 600.0
-reproductive_cooldown        = 500
+spawn_radius                = 50.0   # The radius of the circle in which cells are spawned at the start of the simulation
+reproductive_cooldown        = 500   # 
 digestive_time                = 50
+
 initial_energy                = 70.0
-breaking_length                = 425.0
+bite_amount = 10.0 
+
+integrity_conversion_rate = 0.05
+nutrients_conversion_rate = 0.185
+
+friction_energy_loss_const = 0.02
+
+# ── Spring ─────────────────────────────────────────────────────────────────
+[spring]
 maximum_extension               = 380.0
 spring_work_const                = 0.00001
-
 
 # ── Food Manager ─────────────────────────────────────────────────────────
 [food_manager]

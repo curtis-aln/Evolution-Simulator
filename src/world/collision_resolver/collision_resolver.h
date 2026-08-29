@@ -22,8 +22,7 @@ inline static constexpr int collision_resolution_interval = 30; // how often to 
 struct ResolutionSettings
 {
 	// 1, 2, 4, 8, 16, 32, 64, 128
-	inline static uint32_t cells_x = (1u << 6); // for morton indexing, must be a power of 2
-	inline static uint32_t cells_y = cells_x;     // square worlds
+	inline static uint32_t grid_power = 6; // 2^grid_power = number of cells in each dimension
 	inline static const uint8_t cell_max_capacity = 28; // maximum number of particles per cell, must be less than 256, but really shouldnt be any greater than 6
 
 	inline static constexpr float correction_factor = 0.2f; // how much of the overlap is corrected each frame, 0.2 is a good value, 1.0 is too much and causes jittering

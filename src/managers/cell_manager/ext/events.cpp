@@ -77,16 +77,16 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 
 		// Spring Natual Selection Modifier
 	case CommandType::SetSpringBreakingForce:
-		Spring::SPRING_BREAK_FORCE = cmd.float_val;
+		Spring::spring_break_force = cmd.float_val;
 		break;
 	case CommandType::SetSpringBreakingLength:
-		Spring::SPRING_BREAK_LENGTH = cmd.float_val;
+		Spring::spring_break_length_factor = cmd.float_val;
 		break;
 	case CommandType::SetSpringDamageThreshold:
-		Spring::SPRING_DAMAGE_THRESH = cmd.float_val;
+		Spring::spring_damage_threshold = cmd.float_val;
 		break;
 	case CommandType::SetSpringWorkConst:
-		Spring::SPRING_WORK_CONST = cmd.float_val;
+		Spring::spring_work_const = cmd.float_val;
 		break;
 
 	case CommandType::SetMinSpeed:

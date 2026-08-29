@@ -5,18 +5,10 @@
 #include "../cell/cell.h"
 #include "spring_settings.h"
 
-inline static constexpr float stress_damage_const = 0.095f;
-
 struct SpringResult { float work_done; float force_magnitude; bool broken; };
 
 struct Spring : SpringSettings
 {
-	// These parameters determine the organics of the spring
-	inline static float SPRING_BREAK_FORCE = 100000.f;
-	inline static float SPRING_BREAK_LENGTH = 0.f;
-	inline static float SPRING_DAMAGE_THRESH = 0.f;
-	inline static float SPRING_WORK_CONST = 0.f;
-
 private:
 	bool broken = false;
 
@@ -108,7 +100,8 @@ public:
 		const sf::Vector2f dir = pos_b - pos_a;
 		const float length_squared = dir.x * dir.x + dir.y * dir.y;
 
-		if (length_squared > SPRING_BREAK_LENGTH * SPRING_BREAK_LENGTH && !disable_length_breakage)
+		float break_len = spring_break_length_factor * maximum_extension;
+		if (length_squared > break_len * break_len && !disable_length_breakage)
 		{
 			break_spring();
 			movement_vector = { 0, 0 };
@@ -137,15 +130,15 @@ public:
 
 		// we can calculate the amount of energy this contraction / extension took
 		work_done = std::abs(spring_force * length_diff);
-		work_done *= SPRING_WORK_CONST;
+		work_done *= spring_work_const;
 
 		const float force_magnitude = std::abs(total_force);
 
 		// Stress: 0 = relaxed, 1 = at breaking point
-		stress = force_magnitude / SPRING_BREAK_FORCE;
+		stress = force_magnitude / spring_break_force;
 
 		// Force-based break (complements your existing length-based break)
-		if (force_magnitude > SPRING_BREAK_FORCE && !disable_force_breakage)
+		if (force_magnitude > spring_break_force && !disable_force_breakage)
 			break_spring();
 	}
 
@@ -163,7 +156,7 @@ public:
 			return;
 		}
 
-		if (stress > SPRING_DAMAGE_THRESH && !disable_stress_damage)
+		if (stress > spring_damage_threshold && !disable_stress_damage)
 		{
 			update_integrity(cell_a, cell_b);
 		}
@@ -180,7 +173,7 @@ public:
 
 	void update_integrity(Cell& cell_a, Cell& cell_b)
 	{
-		float excess = stress - SPRING_DAMAGE_THRESH;
+		float excess = stress - spring_damage_threshold;
 		float damage = -excess / 2.f * stress_damage_const;
 
 		cell_a.change_integrity(damage);

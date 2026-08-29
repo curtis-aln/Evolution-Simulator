@@ -155,7 +155,6 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
     ImGui::Separator();
     ImGui::Text("Nutrients  ->  Energy    %.5f", CellSettings::nutrients_conversion_rate);
     ImGui::Text("Energy     ->  Integrity %.5f", CellSettings::integrity_conversion_rate);
-    ImGui::Text("Energy share (springs)   %.5f", SpringSettings::energy_share_rate);
     ImGui::Text("Spring work cost         %.5f", SpringSettings::spring_work_const);
 
     ImGui::Spacing();
@@ -163,7 +162,6 @@ void OrganismTab::draw_energy_tab(ImGuiContext& ctx, const SimSnapshot& snap)
     ImGui::Separator();
     ImGui::Text("Initial energy           %.1f", CellSettings::initial_energy);
     ImGui::Text("Reproduce threshold      %.1f", CellSettings::max_energy);
-    ImGui::Text("Offspring energy cost    %.1f", CellSettings::offspring_energy_cost);
     ImGui::Text("Integrity max            %.1f", CellSettings::max_integrity);
     ImGui::Text("Nutrients cap (*)        %.1f", CellSettings::max_nutrients);
 

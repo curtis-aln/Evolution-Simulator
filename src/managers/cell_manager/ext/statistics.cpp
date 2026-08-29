@@ -132,8 +132,9 @@ void CellManager::update_statistics()
 	statistics_.average_generation /= count;
 
 
-	statistics_.spring_breaking_force = Spring::SPRING_BREAK_FORCE;
-	statistics_.spring_breaking_length = Spring::SPRING_BREAK_LENGTH;
-	statistics_.spring_damage_threshold = Spring::SPRING_DAMAGE_THRESH;
-	statistics_.spring_work_const = Spring::SPRING_WORK_CONST;
+
+	statistics_.spring_breaking_force = Spring::spring_break_force;
+	statistics_.spring_breaking_length = Spring::spring_break_length_factor;
+	statistics_.spring_damage_threshold = Spring::spring_damage_threshold;
+	statistics_.spring_work_const = Spring::spring_work_const;
 }

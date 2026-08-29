@@ -2,17 +2,11 @@
 
 struct CellSettings
 {
-	inline static float offspring_energy_cost = 50.f;
+	inline static float spawn_radius; // during the protozoa creation, cells are spawned in a circle of this radius
+	inline static float bite_amount; // how much nutrients a cell can take from food in one bite
 
-	inline static float bite_amount = 10.f;
-
-	inline static int max_cells;
-	inline static float spawn_radius;
-
-	inline static float wander_threshold; // if a cell wanders too far away from the protozoa it kills the whole thing
-
-	inline static size_t repro_cooldown;
-	inline static float digestive_time; // per cell
+	inline static size_t repro_cooldown; // how long a cell has to wait before it can reproduce again
+	inline static float digestive_time; // how long it takes for a cell to digest food before it can eat again
 
 	// Energy, nutrients, and integrity
 	inline static float initial_energy; // energy the protozoa spawn with
@@ -22,9 +16,9 @@ struct CellSettings
 	inline static float max_integrity = 100;
 	inline static float max_energy = 100;
 
-	inline static float integrity_conversion_rate = 0.05f;
-	inline static float nutrients_conversion_rate = .185f;
+	inline static float integrity_conversion_rate;
+	inline static float nutrients_conversion_rate;
 
-	inline static constexpr float friction_energy_loss_const = 0.02f;
-	inline static const uint8_t max_cell_connections = 2;
+	inline static float friction_energy_loss_const;
+	inline static constexpr uint8_t max_cell_connections = 2;
 };

@@ -59,7 +59,7 @@ void CellManager::update(int iterations)
 	apply_matter_death_requests();
 
 	// --------------- updating cells and matter ---------------
-	spawn_immune = iterations < sim_death_immunity_frames;
+	spawn_immune = iterations < init_spring_immunity_time;
 
 	add_new_cells_to_grid();
 

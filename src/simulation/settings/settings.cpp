@@ -36,9 +36,12 @@ static void load_world_settings(toml::table& tbl)
 {
     REQUIRE(WorldSettings::bounds_radius, tbl["world"]["bounds_radius"]);
     REQUIRE(WorldSettings::border_repulsion_magnitude, tbl["world"]["border_repulsion_magnitude"]);
-    REQUIRE(WorldSettings::cells_x, tbl["world"]["cells_x"]);
-    REQUIRE(WorldSettings::cells_y, tbl["world"]["cells_y"]);
-    REQUIRE(WorldSettings::cell_max_capacity, tbl["world"]["cell_max_capacity"]);
+    
+	REQUIRE(WorldSettings::collision_grid_power, tbl["world"]["collision_grid_power"]);
+	REQUIRE(WorldSettings::collision_max_capacity, tbl["world"]["collision_grid_max_capacity"]);
+
+	REQUIRE(WorldSettings::birth_cell_power, tbl["world"]["birth_cell_power"]);
+	REQUIRE(WorldSettings::birth_max_capacity, tbl["world"]["birth_grid_max_capacity"]);
 
 	REQUIRE(WorldSettings::updating_threads, tbl["world"]["updating_threads"]);
 	REQUIRE(WorldSettings::tick_sim_multiplier, tbl["world"]["tick_sim_multiplier"]);
@@ -46,26 +49,31 @@ static void load_world_settings(toml::table& tbl)
 
 static void load_cell_manager_settings(toml::table& tbl)
 {
-    REQUIRE(CellManagerSettings::max_cells, tbl["cell_manager"]["max_protozoa"]);
+    REQUIRE(CellManagerSettings::max_cells, tbl["cell_manager"]["max_cells"]);
     REQUIRE(CellManagerSettings::initial_protozoa, tbl["cell_manager"]["initial_protozoa"]);
-    REQUIRE(CellManagerSettings::auto_reset_on_extinction, tbl["cell_manager"]["auto_reset_on_extinction"]); // NEW
+    REQUIRE(CellManagerSettings::auto_reset_on_extinction, tbl["cell_manager"]["auto_reset_on_extinction"]); 
+	REQUIRE(CellManagerSettings::infant_time, tbl["cell_manager"]["infant_time"]);
+	REQUIRE(CellManagerSettings::speed_energy_tax, tbl["cell_manager"]["speed_energy_tax"]);
 }
 
 static void load_cell_settings(toml::table& tbl)
 {
-    REQUIRE(CellSettings::max_cells, tbl["cell"]["max_cells"]);              // "protozoa" -> "cell", NEW key
-    REQUIRE(CellSettings::spawn_radius, tbl["cell"]["spawn_radius"]);        // "protozoa" -> "cell", NEW key
+    REQUIRE(CellSettings::spawn_radius, tbl["cell"]["spawn_radius"]);   
     REQUIRE(CellSettings::repro_cooldown, tbl["cell"]["reproductive_cooldown"]);
     REQUIRE(CellSettings::initial_energy, tbl["cell"]["initial_energy"]);
-    REQUIRE(CellSettings::wander_threshold, tbl["cell"]["wander_threshold"]);
     REQUIRE(CellSettings::digestive_time, tbl["cell"]["digestive_time"]);
+	REQUIRE(CellSettings::bite_amount, tbl["cell"]["bite_amount"]);
+
+	REQUIRE(CellSettings::integrity_conversion_rate, tbl["cell"]["integrity_conversion_rate"]);
+	REQUIRE(CellSettings::nutrients_conversion_rate, tbl["cell"]["nutrients_conversion_rate"]);
+
+	REQUIRE(CellSettings::friction_energy_loss_const, tbl["cell"]["friction_energy_loss_const"]);
 }
 
 static void load_spring_settings(toml::table& tbl)
 {
-    REQUIRE(SpringSettings::spring_work_const, tbl["cell"]["spring_work_const"]);   // "protozoa" -> "cell"
-    REQUIRE(SpringSettings::breaking_length, tbl["cell"]["breaking_length"]);       // "protozoa" -> "cell"
-    REQUIRE(SpringSettings::maximum_extension, tbl["cell"]["maximum_extension"]);   // "protozoa" -> "cell"
+    REQUIRE(SpringSettings::spring_work_const, tbl["spring"]["spring_work_const"]);  
+    REQUIRE(SpringSettings::maximum_extension, tbl["spring"]["maximum_extension"]);   
 }
 
 static void load_food_manager_settings(toml::table& tbl)

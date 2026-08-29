@@ -8,7 +8,7 @@ CollisionResolver::CollisionResolver(sf::Rect<float>* bounds, o_vector<Body>* en
 	unsigned int init_thread_count, unsigned int max_collisions_per_thread, unsigned int max_particles)
 	: 
 	collision_bodies_(entities), thread_count_(init_thread_count),
-	spatial_grid_(cells_x, cells_y, cell_max_capacity, bounds->size.x, bounds->size.y),
+	spatial_grid_(2 << grid_power, 2 << grid_power, cell_max_capacity, bounds->size.x, bounds->size.y),
 	collision_thread_pool_( static_cast<int>(thread_count_)),
 	add_to_grid_thread_pool_( static_cast<int>(thread_count_)),
 	quick_collision_thread_pool_(static_cast<int>(thread_count_))

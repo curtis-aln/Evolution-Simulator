@@ -23,10 +23,6 @@ CellManager::CellManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_
 		std::cerr << "[ERROR]: CellManager initialized with null window pointer.\n";
 	}
 
-	Spring::SPRING_BREAK_LENGTH = SpringSettings::breaking_length;
-	Spring::SPRING_BREAK_FORCE = SpringSettings::spring_break_force;
-	Spring::SPRING_DAMAGE_THRESH = SpringSettings::spring_damage_threshold;
-	Spring::SPRING_WORK_CONST = SpringSettings::spring_work_const;
 }
 
 
