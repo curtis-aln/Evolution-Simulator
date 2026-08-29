@@ -93,7 +93,7 @@ void CellManager::update_cell(Cell* cell)
 {
 	Body* body = bodies_->at(cell->body_id_);
 	cell->update_statistics();
-	cell->update_organics(spawn_immune, toggles_.disable_friction_energy_loss);
+	cell->update_organics(spawn_immune, toggles_.friction_energy_loss);
 	body->velocity_ *= cell->sinwave_current_friction_;
 
 	speed_tax_cell(cell);
@@ -102,7 +102,6 @@ void CellManager::update_cell(Cell* cell)
 
 void CellManager::impulse_tax_cell(Cell* cell, const float impulse) const
 {
-	static constexpr float max_single_hit_integrity_fraction = 0.3f;
 	if (impulse < impulse_damage_thresh || spawn_immune || !toggles_.collision_integrity_damage_)
 		return;
 
@@ -253,7 +252,7 @@ void CellManager::update_springs(bool immune)
 		Cell* cell_b = all_cells_.at(spring->cell_B_id);
 
 		bool true_immune = immune || !toggles_.spring_stress_integrity_damage;
-		spring->update_organics(*cell_a, *cell_b, true_immune, toggles_.disable_work_done_energy);
+		spring->update_organics(*cell_a, *cell_b, !true_immune, toggles_.work_done_energy);
 
 		// if the spring has broken on its own
 		if (spring->is_spring_broken())

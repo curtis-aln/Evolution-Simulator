@@ -144,13 +144,13 @@ void  Cell::update_statistics()
 }
 
 
-void Cell::update_organics(bool immune, bool disable_friction_energy_loss)
+void Cell::update_organics(bool immune, bool friction_energy_loss)
 {
 	if (immune)
 		apply_immunity();
 
-	if (!disable_friction_energy_loss)
-	apply_passive_decay();
+	if (friction_energy_loss)
+		apply_passive_decay();
 	process_nutrients();
 
 	if (check_death())

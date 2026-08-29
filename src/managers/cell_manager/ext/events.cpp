@@ -163,6 +163,22 @@ void CellManager::handle_cell_manager_event(SimCommand& cmd)
 		clone_selected_protozoa();
 		break;
 
+	case CommandType::SetImpulseDamageMultiplier:
+		CellManagerSettings::impulse_damage_multiplier = cmd.float_val;
+		break;
+
+	case CommandType::SetImpulseDamageThreshold:
+		CellManagerSettings::impulse_damage_thresh = cmd.float_val;
+		break;
+
+	case CommandType::SetMaxImpulseDamage:
+		CellManagerSettings::max_single_hit_integrity_fraction = cmd.float_val;
+		break;
+
+	case CommandType::SetCellMatterLifetime:
+		CellMatterSettings::max_time_to_live = cmd.int_val;
+		break;
+
 	case CommandType::SetSpringAmplitude:
 		//if (selected_protozoa)
 		//{

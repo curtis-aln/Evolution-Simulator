@@ -35,15 +35,36 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 	ImGui::Text("delta min speed (DMS): %.3f", CellManagerSettings::delta_min_speed);
 	ImGui::Spacing();
 	ImGui::Separator();
-	toggle(snap, ctx, "collision integrity damage", &CellManagerToggles::collision_integrity_damage_);
+	toggle(snap, ctx, "Impulse Damage", &CellManagerToggles::collision_integrity_damage_);
+	if (ctx.cell_toggles.collision_integrity_damage_)
+	{
+		ImGui::Indent();
+		float thresh = CellManagerSettings::impulse_damage_thresh;
+		if (ImGui::SliderFloat("##impulse_damage_thresh", &thresh, 0.f, 100.f, "threshold %.2f"))
+			ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetImpulseDamageThreshold, .float_val = thresh });
+		float damage = CellManagerSettings::impulse_damage_multiplier;
+		if (ImGui::SliderFloat("##impulse_damage_multiplier", &damage, 0.f, 0.002f, "multiplier %.5f"))
+			ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetImpulseDamageMultiplier, .float_val = damage });
+		float max = CellManagerSettings::max_single_hit_integrity_fraction;
+		if (ImGui::SliderFloat("##max_single_hit_integrity_fraction", &max, 0.f, 1.f, "max single hit integrity fraction %.2f"))
+			ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetMaxImpulseDamage, .float_val = max });
+		ImGui::Unindent();
+	}
+
 	toggle(snap, ctx, "spring stress integrity damage", &CellManagerToggles::spring_stress_integrity_damage);
 	toggle(snap, ctx, "spring too long breakage", &CellManagerToggles::spring_too_long_breakage);
 	toggle(snap, ctx, "spring too much force breakage", &CellManagerToggles::spring_too_much_force_breakage);
 
 	ImGui::Spacing();
 	ImGui::TextDisabled("Energy Tax");
-	toggle(snap, ctx, "disable work done energy", &CellManagerToggles::disable_work_done_energy);
-	toggle(snap, ctx, "disable friction energy loss", &CellManagerToggles::disable_friction_energy_loss);
+	toggle(snap, ctx, "work done energy", &CellManagerToggles::work_done_energy);
+
+	toggle(snap, ctx, "friction energy loss", &CellManagerToggles::friction_energy_loss);
+
+	// Sets the Lifetime of cell matter
+	int lifetime = CellMatterSettings::max_time_to_live;
+	if (ImGui::SliderInt("##cell_matter_lifetime", &lifetime, 0, 30000, "lifetime %d"))
+		ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetCellMatterLifetime, .int_val = lifetime });
 
 	ImGui::EndChild();
 }

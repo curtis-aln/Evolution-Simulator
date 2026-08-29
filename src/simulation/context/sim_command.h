@@ -76,6 +76,12 @@ enum class CommandType
 	SetSpringDamageThreshold,  // set the spring damage threshold of a specific spring
 	SetSpringWorkConst,        // set the spring work constant of a specific spring
 
+	SetImpulseDamageThreshold, // set the impulse damage threshold of the cell manager
+	SetImpulseDamageMultiplier,    // set the impulse damage multiplier of the cell manager
+	SetMaxImpulseDamage,          // set the maximum impulse damage of the cell manager
+
+	SetCellMatterLifetime,        // set the lifetime of cell matter
+
     // FOOD MANAGER EVENT  ──────────────────────────────────────────────────
     SetFoodToggles,
 	ClearAllFood, // clears all food from the simulation

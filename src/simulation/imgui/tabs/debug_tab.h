@@ -1,6 +1,7 @@
 #pragma once
 
 #include "i_tab.h"
+#include "../../../entities/matter/matter_settings.h"
 
 
 class DebugTab : public ITab

@@ -1,25 +1,6 @@
 #pragma once
-#include "cell/cell.h"
-
-struct CellMatterSettings
-{
-	static constexpr float transparency_outer = 175.f;
-	static constexpr float transparency_inner = 150.f;
-
-	static constexpr float    friction = 0.8f;
-	static constexpr uint16_t max_time_to_live = 13'000; // frames
-
-	static constexpr uint8_t max_radius = 70;
-	static constexpr uint8_t min_radius = 40;
-
-	static constexpr uint8_t max_gray = 70;
-	static constexpr uint8_t min_gray = 40;
-
-	static constexpr float spawn_chance = 0.75f;
-
-	static constexpr float color_transition_frames = 300.f;
-	static constexpr float inv_color_transition_frames = 1.f / color_transition_frames; // avoid per-frame division
-};
+#include "../cell/cell.h"
+#include "matter_settings.h"
 
 struct CellMatter : CellMatterSettings
 {

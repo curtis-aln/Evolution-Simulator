@@ -11,9 +11,9 @@ struct CellManagerSettings
 	inline static float speed_energy_tax; // The Tax for not traveling fast enough
 
 	// DAMAGE
-	inline static constexpr float impulse_damage_thresh = 50.0f;
-	inline static constexpr float impulse_damage_multiplier = 0.0004f;
-	
+	inline static float impulse_damage_thresh = 50.0f;
+	inline static float impulse_damage_multiplier = 0.0004f;
+	inline static float max_single_hit_integrity_fraction = 0.3f;
 
 	// STATISTICS
 	inline static constexpr size_t max_lifetime_samples_ = 500;

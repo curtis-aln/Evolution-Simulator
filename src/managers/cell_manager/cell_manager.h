@@ -16,7 +16,7 @@
 #include "../../simulation/context/sim_snapshot.h"
 
 #include <simulation/context/sim_command.h>
-#include <entities/CellMatter.h>
+#include <entities/matter/CellMatter.h>
 
 
 struct CellBodyPair

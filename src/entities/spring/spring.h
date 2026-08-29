@@ -142,7 +142,7 @@ public:
 			break_spring();
 	}
 
-	void update_organics(Cell& cell_a, Cell& cell_b, bool disable_stress_damage, bool disable_work_done_energy)
+	void update_organics(Cell& cell_a, Cell& cell_b, bool stress_damage, bool work_done_energy)
 	{
 		if (Random::rand01_float() < death_chance_)
 		{
@@ -156,14 +156,14 @@ public:
 			return;
 		}
 
-		if (stress > spring_damage_threshold && !disable_stress_damage)
+		if (stress > spring_damage_threshold && stress_damage)
 		{
 			update_integrity(cell_a, cell_b);
 		}
 
 		transfer_nutrients(cell_a, cell_b);
 
-		if (!disable_work_done_energy)
+		if (work_done_energy)
 		{
 			float energy_cost = -work_done / 2.f;
 			cell_a.change_energy(energy_cost);
