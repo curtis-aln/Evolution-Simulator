@@ -30,77 +30,89 @@ struct FoodBodyPair
     }
 };
 
+inline static constexpr uint32_t pheromone_grid_size = 512;
+inline static constexpr int age_variation = 1500; // random age variation for food
+
 
 struct SimSnapshot;
 
 class FoodManager : public FoodManagerSettings
 {
-    sf::RenderWindow* window_;
+	// pointers to useful data from the world
     WorldBorder* world_bounds_;
-
     o_vector<Body>* bodies_;
+
+	// the food container, this is where all the food is stored
     o_vector<Food> food_vector{ max_food };
     
-	FoodManagerStatistics statistics_{};
-
-    std::vector<std::function<void()>> updating_bodies_;
+	// Multithreadding the update of the food
     BarrierThreadPool thread_pool_{ (int)WorldSettings::updating_threads };
+    std::vector<std::function<void()>> updating_bodies_;
 	bool update_jobs_built_ = false;
-    int  current_total_food_ = 0;
+    unsigned  current_total_food_ = 0;
 
+    // pheromone grid
     PheromoneGrid pheromone_grid;
+
+    FoodManagerStatistics statistics_{};
 
 public:
     FixedSpan<cell_idx, uint16_t> selected_cells_indexes_{ static_cast<uint16_t>(10000) };
-
-    int frames = 0;
 
     FoodToggles toggles_{};
 
 public:
     FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies);
-    void  create_food(unsigned amount);
-
+    
+    // Main Entries
+    void update();
+    void update_position_data(RenderData& food_data);
+    void handle_food_manager_event(SimCommand& cmd);
     void reset_food_manager();
 
+    // Food Manipulation
+    void create_food_pool(unsigned amount, WorldBorder* spawn_area = nullptr);
+    void remove_food(int food_id);
+
+    // Mouse Influence
     void remove_food_in_area(const sf::Vector2f& center, float radius);
-
     void gather_food_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, const sf::Vector2f& position, const float radius);
-
     void influence_food_velocities_in_radii(const sf::Vector2f& position, const float radius, const float intensity);
 
-    int    get_size()               const;
-    bool has_food_with_body_id(int body_id);
-    void handle_food_manager_event(SimCommand& cmd);
-    const o_vector<Food>& get_food_vector() const;
-    o_vector<Food>& get_food_vector();
-    void update();
+    // Information Fetching
+	[[nodiscard]] int get_size() const { return food_vector.size(); }
+    [[nodiscard]] const o_vector<Food>& get_food_vector() const { return food_vector; }
+	[[nodiscard]] o_vector<Food>& get_food_vector() { return food_vector; }
+    [[nodiscard]] FoodManagerStatistics& get_statistics() { return statistics_; }
+    [[nodiscard]] PheromoneGrid* get_pheromone_grid() { return &pheromone_grid; }
+    [[nodiscard]] Food* at(int idx) { return food_vector.at(idx); }
+    [[nodiscard]] const Food* at(int idx) const { return food_vector.at(idx); }
+    [[nodiscard]] bool food_container_full() { return food_vector.size() >= max_food; }
 
-    void update_position_data(RenderData& food_data);
-    void set_foods_color_transparency(sf::Color& color_to_change, const float transparency, const float nutrients, const float age) const;
-    void   remove_food(int food_id);
-    Food* at(int idx);
-    const Food* at(int idx) const;
+    [[nodiscard]] bool has_food_with_body_id(int body_id) const;
 
-    FoodBodyPair create_food(const sf::Vector2f& position);
-
-	FoodManagerStatistics& get_statistics() { return statistics_; }
-
-	PheromoneGrid* get_pheromone_grid() { return &pheromone_grid; }
-
+    
 private:
+    // Private Utility
+    [[nodiscard]] FoodBodyPair create_food_body_pair(const sf::Vector2f& position);
+
+    // Updating
     void  update_food();
     void update_food_item(Food* food);
+
     void ensure_update_jobs_built();
+    void set_foods_color_transparency(sf::Color& color_to_change, const float transparency, 
+        const float nutrients, const float age) const;
+
+    // Statistics
     void update_statistics();
-    
+
+	// Reproduction
     void  food_reproduction_function();
     bool  reproduce_food(Food* food);
-    
     float calculate_spawn_chance() const;
     static bool can_food_reproduce(const Food* food) { return food->time_since_last_reproduced >= repro_cooldown && food->age >= reproductive_threshold;}
 
-    bool  food_container_full() { return food_vector.size() >= max_food; }
-
+    // Death
     void handle_food_death();
 };

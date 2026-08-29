@@ -4,7 +4,8 @@
 
 FoodManager::FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies)
 	: world_bounds_(world_bounds), bodies_(bodies),
-	pheromone_grid(512, 512, WorldSettings::bounds_radius * 2.f, WorldSettings::bounds_radius * 2.f)
+	pheromone_grid(pheromone_grid_size, pheromone_grid_size, 
+		WorldSettings::bounds_radius * 2.f, WorldSettings::bounds_radius * 2.f)
 {
 
 }
@@ -113,34 +114,7 @@ void FoodManager::remove_food(const int food_id)
 	bodies_->remove(body->id_);
 }
 
-Food* FoodManager::at(const int idx)
-{
-	return food_vector.at(idx);
-}
-
-const Food* FoodManager::at(const int idx) const
-{
-	return food_vector.at(idx);
-}
-
-
-int FoodManager::get_size() const
-{
-	return food_vector.size();
-}
-
-
-const o_vector<Food>& FoodManager::get_food_vector() const
-{
-	return food_vector;
-}
-o_vector<Food>& FoodManager::get_food_vector()
-{
-	return food_vector;
-}
-
-
-bool FoodManager::has_food_with_body_id(int body_id)
+bool FoodManager::has_food_with_body_id(int body_id) const
 {
 	for (Food* food : food_vector)
 	{

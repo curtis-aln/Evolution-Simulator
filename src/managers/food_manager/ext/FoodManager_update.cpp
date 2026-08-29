@@ -56,15 +56,18 @@ void FoodManager::ensure_update_jobs_built()
 }
 
 
-void FoodManager::create_food(unsigned amount)
+
+void FoodManager::create_food_pool(unsigned amount, WorldBorder* spawn_area)
 {
+	WorldBorder* spawn_bounds = spawn_area ? spawn_area : world_bounds_;
+
 	for (unsigned i = 0; i < amount; ++i)
 	{
-		sf::Vector2f pos = world_bounds_->rand_pos();
-		FoodBodyPair food_body_pair = create_food(pos);
+		sf::Vector2f pos = spawn_bounds->rand_pos();
+		FoodBodyPair food_body_pair = create_food_body_pair(pos);
 
 		Food* food = food_vector.at(food_body_pair.food_id);
-		food->age = Random::rand_range(0, 1500);
+		food->age = Random::rand_range(0, age_variation);
 		food->fully_grown_age = food->age + nutrient_development_time;
 	}
 }
@@ -78,7 +81,7 @@ void FoodManager::reset_food_manager()
 		food_vector.remove(food);
 	}
 
-	create_food(initial_food);
+	create_food_pool(initial_food);
 }
 
 

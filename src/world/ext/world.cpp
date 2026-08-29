@@ -9,7 +9,7 @@
 
 World::World(sf::RenderWindow* window) : m_window_(window)
 {
-    food_manager_.create_food(food_manager_.initial_food);
+    food_manager_.create_food_pool(food_manager_.initial_food);
     bound_bodies();
 }
 
@@ -101,7 +101,7 @@ void World::handle_right_click(WorldBorder& spawn_area)
         for (int i = 0; i < static_cast<int>(intensity); i++)
         {
             if (do_cells) cell_manager_.create_new_protozoa(1, &spawn_area);
-            if (do_food)  food_manager_.create_food(spawn_area.rand_pos());
+            if (do_food)  food_manager_.create_food_pool(1, &spawn_area);
         }
         break;
 

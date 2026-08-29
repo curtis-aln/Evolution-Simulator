@@ -11,7 +11,7 @@ void FoodManager::food_reproduction_function()
 	if (toggles_.spawn_random_food)
 	{
 		if (Random::rand01_float() < 0.25f)
-			create_food(statistics_.food_random_spawn_intensity);
+			create_food_pool(statistics_.food_random_spawn_intensity);
 	}
 
 	if (!toggles_.food_mitosis)
@@ -52,7 +52,7 @@ bool FoodManager::reproduce_food(Food* parent_food)
 	sf::Vector2f parent_pos = parent_body->position_;
 
 	// Creating a new food body pair and linking them together
-	FoodBodyPair pair = create_food(parent_pos);
+	FoodBodyPair pair = create_food_body_pair(parent_pos);
 	if (pair.is_valid() == false)
 		return true;
 
@@ -79,7 +79,7 @@ bool FoodManager::reproduce_food(Food* parent_food)
 	return false;
 }
 
-FoodBodyPair FoodManager::create_food(const sf::Vector2f& position)
+FoodBodyPair FoodManager::create_food_body_pair(const sf::Vector2f& position)
 {
 	// This is the safest way to create a food with a body, all creation events Must go through this function to ensure that the food and body are linked correctly.
 	// if there are not any already avalable foods in the o_vector we create a new one
