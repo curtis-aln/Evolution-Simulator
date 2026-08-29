@@ -58,10 +58,6 @@ void FoodManager::reproduce_food(Food* parent_food)
 
 	// setting the attributes for this new_body
 	child_body->position_ = Random::rand_pos_in_rect(spawn_rect);
-	child_body->radius_ = food_initial_radius;
-	child_food->age = 0;
-	child_food->color_inner = Random::rand_color(food_darkest_color, food_lightest_color);
-	child_food->color_outer = Random::rand_color(food_darkest_color, food_lightest_color);
 
 	// small chance of it spawning with a high velocity
 	if (Random::rand01_float() < food_launch_chance)
@@ -95,7 +91,6 @@ FoodBodyPair FoodManager::create_food_body_pair(const sf::Vector2f& position)
 	food->reset();
 	food->body_id_ = body->id_;
 	body->position_ = position;
-	body->radius_ = food_initial_radius;
 
 	return { (int32_t)food->id_, (int32_t)body->id_ };
 }

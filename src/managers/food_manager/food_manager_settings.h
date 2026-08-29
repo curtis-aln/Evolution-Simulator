@@ -4,53 +4,29 @@
 
 struct FoodManagerSettings
 {
-	inline static uint32_t cells_x;
-	inline static uint32_t cells_y;
-	inline static uint8_t cell_max_capacity;
+	inline static uint32_t pheromone_grid_power;
+	inline static uint16_t cell_max_capcity;
+
 	inline static size_t update_freq; // food do not move that often so they dont have to be updated in the grid every frame
 
 	inline static unsigned max_food;
 	inline static unsigned initial_food;
 
-	inline static float food_radius;
 	inline static float friction;
-
-	inline static float vibration_strength;
 
 	inline static float kFoodVisibilityRampFrames;
 	inline static float kFoodMaxAlpha;
 
-	inline static int food_random_spawn_per_frame = 1;
-	inline static float food_random_spawn_chance = .03f;
+	inline static int food_random_spawn_per_frame;
+	inline static float food_random_spawn_chance;
 
 	inline static float spawn_proportionality_constant; // range between [0.001, 0.01]
 	inline static float food_spawn_distance;
 
-	inline static uint16_t repro_cooldown;
-	inline static float nutrient_reproductive_threshold;
-
-	inline static float initial_nutrients;
-	inline static float final_nutrients;
-	inline static uint16_t nutrient_development_time;
-
-	inline static float death_age;
 	inline static float death_age_chance; // every frame past its death age gives it this chance of dying
+	
+	inline static float fade_start_nutrients;       // nutrients level at which fading begins
 
-	inline static float food_initial_radius = 6;
-
-	inline static float nutrients_to_radius_scale = .66f; // radius = nutrients * this constant
-	inline static float fade_start_nutrients = 30.0f;       // nutrients level at which fading begins
-
-	inline static float food_launch_strength = 50.f;
-	inline static float food_launch_chance = 0.05f;
-
-	inline static const float spawn_immunity = 20;
-
-	inline static constexpr float vibrate_freq = 0.0065f;
-
-	inline static uint8_t   outer_transparency = 125;
-	inline static uint8_t   inner_transparency = 100;
-
-	inline static sf::Vector3i food_darkest_color = { 0, 225, 0 };
-	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
+	inline static float food_launch_strength;
+	inline static float food_launch_chance;
 };

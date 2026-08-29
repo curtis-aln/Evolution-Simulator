@@ -68,7 +68,7 @@ void FoodManager::create_food_pool(unsigned amount, WorldBorder* spawn_area)
 
 		Food* food = food_vector.at(food_body_pair.food_id);
 		food->age = Random::rand_range(0, age_variation);
-		food->fully_grown_age = food->age + nutrient_development_time;
+		food->fully_grown_age = food->age + Food::nutrient_development_time;
 	}
 }
 

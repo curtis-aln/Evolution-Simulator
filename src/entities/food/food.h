@@ -11,7 +11,33 @@
 +
 */
 
-struct Food : FoodManagerSettings
+struct FoodSettings
+{
+	inline static uint16_t repro_cooldown;
+	inline static float nutrient_reproductive_threshold;
+
+	inline static float initial_nutrients;
+	inline static float final_nutrients;
+	inline static uint16_t nutrient_development_time;
+
+	inline static float spawn_immunity;
+
+	inline static float vibrate_freq;
+
+	inline static float death_age;
+
+	inline static uint8_t   outer_transparency = 125;
+	inline static uint8_t   inner_transparency = 100;
+
+	inline static sf::Vector3i food_darkest_color = { 0, 225, 0 };
+	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
+
+	inline static float nutrients_to_radius_scale; // radius = nutrients * this constant
+
+	inline static float vibration_strength;
+};
+
+struct Food : FoodSettings
 {
 	uint32_t id_ = 0; // unique food ID, relative to the food container
 	uint32_t body_id_ = 0; // unique body ID, relative to the body container
@@ -86,6 +112,29 @@ struct Food : FoodManagerSettings
 	{
 		time_since_last_reproduced = 0;
 		nutrients *= 0.5f;
+	}
+
+	static void set_foods_color_transparency(sf::Color& color_to_change,
+		const float transparency, const float nutrients, const float age)
+	{
+		const bool is_dying = age >= death_age;
+
+		if (!is_dying)
+		{
+			// Fade in over the first kFoodVisibilityRampFrames frames
+			const float t = std::min(static_cast<float>(age) / FoodManagerSettings::kFoodVisibilityRampFrames, 1.f);
+			color_to_change.a = static_cast<uint8_t>(t * transparency);
+		}
+		else
+		{
+			// Fade out as nutrients fall from fade_start_nutrients down to initial_nutrients
+			const float range = FoodManagerSettings::fade_start_nutrients - initial_nutrients;
+			const float t = std::clamp(
+				(nutrients - initial_nutrients) / range,
+				0.f, 1.f
+			);
+			color_to_change.a = static_cast<uint8_t>(t * transparency);
+		}
 	}
 
 private:

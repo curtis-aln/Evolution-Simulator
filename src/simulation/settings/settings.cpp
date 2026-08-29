@@ -6,6 +6,7 @@
 #include "managers/food_manager/food_manager_settings.h"
 #include "entities/spring/spring_settings.h"
 #include "entities/cell/cell_settings.h"
+#include "entities/food/food.h"
 
 template<typename T>
 static T require_value(const toml::node_view<toml::node>& node, std::string_view path)
@@ -40,6 +41,9 @@ static void load_world_settings(toml::table& tbl)
 	REQUIRE(WorldSettings::collision_grid_power, tbl["world"]["collision_grid_power"]);
 	REQUIRE(WorldSettings::collision_max_capacity, tbl["world"]["collision_grid_max_capacity"]);
 
+	REQUIRE(FoodManagerSettings::pheromone_grid_power, tbl["world"]["food_pheromone_grid_power"]);
+    REQUIRE(FoodManagerSettings::cell_max_capcity, tbl["world"]["food_resolution_grid_max_capacity"]);
+
 	REQUIRE(WorldSettings::birth_cell_power, tbl["world"]["birth_cell_power"]);
 	REQUIRE(WorldSettings::birth_max_capacity, tbl["world"]["birth_grid_max_capacity"]);
 
@@ -73,38 +77,46 @@ static void load_cell_settings(toml::table& tbl)
 static void load_spring_settings(toml::table& tbl)
 {
     REQUIRE(SpringSettings::spring_work_const, tbl["spring"]["spring_work_const"]);  
-    REQUIRE(SpringSettings::maximum_extension, tbl["spring"]["maximum_extension"]);   
-}
+    REQUIRE(SpringSettings::maximum_extension, tbl["spring"]["maximum_extension"]); 
 
+	REQUIRE(SpringSettings::spring_break_force, tbl["spring"]["spring_break_force"]);
+	REQUIRE(SpringSettings::spring_break_length_factor, tbl["spring"]["spring_break_length_factor"]);
+	REQUIRE(SpringSettings::spring_damage_threshold, tbl["spring"]["spring_damage_threshold"]);
+	REQUIRE(SpringSettings::fully_developed_age, tbl["spring"]["fully_developed_age"]);
+	REQUIRE(SpringSettings::nutrients_transfer_loss, tbl["spring"]["nutrients_transfer_loss"]);
+	REQUIRE(SpringSettings::stress_damage_const, tbl["spring"]["stress_damage_const"]);
+}
 static void load_food_manager_settings(toml::table& tbl)
 {
+	REQUIRE(FoodManagerSettings::update_freq, tbl["food_manager"]["update_freq"]);
 	REQUIRE(FoodManagerSettings::max_food, tbl["food_manager"]["max_food"]);
 	REQUIRE(FoodManagerSettings::initial_food, tbl["food_manager"]["initial_food"]);
+	REQUIRE(FoodManagerSettings::friction, tbl["food_manager"]["friction"]);
+	REQUIRE(FoodManagerSettings::kFoodVisibilityRampFrames, tbl["food_manager"]["food_visibility_ramp_frames"]);
+	REQUIRE(FoodManagerSettings::kFoodMaxAlpha, tbl["food_manager"]["food_max_alpha"]);
+	REQUIRE(FoodManagerSettings::food_random_spawn_per_frame, tbl["food_manager"]["food_random_spawn_per_frame"]);
+	REQUIRE(FoodManagerSettings::food_random_spawn_chance, tbl["food_manager"]["food_random_spawn_chance"]);
+	REQUIRE(FoodManagerSettings::spawn_proportionality_constant, tbl["food_manager"]["spawn_proportionality_constant"]);
+	REQUIRE(FoodManagerSettings::food_spawn_distance, tbl["food_manager"]["food_spawn_distance"]);
+	REQUIRE(FoodManagerSettings::death_age_chance, tbl["food_manager"]["death_age_chance"]);
+	REQUIRE(FoodManagerSettings::fade_start_nutrients, tbl["food_manager"]["fade_start_nutrients"]);
+	REQUIRE(FoodManagerSettings::food_launch_strength, tbl["food_manager"]["food_launch_strength"]);
+	REQUIRE(FoodManagerSettings::food_launch_chance, tbl["food_manager"]["food_launch_chance"]);
 }
-
 
 static void load_food_settings(toml::table& tbl)
 {
-    REQUIRE(FoodManagerSettings::food_radius, tbl["food"]["food_radius"]);
-    REQUIRE(FoodManagerSettings::friction, tbl["food"]["friction"]);
-    REQUIRE(FoodManagerSettings::death_age, tbl["food"]["death_age"]);
-    REQUIRE(FoodManagerSettings::repro_cooldown, tbl["food"]["reproductive_cooldown"]);
-    REQUIRE(FoodManagerSettings::nutrient_reproductive_threshold, tbl["food"]["nutrient_reproductive_threshold"]);
-    REQUIRE(FoodManagerSettings::initial_nutrients, tbl["food"]["initial_nutrients"]);
-    REQUIRE(FoodManagerSettings::final_nutrients, tbl["food"]["final_nutrients"]);
-    REQUIRE(FoodManagerSettings::nutrient_development_time, tbl["food"]["nutrient_development_time"]);
-    REQUIRE(FoodManagerSettings::food_spawn_distance, tbl["food"]["food_spawn_distance"]);
-    REQUIRE(FoodManagerSettings::spawn_proportionality_constant, tbl["food"]["spawn_proportionality_constant"]);
-    REQUIRE(FoodManagerSettings::death_age_chance, tbl["food"]["death_age_chance"]);
-    REQUIRE(FoodManagerSettings::kFoodVisibilityRampFrames, tbl["food"]["food_visibility_ramp_frames"]);
-    REQUIRE(FoodManagerSettings::kFoodMaxAlpha, tbl["food"]["food_max_alpha"]);
-    REQUIRE(FoodManagerSettings::vibration_strength, tbl["food"]["vibration_strength"]);
-    REQUIRE(FoodManagerSettings::update_freq, tbl["food"]["update_freq"]);
-    REQUIRE(FoodManagerSettings::cell_max_capacity, tbl["food"]["cell_max_capacity"]);
-    REQUIRE(FoodManagerSettings::cells_x, tbl["food"]["cells_x"]);
-    REQUIRE(FoodManagerSettings::cells_y, tbl["food"]["cells_y"]);
+	REQUIRE(FoodSettings::repro_cooldown, tbl["food"]["reproductive_cooldown"]);
+	REQUIRE(FoodSettings::nutrient_reproductive_threshold, tbl["food"]["nutrient_reproductive_threshold"]);
+	REQUIRE(FoodSettings::initial_nutrients, tbl["food"]["initial_nutrients"]);
+	REQUIRE(FoodSettings::final_nutrients, tbl["food"]["final_nutrients"]);
+	REQUIRE(FoodSettings::nutrient_development_time, tbl["food"]["nutrient_development_time"]);
+	REQUIRE(FoodSettings::spawn_immunity, tbl["food"]["spawn_immunity"]);
+	REQUIRE(FoodSettings::vibrate_freq, tbl["food"]["vibrate_freq"]);
+	REQUIRE(FoodSettings::death_age, tbl["food"]["death_age"]);
+	REQUIRE(FoodSettings::nutrients_to_radius_scale, tbl["food"]["nutrients_to_radius_scale"]);
+	REQUIRE(FoodSettings::vibration_strength, tbl["food"]["vibration_strength"]);
 }
-
 
 void load_settings(const std::string& path)
 {

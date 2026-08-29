@@ -4,7 +4,7 @@
 
 FoodManager::FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies)
 	: world_bounds_(world_bounds), bodies_(bodies),
-	pheromone_grid(pheromone_grid_size, pheromone_grid_size, 
+	pheromone_grid(2 << pheromone_grid_power, 2 << pheromone_grid_power,
 		WorldSettings::bounds_radius * 2.f, WorldSettings::bounds_radius * 2.f)
 {
 
@@ -70,36 +70,14 @@ void FoodManager::update_position_data(RenderData& food_data)
 		// handling color
 		sf::Color inner_col_copy = food->color_inner;
 		sf::Color outer_col_copy = food->color_outer;
-		set_foods_color_transparency(inner_col_copy, food->inner_transparency, food->nutrients, food->age);
-		set_foods_color_transparency(outer_col_copy, food->outer_transparency, food->nutrients, food->age);
+		Food::set_foods_color_transparency(inner_col_copy, food->inner_transparency, food->nutrients, food->age);
+		Food::set_foods_color_transparency(outer_col_copy, food->outer_transparency, food->nutrients, food->age);
 		food_data.inner_colors.push_back(inner_col_copy);
 		food_data.outer_colors.push_back(outer_col_copy);
 
 	}
 }
 
-void FoodManager::set_foods_color_transparency(sf::Color& color_to_change, 
-	const float transparency, const float nutrients, const float age) const
-{
-	const bool is_dying = age >= death_age;
-
-	if (!is_dying)
-	{
-		// Fade in over the first kFoodVisibilityRampFrames frames
-		const float t = std::min(static_cast<float>(age) / kFoodVisibilityRampFrames, 1.f);
-		color_to_change.a = static_cast<uint8_t>(t * transparency);
-	}
-	else
-	{
-		// Fade out as nutrients fall from fade_start_nutrients down to initial_nutrients
-		const float range = fade_start_nutrients - initial_nutrients;
-		const float t = std::clamp(
-			(nutrients - initial_nutrients) / range,
-			0.f, 1.f
-		);
-		color_to_change.a = static_cast<uint8_t>(t * transparency);
-	}
-}
 
 // world interacting with the food
 void FoodManager::remove_food(const int food_id)
@@ -109,10 +87,8 @@ void FoodManager::remove_food(const int food_id)
 	Body* body = bodies_->at(food->body_id_);
 	
 	// we now reset the body and the food
-	body->position_ = { 0, 0 };
-	food->age = 0;
-	food->time_since_last_reproduced = 0;
-	food->nutrients = initial_nutrients;
+	body->reset_cell_manager();
+	food->reset();
 	
 	// and remove them from their respective vectors
 	food_vector.remove(food_id);
@@ -170,11 +146,11 @@ void FoodManager::handle_food_manager_event(SimCommand& cmd)
 		break;
 
 	case CommandType::SetFoodNutrients:
-		FoodManagerSettings::final_nutrients = cmd.float_val;
+		FoodSettings::final_nutrients = cmd.float_val;
 		break;
 
 	case  CommandType::SetFoodNutrientsDevelopmentTime:
-		FoodManagerSettings::nutrient_development_time = static_cast<uint16_t>(cmd.int_val);
+		FoodSettings::nutrient_development_time = static_cast<uint16_t>(cmd.int_val);
 		break;
 
 	case  CommandType::SetFoodFriction:
@@ -182,19 +158,19 @@ void FoodManager::handle_food_manager_event(SimCommand& cmd)
 		break;
 
 	case  CommandType::SetFoodVibrationStrength:
-		FoodManagerSettings::vibration_strength = cmd.float_val;
+		FoodSettings::vibration_strength = cmd.float_val;
 		break;
 
 	case CommandType::SetFoodReproductiveCooldown:
-		FoodManagerSettings::repro_cooldown = static_cast<size_t>(cmd.float_val);
+		FoodSettings::repro_cooldown = static_cast<size_t>(cmd.float_val);
 		break;
 
 	case  CommandType::SetFoodDeathAge:
-		FoodManagerSettings::death_age = cmd.float_val;
+		FoodSettings::death_age = cmd.float_val;
 		break;
 
 	case  CommandType::SetFoodReproductiveThreshold:
-		FoodManagerSettings::nutrient_reproductive_threshold = cmd.float_val;
+		FoodSettings::nutrient_reproductive_threshold = cmd.float_val;
 		break;
 	}
 }

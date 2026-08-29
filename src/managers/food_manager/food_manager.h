@@ -30,7 +30,6 @@ struct FoodBodyPair
     }
 };
 
-inline static constexpr uint32_t pheromone_grid_size = 512;
 inline static constexpr int age_variation = 1500; // random age variation for food
 
 
@@ -101,9 +100,7 @@ private:
     void update_food_item(Food* food);
 
     void ensure_update_jobs_built();
-    void set_foods_color_transparency(sf::Color& color_to_change, const float transparency, 
-        const float nutrients, const float age) const;
-
+   
     // Statistics
     void update_statistics();
 

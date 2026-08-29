@@ -27,6 +27,7 @@ tick_sim_multiplier = 1
 collision_grid_power = 8          # The grid used to handle collisions between all bodies
 food_resolution_cell_power = 8    # the grid used to handle cell food interactions
 birth_cell_power = 6              # The grid used to let newborns connect with eachover
+food_pheromone_grid_power = 8      # The grid used to handle food pheromone interactions
 
 # Max Capacities for each aswell 
 collision_grid_max_capacity           = 14
@@ -57,42 +58,53 @@ friction_energy_loss_const = 0.02
 
 # ── Spring ─────────────────────────────────────────────────────────────────
 [spring]
-maximum_extension               = 380.0
-spring_work_const                = 0.00001
+maximum_extension = 380.0
+spring_work_const = 0.00001
+spring_break_force  = 35
+spring_break_length_factor = 1.5
+spring_damage_threshold = 30.5
+fully_developed_age = 300
+nutrients_transfer_loss = 0.04
+stress_damage_const = 0.095
 
 # ── Food Manager ─────────────────────────────────────────────────────────
 [food_manager]
+update_freq                    = 4
 max_food                    =  10000
 initial_food                 = 2500
-
-# ── Food ─────────────────────────────────────────────────────────────────
-[food]
-# spatial grid
-cells_x                     = 64
-cells_y                      = 64
-cell_max_capacity             = 15
-update_freq                    = 4
-
-# physics
-food_radius                  = 60.0
 friction                      = 0.95
-vibration_strength             = 0.12
 
 # color / fade
 food_visibility_ramp_frames  = 90.0
 food_max_alpha                = 200.0
 
-# birth
+food_random_spawn_per_frame = 1
+food_random_spawn_chance = 0.03
+
 spawn_proportionality_constant = 0.05
 food_spawn_distance           = 200.0
+
+death_age_chance               = 0.03
+
+fade_start_nutrients = 30.0
+
+food_launch_strength = 50
+food_launch_chance = 0.05
+
+# ── Food ─────────────────────────────────────────────────────────────────
+[food]
 reproductive_cooldown          = 1400
 nutrient_reproductive_threshold = 0.99 # ratio
 
-# nutrients
 initial_nutrients             = 20.0
 final_nutrients                = 80.0
 nutrient_development_time       = 1000
 
-# death
+spawn_immunity = 20
+vibrate_freq = 0.0065
+
 death_age                     = 2500.0
-death_age_chance               = 0.03
+
+nutrients_to_radius_scale = 0.66
+vibration_strength             = 0.12
+
