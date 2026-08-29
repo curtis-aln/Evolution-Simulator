@@ -306,7 +306,7 @@ private:
         max_nutrients = max_energy;
         average_energy = total_energy / cell_count;
         frames_alive = frames_alive / cell_count;
-        ready_to_reproduce_percentage = (cells_ready_to_reproduce / cell_count) * 100;
+        ready_to_reproduce_percentage = (float)(cells_ready_to_reproduce / cell_count) * 100.f;
 		offspring_count = offspring_count / cell_count;
 		time_since_last_reproduced = time_since_last_reproduced / cell_count;
 

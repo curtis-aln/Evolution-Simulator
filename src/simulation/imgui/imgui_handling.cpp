@@ -75,9 +75,9 @@ void Simulation::extinction_popup() // TODO: depricated
         ImGui::InputInt("Max Food", &max_food, step_1, step_fast);
         ImGui::InputInt("Max Protozoa", &max_protozoa, step_1, step_fast);
 
-        step_1 = 1000;
-        step_fast = 10'000;
-        ImGui::InputFloat("World radius", &world_radius, step_1, step_fast);
+        float step_2 = 1000.f;
+        float step_fast_2 = 10'000.f;
+        ImGui::InputFloat("World radius", &world_radius, step_2, step_fast_2);
 #
         ImGui::Spacing();
 

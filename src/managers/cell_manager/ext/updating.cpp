@@ -100,7 +100,7 @@ void CellManager::update_cell(Cell* cell)
 	impulse_tax_cell(cell, body->impulse_);
 }
 
-void CellManager::impulse_tax_cell(Cell* cell, const float impulse)
+void CellManager::impulse_tax_cell(Cell* cell, const float impulse) const
 {
 	static constexpr float max_single_hit_integrity_fraction = 0.3f;
 	if (impulse < impulse_damage_thresh || spawn_immune || !toggles_.collision_integrity_damage_)
@@ -130,9 +130,8 @@ void CellManager::collect_connection_requests()
 
 void CellManager::update_position_container(RenderData& rend_data, const sf::FloatRect& visible_bounds, const bool show_only_newborns)
 {
-	int current_vector_size = rend_data.positions.size();
-	int cell_count = get_cell_count();
-	int resize_to = current_vector_size + cell_count;
+	size_t current_vector_size = rend_data.positions.size();
+	unsigned cell_count = get_cell_count();
 
 	for (const Cell* cell : all_cells_)
 	{
@@ -323,7 +322,7 @@ Cell* CellManager::find_cell_at_point(const sf::Vector2f mouse_position, bool ma
 	return nullptr;
 }
 
-void CellManager::fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bounds)
+void CellManager::fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bounds) const
 {
 	snapshot.protozoa_tracker = protozoa_tracker_;
 

@@ -142,7 +142,7 @@ public:
 
         // Add the actual object to our object store
         raw_object_store_.emplace_back();
-		int id_ = raw_object_store_.size() - 1;
+		auto id_ = static_cast<uint32_t>(raw_object_store_.size() - 1);
 
 		// add the object's index to the list of all object indexes
         all_object_indexes_.push_back(id_);

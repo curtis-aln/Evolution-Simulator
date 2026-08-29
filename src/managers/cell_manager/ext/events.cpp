@@ -42,7 +42,7 @@ void CellManager::check_for_dangling_springs()
 	}
 }
 
-void CellManager::influence_cell_velocities_in_radii(const sf::Vector2f& position, const float radius, const int intensity)
+void CellManager::influence_cell_velocities_in_radii(const sf::Vector2f& position, const float radius, const float intensity)
 {
 	/* This function changes the velocity of cells and cell matter in a given radius */
 	gather_objects_in_radius(selected_cells_indexes_, all_cells_, position, radius);
@@ -54,7 +54,7 @@ void CellManager::influence_cell_velocities_in_radii(const sf::Vector2f& positio
 		Body* body = bodies_->at(cell->body_id_);
 
 		sf::Vector2f direction = (position - body->position_).normalized();
-		body->velocity_ += direction * (float)intensity;
+		body->velocity_ += direction * intensity;
 	}
 
 	for (int i = 0; i < selected_matter_indexes_.count; ++i)

@@ -25,7 +25,7 @@ void Cell::recreate()
 	cumulative_collision_damage_ = 0.f;
 	cumulative_spring_damage_ = 0.f;
 
-	new_connections_made = 0.f;
+	new_connections_made = uint8_t(0);
 
 	repro_timer_ = 0;
 

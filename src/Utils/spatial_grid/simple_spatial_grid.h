@@ -210,7 +210,7 @@ public:
         cy1 = static_cast<uint32_t>(std::clamp(wy1 / cell_height, 0.f, static_cast<float>(CellsY - 1)));
     }
 
-    void track_stats(int& total, int& max_in, int& full, int& empty, int& inv)
+    void track_stats(int& total, int& max_in, int& full, int& empty, float& inv)
     {
         // Iterate over logical cells only (not the full Morton table which has gaps)
         for (uint32_t cy = 0; cy < CellsY; ++cy)

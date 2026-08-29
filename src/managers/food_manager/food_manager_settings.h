@@ -23,12 +23,12 @@ struct FoodManagerSettings
 	inline static float spawn_proportionality_constant; // range between [0.001, 0.01]
 	inline static float food_spawn_distance;
 
-	inline static size_t repro_cooldown;
+	inline static uint16_t repro_cooldown;
 	inline static float reproductive_threshold; // how old a food has to be before it can reproduce
 
 	inline static float initial_nutrients;
 	inline static float final_nutrients;
-	inline static size_t nutrient_development_time;
+	inline static uint16_t nutrient_development_time;
 
 	inline static float death_age;
 	inline static float death_age_chance; // every frame past its death age gives it this chance of dying

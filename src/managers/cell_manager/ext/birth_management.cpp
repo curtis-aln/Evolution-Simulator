@@ -7,7 +7,7 @@ void CellManager::create_protozoa_from_pool(const sf::Vector2f position, const u
 	std::vector<uint32_t> cell_indexes;
 	cell_indexes.reserve(max_cells);
 
-	for (int i = 0; i < max_cells; ++i)
+	for (unsigned i = 0; i < max_cells; ++i)
 	{
 		const sf::Vector2f spawn_pos = Random::rand_position_in_circle(position, spawn_radius);
 		const CellBodyPair& pair = create_cell(spawn_pos, true);

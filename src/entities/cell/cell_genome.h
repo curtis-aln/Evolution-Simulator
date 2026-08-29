@@ -12,10 +12,10 @@ struct Range
 // ---------------------------------------------------------------------------
 // Shared base: every genome type (Cell, Spring, future types) inherits this.
 // ---------------------------------------------------------------------------
-static struct BaseConstants
+struct BaseConstants
 {
     inline static float     colour_mutation_range = 0.055f;
-    static constexpr float mutation_rate_range = 0.015f;
+    inline static constexpr float mutation_rate_range = 0.015f;
 
     inline static Range init_mutation_range_spread = { 0.01f, 0.13f };
 
@@ -243,7 +243,7 @@ struct CellGeneticConstraints
 	inline static Range newborn_search = { 0.f, radius.max * 3.f };
 };
 
-static struct CellInitialSpawnRanges
+struct CellInitialSpawnRanges
 {
     inline static Range radius = { 25.f,          85.f };
 

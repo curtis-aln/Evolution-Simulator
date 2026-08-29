@@ -195,7 +195,7 @@ void Simulation::manage_rendering_frame_rate()
     rendering_clock_.tick();
     rendering_clock_.limit_frame_rate();
 
-    sim_state_.rendering_frame_rate = rendering_clock_.get_average_frame_rate();
+    sim_state_.rendering_frame_rate = (float)rendering_clock_.get_average_frame_rate();
 }
 
 void Simulation::manage_updating_frame_rate()
@@ -204,7 +204,7 @@ void Simulation::manage_updating_frame_rate()
     updating_clock_.tick();
 	updating_clock_.limit_frame_rate();
 
-    sim_state_.updating_frame_rate = updating_clock_.get_average_frame_rate();
+    sim_state_.updating_frame_rate = (float)updating_clock_.get_average_frame_rate();
 }
 
 void Simulation::fill_snapshot(SimSnapshot& snap)

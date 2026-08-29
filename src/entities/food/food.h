@@ -62,7 +62,7 @@ struct Food : FoodManagerSettings
 		return nutrients < initial_nutrients && age > spawn_immunity;
 	}
 
-	float calculate_food_size()
+	float calculate_food_size() const
 	{
 		// Radius is directly proportional to current nutrients
 		if (nutrients == 0.f)

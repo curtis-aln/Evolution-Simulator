@@ -140,13 +140,13 @@ public:
 	void update(int iterations);
 	void update_position_container(RenderData& rend_data, const sf::FloatRect& visible_bounds, const bool show_only_newborns);
 	void update_protozoa_tracker();
-	void fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bounds);
+	void fill_snapshot(SimSnapshot& snapshot, sf::FloatRect& visible_bounds) const;
 
 	// user input & mouse handling
 	void create_new_protozoa(int count, WorldBorder* spawn_area);
 	void drag_selected_cell_to_point(const sf::Vector2f& target_position, const float move_fraction);
 	void remove_cells_in_radius(const sf::Vector2f& position, const float radius);
-	void influence_cell_velocities_in_radii(const sf::Vector2f& position, const float radius, const int intensity);
+	void influence_cell_velocities_in_radii(const sf::Vector2f& position, const float radius, const float intensity);
 	void kill_selected_protozoa();
 	void force_reproduce_selected_protozoa();
 
@@ -200,11 +200,10 @@ private: // only functions this class can access
 
 	// updating
 	void update_springs(bool immune);
-	void check_for_spring_death();
 	void update_cells();
 	void update_cell_matter();
 	void update_cell(Cell* cell);
-	void impulse_tax_cell(Cell* cell, const float impulse);
+	void impulse_tax_cell(Cell* cell, const float impulse) const;
 	void collect_connection_requests();
 
 	void ensure_update_jobs_built();

@@ -20,7 +20,7 @@ static constexpr int k_max_wave_buf = 2048;
 
 // Design constants
 inline static constexpr ImVec4 nutrients_bar_col = { 0.35f, 0.75f, 0.35f, 1.f };
-inline static constexpr ImVec4 selector_color = { 0.2, 0.2, 0.8, 1.0 };
+inline static constexpr ImVec4 selector_color = { 0.2f, 0.2f, 0.8f, 1.0f };
 inline static constexpr ImVec2 spring_cell_box_size = { 300.f, -1.f };
 
 // One genetic sine parameter: its current value, valid range, display format,

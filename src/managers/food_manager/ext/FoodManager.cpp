@@ -37,9 +37,9 @@ void FoodManager::handle_food_death()
 
 void FoodManager::update_position_data(RenderData& food_data)
 {
-	int current_vector_size = food_data.positions.size();
-	int food_count = food_vector.size();
-	int reserve_to = current_vector_size + food_count;
+	size_t current_vector_size = food_data.positions.size();
+	size_t food_count = food_vector.size();
+	size_t reserve_to = current_vector_size + food_count;
 
 	food_data.positions.reserve(reserve_to);
 	food_data.radii.reserve(reserve_to);
@@ -191,7 +191,7 @@ void FoodManager::handle_food_manager_event(SimCommand& cmd)
 		break;
 
 	case  CommandType::SetFoodNutrientsDevelopmentTime:
-		FoodManagerSettings::nutrient_development_time = static_cast<size_t>(cmd.float_val);
+		FoodManagerSettings::nutrient_development_time = static_cast<uint16_t>(cmd.int_val);
 		break;
 
 	case  CommandType::SetFoodFriction:

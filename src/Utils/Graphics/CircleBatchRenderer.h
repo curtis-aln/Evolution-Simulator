@@ -57,7 +57,7 @@ public:
     void set_colors(const std::vector<sf::Color>& colors) { colors_ = colors; }
     void set_positions(const std::vector<sf::Vector2f>& positions) 
     {
-		int size = positions.size();
+		size_t size = positions.size();
 		positions_x_.resize(size);
 		positions_y_.resize(size);
 		for (size_t i = 0; i < size; i += 1)

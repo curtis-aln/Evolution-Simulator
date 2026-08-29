@@ -14,8 +14,6 @@
 #include <Utils/thread_pool.h>
 
 #include <world/world_settings.h>
-
-#include "../../simulation/context/state.h"
 #include <simulation/context/sim_command.h>
 
 #include "../../Utils/Graphics/pheromone_grid.h"
@@ -26,7 +24,7 @@ struct FoodBodyPair
     int32_t food_id;
     int32_t body_id;
 
-    bool is_valid()
+    bool is_valid() const
     {
         return (food_id != -1) && (body_id != -1);
     }
@@ -69,7 +67,7 @@ public:
 
     void gather_food_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, const sf::Vector2f& position, const float radius);
 
-    void influence_food_velocities_in_radii(const sf::Vector2f& position, const float radius, const int intensity);
+    void influence_food_velocities_in_radii(const sf::Vector2f& position, const float radius, const float intensity);
 
     int    get_size()               const;
     bool has_food_with_body_id(int body_id);

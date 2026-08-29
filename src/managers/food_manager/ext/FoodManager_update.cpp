@@ -58,7 +58,7 @@ void FoodManager::ensure_update_jobs_built()
 
 void FoodManager::create_food(unsigned amount)
 {
-	for (int i = 0; i < amount; ++i)
+	for (unsigned i = 0; i < amount; ++i)
 	{
 		sf::Vector2f pos = world_bounds_->rand_pos();
 		FoodBodyPair food_body_pair = create_food(pos);
@@ -106,7 +106,7 @@ void FoodManager::gather_food_in_radius(FixedSpan<cell_idx, uint16_t>& indexes, 
 }
 
 
-void FoodManager::influence_food_velocities_in_radii(const sf::Vector2f& position, const float radius, const int intensity)
+void FoodManager::influence_food_velocities_in_radii(const sf::Vector2f& position, const float radius, const float intensity)
 {
 	gather_food_in_radius(selected_cells_indexes_, position, radius);
 
@@ -116,7 +116,7 @@ void FoodManager::influence_food_velocities_in_radii(const sf::Vector2f& positio
 		Body* body = bodies_->at(food->body_id_);
 
 		sf::Vector2f direction = (position - body->position_).normalized();
-		body->velocity_ += direction * (float)intensity;
+		body->velocity_ += direction * intensity;
 	}
 }
 

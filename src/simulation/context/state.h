@@ -109,7 +109,7 @@ struct SimulationStatistics
 struct WorldStatistics
 {
     int   mouse_mode = 0;      // 0 = Add, 1 = Remove
-    int mouse_intensity = 1;
+    float mouse_intensity = 1;
     float mouse_radius = 300.f;
 
     int structure_mode = 0;

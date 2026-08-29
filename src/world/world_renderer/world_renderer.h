@@ -224,7 +224,7 @@ private:
 	void render_protozoa(const SimSnapshot& snapshot)
 	{
 		// Data Fetching
-		const int container_size = snapshot.render.positions.size();
+		const size_t container_size = snapshot.render.positions.size();
 		const float zoom = snapshot.sim_stats.camera_zoom;
 
 		// This determines if the colors of the protozoa should be simplified based on the zoom level
@@ -236,7 +236,7 @@ private:
 		outer_radii_.resize(container_size);
 		outer_positions_.resize(container_size);
 
-		for (int i = 0; i < container_size; ++i)
+		for (size_t i = 0; i < container_size; ++i)
 		{
 			auto pos = snapshot.render.positions[i];
 			auto vel = snapshot.render.velocities[i];

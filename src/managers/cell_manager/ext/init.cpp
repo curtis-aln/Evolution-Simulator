@@ -113,8 +113,8 @@ void CellManager::create_new_protozoa(int count, WorldBorder* spawn_area)
 	for (int i = 0; i < count; i++)
 	{
 		sf::Vector2f pos = spawn_area->rand_pos();
-		int cell_count = Random::rand_range(2, 3);
-		create_protozoa_from_pool(pos, cell_count, cell_count * 1.5);
+		unsigned cell_count = Random::rand_range(2u, 3u);
+		create_protozoa_from_pool(pos, cell_count, unsigned(cell_count * 1.5));
 	}
 	
 }

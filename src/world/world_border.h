@@ -49,12 +49,14 @@ public:
 		return dist_sq < rad_sq;
 	}
 
-	[[nodiscard]] const sf::Vector2f& rand_pos() const
+	[[nodiscard]] const sf::Vector2f rand_pos() const
 	{
+		constexpr int attempts = 20;
 		const sf::Rect<float> bounds = { {center_.x - bounds_radius, center_.y - bounds_radius}, {bounds_radius * 2, bounds_radius * 2} };
-		for (int i = 0; i < 20; ++i)
+		for (int i = 0; i < attempts; ++i)
 		{
-			if (const sf::Vector2f pos = Random::rand_pos_in_rect(bounds); contains(pos))
+			const sf::Vector2f pos = Random::rand_pos_in_rect(bounds);
+			if (contains(pos))
 			{
 				return pos;
 			}

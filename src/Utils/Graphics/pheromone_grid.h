@@ -10,7 +10,7 @@
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 
-static struct PheromoneGridSettings
+struct PheromoneGridSettings
 {
     inline static float decay_rate = 0.0015f;  // fraction of pheromone lost per step
     inline static float diffuse_rate = 0.20f;  // blend toward weighted neighbour average per step
@@ -226,7 +226,10 @@ private:
     {
         // SFML 3 renamed Texture::create to Texture::resize — swap back to create({w,h})
         // if you're still on SFML 2.
-        heat_texture.resize({ CellsX, CellsY });
+        if (!heat_texture.resize({ CellsX, CellsY }))
+			throw std::runtime_error("Failed to resize pheromone heatmap texture.");
+
+ 
         heat_texture.setSmooth(true);
         heat_sprite.setTexture(heat_texture, true); // true = reset texture rect to the new size
         heat_sprite.setScale({ cell_width, cell_height });
