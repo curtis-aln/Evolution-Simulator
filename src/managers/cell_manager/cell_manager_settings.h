@@ -12,7 +12,7 @@ struct CellManagerSettings
 
 	// DAMAGE
 	inline static float impulse_damage_thresh = 50.0f;
-	inline static float impulse_damage_multiplier = 0.0004f;
+	inline static float impulse_damage_multiplier = 0.00005f;
 	inline static float max_single_hit_integrity_fraction = 0.3f;
 
 	// STATISTICS
@@ -21,7 +21,7 @@ struct CellManagerSettings
 
 	// MISC
 	inline static constexpr int infant_check_interval = 20; // how often to check for newborn connections, in frames
-	inline static constexpr float delta_min_speed = 0.f; // 1.f / 75'000.f;
+	inline static constexpr float delta_min_speed = 0.f; // 1.f / 10'000.f;
 	inline static constexpr int extincion_threshold = 10; // if there are less than this number of protozoas, we consider it an extinction event
 	inline static constexpr int init_spring_immunity_time = 400; // for the start of the sim the springs are immune to damage
 

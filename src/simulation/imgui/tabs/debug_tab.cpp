@@ -27,7 +27,7 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
 	ImGui::SetNextItemWidth(-1.f);
 	float min_speed = snap.cell_manager_stats.min_speed; // sync with sim state
-	if (ImGui::SliderFloat("##min_speed", &min_speed, 0.f, 2.f, "Min Speed %.3f"))
+	if (ImGui::SliderFloat("##min_speed", &min_speed, 0.f, 10.f, "Min Speed %.3f"))
 	{
 		SimCommand cmd{ .section = CommandSection::CellManagerEvent, .type = CommandType::SetMinSpeed, .float_val = min_speed };
 		ctx.push(cmd);
@@ -63,8 +63,13 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
 	// Sets the Lifetime of cell matter
 	int lifetime = CellMatterSettings::max_time_to_live;
-	if (ImGui::SliderInt("##cell_matter_lifetime", &lifetime, 0, 30000, "lifetime %d"))
+	if (ImGui::SliderInt("##cell_matter_lifetime", &lifetime, 0, 30000, "cell matter lifetime %d"))
 		ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetCellMatterLifetime, .int_val = lifetime });
+
+	// Setting the amount of Sub-iterations the program does
+	int sub_iterations = WorldSettings::tick_sim_multiplier;
+	if (ImGui::SliderInt("##sub_iterations", &sub_iterations, 1, 100, "update sub-iterations %d"))
+		ctx.push({ .section = CommandSection::WorldEvent, .type = CommandType::SetSubIterations, .int_val = sub_iterations });
 
 	ImGui::EndChild();
 }

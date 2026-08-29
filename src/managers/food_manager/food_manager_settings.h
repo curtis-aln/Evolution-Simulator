@@ -29,4 +29,7 @@ struct FoodManagerSettings
 
 	inline static float food_launch_strength;
 	inline static float food_launch_chance;
+
+	inline static int pheromone_update_freq = 60;
+	inline static int pheromone_render_update_freq = 30;
 };

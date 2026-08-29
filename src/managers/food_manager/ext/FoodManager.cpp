@@ -10,7 +10,7 @@ FoodManager::FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_
 
 }
 
-void FoodManager::update()
+void FoodManager::update(int iterations)
 {
 	if (!food_container_full())
 	{
@@ -21,10 +21,10 @@ void FoodManager::update()
 	update_food();
 
 	update_statistics();
-	handle_food_death();
+	handle_food_death(iterations);
 }
 
-void FoodManager::handle_food_death()
+void FoodManager::handle_food_death(int iterations)
 {
 	for (Food* food : food_vector)
 	{
@@ -34,14 +34,14 @@ void FoodManager::handle_food_death()
 		sf::Vector2f pos = bodies_->at(food->body_id_)->position_;
 
 		if (toggles_.update_pheromone_grid)
-			pheromone_grid.add_pheromone(pos.x, pos.y, 10.f);
+			pheromone_grid.add_pheromone(pos.x, pos.y, 10.f / pheromone_update_freq);
 	}
 
-	if (toggles_.update_pheromone_grid)
+	if (toggles_.update_pheromone_grid && iterations % pheromone_update_freq == 0)
 		pheromone_grid.step();
 }
 
-void FoodManager::update_position_data(RenderData& food_data)
+void FoodManager::update_position_data(RenderData& food_data, int iterations)
 {
 	size_t current_vector_size = food_data.positions.size();
 	size_t food_count = food_vector.size();
@@ -55,7 +55,10 @@ void FoodManager::update_position_data(RenderData& food_data)
 
 	if (toggles_.render_pheromone_grid)
 	{
-		pheromone_grid.render();
+		if (iterations % pheromone_update_freq == 0)
+		{
+			pheromone_grid.render();
+		}
 		food_data.pheromone_texture = pheromone_grid.get_texture();
 	}
 
@@ -171,6 +174,14 @@ void FoodManager::handle_food_manager_event(SimCommand& cmd)
 
 	case  CommandType::SetFoodReproductiveThreshold:
 		FoodSettings::nutrient_reproductive_threshold = cmd.float_val;
+		break;
+
+	case CommandType::SetPheromoneUpdateFrequency:
+		FoodManagerSettings::pheromone_update_freq = cmd.int_val;
+		break;
+
+	case  CommandType::SetPheromoneRenderFrequency:
+		FoodManagerSettings::pheromone_render_update_freq = cmd.int_val;
 		break;
 	}
 }

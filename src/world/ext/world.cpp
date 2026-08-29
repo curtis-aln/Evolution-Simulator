@@ -129,7 +129,7 @@ void World::fill_snapshot(SimSnapshot& snapshot)
     snapshot.render.clear_render_data();
 
     if (!cell_manager_.toggles_.show_only_newborns)
-        food_manager_.update_position_data(snapshot.render);
+        food_manager_.update_position_data(snapshot.render, statistics_.iterations_);
     cell_manager_.update_position_container(snapshot.render, visible_bounds, cell_manager_.toggles_.show_only_newborns);
 
 
@@ -220,6 +220,10 @@ void World::handle_world_event(SimCommand& cmd)
         case CommandType::SetMouseIntensity:
             statistics_.mouse_intensity = cmd.int_val;
             break;
+
+        case CommandType::SetSubIterations:
+			WorldSettings::tick_sim_multiplier = cmd.int_val;
+			break;
 
         case CommandType::SetCellGridResolution:
             //m_world_.get_spatial_grid()->change_cell_dimsensions(cmd.int_val, cmd.int_val);

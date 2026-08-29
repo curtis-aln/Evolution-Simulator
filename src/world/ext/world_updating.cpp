@@ -50,7 +50,7 @@ void World::tick_sim()
 {
 	/* This function runs one update cycle of the simulation, can be stacked */
 	
-	food_manager_.update();                              // updating the food in the world
+	food_manager_.update(statistics_.iterations_);                              // updating the food in the world
 	cell_manager_.update(statistics_.iterations_);       // updating the cells, springs, and cell matter in the world
 	food_eat_resolver_.resolve(statistics_.iterations_); // updating the interation between cells and food
 

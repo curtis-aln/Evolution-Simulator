@@ -38,6 +38,7 @@ enum class CommandType
     SetFoodGridResolution,
 
     SetWorldRadius,          // world resize stub
+    SetSubIterations,
 
 
     // CELL MANAGER EVENT  ──────────────────────────────────────────────────
@@ -95,6 +96,9 @@ enum class CommandType
 	SetPheromoneDiffusionRate,
     SetPheromoneDepositAmount,
     SetPheromoneMaxPheromone,
+
+    SetPheromoneUpdateFrequency,
+    SetPheromoneRenderFrequency,
 
     SetFoodNutrients,
 	SetFoodNutrientsDevelopmentTime,

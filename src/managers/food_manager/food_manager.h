@@ -64,8 +64,8 @@ public:
     FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_vector<Body>* bodies);
     
     // Main Entries
-    void update();
-    void update_position_data(RenderData& food_data);
+    void update(int iterations);
+    void update_position_data(RenderData& food_data, int iterations);
     void handle_food_manager_event(SimCommand& cmd);
     void reset_food_manager();
 
@@ -111,5 +111,5 @@ private:
     float calculate_spawn_chance() const;
 
     // Death
-    void handle_food_death();
+    void handle_food_death(int iterations);
 };
