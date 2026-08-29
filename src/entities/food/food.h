@@ -71,6 +71,23 @@ struct Food : FoodManagerSettings
 		return nutrients * nutrients_to_radius_scale;
 	}
 
+	bool can_reproduce()
+	{
+		bool  is_fully_grown = age >= fully_grown_age;
+
+		float thresh = final_nutrients * nutrient_reproductive_threshold;
+		bool  has_sufficient_nutrients = nutrients >= thresh;
+		bool is_cooldown_over = time_since_last_reproduced >= repro_cooldown;
+
+		return is_fully_grown && has_sufficient_nutrients && is_cooldown_over;
+	}
+
+	void reproduce()
+	{
+		time_since_last_reproduced = 0;
+		nutrients *= 0.5f;
+	}
+
 private:
 	void update_food_nutrients()
 	{
@@ -89,10 +106,6 @@ private:
 			nutrients -= drain_rate;
 			return;
 		}
-
-		// nutrients only develop after birth, no regeneration from damage
-		if (age > fully_grown_age)
-			return;
 
 		// Normal development toward final_nutrients
 		const float diff = final_nutrients - initial_nutrients;

@@ -234,13 +234,13 @@ struct SpringGenome : GenomeBase
 // ---------------------------------------------------------------------------
 struct CellGeneticConstraints
 {
-    inline static Range radius = { 15.f,         220.f };
+    inline static Range radius = { 25.f,         120.f };
     inline static Range amplitude = { -2.f,         2.f };
     inline static Range frequency = { -1.f / 1.f,  1.f / 1.f };
     inline static Range offset = { -3.14159f,    3.14159f };
     inline static Range vertical_shift = { -0.6f,        0.6f };
 
-	inline static Range newborn_search = { 0.f, radius.max * 3.f };
+	inline static Range newborn_search = { 0.f, radius.max * 2.f };
 };
 
 struct CellInitialSpawnRanges

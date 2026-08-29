@@ -80,8 +80,9 @@ enum class CommandType
     SetFoodToggles,
 	ClearAllFood, // clears all food from the simulation
 
-    SetRandomIntensity,
-    SetMitosisIntensity,
+    SetRandomSpawnsPerFrame,
+    SetRandomSpawnChance,
+    SetMitosisConstant,
 
     SetPheromoneUpdatingSteps,
 	SetPheromoneDecayRate,

@@ -1,60 +1,52 @@
 #include "../food_manager.h"
 
-void FoodManager::food_reproduction_function()
-{
-	// Food can either spawn out of nowhere, or split into two with mitosis
 
-	// dont do anything if the food container is full
-	if (food_container_full())
+void FoodManager::spawn_random_food()
+{
+	if (!toggles_.spawn_random_food)
 		return;
 
-	if (toggles_.spawn_random_food)
+	for (int i = 0; i < FoodManagerSettings::food_random_spawn_per_frame; ++i)
 	{
-		if (Random::rand01_float() < 0.25f)
-			create_food_pool(statistics_.food_random_spawn_intensity);
+		if (Random::rand01_float() < FoodManagerSettings::food_random_spawn_chance)
+			create_food_pool(1, world_bounds_);
 	}
+}
 
+void FoodManager::spawn_food_mitosis()
+{
 	if (!toggles_.food_mitosis)
 		return;
 
+	float spawn_chance = calculate_spawn_chance();
+
 	// Each food must pass the reproduce check and the spawn chance
 	for (Food* food : food_vector)
-	{
-		if (!can_food_reproduce(food) || calculate_spawn_chance() < Random::rand01_float())
-			continue;
-
-		bool break_out_of_loop = reproduce_food(food);
-
-		if (break_out_of_loop)
-			break; // there are no more body vectors left to use
-	}
+		if (food->can_reproduce() && Random::rand01_float() < spawn_chance)
+			reproduce_food(food);
 }
 
 
 float FoodManager::calculate_spawn_chance() const
 {
 	// This function calculates the chance of a food reproducing based on how much food is in the world
-	float spawn_chance = 1.f - static_cast<float>(food_vector.size()) / static_cast<float>(max_food);
-	float scaled = spawn_chance * spawn_proportionality_constant * 0.7f;
-	float clamped = std::clamp(scaled, 0.f, 1.f);
-	return clamped;
+	float ratio = static_cast<float>(food_vector.size()) / static_cast<float>(max_food);
+	float spawn_chance = 1.f - ratio;
+	float scaled = spawn_chance * spawn_proportionality_constant;
+	return std::clamp(scaled, 0.f, 1.f);
 }
 
 
-bool FoodManager::reproduce_food(Food* parent_food)
+void FoodManager::reproduce_food(Food* parent_food)
 {
 	// This function returns true if the food container is full and the food cannot reproduce, false if it can reproduce and has spawned a new food
-
-	if (food_vector.can_add() == false || bodies_->can_add() == false)
-		return true;
-
 	Body* parent_body = bodies_->at(parent_food->body_id_);
 	sf::Vector2f parent_pos = parent_body->position_;
 
 	// Creating a new food body pair and linking them together
 	FoodBodyPair pair = create_food_body_pair(parent_pos);
 	if (pair.is_valid() == false)
-		return true;
+		return;
 
 	Food* child_food = food_vector.at(pair.food_id);
 	Body* child_body = bodies_->at(pair.body_id);
@@ -75,8 +67,8 @@ bool FoodManager::reproduce_food(Food* parent_food)
 	if (Random::rand01_float() < food_launch_chance)
 		child_body->velocity_ = Random::rand_vector(-food_launch_strength, food_launch_strength);
 
-	parent_food->time_since_last_reproduced = 0;
-	return false;
+	parent_food->reproduce();
+	return;
 }
 
 FoodBodyPair FoodManager::create_food_body_pair(const sf::Vector2f& position)

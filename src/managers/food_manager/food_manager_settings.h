@@ -20,11 +20,14 @@ struct FoodManagerSettings
 	inline static float kFoodVisibilityRampFrames;
 	inline static float kFoodMaxAlpha;
 
+	inline static int food_random_spawn_per_frame = 1;
+	inline static float food_random_spawn_chance = .03f;
+
 	inline static float spawn_proportionality_constant; // range between [0.001, 0.01]
 	inline static float food_spawn_distance;
 
 	inline static uint16_t repro_cooldown;
-	inline static float reproductive_threshold; // how old a food has to be before it can reproduce
+	inline static float nutrient_reproductive_threshold;
 
 	inline static float initial_nutrients;
 	inline static float final_nutrients;
@@ -35,7 +38,7 @@ struct FoodManagerSettings
 
 	inline static float food_initial_radius = 6;
 
-	inline static float nutrients_to_radius_scale = .56f; // radius = nutrients * this constant
+	inline static float nutrients_to_radius_scale = .66f; // radius = nutrients * this constant
 	inline static float fade_start_nutrients = 30.0f;       // nutrients level at which fading begins
 
 	inline static float food_launch_strength = 50.f;
@@ -50,9 +53,4 @@ struct FoodManagerSettings
 
 	inline static sf::Vector3i food_darkest_color = { 0, 225, 0 };
 	inline static sf::Vector3i food_lightest_color = { 80, 255, 100 };
-
-
-	// Intensity Sliders
-	inline static int max_random_food_spawned_per_frame = 20;
-
 };

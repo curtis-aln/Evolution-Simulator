@@ -18,9 +18,14 @@ void FoodTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 	if (ctx.food_toggles.spawn_random_food)
 	{
 		ImGui::Indent();
-		int intensity = snap.food_manager_stats.food_random_spawn_intensity;
-		if (ImGui::SliderInt("##random_intensity", &intensity, 0, FoodManagerSettings::max_random_food_spawned_per_frame, "intensity %d"))
-			ctx.push({ .section = CommandSection::FoodManagerEvent, .type = CommandType::SetRandomIntensity, .int_val = intensity });
+		int spawns_per_frame = FoodManagerSettings::food_random_spawn_per_frame;
+		if (ImGui::SliderInt("##random_intensity", &spawns_per_frame, 0, 10, "spawns per frame %d"))
+			ctx.push({ .section = CommandSection::FoodManagerEvent, .type = CommandType::SetRandomSpawnsPerFrame, .int_val = spawns_per_frame });
+		
+		float spawn_chance = FoodManagerSettings::food_random_spawn_chance;
+		if (ImGui::SliderFloat("##random_chance", &spawn_chance, 0.f, 1.f, "spawn chance %.2f"))
+			ctx.push({ .section = CommandSection::FoodManagerEvent, .type = CommandType::SetRandomSpawnChance, .float_val = spawn_chance });
+		
 		ImGui::Unindent();
 	}
 
@@ -32,9 +37,9 @@ void FoodTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 	if (ctx.food_toggles.food_mitosis)
 	{
 		ImGui::Indent();
-		float intensity = snap.food_manager_stats.food_mitosis_spawn_intensity;
-		if (ImGui::SliderFloat("##mitosis_intensity", &intensity, 0.f, 4.f, "intensity %.2f"))
-			ctx.push({ .section = CommandSection::FoodManagerEvent, .type = CommandType::SetMitosisIntensity, .float_val = intensity });
+		float constant = FoodManagerSettings::spawn_proportionality_constant;
+		if (ImGui::SliderFloat("##mitosis_intensity", &constant, 0.f, 0.1f, "spawn constant %.3f"))
+			ctx.push({ .section = CommandSection::FoodManagerEvent, .type = CommandType::SetMitosisConstant, .float_val = constant });
 		ImGui::Unindent();
 	}
 

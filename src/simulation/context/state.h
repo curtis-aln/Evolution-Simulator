@@ -77,10 +77,10 @@ struct CellManagerToggles
 struct FoodToggles
 {
     bool spawn_random_food = true;
-    bool food_mitosis = false;
+    bool food_mitosis = true;
 
-    bool update_pheromone_grid = true;
-    bool render_pheromone_grid = true;
+    bool update_pheromone_grid = false;
+    bool render_pheromone_grid = false;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -176,9 +176,6 @@ struct CellManagerStatistics
 struct FoodManagerStatistics
 {
     int   food_count = 0;
-
-    float   food_random_spawn_intensity = 1.f;
-    float   food_mitosis_spawn_intensity;
 
 	float pheromone_grid_cells_x = 0;
 	float pheromone_grid_cells_y = 0;

@@ -108,10 +108,10 @@ private:
     void update_statistics();
 
 	// Reproduction
-    void  food_reproduction_function();
-    bool  reproduce_food(Food* food);
+    void spawn_random_food();
+    void spawn_food_mitosis();
+    void  reproduce_food(Food* food);
     float calculate_spawn_chance() const;
-    static bool can_food_reproduce(const Food* food) { return food->time_since_last_reproduced >= repro_cooldown && food->age >= reproductive_threshold;}
 
     // Death
     void handle_food_death();

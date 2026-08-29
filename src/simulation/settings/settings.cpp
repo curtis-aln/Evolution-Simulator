@@ -80,7 +80,7 @@ static void load_food_settings(toml::table& tbl)
     REQUIRE(FoodManagerSettings::friction, tbl["food"]["friction"]);
     REQUIRE(FoodManagerSettings::death_age, tbl["food"]["death_age"]);
     REQUIRE(FoodManagerSettings::repro_cooldown, tbl["food"]["reproductive_cooldown"]);
-    REQUIRE(FoodManagerSettings::reproductive_threshold, tbl["food"]["reproductive_threshold"]);
+    REQUIRE(FoodManagerSettings::nutrient_reproductive_threshold, tbl["food"]["nutrient_reproductive_threshold"]);
     REQUIRE(FoodManagerSettings::initial_nutrients, tbl["food"]["initial_nutrients"]);
     REQUIRE(FoodManagerSettings::final_nutrients, tbl["food"]["final_nutrients"]);
     REQUIRE(FoodManagerSettings::nutrient_development_time, tbl["food"]["nutrient_development_time"]);

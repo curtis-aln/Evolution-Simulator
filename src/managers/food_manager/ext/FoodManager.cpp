@@ -10,11 +10,16 @@ FoodManager::FoodManager(sf::RenderWindow* window, WorldBorder* world_bounds, o_
 
 }
 
-
 void FoodManager::update()
 {
-	food_reproduction_function();
+	if (!food_container_full())
+	{
+		spawn_random_food();
+		spawn_food_mitosis();
+	}
+	
 	update_food();
+
 	update_statistics();
 	handle_food_death();
 }
@@ -132,12 +137,16 @@ void FoodManager::handle_food_manager_event(SimCommand& cmd)
 		toggles_ = cmd.food_toggles;
 		break;
 
-	case CommandType::SetRandomIntensity:
-		statistics_.food_random_spawn_intensity = cmd.int_val;
+	case CommandType::SetRandomSpawnsPerFrame:
+		FoodManagerSettings::food_random_spawn_per_frame = cmd.int_val;
 		break;
 
-	case CommandType::SetMitosisIntensity:
-		statistics_.food_mitosis_spawn_intensity = cmd.float_val;
+	case CommandType::SetRandomSpawnChance:
+		FoodManagerSettings::food_random_spawn_chance = cmd.float_val;
+		break;
+
+	case CommandType::SetMitosisConstant:
+		FoodManagerSettings::spawn_proportionality_constant = cmd.float_val;
 		break;
 
 	case CommandType::SetPheromoneUpdatingSteps:
@@ -185,7 +194,7 @@ void FoodManager::handle_food_manager_event(SimCommand& cmd)
 		break;
 
 	case  CommandType::SetFoodReproductiveThreshold:
-		FoodManagerSettings::reproductive_threshold = cmd.float_val;
+		FoodManagerSettings::nutrient_reproductive_threshold = cmd.float_val;
 		break;
 	}
 }
