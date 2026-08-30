@@ -54,7 +54,7 @@ bite_amount = 10.0
 integrity_conversion_rate = 0.05
 nutrients_conversion_rate = 0.185
 
-friction_energy_loss_const = 0.02
+friction_energy_loss_const = 0.0025
 
 # ── Spring ─────────────────────────────────────────────────────────────────
 [spring]

@@ -1,159 +1,168 @@
 #pragma once
 
-#include "../managers/food_manager/food_manager.h"
 #include "../managers/cell_manager/cell_manager.h"
+#include "../managers/food_manager/food_manager.h"
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
-#include "world_settings.h"
-#include "../simulation/context/state.h"
 #include "../managers/cell_manager/cell_manager_settings.h"
 #include "../managers/cell_manager/organism_tracker.h"
+#include "../simulation/context/state.h"
+#include "world_settings.h"
 
 #include "collision_resolver/collision_resolver.h"
 
-#include "../Utils/thread_pool.h"
-#include "../Utils/Graphics/CircleBatchRenderer.h"
-#include "../Utils/spatial_grid/simple_spatial_grid.h"
-#include "../Utils/spatial_grid/spatial_grid_renderer.h"
 #include "../simulation/context/sim_snapshot.h"
-#include "../Utils/Graphics/font_renderer.hpp"
 #include "../Utils/o_vec/o_vec_debug.h"
-#include "../Utils/Graphics/SFML_Grid.h"
+#include "../Utils/spatial_grid/simple_spatial_grid.h"
+#include "../Utils/thread_pool.h"
 
-#include "world_renderer/world_renderer.h"
 #include "food_eat_resolver.h"
+#include "world_border.h"
+#include "world_renderer/world_renderer.h"
+#include <entities/body.h>
+#include <entities/cell/cell.h>
+#include <entities/food/food.h>
+#include <entities/spring/spring.h>
+#include <functional>
+#include <managers/food_manager/food_manager_settings.h>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <simulation/context/sim_command.h>
+#include <Utils/o_vec/o_vector.hpp>
+#include <vector>
 
 class World : public WorldSettings
 {
-    unsigned max_entities = CellManagerSettings::max_cells + FoodManagerSettings::max_food;
+	unsigned max_entities = CellManagerSettings::max_cells + FoodManagerSettings::max_food;
 
-    sf::RenderWindow* m_window_ = nullptr;
+	sf::RenderWindow* m_window_ = nullptr;
 
-    WorldBorder        world_circular_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
-    sf::FloatRect world_rect_bounds_{ {0.f, 0.f}, {bounds_radius * 2.f, bounds_radius * 2.f} };
-   
-    WorldStatistics statistics_{}; // Statistics accumulated each tick by the update thread.
+	WorldBorder        world_circular_bounds_{ {bounds_radius, bounds_radius}, bounds_radius };
+	sf::FloatRect world_rect_bounds_{ {0.f, 0.f}, {bounds_radius * 2.f, bounds_radius * 2.f} };
 
-    // for the physics updating 
-    // both food and cells query id's from this vector
+	WorldStatistics statistics_{}; // Statistics accumulated each tick by the update thread.
+
+	// for the physics updating 
+	// both food and cells query id's from this vector
 	o_vector<Body> bodies_{ max_entities };
 
-    float tex_rad = 120;
+	float tex_rad = 120;
 
-    
 
-    FoodManager        food_manager_{ m_window_, &world_circular_bounds_, &bodies_ };
+
+	FoodManager        food_manager_{ m_window_, &world_circular_bounds_, &bodies_ };
 	CellManager 	  cell_manager_{ m_window_ , &world_circular_bounds_, &bodies_ };
 
-    sf::FloatRect bounds = { {0, 0}, {bounds_radius * 2, bounds_radius * 2} };
-    
-    CollisionResolver collision_resolver_{ &bounds, &bodies_, updating_threads, max_entities, max_entities };
-	FoodEatResolver food_eat_resolver_{ 
-        &food_manager_.get_food_vector(), &bodies_, &cell_manager_.get_all_cells(), 
-        updating_threads, max_entities / updating_threads, bounds };
-    
-    WorldRenderer world_renderer_{ 
-        m_window_, 
-        collision_resolver_.get_grid(), 
-        &food_eat_resolver_.get_spatial_grid(),
-        cell_manager_.get_new_born_cell_grid(),
-        food_manager_.get_pheromone_grid(),
-        world_rect_bounds_,
-        world_circular_bounds_};
+	sf::FloatRect bounds = { {0, 0}, {bounds_radius * 2, bounds_radius * 2} };
+
+	CollisionResolver collision_resolver_{ &bounds, &bodies_, updating_threads, max_entities, max_entities };
+	FoodEatResolver food_eat_resolver_{
+		&food_manager_.get_food_vector(), &bodies_, &cell_manager_.get_all_cells(),
+		updating_threads, max_entities / updating_threads, bounds };
+
+	WorldRenderer world_renderer_{
+		m_window_,
+		collision_resolver_.get_grid(),
+		&food_eat_resolver_.get_spatial_grid(),
+		cell_manager_.get_new_born_cell_grid(),
+		food_manager_.get_pheromone_grid(),
+		world_rect_bounds_,
+		world_circular_bounds_ };
 
 
-    std::vector<std::function<void()>> updating_bodies_;
-    BarrierThreadPool thread_pool_{ (int)updating_threads };
+	std::vector<std::function<void()>> updating_bodies_;
+	BarrierThreadPool thread_pool_{ (int)updating_threads };
 
-    int  current_total_bodies_ = 0;
-    bool update_jobs_built_ = false;
+	int  current_total_bodies_ = 0;
+	bool update_jobs_built_ = false;
 
-    // debugging o_vectors
-    OVecDebug<Cell> dbg_cells_{ cell_manager_.get_all_cells()};
-    OVecDebug<Food> dbg_food_{food_manager_.get_food_vector()};
-	OVecDebug<Body> dbg_bodies_{bodies_};
-	OVecDebug<Spring> dbg_springs_{cell_manager_.get_all_springs()};
-
-public:
-    // ── Toggles — written by ImGui (main thread), read by update thread ──────
-    // Safe to read/write without locking while the threads are not simultaneously
-    // accessing them; copy into SharedState before handing to the update thread.
-    WorldToggles world_toggles;
-
-    bool dragging = false;
-
+	// debugging o_vectors
+	OVecDebug<Cell> dbg_cells_{ cell_manager_.get_all_cells() };
+	OVecDebug<Food> dbg_food_{ food_manager_.get_food_vector() };
+	OVecDebug<Body> dbg_bodies_{ bodies_ };
+	OVecDebug<Spring> dbg_springs_{ cell_manager_.get_all_springs() };
 
 public:
-    explicit World(sf::RenderWindow* window = nullptr);
+	// ── Toggles — written by ImGui (main thread), read by update thread ──────
+	// Safe to read/write without locking while the threads are not simultaneously
+	// accessing them; copy into SharedState before handing to the update thread.
+	WorldToggles world_toggles;
 
-    // ── Update ───────────────────────────────────────────────────────────────
-    void update(SimSnapshot& write_snapshot);
-
-    void ensure_update_jobs_built();
-
-    // ── Render ───────────────────────────────────────────────────────────────
-    void render(const SimSnapshot& snapshot, sf::Vector2f mouse_pos);
-
-    void handle_world_event(SimCommand& cmd);
-    void reset_world();
+	bool dragging = false;
 
 
-    // ── Accessors — spatial grids / food ─────────────────────────────────────
-    SimpleSpatialGrid* get_spatial_grid() { return collision_resolver_.get_grid(); }
+public:
+	explicit World(sf::RenderWindow* window = nullptr);
 
-    FoodManager* get_food_manager() { return &food_manager_; }
-    const FoodManager* get_food_manager() const { return &food_manager_; }
-    const CellManager* get_cell_manager() const { return &cell_manager_; }
-    CellManager* get_cell_manager() { return &cell_manager_; }
-	
-    int get_entity_count() const { return cell_manager_.get_cell_count() + food_manager_.get_size() + cell_manager_.get_matter_count(); }
+	// ── Update ───────────────────────────────────────────────────────────────
+	void update(SimSnapshot& write_snapshot);
+
+	void ensure_update_jobs_built();
+
+	// ── Render ───────────────────────────────────────────────────────────────
+	void render(const SimSnapshot& snapshot, sf::Vector2f mouse_pos);
+
+	void handle_world_event(SimCommand& cmd);
+	void reset_world();
+
+
+	// ── Accessors — spatial grids / food ─────────────────────────────────────
+	SimpleSpatialGrid* get_spatial_grid() { return collision_resolver_.get_grid(); }
+
+	FoodManager* get_food_manager() { return &food_manager_; }
+	const FoodManager* get_food_manager() const { return &food_manager_; }
+	const CellManager* get_cell_manager() const { return &cell_manager_; }
+	CellManager* get_cell_manager() { return &cell_manager_; }
+
+	int get_entity_count() const { return cell_manager_.get_cell_count() + food_manager_.get_size() + cell_manager_.get_matter_count(); }
 	int get_cell_count() const { return cell_manager_.get_cell_count(); }
 	int get_food_count() const { return food_manager_.get_size(); }
 
-    // world.h
-    static SpatialGridData get_grid_data(SimpleSpatialGrid* grid);
-    void calculate_spatial_grid_statistics(SimpleSpatialGrid* grid, SpatialGridData& data);
+	// world.h
+	static SpatialGridData get_grid_data(SimpleSpatialGrid* grid);
+	void calculate_spatial_grid_statistics(SimpleSpatialGrid* grid, SpatialGridData& data);
 
-    // ── Statistics getters — read by ImGui from snapshot ─────────────────────
-    WorldStatistics& get_statistics()  { return statistics_; }
+	// ── Statistics getters — read by ImGui from snapshot ─────────────────────
+	WorldStatistics& get_statistics() { return statistics_; }
 
-    void render_springs(const SimSnapshot& snapshot);
+	void render_springs(const SimSnapshot& snapshot);
 
-    // ── Selection ─────────────────────────────────────────────────────────────
-    bool handle_mouse_click(sf::Vector2f mouse_position);
-    void keyboardEvents(const sf::Keyboard::Key& event_key_code);
+	// ── Selection ─────────────────────────────────────────────────────────────
+	bool handle_mouse_click(sf::Vector2f mouse_position);
+	void keyboardEvents(const sf::Keyboard::Key& event_key_code);
 
-    void handle_right_click(WorldBorder& spawn_area);
+	void handle_right_click(WorldBorder& spawn_area);
 
 private:
-    void fill_snapshot(SimSnapshot& snapshot);
+	void fill_snapshot(SimSnapshot& snapshot);
 
-    void update_entities();
-    void bound_bodies();
-    void bound_body_to_world(Body* body);
+	void update_entities();
+	void bound_bodies();
+	void bound_body_to_world(Body* body);
 
-    void copy_render_data_to_snapshot(SimSnapshot& snapshot);
-    void copy_spatial_grids_to_snapshot(SimSnapshot& snapshot);
+	void copy_render_data_to_snapshot(SimSnapshot& snapshot);
+	void copy_spatial_grids_to_snapshot(SimSnapshot& snapshot);
 
-    void nearby_food_information(const OrganismTracker& protozoa) const;
+	void nearby_food_information(const OrganismTracker& protozoa) const;
 
-    int check_mouse_press(const OrganismTracker& protozoa, sf::Vector2f mousePosition, bool tolerance_check) const;
+	int check_mouse_press(const OrganismTracker& protozoa, sf::Vector2f mousePosition, bool tolerance_check) const;
 
-    
-   
-    void debug_sanity_checks();
 
-    sf::FloatRect calulcate_visible_range();
 
-    void update_statistics();
+	void debug_sanity_checks();
 
-    void resolve_food_interactions();
+	sf::FloatRect calulcate_visible_range();
 
-    void drag_selected_cell_logic();
-    void tick_sim();
+	void update_statistics();
 
-    bool should_tick_sim();
+	void resolve_food_interactions();
 
-    void bound_bodies_in_range(int begin, int end);
+	void drag_selected_cell_logic();
+	void tick_sim();
+
+	bool should_tick_sim();
+
+	void bound_bodies_in_range(int begin, int end);
 };

@@ -1,4 +1,9 @@
 #include "../cell_manager.h"
+#include <cmath>
+#include <entities/cell/cell.h>
+#include <entities/matter/CellMatter.h>
+#include <SFML/System/Vector2.hpp>
+#include <Utils/spatial_grid/simple_spatial_grid.h>
 
 // The only case in which a cell is removed from the world:
 // integrity is zero
@@ -25,24 +30,28 @@ void CellManager::collect_cell_death_requests()
 
 void CellManager::speed_tax_cell(Cell* cell)
 {
-	float speed = bodies_->at(cell->body_id_)->velocity_.length();
-	if (speed < statistics_.min_speed)
+	if (cell->immortal_ || statistics_.min_speed <= 0.f)
+		return;
+
+	sf::Vector2f velocity = bodies_->at(cell->body_id_)->velocity_;
+	float speed_sq = velocity.x * velocity.x + velocity.y * velocity.y;
+	if (speed_sq < statistics_.min_speed * statistics_.min_speed)
 	{
-		float deficit_ratio = 1.f - (speed / statistics_.min_speed); // 0 at threshold, 1 at rest
+		float deficit_ratio = 1.f - (sqrt(speed_sq) / statistics_.min_speed); // 0 at threshold, 1 at rest
 		cell->change_energy(speed_energy_tax * deficit_ratio);
 	}
 }
 
 void CellManager::remove_cell(cell_idx cell_id)
 {
-    Cell* cell = all_cells_.at(cell_id);
-    if (cell == nullptr) return;
-    register_death_stat(cell->internal_clock_, cell->offspring_count > 0);
+	Cell* cell = all_cells_.at(cell_id);
+	if (cell == nullptr) return;
+	register_death_stat(cell->internal_clock_, cell->offspring_count > 0);
 
 	cell->kill();
 
-    all_cells_.remove(cell);
-    bodies_->remove(cell->body_id_);
+	all_cells_.remove(cell);
+	bodies_->remove(cell->body_id_);
 }
 
 void CellManager::remove_cell_matter(cell_idx matter_id)
@@ -59,7 +68,7 @@ void CellManager::apply_cell_death_requests()
 	{
 		sf::Vector2f pos = get_cell_pos(cell_id);
 		Cell* cell = all_cells_.at(cell_id);
-		matter_birth_requests.push_back({pos, cell->get_inner_color(), cell->get_outer_color()});
+		matter_birth_requests.push_back({ pos, cell->get_inner_color(), cell->get_outer_color() });
 		remove_cell(cell_id);
 	}
 	cell_death_requests_.clear();

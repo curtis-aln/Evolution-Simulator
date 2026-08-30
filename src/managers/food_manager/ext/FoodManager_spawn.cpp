@@ -54,7 +54,7 @@ void FoodManager::reproduce_food(Food* parent_food)
 	// spawning the food next to another existing food 
 	sf::FloatRect spawn_rect = {
 		{parent_pos.x - food_spawn_distance, parent_pos.y - food_spawn_distance},
-		{food_spawn_distance * 2, food_spawn_distance * 2}};
+		{food_spawn_distance * 2, food_spawn_distance * 2} };
 
 	// setting the attributes for this new_body
 	child_body->position_ = Random::rand_pos_in_rect(spawn_rect);

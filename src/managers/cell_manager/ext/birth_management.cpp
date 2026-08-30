@@ -1,4 +1,18 @@
 #include "../cell_manager.h"
+#include <algorithm>
+#include <cstdint>
+#include <entities/body.h>
+#include <entities/cell/cell.h>
+#include <entities/cell/cell_settings.h>
+#include <entities/matter/CellMatter.h>
+#include <entities/spring/spring.h>
+#include <iostream>
+#include <SFML/System/Vector2.hpp>
+#include <unordered_set>
+#include <utility>
+#include <Utils/random.h>
+#include <Utils/spatial_grid/simple_spatial_grid.h>
+#include <vector>
 
 void CellManager::create_protozoa_from_pool(const sf::Vector2f position, const unsigned max_cells, const unsigned max_springs)
 {
@@ -135,10 +149,10 @@ void CellManager::apply_reproduction_requests()
 		// retrieve the offspring cell and body
 		Body* offspring_body = bodies_->at(pair.body_id);
 		Cell* offspring_cell = all_cells_.at(pair.cell_id);
-		
+
 		// create the offspring by filling in its genetics and other properties based on the parent cell
 		parent_cell->create_offspring(parent_body, offspring_cell, offspring_body, true);
-		
+
 		// connecting the parent and childS
 		create_temporary_spring_connection(parent_cell->id_, offspring_cell->id_);
 
@@ -149,7 +163,7 @@ void CellManager::apply_reproduction_requests()
 		}
 	}
 
-	cell_birth_requests.clear(); 
+	cell_birth_requests.clear();
 }
 
 void CellManager::create_temporary_spring_connection(const cell_idx parent_id, const cell_idx offspring_id)
@@ -162,18 +176,18 @@ void CellManager::create_temporary_spring_connection(const cell_idx parent_id, c
 	Spring* spring = all_springs_.at(new_spring_id);
 
 	// Setting the spring attributes - it should keep a near constant length with no oscillation
-	constexpr float spring_death_chance = 1.f / 300.f; // 1 in 300 chance of breaking per frame
+	constexpr float spring_death_chance = 1.f / 180.f; // 1 in 300 chance of breaking per frame
 	constexpr float temporary_spring_const = 0.1f;
 	constexpr float  temporary_spring_damping = 0.5f;
 	constexpr float temporary_spring_nutrient_rate = 0.f;
 
 	spring->death_chance_ = spring_death_chance;
-	
+
 	spring->genome.frequency = 0.f;      // no oscillation
 	spring->genome.amplitude = 0.f;      // no oscillation -> vertical_shift alone sets rest_length
 	spring->genome.vertical_shift = 0.2f;
 	spring->genome.spring_const = temporary_spring_const;
-	spring->genome.damping = temporary_spring_damping;   
+	spring->genome.damping = temporary_spring_damping;
 
 	spring->genome.nutrient_transfer_rate = temporary_spring_nutrient_rate;
 }
@@ -193,7 +207,7 @@ void CellManager::apply_connection_requests()
 		// if the distance is suspiciously large, print
 
 		int32_t new_spring_id = create_spring(static_cast<uint32_t>(req.offspring_id), static_cast<uint32_t>(req.connect_to_id));
-		
+
 		if (new_spring_id == -1)
 			continue;
 
@@ -252,7 +266,7 @@ void CellManager::apply_matter_birth_requests()
 		CellMatter* cell_matter = all_cell_matter_.emplace(true, true); // TODO create a creation Function;
 		if (cell_matter == nullptr)
 			std::cout << "Failed to create cell matter for birth request\n";
-		
+
 		cell_matter->reset_cell_matter();
 		cell_matter->cell_to_matter(body, req.inner_color, req.outer_color);
 	}

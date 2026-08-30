@@ -197,6 +197,10 @@ bool Cell::check_death()
 		integrity = 0.f;
 		dead_ = true;
 	}
+	else if (internal_clock_ > 10000)
+	{
+		energy -= 0.02f;
+	}
 	return dead_;
 }
 
