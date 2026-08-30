@@ -16,6 +16,26 @@
 
 | A realtime 2D evolution and natural selection simulator built in C++23 and SFML 3. Organisms called *protozoa* are made up of cells connected by springs. Locomotion is achieved by a sin-wave genetic system that mutates across generations. All behaviour between cells is localised, there is no "protozoa" class or container, only individual cells and springs exist.
 
+<details>
+<summary>📑 Table of Contents</summary>
+
+- [How It Works](#how-it-works)
+- [ImGui Interface](#imgui-interface)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Build](#build)
+  - [Run](#run)
+- [Controls](#controls)
+- [Settings](#settings)
+- [Performance Notes](#performance-notes)
+- [License](#license)
+- [Contributing](#contributing)
+
+</details>
+
+## How It Works
+
 ---
 ![Protozoa in action](media/gifs/video1.gif)
 
@@ -28,8 +48,6 @@ Reproduction has to be Learned by the protozoa, and is not hard-coded.
 ![Biome](media/images/Biome1.png)
 
 ---
-
-## How It Works
 
 Each protozoa is a small physics object made of **cells** (circles) connected by **springs**. Every cell and spring has its own gene — a sin-wave with four parameters (`amplitude`, `frequency`, `offset`, `vertical_shift`) — that controls how it moves and behaves. Cells modulate their own friction, springs modulate their rest length, and the combination produces emergent locomotion.
 
