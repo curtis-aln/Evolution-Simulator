@@ -12,6 +12,8 @@
 
 [![Project A.R.I.A Demo](https://img.youtube.com/vi/rUsfT7OLaL8/maxresdefault.jpg)](https://youtu.be/rUsfT7OLaL8)
 
+[![Watch on YouTube](https://img.shields.io/badge/▶-Watch%20Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/rUsfT7OLaL8)
+
 | A realtime 2D evolution and natural selection simulator built in C++23 and SFML 3. Organisms called *protozoa* are made up of cells connected by springs. Locomotion is achieved by a sin-wave genetic system that mutates across generations. All behaviour between cells is localised, there is no "protozoa" class or container, only individual cells and springs exist.
 
 ---
