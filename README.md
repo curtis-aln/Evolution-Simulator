@@ -1,5 +1,16 @@
 # Project A.R.I.A
+
+![C++](https://img.shields.io/badge/C%2B%2B-23-blue.svg?style=flat&logo=c%2B%2B)
+![SFML](https://img.shields.io/badge/SFML-3.0-8CC445.svg?style=flat)
+![CMake](https://img.shields.io/badge/CMake-3.21%2B-064F8C.svg?style=flat&logo=cmake)
+![License](https://img.shields.io/github/license/curtis-aln/Evolution-Simulator?style=flat)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-lightgrey.svg)
+![Stars](https://img.shields.io/github/stars/curtis-aln/Evolution-Simulator?style=social)
+![Last Commit](https://img.shields.io/github/last-commit/curtis-aln/Evolution-Simulator)
+
 ### Adaptive Realtime Intelligence Architecture
+
+[![Project A.R.I.A Demo](https://img.youtube.com/vi/rUsfT7OLaL8/maxresdefault.jpg)](https://youtu.be/rUsfT7OLaL8)
 
 | A realtime 2D evolution and natural selection simulator built in C++23 and SFML 3. Organisms called *protozoa* are made up of cells connected by springs. Locomotion is achieved by a sin-wave genetic system that mutates across generations. All behaviour between cells is localised, there is no "protozoa" class or container, only individual cells and springs exist.
 
