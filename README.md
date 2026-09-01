@@ -114,45 +114,30 @@ build\Release\ProjectARIA.exe    # Windows
 
 Or open the folder in Visual Studio 2022, let it detect the `CMakeLists.txt`, and press **Run**.
 
----
-
-## Controls
-
-| Input | Action |
-|---|---|
-| `Scroll wheel` | Zoom in / out |
-| `Left hold` | Pan camera |
-| `Left click` | Select protozoa |
-| `Space` | Pause / unpause |
-| `R` | Toggle rendering |
-| `S` | Toggle simple mode (outer cells only) |
-| `G` | Toggle cell collision grid overlay |
-| `F` | Toggle food grid overlay |
-| `D` | Toggle debug mode |
-| `K` | Toggle skeleton mode *(debug mode only)* |
-| `B` | Toggle bounding boxes *(debug mode only)* |
-| `C` | Toggle connections *(debug mode)* / toggle collisions *(normal mode)* |
-| `O` | Step one frame *(while paused)* |
-| `Escape` | Quit |
-
----
 
 ## Settings
 aria_settings.toml contains the default simulation settings. You can edit this file to change the initial conditions of the simulation.
 
 ## Technical Notes
-
-## Performance Notes
-This simulation is capable of simulating 300,000 - 600,000 of Cells, Springs, Cell Matter, and Food particles at around 90fps.
-Alternatively you can choose to run a smaller simulation with only 10,000 - 30,000 Cells and springs and expect a frame rate of 1400 - 2500fps.
-I Run this simulation on an Intel core i7 with an NVIDIA RTX 5070 and 16GB of RAM.
-
 ### Rendering
 - Rendering of all objects is batched and all drawn on the GPU in 2 draw calls. All bodies in the simulation are drawn as an inner and outer circle to provide at least a little bit of visual depth. 
 - Level of Detail (LOD) is used to reduce the load on the CPU when zoomed out. Details are removed in this order: 1. Spring size changes (curves are dropped below 0.08 zoom, springs render as straight lines), 2. Inner circle fill color is dropped below 0.05 zoom, leaving only the outer outline circles visible. Below 0.012 zoom, springs stop rendering entirely.
 
 ### Physics & Updating
 - Collision detection and Cell-Food detection use a `SimpleSpatialGrid` so only nearby cells are checked
+- The Rendering and Updating of this simulation happens on two seperate threads. The rendering is the main thread, and the updating is a sub-thread.
+- The Updating uses up to 16 other threads to update the physics of the simulation, and the number of threads can be changed in the settings menu. The updating thread is also capable of running at a different speed than the rendering thread, so you can have the simulation running at 2x speed while rendering at 1x speed. Due to the implementation of a triple buffer
+
+### Genetics
+- The cells contain the genetics for both itself and any potential spring it will create. When two cells want to make a spring between thmselves, a crossover genetic process will occour between their respective spring genes to create a new spring gene for the new spring. This allows for the evolution of the springs as well as the cells.
+
+## Performance Notes
+This simulation is capable of simulating 300,000 - 600,000 of Cells, Springs, Cell Matter, and Food particles at around 90fps.
+Alternatively you can choose to run a smaller simulation with only 10,000 - 30,000 Cells and springs and expect a frame rate of 1400 - 2500fps.
+I Run this simulation on an Intel core i7 with an NVIDIA RTX 5070 and 16GB of RAM.
+
+I usually run the simulation for about 500,000 - 2 million iterations.
+
 
 - The `nearby_ids` buffer is stack-allocated and sized for 9-cell neighbourhood lookups
 - A `ThreadPool` is available for parallelising update loops — not yet wired into the hot path
@@ -164,7 +149,3 @@ I Run this simulation on an Intel core i7 with an NVIDIA RTX 5070 and 16GB of RA
 MIT — see [LICENSE](LICENSE)
 
 ---
-
-## Contributing
-
-Fork the repo and open a feature branch. Keep PRs small and focused.
