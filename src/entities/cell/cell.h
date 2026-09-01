@@ -1,13 +1,16 @@
 #pragma once
 
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/System/Vector2.hpp>
 
-#include "cell_settings.h"
 #include "cell_genome.h"
+#include "cell_settings.h"
 #include "entities/body.h"
+#include <array>
+#include <cstdint>
+#include <string.h>
 
 // Each organism consists of cells which work together via springs
 // Each cell has their own radius and friction coefficient, as well as cosmetic factors such as color
@@ -56,7 +59,6 @@ struct Cell : public CellGenome, CellSettings
 private:
 	bool reproduce_ = false; // signals to the protozoa manager that this cell needs an offspring index set
 	bool dead_ = false;      // signals that the cell is in its decaying state
-	
 
 	float energy = initial_energy;
 	float integrity = max_integrity;
@@ -76,7 +78,7 @@ public:
 	uint16_t repro_timer_ = 0;
 	float nutrients_ = 0.f;
 	uint8_t total_food_eaten_ = 0;
-	
+
 	float sinwave_current_friction_ = 0.f;
 
 	// Statistics information
@@ -114,8 +116,8 @@ public:
 			connected_partner_ids_[new_connections_made++] = other_id;
 	}
 
-	Cell(const uint32_t body_id = 0) 
-	{ 
+	Cell(const uint32_t body_id = 0)
+	{
 		body_id_ = body_id;
 		spring_genome.randomize();
 	}
@@ -136,17 +138,17 @@ public:
 	[[nodiscard]] float get_energy() const { return energy; }
 
 	// ------------ Data setters ------------
-	void kill() 
-	{ 
+	void kill()
+	{
 		if (!immortal_)
-			dead_ = true; 
+			dead_ = true;
 	}
 	void force_reproduce() { reproduce_ = true; }
 	void change_energy(const float amount) { delta_energy += amount; }
 	void change_integrity(const float amount) { delta_integrity += amount; }
 	void set_energy(const float amount) { energy = amount; }
 	void set_integrity(const float amount) { integrity = amount; }
-	
+
 	// ------------ Cell functionality ------------
 	void update_statistics();
 	void update_organics(bool immune, bool friction_energy_loss);

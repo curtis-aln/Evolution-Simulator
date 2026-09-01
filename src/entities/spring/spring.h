@@ -142,7 +142,7 @@ public:
 			break_spring();
 	}
 
-	void update_organics(Cell& cell_a, Cell& cell_b, bool stress_damage, bool work_done_energy)
+	void death_update(Cell& cell_a, Cell& cell_b)
 	{
 		if (Random::rand01_float() < death_chance_)
 		{
@@ -155,6 +155,11 @@ public:
 			broken = true;
 			return;
 		}
+	}
+
+	void update_organics(Cell& cell_a, Cell& cell_b, bool stress_damage, bool work_done_energy)
+	{
+		death_update(cell_a, cell_b);
 
 		if (stress > spring_damage_threshold && stress_damage)
 		{

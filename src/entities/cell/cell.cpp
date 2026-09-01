@@ -1,4 +1,12 @@
 #include "cell.h"
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <entities/body.h>
+#include <random>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <Utils/random.h>
 
 
 
@@ -21,7 +29,7 @@ void Cell::recreate()
 	time_since_last_ate_ = 0;
 	total_food_eaten_ = 0;
 	offspring_count = 0;
-	
+
 	cumulative_collision_damage_ = 0.f;
 	cumulative_spring_damage_ = 0.f;
 
@@ -79,7 +87,7 @@ void Cell::create_offspring(Body* this_body, Cell* child, Body* child_body, cons
 
 	child_body->copy(this_body); // copies the body 
 	float min_r = this_body->radius_ + child_body->radius_ + 1.f; // minimum distance between the two cells
-	child_body->position_ = get_pos_nearby_min_max(this_body->position_,  min_r, min_r * 2.f); // moves the position to somewhere near the parent
+	child_body->position_ = get_pos_nearby_min_max(this_body->position_, min_r, min_r * 2.f); // moves the position to somewhere near the parent
 
 	// Updating this cell's (parent)'s statistics
 	repro_timer_ = 0;
@@ -87,7 +95,7 @@ void Cell::create_offspring(Body* this_body, Cell* child, Body* child_body, cons
 
 	// Updating the child cell's statistics
 	child->generation = generation + 1;
-	
+
 	// a fraction of the energy of the parent is given to the child
 	constexpr float energy_split = 0.25f; // fraction the parent retains; offspring gets the rest
 	const float total_energy = energy;    // snapshot parent's energy before splitting
@@ -124,7 +132,7 @@ void Cell::turn_off_reproduction()
 	return Random::rand_pos_in_rect(sf::FloatRect{
 		{body->position_.x - radius * range, body->position_.y - radius * range},
 		{radius * range * 2 , radius * range * 2}
-	});
+		});
 }
 
 [[nodiscard]] float Cell::calculate_friction() const
@@ -206,9 +214,11 @@ bool Cell::check_death()
 
 void Cell::update_reproduction_flag()
 {
-	// Assignment (not |=) so it clears itself once energy drops back below threshold
-	reproduce_ = check_sufficient_energy() && check_sufficient_integrity()
-		&& check_sufficient_nutrients() && check_repro_cooldown();
+	/* Check if the cell is ready to reproduce */
+	reproduce_ = check_sufficient_energy()
+		&& check_sufficient_integrity()
+		&& check_sufficient_nutrients()
+		&& check_repro_cooldown();
 }
 
 void Cell::process_nutrients()

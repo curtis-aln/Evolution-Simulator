@@ -1,4 +1,5 @@
 # Project A.R.I.A
+A Complex Emergent Evolution Simulator
 
 ![C++](https://img.shields.io/badge/C%2B%2B-23-blue.svg?style=flat&logo=c%2B%2B)
 ![SFML](https://img.shields.io/badge/SFML-3.0-8CC445.svg?style=flat)
@@ -8,13 +9,15 @@
 ![Stars](https://img.shields.io/github/stars/curtis-aln/Evolution-Simulator?style=social)
 ![Last Commit](https://img.shields.io/github/last-commit/curtis-aln/Evolution-Simulator)
 
+A complex, emergent evolution and natural selection simulator built in C++23 and SFML 3. Organisms called *protozoa* are made up of cells connected by springs. Locomotion is achieved by a sin-wave genetic system that mutates across generations. All behaviour between cells is localised, there is no "protozoa" class or container, only individual cells and springs exist.
+
+
 ### Adaptive Realtime Intelligence Architecture
 
 [![Project A.R.I.A Demo](https://img.youtube.com/vi/rUsfT7OLaL8/maxresdefault.jpg)](https://youtu.be/rUsfT7OLaL8)
 
 [![Watch on YouTube](https://img.shields.io/badge/▶-Watch%20Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/rUsfT7OLaL8)
 
-| A realtime 2D evolution and natural selection simulator built in C++23 and SFML 3. Organisms called *protozoa* are made up of cells connected by springs. Locomotion is achieved by a sin-wave genetic system that mutates across generations. All behaviour between cells is localised, there is no "protozoa" class or container, only individual cells and springs exist.
 
 <details>
 <summary>📑 Table of Contents</summary>
@@ -137,11 +140,20 @@ Or open the folder in Visual Studio 2022, let it detect the `CMakeLists.txt`, an
 ## Settings
 aria_settings.toml contains the default simulation settings. You can edit this file to change the initial conditions of the simulation.
 
-## Performance Notes
+## Technical Notes
 
-- Rendering is batched — all cells draw in one call via `CircleBatchRenderer`
-- Collision detection uses a `SimpleSpatialGrid` (50×50) so only nearby cells are checked
-- Food queries use a `SpatialHashGrid` (80×80) supporting up to 80,000 particles
+## Performance Notes
+This simulation is capable of simulating 300,000 - 600,000 of Cells, Springs, Cell Matter, and Food particles at around 90fps.
+Alternatively you can choose to run a smaller simulation with only 10,000 - 30,000 Cells and springs and expect a frame rate of 1400 - 2500fps.
+I Run this simulation on an Intel core i7 with an NVIDIA RTX 5070 and 16GB of RAM.
+
+### Rendering
+- Rendering of all objects is batched and all drawn on the GPU in 2 draw calls. All bodies in the simulation are drawn as an inner and outer circle to provide at least a little bit of visual depth. 
+- Level of Detail (LOD) is used to reduce the load on the CPU when zoomed out. Details are removed in this order: 1. Spring size changes (curves are dropped below 0.08 zoom, springs render as straight lines), 2. Inner circle fill color is dropped below 0.05 zoom, leaving only the outer outline circles visible. Below 0.012 zoom, springs stop rendering entirely.
+
+### Physics & Updating
+- Collision detection and Cell-Food detection use a `SimpleSpatialGrid` so only nearby cells are checked
+
 - The `nearby_ids` buffer is stack-allocated and sized for 9-cell neighbourhood lookups
 - A `ThreadPool` is available for parallelising update loops — not yet wired into the hot path
 
