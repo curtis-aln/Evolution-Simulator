@@ -1,5 +1,16 @@
 #include "debug_tab.h"
+#include <entities/matter/matter_settings.h>
+#include <imgui.h>
 #include <managers/cell_manager/cell_manager_settings.h>
+#include <simulation/context/sim_command.h>
+#include <simulation/context/sim_snapshot.h>
+#include <simulation/context/state.h>
+#include <world/world_settings.h>
+
+#include "../../settings/settings.h" 
+
+#include <cstdint>
+#include <SFML/Graphics/Color.hpp>
 
 void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 {
@@ -16,7 +27,7 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 
 	if (ImGui::Checkbox("show only newborns", &ctx.cell_toggles.show_only_newborns))
 		ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetCellToggles, .cell_toggles = ctx.cell_toggles });
-	
+
 	if (ImGui::Checkbox("show grid", &ctx.cell_toggles.show_newborn_grid))
 		ctx.push({ .section = CommandSection::CellManagerEvent, .type = CommandType::SetCellToggles, .cell_toggles = ctx.cell_toggles });
 
@@ -70,6 +81,67 @@ void DebugTab::draw(const SimSnapshot& snap, ImGuiContext& ctx)
 	int sub_iterations = WorldSettings::tick_sim_multiplier;
 	if (ImGui::SliderInt("##sub_iterations", &sub_iterations, 1, 100, "update sub-iterations %d"))
 		ctx.push({ .section = CommandSection::WorldEvent, .type = CommandType::SetSubIterations, .int_val = sub_iterations });
+
+	// rendering the background grid
+	toggle(snap, ctx, "background grid", &WorldToggles::draw_background_grid);
+
+	ImGui::EndChild();
+	ImGui::SameLine();
+
+	ImGui::BeginChild("Background", { cw, ch }, true);
+
+	ImGui::TextDisabled("Background");
+	ImGui::Separator();
+
+	const auto& presets = SimulationSettings::bg_presets;
+	static int selected_preset = SimulationSettings::bg_preset_index;
+	static float top_col[3] = {
+		SimulationSettings::bg_colors[0].r / 255.f,
+		SimulationSettings::bg_colors[0].g / 255.f,
+		SimulationSettings::bg_colors[0].b / 255.f };
+	static float bot_col[3] = {
+		SimulationSettings::bg_colors[1].r / 255.f,
+		SimulationSettings::bg_colors[1].g / 255.f,
+		SimulationSettings::bg_colors[1].b / 255.f };
+
+	if (ImGui::BeginCombo("##bg_preset", presets[selected_preset].name.c_str()))
+	{
+		for (int i = 0; i < static_cast<int>(presets.size()); ++i)
+		{
+			const bool is_selected = (selected_preset == i);
+			if (ImGui::Selectable(presets[i].name.c_str(), is_selected))
+			{
+				selected_preset = i;
+				if (presets[i].name != "Custom")
+					ctx.push({ .section = CommandSection::SimulationEvent, .type = CommandType::SetBackgroundPreset, .int_val = i });
+			}
+			if (is_selected)
+				ImGui::SetItemDefaultFocus();
+		}
+		ImGui::EndCombo();
+	}
+
+	if (presets[selected_preset].name == "Custom")
+	{
+		ImGui::Spacing();
+		bool changed = false;
+		changed |= ImGui::ColorEdit3("Top", top_col);
+		changed |= ImGui::ColorEdit3("Bottom", bot_col);
+
+		if (changed)
+		{
+			SimCommand cmd{ .section = CommandSection::SimulationEvent, .type = CommandType::SetCustomBackground };
+			cmd.color_val_a = sf::Color(
+				static_cast<uint8_t>(top_col[0] * 255.f),
+				static_cast<uint8_t>(top_col[1] * 255.f),
+				static_cast<uint8_t>(top_col[2] * 255.f));
+			cmd.color_val_b = sf::Color(
+				static_cast<uint8_t>(bot_col[0] * 255.f),
+				static_cast<uint8_t>(bot_col[1] * 255.f),
+				static_cast<uint8_t>(bot_col[2] * 255.f));
+			ctx.push(cmd);
+		}
+	}
 
 	ImGui::EndChild();
 }

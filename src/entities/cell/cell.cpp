@@ -195,20 +195,25 @@ void Cell::flush_deltas()
 
 bool Cell::check_death()
 {
-	if (energy <= 0.f)
+	/* Check if the cell is dead or should die */
+	constexpr float death_energy_threshold = 1000.0f;
+	constexpr float death_energy_rate = 0.02f;
+
+	if (energy <= 0.f) // if the cell has no energy, it dies
 	{
 		energy = 0.f;
 		dead_ = true;
 	}
-	else if (integrity <= 0.f)
+	else if (integrity <= 0.f) // if the cell has no integrity, it dies
 	{
 		integrity = 0.f;
 		dead_ = true;
 	}
-	else if (internal_clock_ > 10000)
+	else if (internal_clock_ > death_energy_threshold) // if the cell has been alive for too long, it dies
 	{
-		energy -= 0.02f;
+		dead_ = true;
 	}
+
 	return dead_;
 }
 
@@ -223,19 +228,21 @@ void Cell::update_reproduction_flag()
 
 void Cell::process_nutrients()
 {
-	if (nutrients_ <= 0.f)
+	/* convert nutrients to energy */
+	if (nutrients_ <= 0.f) // no nutrients to convert
 	{
 		nutrients_ = 0.f;
 		return;
 	}
 
 	const float energy_capacity = max_energy - energy;
-	if (energy_capacity <= 0.f)
+	if (energy_capacity <= 0.f) // no room for energy
 	{
 		energy = max_energy;
 		return;
 	}
 
+	// Convert nutrients to energy, but don't exceed the conversion rate or the energy capacity
 	const float amount = std::min({ nutrients_, nutrients_conversion_rate, energy_capacity });
 	delta_energy += amount;
 	nutrients_ -= amount;
@@ -243,6 +250,7 @@ void Cell::process_nutrients()
 
 void Cell::repair_integrity()
 {
+	/* convert energy to integrity */
 	if (integrity >= max_integrity)
 		return;
 

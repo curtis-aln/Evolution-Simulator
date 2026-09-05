@@ -1,8 +1,16 @@
 #pragma once
-#include "Utils/Graphics/font_renderer.hpp"
-#include <cstdint>
+#include <SFML/Graphics/Color.hpp>
+#include <string>
+#include <vector>
 
 void load_settings(const std::string& path);
+
+
+struct BackgroundPreset
+{
+	std::string name;
+	std::vector<sf::Color> colors; // gradient stops, same layout as bg_colors
+};
 
 
 struct SimulationSettings
@@ -21,8 +29,19 @@ struct SimulationSettings
 
 	inline static constexpr float camera_lerp_factor = 0.04f; // how quickly the camera follows the selected protozoa
 
-	inline static const std::vector<sf::Color> bg_colors = {{0, 5, 40}};
-	inline static const sf::Color window_color = { 0, 0, 0 };
+	// colors
+	inline static std::vector<sf::Color> bg_colors = { {0, 0, 0}, { 0, 5, 40 } };
+	inline static sf::Color window_color = { 0, 0, 0 };
+
+	inline static const std::vector<BackgroundPreset> bg_presets = {
+	{ "Deep Space", { {0, 0, 0},   {0, 5, 40} } },
+	{ "Void Black", { {0, 0, 0},   {0, 0, 0} } },
+	{ "Ocean",      { {0, 10, 20}, {0, 40, 60} } },
+	{ "Twilight",   { {10, 0, 20}, {40, 5, 60} } },
+	{ "Custom",     {} } // populated live from the color pickers
+	};
+
+	inline static int bg_preset_index = 0; // index into bg_presets currently active
 
 	inline static bool full_screen;
 	inline static bool vsync;

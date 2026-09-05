@@ -1,4 +1,12 @@
+#include "context/sim_command.h"
+#include "settings/settings.h"
 #include "simulation.h"
+#include <imgui.h>
+#include <imgui-SFML.h>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Keyboard.hpp>
+#include <SFML/Window/Mouse.hpp>
 
 // ---- Mouse helpers ------------------------------------------------
 
@@ -49,7 +57,7 @@ void Simulation::handle_keyboard_events(const sf::Keyboard::Key& event_key_code)
 	case sf::Keyboard::Key::Space:  handle_pause_toggle();        break;
 	case sf::Keyboard::Key::R:      toggles_.m_rendering_ = !toggles_.m_rendering_; break;
 	case sf::Keyboard::Key::Q:      toggles_.hide_panels = !toggles_.hide_panels; break;
-	case sf::Keyboard::Key::O:      
+	case sf::Keyboard::Key::O:
 		m_world_.world_toggles.m_tick_frame_time = true;
 		m_world_.world_toggles.paused = true;
 		break;
@@ -140,6 +148,16 @@ void Simulation::handle_simulation_event(SimCommand& cmd)
 
 	case CommandType::SetToOrganismTab:
 		m_control_panel_.select_tab("Organisms");
+		break;
+
+	case CommandType::SetBackgroundPreset:
+		SimulationSettings::bg_preset_index = cmd.int_val;
+		SimulationSettings::window_color = SimulationSettings::bg_presets[cmd.int_val].colors[0];
+		break;
+
+	case CommandType::SetCustomBackground:
+		SimulationSettings::bg_preset_index = static_cast<int>(SimulationSettings::bg_presets.size()) - 1; // "Custom" slot
+		SimulationSettings::window_color = cmd.color_val_a;
 		break;
 	}
 }

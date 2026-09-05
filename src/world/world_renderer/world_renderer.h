@@ -2,25 +2,40 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 
+#include "../world_border.h"
 #include "../world_settings.h"
 #include "connection_renderer.h"
-#include "../world_border.h"
 
-#include "../../Utils/Graphics/SFML_Grid.h"
 #include "../../Utils/Graphics/CircleBatchRenderer.h"
-#include "../../Utils/Graphics/font_renderer.hpp"
+#include "../../Utils/Graphics/SFML_Grid.h"
 
 #include "../../Utils/utility_SFML.h"
 
-#include "../collision_resolver/collision_resolver.h"
 
 #include "../../managers/cell_manager/cell_manager_settings.h"
-#include "../../managers/food_manager/food_manager.h"
 
-#include "../../simulation/context/sim_snapshot.h"
 #include "../..//simulation/settings/settings.h"
+#include "../../simulation/context/sim_snapshot.h"
 
 #include "../../Utils/Graphics/pheromone_grid.h"
+#include <algorithm>
+#include <bit>
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
+#include <entities/body.h>
+#include <entities/cell/cell.h>
+#include <managers/cell_manager/organism_tracker.h>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Rect.hpp>
+#include <SFML/Graphics/RenderStates.hpp>
+#include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <Utils/spatial_grid/simple_spatial_grid.h>
+#include <Utils/spatial_grid/spatial_grid_renderer.h>
+#include <vector>
 
 
 inline static constexpr int cells_div_value = 4; // cells_x / cells_div_value is the number of cells in the visual grid
@@ -43,7 +58,7 @@ inline float ease_out(float margin, float v)
 	return sign * eased * margin;
 }
 
-inline void utilise_circle_renderer(CircleBatchRenderer& circle_renderer, 
+inline void utilise_circle_renderer(CircleBatchRenderer& circle_renderer,
 	const std::vector<sf::Color>& colors, const std::vector<sf::Vector2f>& positions, const std::vector<float>& radii)
 {
 	circle_renderer.set_size(colors.size());
@@ -102,15 +117,15 @@ class WorldRenderer : public WorldSettings
 public:
 	// Constructor
 	WorldRenderer(
-		sf::RenderWindow* window, 
+		sf::RenderWindow* window,
 		SimpleSpatialGrid* collision_grid,
 		SimpleSpatialGrid* food_grid,
 		SimpleSpatialGrid* newborn_grid,
 		PheromoneGrid* food_pheromone_grid,
-		sf::FloatRect& bounds_rect, 
+		sf::FloatRect& bounds_rect,
 		WorldBorder& circular_bounds)
-		: 
-		m_window_(window), 
+		:
+		m_window_(window),
 		visual_grid_(*m_window_, bounds_rect, cells_along_axis_, 3, grid_color, grid_line_thickness),
 		collision_grid_renderer_(collision_grid),
 		food_grid_renderer_(food_grid),
@@ -161,7 +176,7 @@ private:
 		if (!snapshot.world_toggles.show_influence_radius)
 			return;
 
-		sf::Vector2f mouse_pos = {snapshot.sim_stats.mouse_pos_x, snapshot.sim_stats.mouse_pos_y};
+		sf::Vector2f mouse_pos = { snapshot.sim_stats.mouse_pos_x, snapshot.sim_stats.mouse_pos_y };
 		float influence_radius = snapshot.world_stats.mouse_radius;
 		float outline_thickness = 2.f + influence_radius / 150.f; // scales with the zoom out of the camera
 		const sf::Color influence_color = { 200, 215, 255, 100 };
@@ -209,6 +224,10 @@ private:
 	{
 		// The visual grid is the faint grid that is drawn in the background of the simulation. 
 		// It is used to help visualize the scale of the simulation and to help with debugging.
+
+		if (!snapshot.world_toggles.draw_background_grid)
+			return;
+
 		float zoom = snapshot.sim_stats.camera_zoom;
 		float alpha_value = 1.f;
 		if (zoom < start_fading_zoom)
@@ -240,9 +259,9 @@ private:
 
 		// This determines if the colors of the protozoa should be simplified based on the zoom level
 		if (bool simplify_colors = zoom < 0.05f; !simplify_colors)
-			utilise_circle_renderer(inner_circle_renderer_, simplify_colors ? colors_ : snapshot.render.inner_colors, 
+			utilise_circle_renderer(inner_circle_renderer_, simplify_colors ? colors_ : snapshot.render.inner_colors,
 				snapshot.render.positions, snapshot.render.radii);
-		
+
 		// This is the outer circle renderer, which is used to render the outline of the protozoa. The outline is scaled based on the velocity of the protozoa, so that faster moving protozoa have a larger outline.
 		outer_radii_.resize(container_size);
 		outer_positions_.resize(container_size);
@@ -304,7 +323,7 @@ private:
 		circle_outline.setFillColor({ 0, 0, 0, 0 });
 		circle_outline.setOutlineColor({ 255, 255, 255, 100 });
 		circle_outline.setOutlineThickness(10.f);
-		
+
 		int i = 0;
 		for (const Cell& cell : protozoa.cells)
 		{
